@@ -247,7 +247,7 @@ func measureJSONDecode(t *testing.T, data []byte, newMsg func() proto.Message) u
 	return best
 }
 
-func TestProtoEstimateJSONCalibration(t *testing.T) {
+func TestProtoEstimateProtoJSONCalibration(t *testing.T) {
 	emptySpans := `{"resourceSpans":[{"scopeSpans":[{"spans":[` + strings.TrimSuffix(strings.Repeat("{},", 1<<18), ",") + `]}]}]}`
 	emptyValues := `{"resourceLogs":[{"scopeLogs":[{"logRecords":[{"body":{"arrayValue":{"values":[` + strings.TrimSuffix(strings.Repeat("{},", 1<<18), ",") + `]}}}]}]}]}`
 	cases := []struct {
@@ -268,7 +268,7 @@ func TestProtoEstimateJSONCalibration(t *testing.T) {
 	budget := Proto{MaxFields: 1 << 30, MaxDepth: 100}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			est, err := budget.EstimateJSON(tc.data, tc.newMsg().ProtoReflect().Descriptor())
+			est, err := budget.EstimateProtoJSON(tc.data, tc.newMsg().ProtoReflect().Descriptor())
 			require.NoError(t, err)
 			got := measureJSONDecode(t, tc.data, tc.newMsg)
 			t.Logf("json=%d measured=%d estimate=%d ratio=%.2f", len(tc.data), got, est, float64(est)/float64(got))

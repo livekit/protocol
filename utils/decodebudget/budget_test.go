@@ -28,7 +28,7 @@ func TestProtoDecodedBytes(t *testing.T) {
 
 	jsonData, err := protojson.Marshal(input)
 	require.NoError(t, err)
-	jsonEstimate, err := unlimited.EstimateJSON(jsonData, desc)
+	jsonEstimate, err := unlimited.EstimateProtoJSON(jsonData, desc)
 	require.NoError(t, err)
-	require.ErrorIs(t, (Proto{MaxFields: 100, MaxDepth: 4, MaxDecodedBytes: jsonEstimate - 1}).ValidateJSON(jsonData, desc), ErrMessageComplexity)
+	require.ErrorIs(t, (Proto{MaxFields: 100, MaxDepth: 4, MaxDecodedBytes: jsonEstimate - 1}).ValidateProtoJSON(jsonData, desc), ErrMessageComplexity)
 }

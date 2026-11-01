@@ -33,17 +33,17 @@ const (
 	jsonObjectCost      = 8
 )
 
-// ValidateJSON checks protojson input against the budget in protobuf terms: an
+// ValidateProtoJSON checks protojson input against the budget in protobuf terms: an
 // object key or array element is a field, and nesting is message depth.
-func (b Proto) ValidateJSON(data []byte, desc protoreflect.MessageDescriptor) error {
-	_, err := b.EstimateJSON(data, desc)
+func (b Proto) ValidateProtoJSON(data []byte, desc protoreflect.MessageDescriptor) error {
+	_, err := b.EstimateProtoJSON(data, desc)
 	return err
 }
 
-// EstimateJSON validates protojson input like ValidateJSON and returns the
+// EstimateProtoJSON validates protojson input like ValidateProtoJSON and returns the
 // estimated bytes protojson allocates decoding it. Malformed or mistyped input
 // is left for the decoder to reject.
-func (b Proto) EstimateJSON(data []byte, desc protoreflect.MessageDescriptor) (int, error) {
+func (b Proto) EstimateProtoJSON(data []byte, desc protoreflect.MessageDescriptor) (int, error) {
 	t, err := b.newTally(desc)
 	if err != nil {
 		return 0, err
