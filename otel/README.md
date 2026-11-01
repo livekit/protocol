@@ -182,7 +182,7 @@ add to it:
 - Values beyond upstream. A ref to an upstream key can list `annotations.livekit.shipped_values`:
   values a producer sends that the upstream definition does not list, for example
   `gen_ai.provider.name = mistral_ai`. Each value gets a constant next to the upstream values
-  (`GEN_AI_PROVIDER_NAME_MISTRAL_AI`). Two rules keep those constants unique.
+  (`GenAiProviderName.MISTRAL_AI` in Python). Two rules keep those constants unique.
   A shipped `id` must be lowercase snake_case (`^[a-z][a-z0-9_]*$`), so its uppercase form is
   exactly the constant name, and it must differ from every upstream member id read the same way
   (`aws.bedrock` as `aws_bedrock`).
