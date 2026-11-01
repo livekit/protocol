@@ -12,98 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package decodebudget bounds protobuf and protojson input before decoding,
-// by field count, nesting depth and estimated decoded allocation. It depends
-// only on the protobuf runtime so callers need not import utils.
 package decodebudget
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
-	"io"
-	"reflect"
 
 	"google.golang.org/protobuf/encoding/protowire"
-	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/reflect/protoregistry"
 )
 
-// ErrMessageComplexity indicates that a message exceeds its structural budget.
-var ErrMessageComplexity = errors.New("message exceeds structural complexity limit")
-
-// Proto limits allocation-driving protobuf structure before decoding.
-// Callers must separately limit the serialized byte size. MaxFields and
-// MaxDepth must be positive; the zero value does not disable validation.
-type Proto struct {
-	// MaxFields counts every wire-field occurrence and each packed scalar value,
-	// including occurrences of singular and unknown fields.
-	MaxFields int
-	// MaxDepth counts nested messages, including the root message at depth one.
-	MaxDepth int
-	// MaxDecodedBytes bounds the estimated bytes the decoder allocates: the Go
-	// struct of each message, copied strings and bytes, oneof wrappers, and
-	// slice and map growth. Zero leaves it unchecked.
-	MaxDecodedBytes int
-}
-
-// Validate checks data against the message descriptor without constructing the
-// decoded message. Known extensions use protoregistry.GlobalTypes, matching the
-// default protobuf decoder. Legacy protobuf groups are deliberately unsupported.
-func (b Proto) Validate(data []byte, desc protoreflect.MessageDescriptor) error {
-	_, err := b.Estimate(data, desc)
-	return err
-}
-
-// Estimate validates data like Validate and returns the estimated bytes the
-// binary decoder allocates for it, including the root message.
-func (b Proto) Estimate(data []byte, desc protoreflect.MessageDescriptor) (int, error) {
-	w, err := b.newWalk(desc)
-	if err != nil {
-		return 0, err
-	}
-	if err := w.alloc(protoStructSize(desc)); err != nil {
-		return w.total(), err
-	}
-	err = w.message(data, desc, 1)
-	return w.total(), err
-}
-
-func (b Proto) newWalk(desc protoreflect.MessageDescriptor) (*protoWalk, error) {
-	if b.MaxFields <= 0 || b.MaxDepth <= 0 || b.MaxDecodedBytes < 0 {
-		return nil, errors.New("protobuf budget limits must be positive")
-	}
-	if desc == nil {
-		return nil, errors.New("protobuf descriptor must not be nil")
-	}
-	return &protoWalk{budget: b}, nil
-}
-
-type protoWalk struct {
-	budget Proto
-	fields int
-	bytes  int
-}
-
-func (w *protoWalk) count() error {
-	w.fields++
-	if w.fields > w.budget.MaxFields {
-		return ErrMessageComplexity
-	}
-	return nil
-}
-
-func (w *protoWalk) total() int {
-	return withMargin(w.bytes)
-}
-
-func (w *protoWalk) alloc(n int) error {
-	w.bytes += n
-	if w.budget.MaxDecodedBytes > 0 && w.total() > w.budget.MaxDecodedBytes {
-		return ErrMessageComplexity
-	}
-	return nil
+// wireWalk walks the protobuf binary encoding.
+type wireWalk struct {
+	*tally
 }
 
 // messageState mirrors the decoder state of one message whose cost depends on
@@ -131,7 +52,7 @@ func (m *messageState) get(field protoreflect.FieldDescriptor) *fieldState {
 	return &m.fields[len(m.fields)-1]
 }
 
-func (w *protoWalk) message(data []byte, desc protoreflect.MessageDescriptor, depth int) error {
+func (w *wireWalk) message(data []byte, desc protoreflect.MessageDescriptor, depth int) error {
 	if depth > w.budget.MaxDepth {
 		return ErrMessageComplexity
 	}
@@ -183,7 +104,7 @@ func (w *protoWalk) message(data []byte, desc protoreflect.MessageDescriptor, de
 			if err = w.alloc(state.occurrence(field, 0)); err == nil {
 				err = w.message(value, field.Message(), depth+1)
 			}
-		case kind == protowire.BytesType && isPackableProtoField(field):
+		case kind == protowire.BytesType && isPackable(field):
 			err = w.packed(value, field, &state)
 		default:
 			err = w.alloc(state.occurrence(field, len(value)))
@@ -227,7 +148,7 @@ func (m *messageState) unknown(n int) int {
 // packed walks a packed scalar run; decoders accept one even when the schema
 // prefers unpacked. Each run reallocates the field's slice at exactly its new
 // length, so many small runs cost quadratically.
-func (w *protoWalk) packed(value []byte, field protoreflect.FieldDescriptor, state *messageState) error {
+func (w *wireWalk) packed(value []byte, field protoreflect.FieldDescriptor, state *messageState) error {
 	count := 0
 	for len(value) > 0 {
 		var consumed int
@@ -258,7 +179,7 @@ func (w *protoWalk) packed(value []byte, field protoreflect.FieldDescriptor, sta
 }
 
 func wireTypeMatches(field protoreflect.FieldDescriptor, kind protowire.Type) bool {
-	if kind == protowire.BytesType && isPackableProtoField(field) {
+	if kind == protowire.BytesType && isPackable(field) {
 		return true
 	}
 	switch field.Kind() {
@@ -275,7 +196,7 @@ func wireTypeMatches(field protoreflect.FieldDescriptor, kind protowire.Type) bo
 	}
 }
 
-func isPackableProtoField(field protoreflect.FieldDescriptor) bool {
+func isPackable(field protoreflect.FieldDescriptor) bool {
 	if field == nil || !field.IsList() {
 		return false
 	}
@@ -288,78 +209,5 @@ func isPackableProtoField(field protoreflect.FieldDescriptor) bool {
 		return true
 	default:
 		return false
-	}
-}
-
-// Unmarshal validates the budget before decoding into a non-nil mutable message.
-// It discards unknown fields, uses MaxDepth as the decoder recursion limit, and
-// retains the binary decoder's required-field checks. Preflight rejection leaves
-// the destination unchanged; other decode errors follow normal protobuf semantics.
-func (b Proto) Unmarshal(data []byte, msg proto.Message) error {
-	if msg == nil || (reflect.ValueOf(msg).Kind() == reflect.Pointer && reflect.ValueOf(msg).IsNil()) {
-		return errors.New("protobuf message must be non-nil and mutable")
-	}
-	reflected := msg.ProtoReflect()
-	if !reflected.IsValid() {
-		return errors.New("protobuf message must be non-nil and mutable")
-	}
-	if err := b.Validate(data, reflected.Descriptor()); err != nil {
-		return err
-	}
-	return (proto.UnmarshalOptions{DiscardUnknown: true, RecursionLimit: b.MaxDepth}).Unmarshal(data, msg)
-}
-
-// JSON limits JSON structure before a downstream decoder constructs
-// collections. Callers must separately limit the serialized byte size. Both
-// limits must be positive; the zero value does not disable validation.
-type JSON struct {
-	// MaxTokens includes scalar values, object keys, and opening/closing delimiters.
-	MaxTokens int
-	// MaxDepth counts nested arrays/objects, including a root container at depth one.
-	MaxDepth int
-}
-
-// Validate accepts exactly one complete JSON value, including scalar roots.
-func (b JSON) Validate(data []byte) error {
-	if b.MaxTokens <= 0 || b.MaxDepth <= 0 {
-		return errors.New("JSON budget limits must be positive")
-	}
-	dec := json.NewDecoder(bytes.NewReader(data))
-	dec.UseNumber()
-	depth, tokens := 0, 0
-	seen, complete := false, false
-	for {
-		token, err := dec.Token()
-		if err == io.EOF {
-			if !seen || depth != 0 {
-				return io.ErrUnexpectedEOF
-			}
-			return nil
-		}
-		if err != nil {
-			return err
-		}
-		if complete {
-			return errors.New("unexpected value after JSON document")
-		}
-		tokens++
-		if tokens > b.MaxTokens {
-			return ErrMessageComplexity
-		}
-		seen = true
-		if d, ok := token.(json.Delim); ok {
-			switch d {
-			case '{', '[':
-				depth++
-			case '}', ']':
-				depth--
-			}
-			if depth > b.MaxDepth {
-				return ErrMessageComplexity
-			}
-		}
-		if depth == 0 {
-			complete = true
-		}
 	}
 }

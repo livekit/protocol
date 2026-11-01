@@ -2,7 +2,6 @@ package decodebudget
 
 import (
 	"bytes"
-	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -18,7 +17,6 @@ import (
 	"google.golang.org/protobuf/types/dynamicpb"
 
 	"github.com/livekit/protocol/livekit"
-	"github.com/livekit/protocol/utils/protojson"
 )
 
 func TestProtoFields(t *testing.T) {
@@ -175,26 +173,6 @@ func TestProtoInvalidInput(t *testing.T) {
 	require.Error(t, budget.Unmarshal(nil, &descriptorpb.UninterpretedOption_NamePart{}))
 }
 
-func TestJSON(t *testing.T) {
-	budget := JSON{MaxTokens: 20, MaxDepth: 3}
-	for _, data := range []string{`null`, `true`, `false`, `1e100000`, `"value"`, `{}`, `[]`, `{"name":"camera","layers":[{}]}`} {
-		t.Run(data, func(t *testing.T) { require.NoError(t, budget.Validate([]byte(data))) })
-	}
-	for _, data := range []string{"", " \n\t", `{} {}`, `true false`, `null 0`, `{"a":`, `[1,]`, `]`} {
-		t.Run("invalid "+data, func(t *testing.T) { require.Error(t, budget.Validate([]byte(data))) })
-	}
-	require.NoError(t, (JSON{MaxTokens: 3, MaxDepth: 1}).Validate([]byte(`[0]`)))
-	require.ErrorIs(t, (JSON{MaxTokens: 2, MaxDepth: 1}).Validate([]byte(`[0]`)), ErrMessageComplexity)
-	require.NoError(t, (JSON{MaxTokens: 4, MaxDepth: 1}).Validate([]byte(`{"a":0}`)))
-	require.ErrorIs(t, (JSON{MaxTokens: 3, MaxDepth: 1}).Validate([]byte(`{"a":0}`)), ErrMessageComplexity)
-	require.NoError(t, budget.Validate([]byte(`[[[]]]`)))
-	require.ErrorIs(t, budget.Validate([]byte(`[[[[]]]]`)), ErrMessageComplexity)
-	require.ErrorIs(t, budget.Validate([]byte("["+strings.Repeat("{},", 20)+"{}]")), ErrMessageComplexity)
-	for _, invalid := range []JSON{{}, {MaxTokens: 1}, {MaxDepth: 1}, {MaxTokens: -1, MaxDepth: 1}} {
-		require.Error(t, invalid.Validate([]byte(`null`)))
-	}
-}
-
 var protoTestDescriptors = sync.OnceValues(func() (protoreflect.FileDescriptor, error) {
 	optional := descriptorpb.FieldDescriptorProto_LABEL_OPTIONAL
 	repeated := descriptorpb.FieldDescriptorProto_LABEL_REPEATED
@@ -254,45 +232,6 @@ func protoTestFile(t *testing.T) protoreflect.FileDescriptor {
 	file, err := protoTestDescriptors()
 	require.NoError(t, err)
 	return file
-}
-
-func TestProtoDecodedBytes(t *testing.T) {
-	input := &livekit.ParticipantInfo{Identity: strings.Repeat("x", 1000), Attributes: map[string]string{"a": "one"}}
-	data, err := proto.Marshal(input)
-	require.NoError(t, err)
-	desc := input.ProtoReflect().Descriptor()
-
-	unlimited := Proto{MaxFields: 100, MaxDepth: 4}
-	estimate, err := unlimited.Estimate(data, desc)
-	require.NoError(t, err)
-	require.Greater(t, estimate, 1000)
-
-	require.NoError(t, (Proto{MaxFields: 100, MaxDepth: 4, MaxDecodedBytes: estimate}).Validate(data, desc))
-	require.ErrorIs(t, (Proto{MaxFields: 100, MaxDepth: 4, MaxDecodedBytes: estimate - 1}).Validate(data, desc), ErrMessageComplexity)
-	require.Error(t, (Proto{MaxFields: 100, MaxDepth: 4, MaxDecodedBytes: -1}).Validate(data, desc))
-
-	jsonData, err := protojson.Marshal(input)
-	require.NoError(t, err)
-	jsonEstimate, err := unlimited.EstimateJSON(jsonData, desc)
-	require.NoError(t, err)
-	require.ErrorIs(t, (Proto{MaxFields: 100, MaxDepth: 4, MaxDecodedBytes: jsonEstimate - 1}).ValidateJSON(jsonData, desc), ErrMessageComplexity)
-}
-
-func TestProtoJSONStructure(t *testing.T) {
-	desc := (&livekit.ParticipantInfo{}).ProtoReflect().Descriptor()
-	budget := Proto{MaxFields: 4, MaxDepth: 2}
-	require.NoError(t, budget.ValidateJSON([]byte(`{"identity":"a","tracks":[{"sid":"TR"}]}`), desc))
-	require.ErrorIs(t, budget.ValidateJSON([]byte(`{"tracks":[{"sid":"a"},{"sid":"b"},{"sid":"c"}]}`), desc), ErrMessageComplexity)
-	require.ErrorIs(t, budget.ValidateJSON([]byte(`{"tracks":[{"layers":[{}]}]}`), desc), ErrMessageComplexity)
-	require.ErrorIs(t, (Proto{MaxFields: 4, MaxDepth: 2}).ValidateJSON([]byte(`{"unknown":[[[[1]]]]}`), desc), ErrMessageComplexity)
-	require.Error(t, budget.ValidateJSON([]byte(`{} {}`), desc))
-	require.Error(t, budget.ValidateJSON([]byte(`{"identity":`), desc))
-}
-
-func TestAppendAllocBytes(t *testing.T) {
-	require.Equal(t, 0, appendAllocBytes(0, 8))
-	// 8, 16, 32 and 64 byte arrays for caps 1, 2, 4 and 8.
-	require.Equal(t, 8+16+32+64, appendAllocBytes(5, 8))
 }
 
 func TestProtoRejectsQuadraticPackedRuns(t *testing.T) {
