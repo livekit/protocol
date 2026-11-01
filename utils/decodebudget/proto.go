@@ -106,40 +106,36 @@ func (w *protoWalk) alloc(n int) error {
 	return nil
 }
 
-// repeatedCounts tallies unpacked occurrences of each repeated field in one
-// message, so slice growth is charged once for the final length.
-type repeatedCounts []struct {
+// messageState mirrors the decoder state of one message whose cost depends on
+// earlier occurrences: each repeated field's slice, whether a presence field's
+// pointer exists, and the unknown-fields slice.
+type messageState struct {
+	fields     []fieldState
+	unknownLen int
+	unknownCap int
+}
+
+type fieldState struct {
 	field protoreflect.FieldDescriptor
-	n     int
+	len   int
+	cap   int
 }
 
-func (r *repeatedCounts) add(field protoreflect.FieldDescriptor) {
-	for i := range *r {
-		if (*r)[i].field == field {
-			(*r)[i].n++
-			return
+func (m *messageState) get(field protoreflect.FieldDescriptor) *fieldState {
+	for i := range m.fields {
+		if m.fields[i].field == field {
+			return &m.fields[i]
 		}
 	}
-	*r = append(*r, struct {
-		field protoreflect.FieldDescriptor
-		n     int
-	}{field, 1})
-}
-
-func (w *protoWalk) growth(r repeatedCounts) error {
-	for _, c := range r {
-		if err := w.alloc(appendAllocBytes(c.n, goValueSize(c.field))); err != nil {
-			return err
-		}
-	}
-	return nil
+	m.fields = append(m.fields, fieldState{field: field})
+	return &m.fields[len(m.fields)-1]
 }
 
 func (w *protoWalk) message(data []byte, desc protoreflect.MessageDescriptor, depth int) error {
 	if depth > w.budget.MaxDepth {
 		return ErrMessageComplexity
 	}
-	var repeated repeatedCounts
+	var state messageState
 	for len(data) > 0 {
 		if err := w.count(); err != nil {
 			return err
@@ -161,61 +157,77 @@ func (w *protoWalk) message(data []byte, desc protoreflect.MessageDescriptor, de
 				return err
 			}
 		}
-		if kind != protowire.BytesType {
-			size := protowire.ConsumeFieldValue(number, kind, data)
-			if size < 0 {
-				return protowire.ParseError(size)
-			}
-			data = data[size:]
-			cost := unknownFieldCost(n + size)
-			if field != nil {
-				cost = fieldAllocCost(field, 0)
-				if field.IsList() {
-					repeated.add(field)
-				}
-			}
-			if err := w.alloc(cost); err != nil {
-				return err
-			}
-			continue
-		}
 
-		value, size := protowire.ConsumeBytes(data)
+		var value []byte
+		var size int
+		if kind == protowire.BytesType {
+			value, size = protowire.ConsumeBytes(data)
+		} else {
+			size = protowire.ConsumeFieldValue(number, kind, data)
+		}
 		if size < 0 {
 			return protowire.ParseError(size)
 		}
 		data = data[size:]
-		switch {
-		case field == nil:
-			if err := w.alloc(unknownFieldCost(n + size)); err != nil {
+
+		// The decoder keeps a field with an unexpected wire type as unknown.
+		if field == nil || !wireTypeMatches(field, kind) {
+			if err := w.alloc(state.unknown(n + size)); err != nil {
 				return err
 			}
-		case field.Message() != nil:
-			if err := w.alloc(fieldAllocCost(field, 0)); err != nil {
-				return err
-			}
-			if err := w.message(value, field.Message(), depth+1); err != nil {
-				return err
-			}
-		case isPackableProtoField(field):
-			if err := w.packed(value, field); err != nil {
-				return err
-			}
-		default:
-			if err := w.alloc(fieldAllocCost(field, len(value))); err != nil {
-				return err
-			}
+			continue
 		}
-		if field != nil && field.IsList() && (!isPackableProtoField(field) || kind != protowire.BytesType) {
-			repeated.add(field)
+		var err error
+		switch {
+		case kind == protowire.BytesType && field.Message() != nil:
+			if err = w.alloc(state.occurrence(field, 0)); err == nil {
+				err = w.message(value, field.Message(), depth+1)
+			}
+		case kind == protowire.BytesType && isPackableProtoField(field):
+			err = w.packed(value, field, &state)
+		default:
+			err = w.alloc(state.occurrence(field, len(value)))
+		}
+		if err != nil {
+			return err
 		}
 	}
-	return w.growth(repeated)
+	return nil
+}
+
+// occurrence is the allocation for one occurrence of field with a string or
+// bytes payload of payloadLen. Nested message contents are charged separately.
+func (m *messageState) occurrence(field protoreflect.FieldDescriptor, payloadLen int) int {
+	cost := fieldAllocCost(field, payloadLen)
+	switch {
+	case field.IsList():
+		fs := m.get(field)
+		var mem int
+		mem, fs.cap = appendGrow(fs.len, fs.cap, 1, goValueSize(field))
+		fs.len++
+		cost += mem
+	case presenceCost(field) > 0:
+		if fs := m.get(field); fs.len == 0 {
+			fs.len = 1
+			cost += presenceCost(field)
+		}
+	}
+	return cost
+}
+
+// unknown is the allocation for retaining an n-byte field in the message's
+// unknown-fields slice.
+func (m *messageState) unknown(n int) int {
+	mem, newCap := appendGrow(m.unknownLen, m.unknownCap, n, 1)
+	m.unknownLen += n
+	m.unknownCap = newCap
+	return mem
 }
 
 // packed walks a packed scalar run; decoders accept one even when the schema
-// prefers unpacked.
-func (w *protoWalk) packed(value []byte, field protoreflect.FieldDescriptor) error {
+// prefers unpacked. Each run reallocates the field's slice at exactly its new
+// length, so many small runs cost quadratically.
+func (w *protoWalk) packed(value []byte, field protoreflect.FieldDescriptor, state *messageState) error {
 	count := 0
 	for len(value) > 0 {
 		var consumed int
@@ -236,7 +248,31 @@ func (w *protoWalk) packed(value []byte, field protoreflect.FieldDescriptor) err
 		count++
 		value = value[consumed:]
 	}
-	return w.alloc(packedCost(field, count))
+	if count == 0 {
+		return nil
+	}
+	fs := state.get(field)
+	fs.len += count
+	fs.cap = fs.len
+	return w.alloc(allocSize(fs.len * goValueSize(field)))
+}
+
+func wireTypeMatches(field protoreflect.FieldDescriptor, kind protowire.Type) bool {
+	if kind == protowire.BytesType && isPackableProtoField(field) {
+		return true
+	}
+	switch field.Kind() {
+	case protoreflect.MessageKind, protoreflect.StringKind, protoreflect.BytesKind:
+		return kind == protowire.BytesType
+	case protoreflect.GroupKind:
+		return kind == protowire.StartGroupType
+	case protoreflect.FloatKind, protoreflect.Fixed32Kind, protoreflect.Sfixed32Kind:
+		return kind == protowire.Fixed32Type
+	case protoreflect.DoubleKind, protoreflect.Fixed64Kind, protoreflect.Sfixed64Kind:
+		return kind == protowire.Fixed64Type
+	default:
+		return kind == protowire.VarintType
+	}
 }
 
 func isPackableProtoField(field protoreflect.FieldDescriptor) bool {

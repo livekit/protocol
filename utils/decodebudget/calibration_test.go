@@ -94,6 +94,29 @@ func calibHistograms(n int) *metricsv1.MetricsData {
 	return &metricsv1.MetricsData{ResourceMetrics: []*metricsv1.ResourceMetrics{{ScopeMetrics: []*metricsv1.ScopeMetrics{sm}}}}
 }
 
+func calibEnumBytesLogs(n int) *logsv1.LogsData {
+	sl := &logsv1.ScopeLogs{}
+	for i := range n {
+		sl.LogRecords = append(sl.LogRecords, &logsv1.LogRecord{
+			TimeUnixNano: uint64(1763059861000000000 + i), SeverityNumber: logsv1.SeverityNumber_SEVERITY_NUMBER_INFO,
+			TraceId: []byte("0123456789abcdef"), SpanId: []byte("01234567"),
+			Body: &commonv1.AnyValue{Value: &commonv1.AnyValue_BytesValue{BytesValue: []byte("some bytes value")}},
+		})
+	}
+	return &logsv1.LogsData{ResourceLogs: []*logsv1.ResourceLogs{{ScopeLogs: []*logsv1.ScopeLogs{sl}}}}
+}
+
+func calibOptionalPoints(n int) *metricsv1.MetricsData {
+	h := &metricsv1.Histogram{}
+	for i := range n {
+		v := float64(i)
+		h.DataPoints = append(h.DataPoints, &metricsv1.HistogramDataPoint{Sum: &v, Min: &v, Max: &v})
+	}
+	return &metricsv1.MetricsData{ResourceMetrics: []*metricsv1.ResourceMetrics{{ScopeMetrics: []*metricsv1.ScopeMetrics{{
+		Metrics: []*metricsv1.Metric{{Name: "h", Data: &metricsv1.Metric_Histogram{Histogram: h}}},
+	}}}}}
+}
+
 func calibParticipants() *livekit.ListParticipantsResponse {
 	participants := &livekit.ListParticipantsResponse{}
 	for i := range 200 {
@@ -110,6 +133,49 @@ func calibParticipants() *livekit.ListParticipantsResponse {
 func emptyChildren(field protowire.Number, n int) []byte {
 	one := protowire.AppendBytes(protowire.AppendTag(nil, field, protowire.BytesType), nil)
 	return []byte(strings.Repeat(string(one), n))
+}
+
+func field(num protowire.Number, payload []byte) []byte {
+	return protowire.AppendBytes(protowire.AppendTag(nil, num, protowire.BytesType), payload)
+}
+
+// inLogRecord wraps raw LogRecord fields as LogsData.
+func inLogRecord(rec []byte) []byte {
+	return field(1, field(2, field(2, rec)))
+}
+
+// inHistogram wraps raw HistogramDataPoint messages as MetricsData.
+func inHistogram(points []byte) []byte {
+	return field(1, field(2, field(2, field(9, points))))
+}
+
+func packedRuns(k int) []byte {
+	one := field(6, protowire.AppendFixed64(nil, 1)) // bucket_counts
+	return inHistogram(field(1, []byte(strings.Repeat(string(one), k))))
+}
+
+func optionalPoints(n int) []byte {
+	var p []byte
+	for _, num := range []protowire.Number{5, 11, 12} { // sum, min, max
+		p = protowire.AppendFixed64(protowire.AppendTag(p, num, protowire.Fixed64Type), 1)
+	}
+	return inHistogram([]byte(strings.Repeat(string(field(1, p)), n)))
+}
+
+func mismatchedLength(n int) []byte {
+	// time_unix_nano is fixed64 on the wire.
+	return inLogRecord(field(1, make([]byte, n)))
+}
+
+func mismatchedVarints(n int) []byte {
+	// severity_text is a string.
+	one := protowire.AppendVarint(protowire.AppendTag(nil, 3, protowire.VarintType), 1)
+	return inLogRecord([]byte(strings.Repeat(string(one), n)))
+}
+
+func unknownVarints(n int) []byte {
+	one := protowire.AppendVarint(protowire.AppendTag(nil, 1000, protowire.VarintType), 1)
+	return inLogRecord([]byte(strings.Repeat(string(one), n)))
 }
 
 func TestProtoEstimateCalibration(t *testing.T) {
@@ -138,6 +204,11 @@ func TestProtoEstimateCalibration(t *testing.T) {
 		{"empty spans 1M", emptySpans(1 << 20), func() proto.Message { return &tracev1.TracesData{} }},
 		{"empty attributes 1M", emptyAttrs(1 << 20), func() proto.Message { return &logsv1.LogsData{} }},
 		{"participants maps", must(proto.Marshal(participants)), func() proto.Message { return &livekit.ListParticipantsResponse{} }},
+		{"packed runs 3000", packedRuns(3000), func() proto.Message { return &metricsv1.MetricsData{} }},
+		{"optional scalars 64k", optionalPoints(1 << 16), func() proto.Message { return &metricsv1.MetricsData{} }},
+		{"wire type mismatch length", mismatchedLength(1 << 20), func() proto.Message { return &logsv1.LogsData{} }},
+		{"wire type mismatch varints", mismatchedVarints(1 << 18), func() proto.Message { return &logsv1.LogsData{} }},
+		{"unknown varints", unknownVarints(1 << 18), func() proto.Message { return &logsv1.LogsData{} }},
 	}
 	budget := Proto{MaxFields: 1 << 30, MaxDepth: 100}
 	for _, tc := range cases {
@@ -190,6 +261,9 @@ func TestProtoEstimateJSONCalibration(t *testing.T) {
 		{"empty spans", []byte(emptySpans), func() proto.Message { return &tracev1.TracesData{} }},
 		{"empty values", []byte(emptyValues), func() proto.Message { return &logsv1.LogsData{} }},
 		{"participants maps", must(protojson.Marshal(calibParticipants())), func() proto.Message { return &livekit.ListParticipantsResponse{} }},
+		{"enums bytes int64 strings", must(protojson.Marshal(calibEnumBytesLogs(20000))), func() proto.Message { return &logsv1.LogsData{} }},
+		{"proto field names", must(protojson.MarshalOptions{UseProtoNames: true}.Marshal(calibLogs(512))), func() proto.Message { return &logsv1.LogsData{} }},
+		{"optional scalars", must(protojson.Marshal(calibOptionalPoints(16384))), func() proto.Message { return &metricsv1.MetricsData{} }},
 	}
 	budget := Proto{MaxFields: 1 << 30, MaxDepth: 100}
 	for _, tc := range cases {

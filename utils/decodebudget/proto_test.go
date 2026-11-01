@@ -5,8 +5,10 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
+	metricsv1 "go.opentelemetry.io/proto/otlp/metrics/v1"
 	"google.golang.org/protobuf/encoding/protowire"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protodesc"
@@ -291,4 +293,17 @@ func TestAppendAllocBytes(t *testing.T) {
 	require.Equal(t, 0, appendAllocBytes(0, 8))
 	// 8, 16, 32 and 64 byte arrays for caps 1, 2, 4 and 8.
 	require.Equal(t, 8+16+32+64, appendAllocBytes(5, 8))
+}
+
+func TestProtoRejectsQuadraticPackedRuns(t *testing.T) {
+	// Each packed run reallocates the slice at its new length, so 100k
+	// one-element runs in 1.2 MB of wire allocate ~40 GB and decode for seconds.
+	one := protowire.AppendBytes(protowire.AppendTag(nil, 6, protowire.BytesType), protowire.AppendFixed64(nil, 1))
+	point := protowire.AppendBytes(protowire.AppendTag(nil, 1, protowire.BytesType), bytes.Repeat(one, 100_000))
+	desc := (&metricsv1.Histogram{}).ProtoReflect().Descriptor()
+
+	start := time.Now()
+	err := Proto{MaxFields: 1 << 24, MaxDepth: 8, MaxDecodedBytes: 512 << 20}.Validate(point, desc)
+	require.ErrorIs(t, err, ErrMessageComplexity)
+	require.Less(t, time.Since(start), time.Second)
 }

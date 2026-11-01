@@ -23,12 +23,14 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
-// protojson allocates per token on top of the decoded message, and its
-// reflection-based list and map setters box each scalar element and map entry.
+// protojson allocates per token and per object on top of the decoded message
+// and the string copies charged separately, and its reflection-based list and
+// map setters box each scalar element and map entry.
 const (
-	jsonTokenCost       = 12
+	jsonTokenCost       = 8
 	jsonListScalarCost  = 24
 	jsonMapEntryBoxCost = 32
+	jsonObjectCost      = 8
 )
 
 // ValidateJSON checks protojson input against the budget in protobuf terms: an
@@ -58,7 +60,8 @@ func (b Proto) EstimateJSON(data []byte, desc protoreflect.MessageDescriptor) (i
 		return w.total(), err
 	}
 	if tok != json.Delim('{') {
-		return w.total(), w.skip(tok, 1)
+		err := w.skip(tok, 1)
+		return w.total(), err
 	}
 	if err := w.object(desc, 1); err != nil {
 		return w.total(), err
@@ -82,7 +85,12 @@ func (w *jsonWalk) next() (json.Token, error) {
 	if err != nil {
 		return nil, err
 	}
-	return tok, w.alloc(jsonTokenCost)
+	cost := jsonTokenCost
+	if str, ok := tok.(string); ok {
+		// protojson's tokenizer copies every string, key or value.
+		cost += allocSize(len(str))
+	}
+	return tok, w.alloc(cost)
 }
 
 // object walks the members of a message whose '{' has been consumed.
@@ -175,12 +183,7 @@ func (w *jsonWalk) mapEntries(field protoreflect.FieldDescriptor, depth int) err
 		if err := w.count(); err != nil {
 			return err
 		}
-		key, _ := tok.(string)
-		cost := mapEntryCost(field) + jsonMapEntryBoxCost
-		if field.MapKey().Kind() == protoreflect.StringKind {
-			cost += allocSize(len(key))
-		}
-		if err := w.alloc(cost); err != nil {
+		if err := w.alloc(mapEntryCost(field) + jsonMapEntryBoxCost); err != nil {
 			return err
 		}
 		tok, err = w.next()
@@ -206,7 +209,7 @@ func (w *jsonWalk) value(field protoreflect.FieldDescriptor, tok json.Token, dep
 		}
 		return w.alloc(jsonScalarCost(field, tok))
 	}
-	cost := fieldAllocCost(field, jsonPayloadLen(field, tok))
+	cost := fieldAllocCost(field, 0) + jsonScalarCost(field, tok) + presenceCost(field)
 	if field.Message() != nil {
 		cost -= protoStructSize(field.Message())
 	}
@@ -223,7 +226,7 @@ func (w *jsonWalk) value(field protoreflect.FieldDescriptor, tok json.Token, dep
 }
 
 func (w *jsonWalk) message(md protoreflect.MessageDescriptor, tok json.Token, depth int) error {
-	if err := w.alloc(protoStructSize(md)); err != nil {
+	if err := w.alloc(protoStructSize(md) + jsonObjectCost); err != nil {
 		return err
 	}
 	if tok != json.Delim('{') || md.FullName().Parent() == "google.protobuf" {
@@ -260,20 +263,11 @@ func (w *jsonWalk) skip(tok json.Token, depth int) error {
 	return nil
 }
 
-func jsonPayloadLen(field protoreflect.FieldDescriptor, tok json.Token) int {
-	s, ok := tok.(string)
-	if !ok {
-		return 0
-	}
-	if field.Kind() == protoreflect.BytesKind {
-		return len(s) * 3 / 4
-	}
-	return len(s)
-}
-
+// jsonScalarCost is what decoding a scalar token allocates beyond the copy the
+// tokenizer already made: base64 bytes are decoded into a new buffer.
 func jsonScalarCost(field protoreflect.FieldDescriptor, tok json.Token) int {
-	if k := field.Kind(); k == protoreflect.StringKind || k == protoreflect.BytesKind {
-		return allocSize(jsonPayloadLen(field, tok))
+	if str, ok := tok.(string); ok && field.Kind() == protoreflect.BytesKind {
+		return allocSize(len(str) * 3 / 4)
 	}
 	return 0
 }

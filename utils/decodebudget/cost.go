@@ -60,24 +60,36 @@ func allocSize(n int) int {
 	return (n + page - 1) / page * page
 }
 
-// appendAllocBytes is the total size of the backing arrays append allocates
-// while growing a nil slice to n elements, following runtime.growslice.
-func appendAllocBytes(n, elem int) int {
-	total, capacity := 0, 0
-	for capacity < n {
-		newLen, newCap := capacity+1, capacity+capacity
-		switch {
-		case newLen > newCap:
-			newCap = newLen
-		case capacity >= 256:
-			newCap = capacity
-			for newCap < newLen {
-				newCap += (newCap + 3*256) >> 2
-			}
+// appendGrow is the allocation for appending add elements of elem bytes to a
+// slice of length l and capacity c, and the resulting capacity, following
+// runtime.growslice.
+func appendGrow(l, c, add, elem int) (mem, newCap int) {
+	newLen := l + add
+	if newLen <= c {
+		return 0, c
+	}
+	newCap = c + c
+	switch {
+	case newLen > newCap:
+		newCap = newLen
+	case c >= 256:
+		newCap = c
+		for newCap < newLen {
+			newCap += (newCap + 3*256) >> 2
 		}
-		mem := allocSize(newCap * elem)
+	}
+	mem = allocSize(newCap * elem)
+	return mem, mem / elem
+}
+
+// appendAllocBytes is the total size of the backing arrays append allocates
+// while growing a nil slice to n elements one at a time.
+func appendAllocBytes(n, elem int) int {
+	total, c := 0, 0
+	for l := 0; l < n; l++ {
+		mem, newCap := appendGrow(l, c, 1, elem)
 		total += mem
-		capacity = mem / elem
+		c = newCap
 	}
 	return total
 }
@@ -120,11 +132,6 @@ func goValueSize(field protoreflect.FieldDescriptor) int {
 	}
 }
 
-// packedCost is exact: the decoder sizes a packed run's slice once.
-func packedCost(field protoreflect.FieldDescriptor, count int) int {
-	return allocSize(count * goValueSize(field))
-}
-
 func mapEntryCost(field protoreflect.FieldDescriptor) int {
 	return mapGrowthFactor*(goValueSize(field.MapKey())+goValueSize(field.MapValue())) + mapEntryOverhead
 }
@@ -138,9 +145,15 @@ func oneofWrapperCost(field protoreflect.FieldDescriptor) int {
 	}
 }
 
-// unknownFieldCost covers retaining n raw bytes in a growing unknown-fields slice.
-func unknownFieldCost(n int) int {
-	return 2 * n
+// presenceCost is the pointer a generated struct allocates the first time a
+// scalar field with explicit presence, such as proto3 optional, is set.
+func presenceCost(field protoreflect.FieldDescriptor) int {
+	if !field.HasPresence() || field.IsList() || field.Message() != nil || field.IsExtension() ||
+		(field.ContainingOneof() != nil && !field.ContainingOneof().IsSynthetic()) ||
+		field.ContainingMessage().IsMapEntry() {
+		return 0
+	}
+	return allocSize(goValueSize(field))
 }
 
 // fieldAllocCost is the allocation for one occurrence of field with a string or
@@ -157,7 +170,7 @@ func fieldAllocCost(field protoreflect.FieldDescriptor, payloadLen int) int {
 	case field.IsMap():
 		cost += mapEntryCost(field)
 	case field.IsList():
-		// Slice growth is charged per message by protoWalk.
+		// Slice growth depends on earlier occurrences; the caller charges it.
 	case field.IsExtension():
 		cost += extensionCost
 	case field.ContainingOneof() != nil && !field.ContainingOneof().IsSynthetic():
