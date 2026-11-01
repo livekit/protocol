@@ -1,5 +1,23 @@
 # @livekit/protocol
 
+## 1.53.2
+
+### Patch Changes
+
+- Replace `NodeStats.forward_scheduling_delay` with `NodeStats.forward_processing_per_write`, the mean forwarding work per write to a subscriber - [#1895](https://github.com/livekit/protocol/pull/1895) ([@boks1971](https://github.com/boks1971))
+
+- webhook: `ResourceURLNotifier.Stop(false)` waits for queued events to be sent, as `URLNotifier.Stop(false)` does - [#1901](https://github.com/livekit/protocol/pull/1901) ([@mnjalale](https://github.com/mnjalale))
+
+- sdp: add CodecsFromSessionDescription and ParseFmtp helpers - [#1899](https://github.com/livekit/protocol/pull/1899) ([@anunaym14](https://github.com/anunaym14))
+
+- agent_simulation: dial a phone number over SIP instead of dispatching an agent - [#1858](https://github.com/livekit/protocol/pull/1858) ([@u9g](https://github.com/u9g))
+
+- Add `SIPDialtone` to select a regional dial tone on CreateSIPParticipant and TransferSIPParticipant; deprecate `play_dialtone` - [#1892](https://github.com/livekit/protocol/pull/1892) ([@dennwc](https://github.com/dennwc))
+
+- sip: add `SIPMediaConfig.drop_audio_during_dtmf` to stop sending audio RTP while DTMF is sent - [#1907](https://github.com/livekit/protocol/pull/1907) ([@alexlivekit](https://github.com/alexlivekit))
+
+- SIP authentication: compare IP masks against remote address rather than From header. - [#1889](https://github.com/livekit/protocol/pull/1889) ([@alexfish8](https://github.com/alexfish8))
+
 ## 1.53.1
 
 ### Patch Changes
