@@ -246,3 +246,36 @@ func TestProtoRejectsQuadraticPackedRuns(t *testing.T) {
 	require.ErrorIs(t, err, ErrMessageComplexity)
 	require.Less(t, time.Since(start), time.Second)
 }
+
+func TestProtoRejectsQuadraticMergedMessages(t *testing.T) {
+	// The decoder merges repeated occurrences of a singular message field, so
+	// one packed count per occurrence regrows a single slice each time.
+	point := &metricsv1.ExponentialHistogramDataPoint{}
+	desc := point.ProtoReflect().Descriptor()
+	positive := desc.Fields().ByName("positive").Number()
+	counts := desc.Fields().ByName("positive").Message().Fields().ByName("bucket_counts").Number()
+	inner := protowire.AppendBytes(protowire.AppendTag(nil, counts, protowire.BytesType), protowire.AppendVarint(nil, 1))
+	one := protowire.AppendBytes(protowire.AppendTag(nil, positive, protowire.BytesType), inner)
+	data := bytes.Repeat(one, 400_000)
+
+	start := time.Now()
+	err := Proto{MaxFields: 1 << 24, MaxDepth: 8, MaxDecodedBytes: 512 << 20}.Validate(data, desc)
+	require.ErrorIs(t, err, ErrMessageComplexity)
+	require.Less(t, time.Since(start), time.Second)
+}
+
+func TestProtoRejectsQuadraticMergedPackedRuns(t *testing.T) {
+	// Each occurrence of the singular field positive (8) merges into one
+	// Buckets message, so its packed bucket_counts (2) slice grows quadratically.
+	var b []byte
+	for range 40_000 {
+		b = protowire.AppendTag(b, 8, protowire.BytesType)
+		b = protowire.AppendVarint(b, 3)
+		b = protowire.AppendTag(b, 2, protowire.BytesType)
+		b = protowire.AppendVarint(b, 1)
+		b = protowire.AppendVarint(b, 1)
+	}
+	desc := (&metricsv1.ExponentialHistogramDataPoint{}).ProtoReflect().Descriptor()
+	err := Proto{MaxFields: 1 << 24, MaxDepth: 8, MaxDecodedBytes: 512 << 20}.Validate(b, desc)
+	require.ErrorIs(t, err, ErrMessageComplexity) // decode allocates ~6.5 GB
+}
