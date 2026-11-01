@@ -1,0 +1,12 @@
+# expect: livekit_ref_override
+# A ref that drops chat.item's owner while it re-labels the key as non-PII.
+groups:
+  - id: span.lk.review.ref-drop-owner
+    type: span
+    span_kind: internal
+    stability: development
+    brief: Review ref override probe.
+    attributes:
+      - ref: chat.item
+        requirement_level: recommended
+        annotations: {livekit: {sensitivity: none}}

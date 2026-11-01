@@ -1,0 +1,11 @@
+# expect: lk.room_sid: shared identity keys are flat, use lk.room_id
+groups:
+  - id: registry.lk.negative
+    type: attribute_group
+    brief: Negative fixture.
+    attributes:
+      - id: lk.room_sid
+        type: string
+        stability: development
+        brief: Agents' span binding of lk.room_id, defined as a key.
+        annotations: {livekit: {owner: shared, sensitivity: none}}
