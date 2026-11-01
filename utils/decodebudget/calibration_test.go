@@ -19,6 +19,7 @@ import (
 	tracev1 "go.opentelemetry.io/proto/otlp/trace/v1"
 	"google.golang.org/protobuf/encoding/protowire"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protoreflect"
 
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/utils/protojson"
@@ -178,6 +179,37 @@ func unknownVarints(n int) []byte {
 	return inLogRecord([]byte(strings.Repeat(string(one), n)))
 }
 
+func num(m proto.Message, name protoreflect.Name) protowire.Number {
+	return m.ProtoReflect().Descriptor().Fields().ByName(name).Number()
+}
+
+// mergedBuckets repeats a singular Buckets field n times with one packed count
+// each; the decoder merges them, regrowing one slice every time.
+func mergedBuckets(n int) []byte {
+	point := &metricsv1.ExponentialHistogramDataPoint{}
+	buckets := &metricsv1.ExponentialHistogramDataPoint_Buckets{}
+	one := field(num(point, "positive"), field(num(buckets, "bucket_counts"), protowire.AppendVarint(nil, 1)))
+	dp := field(num(&metricsv1.ExponentialHistogram{}, "data_points"), []byte(strings.Repeat(string(one), n)))
+	metric := field(num(&metricsv1.Metric{}, "exponential_histogram"), dp)
+	return field(1, field(2, field(2, metric)))
+}
+
+// mergedResources repeats a singular Resource with one attribute n times.
+func mergedResources(n int) []byte {
+	attr := must(proto.Marshal(&resourcev1.Resource{Attributes: []*commonv1.KeyValue{{Key: "k", Value: str("v")}}}))
+	one := field(num(&logsv1.ResourceLogs{}, "resource"), attr)
+	return field(1, []byte(strings.Repeat(string(one), n)))
+}
+
+// alternatingOneof switches an AnyValue between two message members n times.
+func alternatingOneof(n int) []byte {
+	v := &commonv1.AnyValue{}
+	kv := field(num(v, "kvlist_value"), must(proto.Marshal(&commonv1.KeyValueList{Values: []*commonv1.KeyValue{{Key: "k"}}})))
+	arr := field(num(v, "array_value"), must(proto.Marshal(&commonv1.ArrayValue{Values: []*commonv1.AnyValue{{}}})))
+	body := []byte(strings.Repeat(string(kv)+string(arr), n/2))
+	return inLogRecord(field(num(&logsv1.LogRecord{}, "body"), body))
+}
+
 func TestProtoEstimateCalibration(t *testing.T) {
 	// ScopeSpans{spans: n×{}} inside ResourceSpans inside TracesData.
 	emptySpans := func(n int) []byte {
@@ -209,6 +241,9 @@ func TestProtoEstimateCalibration(t *testing.T) {
 		{"wire type mismatch length", mismatchedLength(1 << 20), func() proto.Message { return &logsv1.LogsData{} }},
 		{"wire type mismatch varints", mismatchedVarints(1 << 18), func() proto.Message { return &logsv1.LogsData{} }},
 		{"unknown varints", unknownVarints(1 << 18), func() proto.Message { return &logsv1.LogsData{} }},
+		{"merged buckets 3000", mergedBuckets(3000), func() proto.Message { return &metricsv1.MetricsData{} }},
+		{"merged resources 64k", mergedResources(1 << 16), func() proto.Message { return &logsv1.LogsData{} }},
+		{"alternating oneof 64k", alternatingOneof(1 << 16), func() proto.Message { return &logsv1.LogsData{} }},
 	}
 	budget := Proto{MaxFields: 1 << 30, MaxDepth: 100}
 	for _, tc := range cases {
