@@ -26,6 +26,10 @@ const (
 	AttrSIPHeaderPrefix = AttrSIPPrefix + "h."
 	// AttrSIPInviteTime attribute contains the time the inbound INVITE was received, in Unix milliseconds.
 	AttrSIPInviteTime = "lk.sip.inviteTime"
+	// AttrSIPPinEnteredTime attribute contains the time the caller finished entering the PIN on an inbound PIN call, in Unix milliseconds.
+	AttrSIPPinEnteredTime = "lk.sip.pinEnteredTime"
+	// AttrSIPAnswerTime attribute contains the time the callee answered an outbound call, in Unix milliseconds.
+	AttrSIPAnswerTime = "lk.sip.answerTime"
 
 	// AttrIngressPrefix is shared for all Ingress attributes
 	AttrIngressPrefix = "ingress."
