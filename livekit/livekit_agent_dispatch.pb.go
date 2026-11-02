@@ -82,6 +82,62 @@ func (JobRestartPolicy) EnumDescriptor() ([]byte, []int) {
 	return file_livekit_agent_dispatch_proto_rawDescGZIP(), []int{0}
 }
 
+// what created the dispatch
+type AgentDispatchTrigger int32
+
+const (
+	AgentDispatchTrigger_ADT_UNSPECIFIED AgentDispatchTrigger = 0
+	// a participant joining created the room, and with it the dispatch
+	AgentDispatchTrigger_ADT_JOIN AgentDispatchTrigger = 1
+	// the CreateRoom API created the room, and with it the dispatch
+	AgentDispatchTrigger_ADT_ROOM_API AgentDispatchTrigger = 2
+	// the CreateDispatch API
+	AgentDispatchTrigger_ADT_DISPATCH_API AgentDispatchTrigger = 3
+)
+
+// Enum value maps for AgentDispatchTrigger.
+var (
+	AgentDispatchTrigger_name = map[int32]string{
+		0: "ADT_UNSPECIFIED",
+		1: "ADT_JOIN",
+		2: "ADT_ROOM_API",
+		3: "ADT_DISPATCH_API",
+	}
+	AgentDispatchTrigger_value = map[string]int32{
+		"ADT_UNSPECIFIED":  0,
+		"ADT_JOIN":         1,
+		"ADT_ROOM_API":     2,
+		"ADT_DISPATCH_API": 3,
+	}
+)
+
+func (x AgentDispatchTrigger) Enum() *AgentDispatchTrigger {
+	p := new(AgentDispatchTrigger)
+	*p = x
+	return p
+}
+
+func (x AgentDispatchTrigger) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (AgentDispatchTrigger) Descriptor() protoreflect.EnumDescriptor {
+	return file_livekit_agent_dispatch_proto_enumTypes[1].Descriptor()
+}
+
+func (AgentDispatchTrigger) Type() protoreflect.EnumType {
+	return &file_livekit_agent_dispatch_proto_enumTypes[1]
+}
+
+func (x AgentDispatchTrigger) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use AgentDispatchTrigger.Descriptor instead.
+func (AgentDispatchTrigger) EnumDescriptor() ([]byte, []int) {
+	return file_livekit_agent_dispatch_proto_rawDescGZIP(), []int{1}
+}
+
 type CreateAgentDispatchRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	AgentName     string                 `protobuf:"bytes,1,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
@@ -494,9 +550,10 @@ type AgentDispatchState struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// For dispatches of tyoe JT_ROOM, there will be at most 1 job.
 	// For dispatches of type JT_PUBLISHER, there will be 1 per publisher.
-	Jobs          []*Job `protobuf:"bytes,1,rep,name=jobs,proto3" json:"jobs,omitempty"`
-	CreatedAt     int64  `protobuf:"varint,2,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	DeletedAt     int64  `protobuf:"varint,3,opt,name=deleted_at,json=deletedAt,proto3" json:"deleted_at,omitempty"`
+	Jobs          []*Job               `protobuf:"bytes,1,rep,name=jobs,proto3" json:"jobs,omitempty"`
+	CreatedAt     int64                `protobuf:"varint,2,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	DeletedAt     int64                `protobuf:"varint,3,opt,name=deleted_at,json=deletedAt,proto3" json:"deleted_at,omitempty"`
+	Trigger       AgentDispatchTrigger `protobuf:"varint,4,opt,name=trigger,proto3,enum=livekit.AgentDispatchTrigger" json:"trigger,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -550,6 +607,13 @@ func (x *AgentDispatchState) GetDeletedAt() int64 {
 		return x.DeletedAt
 	}
 	return 0
+}
+
+func (x *AgentDispatchState) GetTrigger() AgentDispatchTrigger {
+	if x != nil {
+		return x.Trigger
+	}
+	return AgentDispatchTrigger_ADT_UNSPECIFIED
 }
 
 var File_livekit_agent_dispatch_proto protoreflect.FileDescriptor
@@ -614,16 +678,22 @@ const file_livekit_agent_dispatch_proto_rawDesc = "" +
 	"attributes\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"t\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xad\x01\n" +
 	"\x12AgentDispatchState\x12 \n" +
 	"\x04jobs\x18\x01 \x03(\v2\f.livekit.JobR\x04jobs\x12\x1d\n" +
 	"\n" +
 	"created_at\x18\x02 \x01(\x03R\tcreatedAt\x12\x1d\n" +
 	"\n" +
-	"deleted_at\x18\x03 \x01(\x03R\tdeletedAt*5\n" +
+	"deleted_at\x18\x03 \x01(\x03R\tdeletedAt\x127\n" +
+	"\atrigger\x18\x04 \x01(\x0e2\x1d.livekit.AgentDispatchTriggerR\atrigger*5\n" +
 	"\x10JobRestartPolicy\x12\x12\n" +
 	"\x0eJRP_ON_FAILURE\x10\x00\x12\r\n" +
-	"\tJRP_NEVER\x10\x012\x8b\x02\n" +
+	"\tJRP_NEVER\x10\x01*a\n" +
+	"\x14AgentDispatchTrigger\x12\x13\n" +
+	"\x0fADT_UNSPECIFIED\x10\x00\x12\f\n" +
+	"\bADT_JOIN\x10\x01\x12\x10\n" +
+	"\fADT_ROOM_API\x10\x02\x12\x14\n" +
+	"\x10ADT_DISPATCH_API\x10\x032\x8b\x02\n" +
 	"\x14AgentDispatchService\x12M\n" +
 	"\x0eCreateDispatch\x12#.livekit.CreateAgentDispatchRequest\x1a\x16.livekit.AgentDispatch\x12M\n" +
 	"\x0eDeleteDispatch\x12#.livekit.DeleteAgentDispatchRequest\x1a\x16.livekit.AgentDispatch\x12U\n" +
@@ -641,43 +711,45 @@ func file_livekit_agent_dispatch_proto_rawDescGZIP() []byte {
 	return file_livekit_agent_dispatch_proto_rawDescData
 }
 
-var file_livekit_agent_dispatch_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_livekit_agent_dispatch_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_livekit_agent_dispatch_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_livekit_agent_dispatch_proto_goTypes = []any{
 	(JobRestartPolicy)(0),              // 0: livekit.JobRestartPolicy
-	(*CreateAgentDispatchRequest)(nil), // 1: livekit.CreateAgentDispatchRequest
-	(*RoomAgentDispatch)(nil),          // 2: livekit.RoomAgentDispatch
-	(*DeleteAgentDispatchRequest)(nil), // 3: livekit.DeleteAgentDispatchRequest
-	(*ListAgentDispatchRequest)(nil),   // 4: livekit.ListAgentDispatchRequest
-	(*ListAgentDispatchResponse)(nil),  // 5: livekit.ListAgentDispatchResponse
-	(*AgentDispatch)(nil),              // 6: livekit.AgentDispatch
-	(*AgentDispatchState)(nil),         // 7: livekit.AgentDispatchState
-	nil,                                // 8: livekit.CreateAgentDispatchRequest.AttributesEntry
-	nil,                                // 9: livekit.RoomAgentDispatch.AttributesEntry
-	nil,                                // 10: livekit.AgentDispatch.AttributesEntry
-	(*Job)(nil),                        // 11: livekit.Job
+	(AgentDispatchTrigger)(0),          // 1: livekit.AgentDispatchTrigger
+	(*CreateAgentDispatchRequest)(nil), // 2: livekit.CreateAgentDispatchRequest
+	(*RoomAgentDispatch)(nil),          // 3: livekit.RoomAgentDispatch
+	(*DeleteAgentDispatchRequest)(nil), // 4: livekit.DeleteAgentDispatchRequest
+	(*ListAgentDispatchRequest)(nil),   // 5: livekit.ListAgentDispatchRequest
+	(*ListAgentDispatchResponse)(nil),  // 6: livekit.ListAgentDispatchResponse
+	(*AgentDispatch)(nil),              // 7: livekit.AgentDispatch
+	(*AgentDispatchState)(nil),         // 8: livekit.AgentDispatchState
+	nil,                                // 9: livekit.CreateAgentDispatchRequest.AttributesEntry
+	nil,                                // 10: livekit.RoomAgentDispatch.AttributesEntry
+	nil,                                // 11: livekit.AgentDispatch.AttributesEntry
+	(*Job)(nil),                        // 12: livekit.Job
 }
 var file_livekit_agent_dispatch_proto_depIdxs = []int32{
 	0,  // 0: livekit.CreateAgentDispatchRequest.restart_policy:type_name -> livekit.JobRestartPolicy
-	8,  // 1: livekit.CreateAgentDispatchRequest.attributes:type_name -> livekit.CreateAgentDispatchRequest.AttributesEntry
+	9,  // 1: livekit.CreateAgentDispatchRequest.attributes:type_name -> livekit.CreateAgentDispatchRequest.AttributesEntry
 	0,  // 2: livekit.RoomAgentDispatch.restart_policy:type_name -> livekit.JobRestartPolicy
-	9,  // 3: livekit.RoomAgentDispatch.attributes:type_name -> livekit.RoomAgentDispatch.AttributesEntry
-	6,  // 4: livekit.ListAgentDispatchResponse.agent_dispatches:type_name -> livekit.AgentDispatch
-	7,  // 5: livekit.AgentDispatch.state:type_name -> livekit.AgentDispatchState
+	10, // 3: livekit.RoomAgentDispatch.attributes:type_name -> livekit.RoomAgentDispatch.AttributesEntry
+	7,  // 4: livekit.ListAgentDispatchResponse.agent_dispatches:type_name -> livekit.AgentDispatch
+	8,  // 5: livekit.AgentDispatch.state:type_name -> livekit.AgentDispatchState
 	0,  // 6: livekit.AgentDispatch.restart_policy:type_name -> livekit.JobRestartPolicy
-	10, // 7: livekit.AgentDispatch.attributes:type_name -> livekit.AgentDispatch.AttributesEntry
-	11, // 8: livekit.AgentDispatchState.jobs:type_name -> livekit.Job
-	1,  // 9: livekit.AgentDispatchService.CreateDispatch:input_type -> livekit.CreateAgentDispatchRequest
-	3,  // 10: livekit.AgentDispatchService.DeleteDispatch:input_type -> livekit.DeleteAgentDispatchRequest
-	4,  // 11: livekit.AgentDispatchService.ListDispatch:input_type -> livekit.ListAgentDispatchRequest
-	6,  // 12: livekit.AgentDispatchService.CreateDispatch:output_type -> livekit.AgentDispatch
-	6,  // 13: livekit.AgentDispatchService.DeleteDispatch:output_type -> livekit.AgentDispatch
-	5,  // 14: livekit.AgentDispatchService.ListDispatch:output_type -> livekit.ListAgentDispatchResponse
-	12, // [12:15] is the sub-list for method output_type
-	9,  // [9:12] is the sub-list for method input_type
-	9,  // [9:9] is the sub-list for extension type_name
-	9,  // [9:9] is the sub-list for extension extendee
-	0,  // [0:9] is the sub-list for field type_name
+	11, // 7: livekit.AgentDispatch.attributes:type_name -> livekit.AgentDispatch.AttributesEntry
+	12, // 8: livekit.AgentDispatchState.jobs:type_name -> livekit.Job
+	1,  // 9: livekit.AgentDispatchState.trigger:type_name -> livekit.AgentDispatchTrigger
+	2,  // 10: livekit.AgentDispatchService.CreateDispatch:input_type -> livekit.CreateAgentDispatchRequest
+	4,  // 11: livekit.AgentDispatchService.DeleteDispatch:input_type -> livekit.DeleteAgentDispatchRequest
+	5,  // 12: livekit.AgentDispatchService.ListDispatch:input_type -> livekit.ListAgentDispatchRequest
+	7,  // 13: livekit.AgentDispatchService.CreateDispatch:output_type -> livekit.AgentDispatch
+	7,  // 14: livekit.AgentDispatchService.DeleteDispatch:output_type -> livekit.AgentDispatch
+	6,  // 15: livekit.AgentDispatchService.ListDispatch:output_type -> livekit.ListAgentDispatchResponse
+	13, // [13:16] is the sub-list for method output_type
+	10, // [10:13] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_livekit_agent_dispatch_proto_init() }
@@ -691,7 +763,7 @@ func file_livekit_agent_dispatch_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_agent_dispatch_proto_rawDesc), len(file_livekit_agent_dispatch_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      2,
 			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   1,

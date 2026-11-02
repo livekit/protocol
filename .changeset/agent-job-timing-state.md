@@ -3,4 +3,4 @@
 "@livekit/protocol": patch
 ---
 
-Add `Job.created_at`, `JobState.accepted_at` and `JobState.assigned_at`
+Add `Job.created_at`, `JobState.accepted_at`, `JobState.assigned_at` and `AgentDispatchState.trigger`
