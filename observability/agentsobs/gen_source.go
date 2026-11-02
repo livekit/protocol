@@ -44,6 +44,51 @@ const (
 	JobStatusFailed    JobStatus = "failed"
 )
 
+type JobOrigin string
+
+const (
+	JobOriginUndefined   JobOrigin = ""
+	JobOriginSIPInbound  JobOrigin = "sip_inbound"
+	JobOriginSIPOutbound JobOrigin = "sip_outbound"
+	JobOriginWebrtc      JobOrigin = "webrtc"
+)
+
+type DispatchTrigger string
+
+const (
+	DispatchTriggerUndefined   DispatchTrigger = ""
+	DispatchTriggerJoin        DispatchTrigger = "join"
+	DispatchTriggerRoomAPI     DispatchTrigger = "room_api"
+	DispatchTriggerDispatchAPI DispatchTrigger = "dispatch_api"
+)
+
+type LaunchWarm string
+
+const (
+	LaunchWarmUndefined LaunchWarm = ""
+	LaunchWarmWarm      LaunchWarm = "warm"
+	LaunchWarmCold      LaunchWarm = "cold"
+)
+
+type JoinOutcome string
+
+const (
+	JoinOutcomeUndefined     JoinOutcome = ""
+	JoinOutcomeConnected     JoinOutcome = "connected"
+	JoinOutcomeAbandoned     JoinOutcome = "abandoned"
+	JoinOutcomeCancelled     JoinOutcome = "cancelled"
+	JoinOutcomeCustomerError JoinOutcome = "customer_error"
+	JoinOutcomeFailed        JoinOutcome = "failed"
+)
+
+type SLAClass string
+
+const (
+	SLAClassUndefined SLAClass = ""
+	SLAClassCounted   SLAClass = "counted"
+	SLAClassExcluded  SLAClass = "excluded"
+)
+
 type Rollup string
 
 const (
