@@ -2,7 +2,6 @@ package agent
 
 import (
 	"fmt"
-	"google.golang.org/protobuf/encoding/protojson"
 	"testing"
 
 	"google.golang.org/protobuf/encoding/protojson"
