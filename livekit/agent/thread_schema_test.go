@@ -16,12 +16,32 @@ package agent
 
 import "testing"
 
-// Every AgentTask.Status must be reachable from a stored state, or a filter on
-// it would silently match nothing.
-func TestEveryTaskStatusHasStates(t *testing.T) {
-	for value := range AgentTask_Status_name {
-		if value != 0 && len(TaskStates(AgentTask_Status(value))) == 0 {
-			t.Errorf("%s has no tasks.status value", AgentTask_Status(value))
+func TestTaskStatesRoundTripWithoutCollapsingOutcomes(t *testing.T) {
+	states := map[string]AgentTask_Status{
+		"submitted":      AgentTask_SUBMITTED,
+		"working":        AgentTask_WORKING,
+		"input-required": AgentTask_INPUT_REQUIRED,
+		"completed":      AgentTask_COMPLETED,
+		"failed":         AgentTask_FAILED,
+		"canceled":       AgentTask_CANCELED,
+		"rejected":       AgentTask_REJECTED,
+	}
+	for state, expected := range states {
+		status, ok := TaskStatus(state)
+		if !ok || status != expected {
+			t.Errorf("state %q mapped to %v, %v", state, status, ok)
+		}
+		got := TaskStates(expected)
+		if len(got) != 1 || got[0] != state {
+			t.Errorf("filter %v expands to %v", expected, got)
+		}
+	}
+	if _, ok := TaskStatus("unknown"); ok {
+		t.Fatal("unknown state accepted")
+	}
+	for _, status := range []AgentTask_Status{AgentTask_UNSPECIFIED, AgentTask_Status(999)} {
+		if got := TaskStates(status); len(got) != 0 {
+			t.Fatalf("invalid filter %v expands to %v", status, got)
 		}
 	}
 }

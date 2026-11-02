@@ -26,32 +26,46 @@ const ThreadSchemaVersion = 1
 //go:embed thread_schema_v1.sql
 var ThreadSchemaV1 string
 
-// taskStatuses maps the values of tasks.status (A2A task states) to
-// AgentTask.Status: a task not yet finished is running, a rejected one failed.
-var taskStatuses = map[string]AgentTask_Status{
-	"submitted":      AgentTask_RUNNING,
-	"working":        AgentTask_RUNNING,
-	"input-required": AgentTask_RUNNING,
-	"completed":      AgentTask_COMPLETED,
-	"failed":         AgentTask_FAILED,
-	"rejected":       AgentTask_FAILED,
-	"canceled":       AgentTask_CANCELED,
-}
-
-// TaskStatus is the AgentTask.Status of a tasks.status value.
+// TaskStatus converts a stored framework state to its typed API status.
 func TaskStatus(state string) (AgentTask_Status, bool) {
-	status, ok := taskStatuses[state]
-	return status, ok
-}
-
-// TaskStates are the tasks.status values of an AgentTask.Status.
-func TaskStates(status AgentTask_Status) []string {
-	var states []string
-	for state, s := range taskStatuses {
-		if s == status {
-			states = append(states, state)
-		}
+	switch state {
+	case "submitted":
+		return AgentTask_SUBMITTED, true
+	case "working":
+		return AgentTask_WORKING, true
+	case "input-required":
+		return AgentTask_INPUT_REQUIRED, true
+	case "completed":
+		return AgentTask_COMPLETED, true
+	case "failed":
+		return AgentTask_FAILED, true
+	case "canceled":
+		return AgentTask_CANCELED, true
+	case "rejected":
+		return AgentTask_REJECTED, true
+	default:
+		return AgentTask_UNSPECIFIED, false
 	}
-	return states
 }
 
+// TaskStates returns the exact stored framework state selected by a filter.
+func TaskStates(status AgentTask_Status) []string {
+	switch status {
+	case AgentTask_SUBMITTED:
+		return []string{"submitted"}
+	case AgentTask_WORKING:
+		return []string{"working"}
+	case AgentTask_INPUT_REQUIRED:
+		return []string{"input-required"}
+	case AgentTask_COMPLETED:
+		return []string{"completed"}
+	case AgentTask_FAILED:
+		return []string{"failed"}
+	case AgentTask_CANCELED:
+		return []string{"canceled"}
+	case AgentTask_REJECTED:
+		return []string{"rejected"}
+	default:
+		return nil
+	}
+}
