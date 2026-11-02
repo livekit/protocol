@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_MT6C9E8 = true
+const Version_9014KVG = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -133,6 +133,7 @@ type jobReporter interface {
 	ReportLaunchWarm(v LaunchWarm)
 	ReportMeasuredParticipantID(v string)
 	ReportUserArrivedAt(v time.Time)
+	ReportFirstPublishedAt(v time.Time)
 	ReportDispatchCreatedAt(v time.Time)
 	ReportWorkerRegisteredAt(v time.Time)
 	ReportFirstRequestedAt(v time.Time)

@@ -201,6 +201,7 @@ func (r *noopJobReporter) ReportDispatchTrigger(v DispatchTrigger)          {}
 func (r *noopJobReporter) ReportLaunchWarm(v LaunchWarm)                    {}
 func (r *noopJobReporter) ReportMeasuredParticipantID(v string)             {}
 func (r *noopJobReporter) ReportUserArrivedAt(v time.Time)                  {}
+func (r *noopJobReporter) ReportFirstPublishedAt(v time.Time)               {}
 func (r *noopJobReporter) ReportDispatchCreatedAt(v time.Time)              {}
 func (r *noopJobReporter) ReportWorkerRegisteredAt(v time.Time)             {}
 func (r *noopJobReporter) ReportFirstRequestedAt(v time.Time)               {}
@@ -243,6 +244,7 @@ func (t *noopJobTx) ReportDispatchTrigger(v DispatchTrigger) {}
 func (t *noopJobTx) ReportLaunchWarm(v LaunchWarm)           {}
 func (t *noopJobTx) ReportMeasuredParticipantID(v string)    {}
 func (t *noopJobTx) ReportUserArrivedAt(v time.Time)         {}
+func (t *noopJobTx) ReportFirstPublishedAt(v time.Time)      {}
 func (t *noopJobTx) ReportDispatchCreatedAt(v time.Time)     {}
 func (t *noopJobTx) ReportWorkerRegisteredAt(v time.Time)    {}
 func (t *noopJobTx) ReportFirstRequestedAt(v time.Time)      {}
