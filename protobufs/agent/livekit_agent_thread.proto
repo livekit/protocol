@@ -126,11 +126,24 @@ message AgentThread {
 // AgentTask: a framework task in a thread, including an incoming message's task.
 // The application may label it with an optional name.
 message AgentTask {
+  // The framework's A2A task state. A task is never UNSPECIFIED.
+  // Keep the existing completed, failed and canceled wire numbers.
+  enum Status {
+    UNSPECIFIED = 0;
+    WORKING = 1;
+    COMPLETED = 2;
+    FAILED = 3;
+    CANCELED = 4;
+    SUBMITTED = 5;
+    INPUT_REQUIRED = 6;
+    REJECTED = 7;
+  }
+
   // A thread's tasks, oldest first.
   message GetTasksRequest {
     string thread_id = 1 [(logger.name) = "threadID"];
     // Unset for every status.
-    optional string status = 2;
+    optional Status status = 2;
     // next_page_token of the previous GetTasksResponse; empty for the first page.
     string page_token = 3;
     int32 limit = 4;
@@ -149,7 +162,7 @@ message AgentTask {
     optional string name = 3;
     // The framework's A2A state: submitted, working, input-required, completed, failed,
     // canceled or rejected.
-    string status = 4;
+    Status status = 4;
     google.protobuf.Timestamp updated_at = 5;
   }
 }

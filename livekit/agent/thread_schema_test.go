@@ -16,14 +16,32 @@ package agent
 
 import "testing"
 
-func TestTaskFiltersKeepNonterminalAndRejectedStatesSeparate(t *testing.T) {
-	for _, state := range []string{"submitted", "working", "input-required", "rejected", "failed"} {
-		got := TaskStates(state)
+func TestTaskStatesRoundTripWithoutCollapsingOutcomes(t *testing.T) {
+	states := map[string]AgentTask_Status{
+		"submitted":      AgentTask_SUBMITTED,
+		"working":        AgentTask_WORKING,
+		"input-required": AgentTask_INPUT_REQUIRED,
+		"completed":      AgentTask_COMPLETED,
+		"failed":         AgentTask_FAILED,
+		"canceled":       AgentTask_CANCELED,
+		"rejected":       AgentTask_REJECTED,
+	}
+	for state, expected := range states {
+		status, ok := TaskStatus(state)
+		if !ok || status != expected {
+			t.Errorf("state %q mapped to %v, %v", state, status, ok)
+		}
+		got := TaskStates(expected)
 		if len(got) != 1 || got[0] != state {
-			t.Errorf("filter %q expands to %v", state, got)
+			t.Errorf("filter %v expands to %v", expected, got)
 		}
 	}
-	if got := TaskStates("unknown"); len(got) != 0 {
-		t.Fatalf("unknown state accepted: %v", got)
+	if _, ok := TaskStatus("unknown"); ok {
+		t.Fatal("unknown state accepted")
+	}
+	for _, status := range []AgentTask_Status{AgentTask_UNSPECIFIED, AgentTask_Status(999)} {
+		if got := TaskStates(status); len(got) != 0 {
+			t.Fatalf("invalid filter %v expands to %v", status, got)
+		}
 	}
 }

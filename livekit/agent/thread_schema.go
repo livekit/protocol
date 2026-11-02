@@ -26,20 +26,46 @@ const ThreadSchemaVersion = 1
 //go:embed thread_schema_v1.sql
 var ThreadSchemaV1 string
 
-// TaskStatus validates a framework A2A state without collapsing its outcome.
-func TaskStatus(state string) (string, bool) {
+// TaskStatus converts a stored framework state to its typed API status.
+func TaskStatus(state string) (AgentTask_Status, bool) {
 	switch state {
-	case "submitted", "working", "input-required", "completed", "failed", "canceled", "rejected":
-		return state, true
+	case "submitted":
+		return AgentTask_SUBMITTED, true
+	case "working":
+		return AgentTask_WORKING, true
+	case "input-required":
+		return AgentTask_INPUT_REQUIRED, true
+	case "completed":
+		return AgentTask_COMPLETED, true
+	case "failed":
+		return AgentTask_FAILED, true
+	case "canceled":
+		return AgentTask_CANCELED, true
+	case "rejected":
+		return AgentTask_REJECTED, true
 	default:
-		return "", false
+		return AgentTask_UNSPECIFIED, false
 	}
 }
 
-// TaskStates is the exact state selected by a task filter.
-func TaskStates(state string) []string {
-	if state, ok := TaskStatus(state); ok {
-		return []string{state}
+// TaskStates returns the exact stored framework state selected by a filter.
+func TaskStates(status AgentTask_Status) []string {
+	switch status {
+	case AgentTask_SUBMITTED:
+		return []string{"submitted"}
+	case AgentTask_WORKING:
+		return []string{"working"}
+	case AgentTask_INPUT_REQUIRED:
+		return []string{"input-required"}
+	case AgentTask_COMPLETED:
+		return []string{"completed"}
+	case AgentTask_FAILED:
+		return []string{"failed"}
+	case AgentTask_CANCELED:
+		return []string{"canceled"}
+	case AgentTask_REJECTED:
+		return []string{"rejected"}
+	default:
+		return nil
 	}
-	return nil
 }

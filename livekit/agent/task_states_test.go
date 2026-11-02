@@ -1,34 +1,35 @@
 package agent
 
 import (
-	"fmt"
 	"testing"
 
 	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 )
 
-func TestTaskStatesKeepBusinessOutcomes(t *testing.T) {
-	for _, state := range []string{"submitted", "working", "input-required", "completed", "failed", "canceled", "rejected"} {
-		actual, ok := TaskStatus(state)
-		if !ok || fmt.Sprint(actual) != state {
-			t.Errorf("task state %q projected as %q", state, fmt.Sprint(actual))
-		}
-	}
-}
-
-func TestTaskNamePresenceAndStatusSurviveJSON(t *testing.T) {
+func TestTaskNamePresenceAndStatusSurviveSerialization(t *testing.T) {
 	for _, name := range []*string{nil, new(string)} {
-		original := &AgentTask_Task{Status: "input-required", Name: name}
-		data, err := protojson.Marshal(original)
-		if err != nil {
-			t.Fatal(err)
-		}
-		var restored AgentTask_Task
-		if err := protojson.Unmarshal(data, &restored); err != nil {
-			t.Fatal(err)
-		}
-		if restored.Status != original.Status || (restored.Name == nil) != (original.Name == nil) {
-			t.Fatalf("JSON lost state or label presence: %s", data)
+		original := &AgentTask_Task{Status: AgentTask_INPUT_REQUIRED, Name: name}
+		for format, codec := range map[string]struct {
+			marshal   func(proto.Message) ([]byte, error)
+			unmarshal func([]byte, proto.Message) error
+		}{
+			"json":     {protojson.Marshal, protojson.Unmarshal},
+			"protobuf": {proto.Marshal, proto.Unmarshal},
+		} {
+			t.Run(format, func(t *testing.T) {
+				data, err := codec.marshal(original)
+				if err != nil {
+					t.Fatal(err)
+				}
+				var restored AgentTask_Task
+				if err := codec.unmarshal(data, &restored); err != nil {
+					t.Fatal(err)
+				}
+				if restored.Status != original.Status || (restored.Name == nil) != (original.Name == nil) {
+					t.Fatalf("serialization lost state or label presence: %v", &restored)
+				}
+			})
 		}
 	}
 }
