@@ -380,8 +380,10 @@ type Job struct {
 	Deployment      string            `protobuf:"bytes,11,opt,name=deployment,proto3" json:"deployment,omitempty"`
 	Attributes      map[string]string `protobuf:"bytes,12,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	EnableRedaction bool              `protobuf:"varint,13,opt,name=enable_redaction,json=enableRedaction,proto3" json:"enable_redaction,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// when the server created the job, in Unix nanoseconds
+	CreatedAt     int64 `protobuf:"varint,14,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Job) Reset() {
@@ -506,6 +508,13 @@ func (x *Job) GetEnableRedaction() bool {
 	return false
 }
 
+func (x *Job) GetCreatedAt() int64 {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return 0
+}
+
 type JobState struct {
 	state               protoimpl.MessageState `protogen:"open.v1"`
 	Status              JobStatus              `protobuf:"varint,1,opt,name=status,proto3,enum=livekit.JobStatus" json:"status,omitempty"`
@@ -517,7 +526,11 @@ type JobState struct {
 	WorkerId            string                 `protobuf:"bytes,7,opt,name=worker_id,json=workerId,proto3" json:"worker_id,omitempty"`
 	AgentId             string                 `protobuf:"bytes,8,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
 	// why the job has no agent, for JS_PENDING and JS_CANCELLED jobs
-	Reason        JobStateReason `protobuf:"varint,9,opt,name=reason,proto3,enum=livekit.JobStateReason" json:"reason,omitempty"`
+	Reason JobStateReason `protobuf:"varint,9,opt,name=reason,proto3,enum=livekit.JobStateReason" json:"reason,omitempty"`
+	// when the server received the worker's accept for this attempt, in Unix nanoseconds
+	AcceptedAt int64 `protobuf:"varint,10,opt,name=accepted_at,json=acceptedAt,proto3" json:"accepted_at,omitempty"`
+	// when the server sent the assignment for this attempt, in Unix nanoseconds
+	AssignedAt    int64 `protobuf:"varint,11,opt,name=assigned_at,json=assignedAt,proto3" json:"assigned_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -613,6 +626,20 @@ func (x *JobState) GetReason() JobStateReason {
 		return x.Reason
 	}
 	return JobStateReason_JSR_UNSPECIFIED
+}
+
+func (x *JobState) GetAcceptedAt() int64 {
+	if x != nil {
+		return x.AcceptedAt
+	}
+	return 0
+}
+
+func (x *JobState) GetAssignedAt() int64 {
+	if x != nil {
+		return x.AssignedAt
+	}
+	return 0
 }
 
 // from Worker to Server
@@ -2080,7 +2107,7 @@ var File_livekit_agent_proto protoreflect.FileDescriptor
 
 const file_livekit_agent_proto_rawDesc = "" +
 	"\n" +
-	"\x13livekit_agent.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14logger/options.proto\"\xe2\x04\n" +
+	"\x13livekit_agent.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14logger/options.proto\"\x81\x05\n" +
 	"\x03Job\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12.\n" +
 	"\vdispatch_id\x18\t \x01(\tB\r\xbaP\n" +
@@ -2102,11 +2129,13 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\n" +
 	"attributes\x18\f \x03(\v2\x1c.livekit.Job.AttributesEntryB\x03\xc0P\x01R\n" +
 	"attributes\x12)\n" +
-	"\x10enable_redaction\x18\r \x01(\bR\x0fenableRedaction\x1a=\n" +
+	"\x10enable_redaction\x18\r \x01(\bR\x0fenableRedaction\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\x0e \x01(\x03R\tcreatedAt\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x0e\n" +
-	"\f_participant\"\xda\x02\n" +
+	"\f_participant\"\x9c\x03\n" +
 	"\bJobState\x12*\n" +
 	"\x06status\x18\x01 \x01(\x0e2\x12.livekit.JobStatusR\x06status\x12\x14\n" +
 	"\x05error\x18\x02 \x01(\tR\x05error\x12\x1d\n" +
@@ -2119,7 +2148,12 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\tworker_id\x18\a \x01(\tB\v\xbaP\bworkerIDR\bworkerId\x12%\n" +
 	"\bagent_id\x18\b \x01(\tB\n" +
 	"\xbaP\aagentIDR\aagentId\x12/\n" +
-	"\x06reason\x18\t \x01(\x0e2\x17.livekit.JobStateReasonR\x06reason\"\xc8\x03\n" +
+	"\x06reason\x18\t \x01(\x0e2\x17.livekit.JobStateReasonR\x06reason\x12\x1f\n" +
+	"\vaccepted_at\x18\n" +
+	" \x01(\x03R\n" +
+	"acceptedAt\x12\x1f\n" +
+	"\vassigned_at\x18\v \x01(\x03R\n" +
+	"assignedAt\"\xc8\x03\n" +
 	"\rWorkerMessage\x12<\n" +
 	"\bregister\x18\x01 \x01(\v2\x1e.livekit.RegisterWorkerRequestH\x00R\bregister\x12C\n" +
 	"\favailability\x18\x02 \x01(\v2\x1d.livekit.AvailabilityResponseH\x00R\favailability\x12B\n" +
