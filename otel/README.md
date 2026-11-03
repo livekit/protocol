@@ -228,7 +228,8 @@ otel/live-check.sh session.jsonl [out-dir] [--fail-on none]
 It takes OTLP/JSON lines from an otelcol `file` exporter (the SDK e2e setup), or a weaver samples
 JSON file. `live-check/otlp2samples.py` converts the OTLP lines and stops the run before weaver,
 whatever `--fail-on` says, when it cannot: exit 1 for an attribute value it does not support
-(`bytesValue`, `kvlistValue`), 2 for a capture with only metrics, 3 for an empty capture.
+(`bytesValue`, `kvlistValue`), 2 for a capture with metrics but no span or log record, 3 for one
+with no record at all. An envelope without spans or log records is no record.
 `live-check/weaver.toml` matches spans by name and checks the resource and every
 record against `model/client/groups.yaml`. It drops three kinds of finding: `not_stable` (every
 key is `development`), absent `conditionally_required` attributes (their conditions are prose), and

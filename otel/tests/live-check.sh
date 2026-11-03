@@ -123,17 +123,27 @@ mkdir -p "$tmp/reused" && cp "$report" "$tmp/reused/live_check.json" && echo kee
 stub 7 "" "$tmp/reused"
 [[ $st == 7 && $res != *"totals:"* && $res != *"report:"* && -f $tmp/reused/unrelated.txt && ! -e $tmp/reused/live_check.json ]] ||
   fail "stale report in a reused directory: must not be summarized, and an unrelated file must stay"
-# A capture the converter cannot use stops before weaver (the stub would write a report), even in
-# report-only mode, with a status and message per case. An unsupported AnyValue fails the whole
-# capture, also when the same record has supported attributes: nothing is skipped silently.
-convert() { st=0; res=$(STUB_REPORT=$report WEAVER=$tmp/weaver ./live-check.sh "$1" "$tmp/conv" --fail-on none 2>&1) || st=$?; }
+# A capture the converter cannot use stops before weaver (the stub would write a report), in both
+# fail-on modes, with a status and message per case, and leaves samples.json empty. Envelopes
+# without spans or log records are no records. An unsupported AnyValue fails the whole capture,
+# also when the same record has supported attributes: nothing is skipped silently.
+convert() { st=0; res=$(STUB_REPORT=$report WEAVER=$tmp/weaver ./live-check.sh "$@" 2>&1) || st=$?; }
+metrics='{"resourceMetrics":[{"scopeMetrics":[{"metrics":[{"name":"lk.test.count"}]}]}]}'
+logs='{"resourceLogs":[{"scopeLogs":[{"logRecords":[]}]}]}'
 echo '{"resourceLogs":[{"scopeLogs":[{"logRecords":[{"eventName":"lk.ping","severityNumber":9,"attributes":[{"key":"lk.kept","value":{"stringValue":"ok"}},{"key":"lk.blob","value":{"bytesValue":"YQ=="}}]}]}]}]}' > "$tmp/mixed.jsonl"
-echo '{"resourceMetrics":[{"scopeMetrics":[{"metrics":[{"name":"lk.test.count"}]}]}]}' > "$tmp/metrics.jsonl"
+echo "$metrics" > "$tmp/metrics.jsonl"
+printf '%s\n' "$metrics" "$logs" > "$tmp/metrics-empty-logs.jsonl"
 : > "$tmp/empty.jsonl"
-for case in "mixed.jsonl 1 unsupported AnyValue {'bytesValue': 'YQ=='}" "metrics.jsonl 2 unsupported signal type" "empty.jsonl 3 empty capture"; do
+echo "$logs" > "$tmp/empty-logs.jsonl"
+echo '{"resourceSpans":[{"scopeSpans":[{"spans":[]}]}]}' > "$tmp/empty-traces.jsonl"
+for case in "mixed 1 unsupported AnyValue {'bytesValue': 'YQ=='}" "metrics 2 unsupported signal type" \
+  "metrics-empty-logs 2 unsupported signal type" "empty 3 empty capture" "empty-logs 3 empty capture" "empty-traces 3 empty capture"; do
   read -r file want msg <<<"$case"
-  convert "$tmp/$file"
-  [[ $st == "$want" && $res == *"$msg"* && $res != *"stub weaver"* && ! -e $tmp/conv/live_check.json ]] ||
-    fail "$file: must exit $want before weaver with: $msg"
+  for mode in default report-only; do
+    dir=$tmp/conv-$file-$mode flags=() && [[ $mode == report-only ]] && flags=(--fail-on none)
+    convert "$tmp/$file.jsonl" "$dir" ${flags[@]+"${flags[@]}"}
+    [[ $st == "$want" && $res == *"$msg"* && $res != *"stub weaver"* && ! -e $dir/live_check.json && ! -s $dir/samples.json ]] ||
+      fail "$file.jsonl ($mode): must exit $want before weaver, with empty samples.json, saying: $msg"
+  done
 done
 echo "PASS  live-check: smoke, sparse, JS and no-severity-text samples clean, Agents sample only its two bindings, every planted violation flagged, wrapper status, stale-report and converter cases"
