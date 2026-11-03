@@ -121,6 +121,18 @@ cardinality(name, where, keys, exception) := {finding("livekit_cardinality", spr
 	high_cardinality[key]
 }
 
+# The collector redacts traces and logs by key, never metric points: no metric dimension may be a
+# key it redacts (`lk.pii.*`, chat.item) or one the PII heuristic matches. The heuristic's allowlist
+# does not apply here: it documents span and log keys Agents ships, not metric dimensions.
+pii_metric(name, where, keys) := {finding("livekit_pii_metric", sprintf("%s (%s): %s is PII, and the collector does not redact metric dimensions", [name, where, key])) |
+	some key in keys
+	pii_dimension(key)
+}
+
+pii_dimension(key) if redacted(key)
+
+pii_dimension(key) if regex.match(pii_looking, key)
+
 # The six OTLP severity texts (logs data model); live-check/livekit.rego maps each to its numbers.
 severity_texts := {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"}
 

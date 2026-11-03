@@ -85,6 +85,11 @@ deny contains f if {
 	some f in data.livekit.lib.cardinality(m.name, m.where, m.keys, m.exception)
 }
 
+deny contains f if {
+	some m in metrics
+	some f in data.livekit.lib.pii_metric(m.name, m.where, m.keys)
+}
+
 # Every resolved event, either representation, against its severity declaration.
 events contains {"name": g.name, "event": g, "where": object.get(g, ["lineage", "provenance", "path"], g.id)} if {
 	some g in object.get(input, "groups", [])
