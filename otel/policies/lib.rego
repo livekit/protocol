@@ -125,7 +125,11 @@ lk_all(obj) := object.get(obj, ["annotations", "livekit"], null)
 
 # `annotations.livekit.shipped_values` on a ref: values a producer sends for an upstream key that
 # the upstream definition does not list. Every problem with one ref's list, as messages.
-shipped_value_problems(key, attr) := ((((lk_key_shipped(key) | unshippable(key, attr)) | malformed_shipped(key, attr)) | upstream_shipped(key, attr)) | upstream_id_shipped(key, attr)) | repeated_id_shipped(key, attr)
+# Anything but a list gets only this message: the rules below iterate the list, and iterating a
+# string or a boolean is a policy evaluation error, not a finding.
+shipped_value_problems(key, attr) := {sprintf("%s: shipped_values must be a list, not %v", [key, lk(attr, "shipped_values")])} if {
+	not is_array(lk(attr, "shipped_values"))
+} else := ((((lk_key_shipped(key) | unshippable(key, attr)) | malformed_shipped(key, attr)) | upstream_shipped(key, attr)) | upstream_id_shipped(key, attr)) | repeated_id_shipped(key, attr)
 
 lk_key_shipped(key) := {sprintf("%s: shipped_values are for upstream keys; list a LiveKit key's values as enum members", [key]) |
 	startswith(key, "lk.")

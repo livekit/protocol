@@ -207,7 +207,7 @@ add to it:
 | `livekit_metric_unit` | yes | metric units are not `ms` (resolved, so `definition/2` metrics and refinements count) |
 | `livekit_cardinality` | yes | high-cardinality IDs are not metric dimensions (resolved, so `extends` and refinements count) |
 | `livekit_ref_override` | yes | a `ref` to a key defined in `otel/model` may not override its `annotations` (owner, sensitivity, unit) |
-| `livekit_shipped_value` | yes | a `shipped_values` list is on a non-`lk.*` key of type string, string[] or an enum whose values are all strings; every entry has a lowercase snake_case id, a value and a brief; no value repeats an upstream value; no id repeats another entry or an upstream member id (lowercased, non-alphanumerics as `_`); and each key has at most one distinct list in the whole registry. Refs and definitions, resolved, both modes |
+| `livekit_shipped_value` | yes | `shipped_values` is a list, on a non-`lk.*` key of type string, string[] or an enum whose values are all strings; every entry has a lowercase snake_case id, a value and a brief; no value repeats an upstream value; no id repeats another entry or an upstream member id (lowercased, non-alphanumerics as `_`); and each key has at most one distinct list in the whole registry. Refs and definitions, resolved, both modes |
 | `livekit_client_namespace` | no (advice) | client-owned keys under `lk.client.*` |
 
 The attribute rules cover every key defined in `otel/model`, `lk.*` or not.
