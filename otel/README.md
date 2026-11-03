@@ -110,7 +110,7 @@ map, and its fields (such as `reason` in `outcome`) are payload, not attribute k
 
    | Annotation | On | Meaning |
    |---|---|---|
-   | `severity` | event | OTLP severity texts the event is sent with, e.g. `[INFO]` |
+   | `severity` | event | OTLP severity texts the event is sent with, from `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `FATAL`, e.g. `[INFO]`; `[]` for an event that is never a log record (a span event) |
    | `body` | event | What the log body carries |
    | `reserved`, `limits` | `custom` event | Keys and prefixes apps may not use; size caps on app events and attributes |
    | `checkpoints` | span | Span events in order, each `{name, requirement: required\|best_effort, brief}` |
@@ -205,6 +205,7 @@ add to it:
 | `livekit_rename_value` | yes | every value a `renamed_from` maps to is a member of the shared key's enum |
 | `livekit_seconds`, `livekit_unit` | yes | seconds, unless `unit_exception` |
 | `livekit_metric_unit` | yes | metric units are not `ms` (resolved, so `definition/2` metrics and refinements count) |
+| `livekit_event_severity` | yes | an event's `severity`, when present, is a list of `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `FATAL`; `[]` marks an event that is never a log record (resolved, both modes) |
 | `livekit_cardinality` | yes | high-cardinality IDs are not metric dimensions (resolved, so `extends` and refinements count) |
 | `livekit_ref_override` | yes | a `ref` to a key defined in `otel/model` may not override its `annotations` (owner, sensitivity, unit) |
 | `livekit_shipped_value` | yes | `shipped_values` is a list, on a non-`lk.*` key of type string, string[] or an enum whose values are all strings; every entry has a lowercase snake_case id, a value and a brief; no value repeats an upstream value; no id repeats another entry or an upstream member id (lowercased, non-alphanumerics as `_`); and each key has at most one distinct list in the whole registry. Refs and definitions, resolved, both modes |
@@ -244,7 +245,8 @@ enum, the value. It also adds `livekit_pii_unmarked` for any other PII-looking k
 keys with a `pii_heuristic_exception` (read by `renames.jq`, so it agrees with the registry check), and
 `livekit_unknown_span` for an `lk.*` span no matcher places (weaver
 alone reports nothing for an unmatched span that has no attributes). From the event and span
-annotations it adds `livekit_severity` (an event at a severity it is not declared with),
+annotations it adds `livekit_severity` (an event at a severity it is not declared with, by number
+or by text, or a log record for an event declared `severity: []`),
 `livekit_checkpoint` (a span event the span does not list) and `livekit_span_outcome` (span status
 disagreeing with `lk.outcome`, or `error.type` without `lk.outcome = error`).
 

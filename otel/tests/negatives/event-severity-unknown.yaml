@@ -1,0 +1,10 @@
+# expect: livekit_event_severity
+# An event severity that is not a list of OTLP severity texts: live-check would flag every record.
+groups:
+  - id: event.lk.negative
+    type: event
+    name: lk.negative
+    stability: development
+    brief: An event with a severity declaration live-check cannot match.
+    annotations:
+      livekit: {severity: [INFO, VERBOSE]}

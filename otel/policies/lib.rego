@@ -121,6 +121,24 @@ cardinality(name, where, keys, exception) := {finding("livekit_cardinality", spr
 	high_cardinality[key]
 }
 
+# The six OTLP severity texts (logs data model); live-check/livekit.rego maps each to its numbers.
+severity_texts := {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"}
+
+# An event's `severity`, when present: OTLP severity texts, or [] for an event that is never a log
+# record (a span event). live-check could not match a record against anything else.
+event_severity(name, where, event) := {finding("livekit_event_severity", sprintf("%s (%s): severity must be a list of %v, or [] for an event that is never a log record, not %v", [name, where, severity_texts, s])) |
+	s := lk(event, "severity")
+	s != null
+	not severity_texts_only(s)
+}
+
+severity_texts_only(s) if {
+	is_array(s)
+	every t in s {
+		severity_texts[t]
+	}
+}
+
 lk_all(obj) := object.get(obj, ["annotations", "livekit"], null)
 
 # `annotations.livekit.shipped_values` on a ref: values a producer sends for an upstream key that
