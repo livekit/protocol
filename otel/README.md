@@ -205,7 +205,7 @@ add to it:
 | `livekit_rename_value` | yes | every value a `renamed_from` maps to is a member of the shared key's enum |
 | `livekit_seconds`, `livekit_unit` | yes | seconds, unless `unit_exception` |
 | `livekit_metric_unit` | yes | metric units are not `ms` (resolved, so `definition/2` metrics and refinements count) |
-| `livekit_event_severity` | yes | an event's `severity`, when present, is a list of `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `FATAL`; `[]` marks an event that is never a log record (resolved, both modes) |
+| `livekit_event_severity` | yes | an event's `severity`, when present (an explicit null too), is a list of `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `FATAL`; `[]` marks an event that is never a log record (resolved, both modes) |
 | `livekit_pii_metric` | yes | no metric dimension is a key the collector redacts (`lk.pii.*`, `chat.item`) or one the PII heuristic matches, allowlisted keys included: the collector does not redact metrics (resolved, so inline definitions, refs, `extends` and refinements count) |
 | `livekit_cardinality` | yes | high-cardinality IDs are not metric dimensions (resolved, so `extends` and refinements count) |
 | `livekit_ref_override` | yes | a `ref` to a key defined in `otel/model` may not override its `annotations` (owner, sensitivity, unit) |
@@ -244,11 +244,15 @@ Both go by the attribute name alone, not by producer or span: a client record th
 `live-check/livekit.rego` adds `livekit_shared_rename` for an old spelling. `live-check/renames.jq`
 builds its map from the model's `renamed_from`, so each finding names the key to send and, for an
 enum, the value. It also adds `livekit_pii_unmarked` for any other PII-looking key, except the
-keys with a `pii_heuristic_exception` (read by `renames.jq`, so it agrees with the registry check), and
+keys the registry check exempts: `live-check/lib.rego` is a symlink to `policies/lib.rego`, so
+both apply the same `pii_heuristic_allowlist` and annotation rule, with or without a prior
+`check.sh`. It also adds
 `livekit_unknown_span` for an `lk.*` span no matcher places (weaver
 alone reports nothing for an unmatched span that has no attributes). From the event and span
 annotations it adds `livekit_severity` (an event at a severity it is not declared with, by number
-or by text, or a log record for an event declared `severity: []`),
+or by text, or a log record for an event declared `severity: []`), `livekit_event_severity` (a
+record of an event whose declaration breaks the registry rule of that name; no record is compared
+against it),
 `livekit_checkpoint` (a span event the span does not list) and `livekit_span_outcome` (span status
 disagreeing with `lk.outcome`, or `error.type` without `lk.outcome = error`).
 

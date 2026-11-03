@@ -13,10 +13,6 @@ pii_looking := `(identity|email|phone|ip_address|user_agent|(room|participant)[.
 # spelling: `data.renames[old] = {key, values}`. Built by live-check/renames.jq.
 renames := object.get(data, "renames", {})
 
-# The keys policies/lib.rego exempts from its PII heuristic (`pii_heuristic_allowlist`, documented on
-# each key as `pii_heuristic_exception`), so the same key passes both checks. Built by renames.jq.
-pii_exceptions := object.get(data, "pii_exceptions", {})
-
 # The span keys Agents sends for a shared key under another name (`bindings.agents_otlp` in
 # otel/model), keyed by that name: `data.bindings[name] = key`. Also built by renames.jq.
 bindings := object.get(data, "bindings", {})
@@ -31,14 +27,23 @@ lk_finding(level, type, ctx, msg) := {
 	"message": msg,
 }
 
-# A PII-looking key that is not an old spelling (those get livekit_shared_rename) or an exception.
+# A key the registry check exempts from its PII heuristic: the same rule, allowlist and annotation,
+# from policies/lib.rego (loaded here through the live-check/lib.rego symlink), applied to the
+# key's registered definition. An unregistered key has none and is never exempt.
+pii_exempt(key) if {
+	attr := object.get(input, "registry_attribute", null)
+	is_object(attr)
+	data.livekit.lib.heuristic_exception(object.union(attr, {"id": key}))
+}
+
+# A PII-looking key that is not an old spelling (those get livekit_shared_rename) or exempt.
 deny contains lk_advice("livekit_pii_unmarked", {"attribute_key": key}, sprintf("'%s' looks like PII but has no `pii` key segment, so the collector will not redact it", [key])) if {
 	key := input.sample.attribute.name
 	startswith(key, "lk.")
 	regex.match(pii_looking, key)
 	not regex.match(pii_segment, key)
 	not renames[key]
-	not pii_exceptions[key]
+	not pii_exempt(key)
 }
 
 # An old spelling: the model names the key to send and, for an enum, the value.
@@ -97,22 +102,46 @@ deny contains lk_advice("livekit_checkpoint", {"span_name": span.name, "checkpoi
 	not matches_declared_pattern(name)
 }
 
-# OTLP severity numbers per severity text, all six ranges of the logs data model. policies/lib.rego
-# rejects any other text in a declaration.
+# OTLP severity numbers per severity text, all six ranges of the logs data model.
 severity_range := {"TRACE": [1, 4], "DEBUG": [5, 8], "INFO": [9, 12], "WARN": [13, 16], "ERROR": [17, 20], "FATAL": [21, 24]}
+
+# The matched event's annotations.livekit, {} when the sample matched no event.
+event_livekit := object.get(input, ["registry_group", "annotations", "livekit"], {})
+
+# `severity` is declared, also as an explicit null: absent means no constraint.
+severity_declared if {
+	is_object(event_livekit)
+	some field, _ in event_livekit
+	field == "severity"
+}
+
+# The same declaration rule as livekit_event_severity in policies/lib.rego, so live-check does not
+# depend on otel/check.sh having run on the model.
+severity_valid if {
+	severity_declared
+	data.livekit.lib.severity_texts_only(event_livekit.severity)
+}
+
+# A declaration no record can be compared against: reported once per record, and no record is
+# compared against it.
+deny contains lk_advice("livekit_event_severity", {"event_name": log.event_name}, sprintf("event '%s': otel/model declares severity %v, which is not a list of %v; records are not compared against it", [log.event_name, event_livekit.severity, data.livekit.lib.severity_texts])) if {
+	log := input.sample.log
+	severity_declared
+	not severity_valid
+}
 
 # `severity: []` declares an event that is never a log record (the GenAI span events): a log record
 # under its name is one finding that says so, not a severity mismatch.
 deny contains lk_advice("livekit_severity", {"event_name": log.event_name}, sprintf("event '%s' is declared as not a log record (severity: []), but was sent as one", [log.event_name])) if {
 	log := input.sample.log
-	declared("severity") == []
+	severity_valid
+	event_livekit.severity == []
 }
 
-# An event declared with one or more severities. `declared` is null without the annotation, and
-# count(null) is an evaluation error, not false.
+# A valid declaration with one or more severities.
 declared_levels if {
-	is_array(declared("severity"))
-	count(declared("severity")) > 0
+	severity_valid
+	count(event_livekit.severity) > 0
 }
 
 number_declared(n) if {

@@ -133,14 +133,17 @@ pii_dimension(key) if redacted(key)
 
 pii_dimension(key) if regex.match(pii_looking, key)
 
-# The six OTLP severity texts (logs data model); live-check/livekit.rego maps each to its numbers.
+# The six OTLP severity texts (logs data model); live-check/livekit.rego maps each to its numbers
+# and applies the same declaration rule.
 severity_texts := {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"}
 
-# An event's `severity`, when present: OTLP severity texts, or [] for an event that is never a log
-# record (a span event). live-check could not match a record against anything else.
+# An event's `severity`, when present (an explicit null too): OTLP severity texts, or [] for an
+# event that is never a log record (a span event). Absent means no constraint.
 event_severity(name, where, event) := {finding("livekit_event_severity", sprintf("%s (%s): severity must be a list of %v, or [] for an event that is never a log record, not %v", [name, where, severity_texts, s])) |
-	s := lk(event, "severity")
-	s != null
+	livekit := lk_all(event)
+	is_object(livekit)
+	some field, s in livekit
+	field == "severity"
 	not severity_texts_only(s)
 }
 

@@ -56,29 +56,39 @@ sed -e 's/"lk\.room_id"/"lk.room.sid"/g' -e 's/"lk\.pii\.room_name"/"lk.room.nam
   -e 's/"name": "lk\.disconnect_reason", "value": "CLIENT_INITIATED"/"name": "lk.disconnect.reason", "value": "client_initiated"/' \
   -e '/"name": "lk\.connect"/s/"name": "lk\.pii\.participant_identity"/"name": "lk.caller_identity"/' \
   tests/live-sample.json > "$tmp/legacy.json"
-# Every OTLP severity range is known: an event declared [DEBUG, FATAL] (a fixture event, in a copy
-# of the registry) passes at 5/DEBUG and 21/FATAL, and fails at 9/INFO by number and by text. An
-# event declared `severity: []` (a GenAI span event) sent as a log record gets one finding that
-# says it is not a log record.
-mkdir -p "$tmp/sev" && cp -R live-check.sh live-check model "$tmp/sev/"
-cat > "$tmp/sev/model/severity-test.yaml" <<'YAML'
+# live-check applies the event and PII declaration rules itself, on a copy of the registry with
+# fixtures that otel/check.sh would reject. Every OTLP severity range is known: an event declared
+# [DEBUG, FATAL] passes at 5/DEBUG and 21/FATAL, and fails at 9/INFO by number and by text. A
+# GenAI span event (`severity: []`) sent as a log record gets one finding that says so. A scalar,
+# an explicit null and an unknown text each get one livekit_event_severity finding per record and
+# no comparison. lk.caller_identity carries a pii_heuristic_exception but is not on the
+# allowlist in policies/lib.rego, so it is still flagged; lk.rpc.caller_identity is exempt.
+mkdir -p "$tmp/reg" && cp -R live-check.sh live-check model policies "$tmp/reg/"
+cat > "$tmp/reg/model/live-test.yaml" <<'YAML'
 groups:
-  - id: event.lk.test.verbose
-    type: event
-    name: lk.test.verbose
-    stability: development
-    brief: Severity fixture.
-    annotations:
-      livekit: {severity: [DEBUG, FATAL]}
+  - {id: event.lk.test.verbose, type: event, name: lk.test.verbose, stability: development, brief: Fixture., annotations: {livekit: {severity: [DEBUG, FATAL]}}}
+  - {id: event.lk.test.scalar, type: event, name: lk.test.scalar, stability: development, brief: Fixture., annotations: {livekit: {severity: INFO}}}
+  - {id: event.lk.test.null, type: event, name: lk.test.null, stability: development, brief: Fixture., annotations: {livekit: {severity: null}}}
+  - {id: event.lk.test.unknown, type: event, name: lk.test.unknown, stability: development, brief: Fixture., annotations: {livekit: {severity: [INFO, VERBOSE]}}}
+  - id: registry.lk.test.pii
+    type: attribute_group
+    brief: Fixture.
+    attributes:
+      - {id: lk.caller_identity, type: string, stability: development, brief: Fixture., examples: [x], annotations: {livekit: {owner: agents, sensitivity: none, pii_heuristic_exception: "Not on the allowlist."}}}
 YAML
 rec() { printf '{"log": {"event_name": "%s", "severity_number": %s, "severity_text": "%s", "body": "x", "attributes": [{"name": "session.id", "value": "4bf92f3577b34da6a3ce929d0e0e4736"}, {"name": "otel.event.name", "value": "%s"}]}}' "$1" "$2" "$3" "$1"; }
-echo "[$(rec lk.test.verbose 5 DEBUG), $(rec lk.test.verbose 21 FATAL), $(rec lk.test.verbose 9 INFO), $(rec gen_ai.user.message 9 INFO)]" > "$tmp/sev.json"
-sev=$("$tmp/sev/live-check.sh" "$tmp/sev.json" "$tmp/sev-out" --fail-on none)
-echo "$sev"
-[[ $sev == *'"advice_level_counts": {"violation": 3}'* ]] || { echo "FAIL  severity sample: want exactly 3 violations" >&2; exit 1; }
+attr() { printf '{"attribute": {"name": "%s", "value": "x"}}' "$1"; }
+echo "[$(rec lk.test.verbose 5 DEBUG), $(rec lk.test.verbose 21 FATAL), $(rec lk.test.verbose 9 INFO), $(rec gen_ai.user.message 9 INFO),
+  $(rec lk.test.scalar 9 INFO), $(rec lk.test.null 9 INFO), $(rec lk.test.unknown 9 INFO),
+  $(attr lk.caller_identity), $(attr lk.rpc.caller_identity)]" > "$tmp/reg.json"
+reg=$("$tmp/reg/live-check.sh" "$tmp/reg.json" "$tmp/reg-out" --search-all-attributes --fail-on none)
+echo "$reg"
+[[ $reg == *'"advice_level_counts": {"violation": 7}'* ]] || { echo "FAIL  registry-copy sample: want exactly 7 violations" >&2; exit 1; }
 for want in "event 'lk.test.verbose' is sent at severity number 9" "event 'lk.test.verbose' is sent at INFO" \
-  "event 'gen_ai.user.message' is declared as not a log record (severity: []), but was sent as one"; do
-  grep -q -F -- "$want" "$tmp/sev-out/live_check.json" || { echo "FAIL  no finding says: $want" >&2; exit 1; }
+  "event 'gen_ai.user.message' is declared as not a log record (severity: []), but was sent as one" \
+  "event 'lk.test.scalar': otel/model declares severity" "event 'lk.test.null': otel/model declares severity null" \
+  "event 'lk.test.unknown': otel/model declares severity" "'lk.caller_identity' looks like PII"; do
+  grep -q -F -- "$want" "$tmp/reg-out/live_check.json" || { echo "FAIL  no finding says: $want" >&2; exit 1; }
 done
 
 legacy=$(./live-check.sh "$tmp/legacy.json" "$tmp/legacy" --fail-on none)
