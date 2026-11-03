@@ -1,5 +1,11 @@
 package livekit
 
+// Names of participant attributes set by LiveKit.
+const (
+	// AttrJoinRequestTime attribute contains the time the server received a participant's join request, in Unix milliseconds.
+	AttrJoinRequestTime = "lk.joinRequestTime"
+)
+
 // Names of participant attributes for SIP.
 const (
 	// AttrSIPPrefix is shared for all SIP attributes.
