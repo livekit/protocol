@@ -14,7 +14,7 @@
 {%- macro attr(a) -%}
 #: {{ doc(a) }}
 {{ a.key | screaming_snake_case }} = {{ lit(a.key) }}
-{% if a.type is mapping %}{% for m in a.type.members %}#: {{ line(m.brief) or "`" ~ m.value ~ "`." }}
+{% if a.type is mapping %}{% for m in a.type.members %}#: {{ line(m.brief) or line("`" ~ m.value ~ "`.") }}
 {{ a.key | screaming_snake_case }}_{{ m.id | screaming_snake_case }} = {{ lit(m.value) }}
 {% endfor %}{% endif %}{% for v in a.shipped_values or [] %}#: {{ line(v.brief) }} Sent by LiveKit, not an upstream value.
 {{ a.key | screaming_snake_case }}_{{ v.id | screaming_snake_case }} = {{ lit(v.value) }}
