@@ -28,6 +28,7 @@ echo "$js"
 
 # What Agents sends for the shared keys, as bare attributes (Agents spans have no matchers). Its
 # span names for the room and track keys are bindings: improvements that name the key, nothing else.
+# Its RPC identity keys are the registry's PII heuristic exceptions, so they are no finding either.
 agents=$(./live-check.sh tests/live-agents.json "$tmp/agents" --search-all-attributes)
 echo "$agents"
 [[ $agents == *'"advice_level_counts": {"improvement": 2}'* ]] || { echo "FAIL  Agents shared-key sample has findings beyond its two bindings" >&2; exit 1; }

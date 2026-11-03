@@ -13,6 +13,10 @@ pii_looking := `(identity|email|phone|ip_address|user_agent|(room|participant)[.
 # spelling: `data.renames[old] = {key, values}`. Built by live-check/renames.jq.
 renames := object.get(data, "renames", {})
 
+# The keys policies/lib.rego exempts from its PII heuristic (`pii_heuristic_allowlist`, documented on
+# each key as `pii_heuristic_exception`), so the same key passes both checks. Built by renames.jq.
+pii_exceptions := object.get(data, "pii_exceptions", {})
+
 # The span keys Agents sends for a shared key under another name (`bindings.agents_otlp` in
 # otel/model), keyed by that name: `data.bindings[name] = key`. Also built by renames.jq.
 bindings := object.get(data, "bindings", {})
@@ -27,13 +31,14 @@ lk_finding(level, type, ctx, msg) := {
 	"message": msg,
 }
 
-# A PII-looking key that is not an old spelling (those get livekit_shared_rename).
+# A PII-looking key that is not an old spelling (those get livekit_shared_rename) or an exception.
 deny contains lk_advice("livekit_pii_unmarked", {"attribute_key": key}, sprintf("'%s' looks like PII but has no `pii` key segment, so the collector will not redact it", [key])) if {
 	key := input.sample.attribute.name
 	startswith(key, "lk.")
 	regex.match(pii_looking, key)
 	not regex.match(pii_segment, key)
 	not renames[key]
+	not pii_exceptions[key]
 }
 
 # An old spelling: the model names the key to send and, for an enum, the value.

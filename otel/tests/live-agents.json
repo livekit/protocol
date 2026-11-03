@@ -9,5 +9,7 @@
  {"attribute": {"name": "lk.track_source", "value": "SOURCE_MICROPHONE"}},
  {"attribute": {"name": "lk.track_source", "value": "SOURCE_CAMERA"}},
  {"attribute": {"name": "lk.disconnect_reason", "value": "CLIENT_INITIATED"}},
- {"attribute": {"name": "lk.disconnect_reason", "value": "UNKNOWN_REASON"}}
+ {"attribute": {"name": "lk.disconnect_reason", "value": "UNKNOWN_REASON"}},
+ {"attribute": {"name": "lk.rpc.caller_identity", "value": "identity-0"}},
+ {"attribute": {"name": "lk.rpc.destination_identity", "value": "identity-1"}}
 ]

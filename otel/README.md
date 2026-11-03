@@ -237,7 +237,8 @@ Both go by the attribute name alone, not by producer or span: a client record th
 `lk.track_sid` in place of a required `lk.track_id` still fails as `required_attribute_not_present`.
 `live-check/livekit.rego` adds `livekit_shared_rename` for an old spelling. `live-check/renames.jq`
 builds its map from the model's `renamed_from`, so each finding names the key to send and, for an
-enum, the value. It also adds `livekit_pii_unmarked` for any other PII-looking key, and
+enum, the value. It also adds `livekit_pii_unmarked` for any other PII-looking key, except the
+keys with a `pii_heuristic_exception` (read by `renames.jq`, so it agrees with the registry check), and
 `livekit_unknown_span` for an `lk.*` span no matcher places (weaver
 alone reports nothing for an unmatched span that has no attributes). From the event and span
 annotations it adds `livekit_severity` (an event at a severity it is not declared with),
