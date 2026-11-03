@@ -6,8 +6,8 @@
 # spellings of shared keys, an unregistered lk.* span, unlisted checkpoints (one empty), outcomes
 # that disagree with the span status (Error for ok, Ok for ok) and events at the wrong severity
 # (by text, and by number) must be flagged. Last, a stub weaver checks the wrapper: it keeps
-# weaver's status, shows weaver's log when there is no report, and never summarizes a report left
-# over from an earlier run.
+# weaver's status, shows weaver's log when there is no report, never summarizes a report left over
+# from an earlier run, and stops before weaver on a capture the converter cannot use.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 tmp=$(mktemp -d) && trap 'rm -rf "$tmp"' EXIT
@@ -98,4 +98,17 @@ mkdir -p "$tmp/reused" && cp "$report" "$tmp/reused/live_check.json" && echo kee
 stub 7 "" "$tmp/reused"
 [[ $st == 7 && $res != *"totals:"* && $res != *"report:"* && -f $tmp/reused/unrelated.txt && ! -e $tmp/reused/live_check.json ]] ||
   fail "stale report in a reused directory: must not be summarized, and an unrelated file must stay"
-echo "PASS  live-check: smoke, sparse, JS and no-severity-text samples clean, Agents sample only its two bindings, every planted violation flagged, wrapper status and stale-report cases"
+# A capture the converter cannot use stops before weaver (the stub would write a report), even in
+# report-only mode, with a status and message per case. An unsupported AnyValue fails the whole
+# capture, also when the same record has supported attributes: nothing is skipped silently.
+convert() { st=0; res=$(STUB_REPORT=$report WEAVER=$tmp/weaver ./live-check.sh "$1" "$tmp/conv" --fail-on none 2>&1) || st=$?; }
+echo '{"resourceLogs":[{"scopeLogs":[{"logRecords":[{"eventName":"lk.ping","severityNumber":9,"attributes":[{"key":"lk.kept","value":{"stringValue":"ok"}},{"key":"lk.blob","value":{"bytesValue":"YQ=="}}]}]}]}]}' > "$tmp/mixed.jsonl"
+echo '{"resourceMetrics":[{"scopeMetrics":[{"metrics":[{"name":"lk.test.count"}]}]}]}' > "$tmp/metrics.jsonl"
+: > "$tmp/empty.jsonl"
+for case in "mixed.jsonl 1 unsupported AnyValue {'bytesValue': 'YQ=='}" "metrics.jsonl 2 unsupported signal type" "empty.jsonl 3 empty capture"; do
+  read -r file want msg <<<"$case"
+  convert "$tmp/$file"
+  [[ $st == "$want" && $res == *"$msg"* && $res != *"stub weaver"* && ! -e $tmp/conv/live_check.json ]] ||
+    fail "$file: must exit $want before weaver with: $msg"
+done
+echo "PASS  live-check: smoke, sparse, JS and no-severity-text samples clean, Agents sample only its two bindings, every planted violation flagged, wrapper status, stale-report and converter cases"

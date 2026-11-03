@@ -224,7 +224,10 @@ otel/live-check.sh session.jsonl [out-dir] [--fail-on none]
 ```
 
 It takes OTLP/JSON lines from an otelcol `file` exporter (the SDK e2e setup), or a weaver samples
-JSON file. `live-check/weaver.toml` matches spans by name and checks the resource and every
+JSON file. `live-check/otlp2samples.py` converts the OTLP lines and stops the run before weaver,
+whatever `--fail-on` says, when it cannot: exit 1 for an attribute value it does not support
+(`bytesValue`, `kvlistValue`), 2 for a capture with only metrics, 3 for an empty capture.
+`live-check/weaver.toml` matches spans by name and checks the resource and every
 record against `model/client/groups.yaml`. It drops three kinds of finding: `not_stable` (every
 key is `development`), absent `conditionally_required` attributes (their conditions are prose), and
 `missing_attribute` for `lk.room_sid` and `lk.track_sid`, the names Agents spans send for
@@ -275,6 +278,8 @@ Known limits:
 - App-defined attributes (custom events, `Scope::set_attribute`) are reported as unknown keys.
 - `lk.sdk.*` is not reported when missing: resource attributes are only compared, not required.
 - Units are annotations; live-check checks names, types and enum values, never magnitudes.
+- Metrics are not converted from OTLP: a capture with spans or logs as well passes without its
+  metrics checked.
 
 ### In SDK integration tests
 
