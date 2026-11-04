@@ -1,5 +1,11 @@
 # github.com/livekit/protocol
 
+## 1.53.4
+
+### Patch Changes
+
+- Add `AgentSessionEvent.SessionClosed`, sent when an agent session ends while its host keeps serving requests - [#1888](https://github.com/livekit/protocol/pull/1888) ([@u9g](https://github.com/u9g))
+
 ## 1.53.3
 
 ### Patch Changes
