@@ -3368,9 +3368,9 @@ type AgentSessionEvent_AmdCompleted struct {
 	Reason                 string                 `protobuf:"bytes,2,opt,name=reason,proto3" json:"reason,omitempty"`
 	VoicemailMessagePlayed bool                   `protobuf:"varint,3,opt,name=voicemail_message_played,json=voicemailMessagePlayed,proto3" json:"voicemail_message_played,omitempty"`
 	// Unset when the run ended before any prediction.
-	LastPrediction *AgentSessionEvent_AmdPrediction `protobuf:"bytes,4,opt,name=last_prediction,json=lastPrediction,proto3" json:"last_prediction,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	Prediction    *AgentSessionEvent_AmdPrediction `protobuf:"bytes,4,opt,name=prediction,proto3" json:"prediction,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *AgentSessionEvent_AmdCompleted) Reset() {
@@ -3424,9 +3424,9 @@ func (x *AgentSessionEvent_AmdCompleted) GetVoicemailMessagePlayed() bool {
 	return false
 }
 
-func (x *AgentSessionEvent_AmdCompleted) GetLastPrediction() *AgentSessionEvent_AmdPrediction {
+func (x *AgentSessionEvent_AmdCompleted) GetPrediction() *AgentSessionEvent_AmdPrediction {
 	if x != nil {
-		return x.LastPrediction
+		return x.Prediction
 	}
 	return nil
 }
@@ -5388,7 +5388,7 @@ const file_agent_livekit_agent_session_proto_rawDesc = "" +
 	"\vmodel_usage\x18\x01 \x03(\v2\x19.livekit.agent.ModelUsageR\n" +
 	"modelUsage\"A\n" +
 	"\fDebugMessage\x121\n" +
-	"\apayload\x18\x01 \x01(\v2\x17.google.protobuf.StructR\apayload\"\xd3#\n" +
+	"\apayload\x18\x01 \x01(\v2\x17.google.protobuf.StructR\apayload\"\xca#\n" +
 	"\x11AgentSessionEvent\x129\n" +
 	"\n" +
 	"created_at\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12d\n" +
@@ -5448,12 +5448,14 @@ const file_agent_livekit_agent_session_proto_rawDesc = "" +
 	"\aturn_id\x18\x06 \x01(\rR\x06turnId\x120\n" +
 	"\x05stage\x18\a \x01(\x0e2\x1a.livekit.agent.AmdCategoryR\x05stage\x12%\n" +
 	"\x0ecorrects_stage\x18\b \x01(\bR\rcorrectsStage\x12H\n" +
-	"\x12inference_duration\x18\t \x01(\v2\x19.google.protobuf.DurationR\x11inferenceDuration\x1a\xf1\x01\n" +
+	"\x12inference_duration\x18\t \x01(\v2\x19.google.protobuf.DurationR\x11inferenceDuration\x1a\xe8\x01\n" +
 	"\fAmdCompleted\x126\n" +
 	"\bcategory\x18\x01 \x01(\x0e2\x1a.livekit.agent.AmdCategoryR\bcategory\x12\x16\n" +
 	"\x06reason\x18\x02 \x01(\tR\x06reason\x128\n" +
-	"\x18voicemail_message_played\x18\x03 \x01(\bR\x16voicemailMessagePlayed\x12W\n" +
-	"\x0flast_prediction\x18\x04 \x01(\v2..livekit.agent.AgentSessionEvent.AmdPredictionR\x0elastPrediction\x1a\xca\x01\n" +
+	"\x18voicemail_message_played\x18\x03 \x01(\bR\x16voicemailMessagePlayed\x12N\n" +
+	"\n" +
+	"prediction\x18\x04 \x01(\v2..livekit.agent.AgentSessionEvent.AmdPredictionR\n" +
+	"prediction\x1a\xca\x01\n" +
 	"\rEotPrediction\x12 \n" +
 	"\vprobability\x18\x01 \x01(\x02R\vprobability\x12\x1c\n" +
 	"\tthreshold\x18\x02 \x01(\x02R\tthreshold\x12H\n" +
@@ -5842,7 +5844,7 @@ var file_agent_livekit_agent_session_proto_depIdxs = []int32{
 	6,   // 82: livekit.agent.AgentSessionEvent.AmdPrediction.stage:type_name -> livekit.agent.AmdCategory
 	80,  // 83: livekit.agent.AgentSessionEvent.AmdPrediction.inference_duration:type_name -> google.protobuf.Duration
 	6,   // 84: livekit.agent.AgentSessionEvent.AmdCompleted.category:type_name -> livekit.agent.AmdCategory
-	39,  // 85: livekit.agent.AgentSessionEvent.AmdCompleted.last_prediction:type_name -> livekit.agent.AgentSessionEvent.AmdPrediction
+	39,  // 85: livekit.agent.AgentSessionEvent.AmdCompleted.prediction:type_name -> livekit.agent.AgentSessionEvent.AmdPrediction
 	80,  // 86: livekit.agent.AgentSessionEvent.EotPrediction.inference_duration:type_name -> google.protobuf.Duration
 	80,  // 87: livekit.agent.AgentSessionEvent.EotPrediction.delay:type_name -> google.protobuf.Duration
 	21,  // 88: livekit.agent.AgentSessionEvent.SessionUsageUpdated.usage:type_name -> livekit.agent.AgentSessionUsage
