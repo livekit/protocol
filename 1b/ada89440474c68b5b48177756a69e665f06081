@@ -1,0 +1,21 @@
+protobufs/agent/livekit_agent_inference.proto
+  s_9dc60d915e2121::t_d752be6e417054 92-97
+.changeset/eot-turn-samples.md
+  s_9dc60d915e2121::t_409102d3b1bdb5 1-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1bada89440474c68b5b48177756a69e665f06081",
+  "prompts": {},
+  "sessions": {
+    "s_9dc60d915e2121": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3bb7b518-e716-431d-8b0e-9b5f73deb748",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Chenghao Mou <chenghao.mou@livekit.io>"
+    }
+  }
+}
