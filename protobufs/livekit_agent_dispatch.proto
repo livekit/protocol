@@ -23,8 +23,10 @@ import "livekit_agent.proto";
 import "logger/options.proto";
 
 enum JobRestartPolicy {
-  JRP_ON_FAILURE = 0; // restart when the job fails (default)
-  JRP_NEVER = 1;      // never restart
+  // Restart the job when it fails. This is the default.
+  JRP_ON_FAILURE = 0;
+  // Never restart the job.
+  JRP_NEVER = 1;
 }
 
 service AgentDispatchService {
@@ -54,7 +56,8 @@ message RoomAgentDispatch {
     (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
-  JobRestartPolicy restart_policy = 3; // cloud only
+  // The restart policy of the job. Applies only on LiveKit Cloud.
+  JobRestartPolicy restart_policy = 3;
   string deployment = 4;
   map<string, string> attributes = 5 [
     (logger.sensitivity) = SENSITIVITY_PII,

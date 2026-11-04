@@ -62,9 +62,10 @@ message FunctionCall {
   string arguments = 3;
   string name = 4;
   google.protobuf.Timestamp created_at = 5;
-  // Framework metadata recorded on the call, kept with the history. A delegating call records
-  // where the request went: lk.delegation.task_id, lk.delegation.endpoint,
-  // lk.delegation.transport and lk.delegation.profile.
+  // The metadata that the Agents framework records on the call. It is kept with
+  // the chat history. A call that delegates records where the request went:
+  // `lk.delegation.task_id`, `lk.delegation.endpoint`,
+  // `lk.delegation.transport`, and `lk.delegation.profile`.
   map<string, string> extra = 6;
 }
 
@@ -134,8 +135,8 @@ enum ToolReplyStatus {
   TR_SKIPPED = 3;
 }
 
-// Why an agent session closed. Agent evals read it from the recording upload's session
-// summary (MetricsRecordingHeader.session_summary), as the value name.
+// Why an agent session closed. Agent evals read it, as the value name, from the
+// session summary of the recording upload (MetricsRecordingHeader.session_summary).
 enum CloseReason {
   CR_UNKNOWN = 0; // not reported, or an SDK-specific reason
   CR_ERROR = 1;
