@@ -32,6 +32,7 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@bufbuild/protoc-gen-es": "^1.10.0",
+    "@typescript/typescript6": "6.0.2",
     "genversion": "^3.2.0",
     "typescript": "7.0.2",
     "unbuild": "^3.6.1"
