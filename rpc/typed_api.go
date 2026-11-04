@@ -74,6 +74,9 @@ type ClientParams struct {
 	TracerProvider tracer.TracerProvider // will use default if unset
 	Observer       middleware.MetricsObserver
 	ClientOptions  []psrpc.ClientOption
+	// Retries builds the retry option from the retry settings. psrpc's retry
+	// interceptor is used when unset.
+	Retries func(middleware.RetryOptions) psrpc.ClientOption
 }
 
 func NewClientParams(
@@ -104,7 +107,7 @@ func (p *ClientParams) Options() []psrpc.ClientOption {
 		opts = append(opts, WithClientLogger(p.Logger))
 	}
 	if p.MaxAttempts != 0 || p.Timeout != 0 || p.Backoff != 0 {
-		opts = append(opts, middleware.WithRPCRetries(middleware.RetryOptions{
+		opts = append(opts, p.WithRetries(middleware.RetryOptions{
 			MaxAttempts: p.MaxAttempts,
 			Timeout:     p.Timeout,
 			Backoff:     p.Backoff,
@@ -115,6 +118,15 @@ func (p *ClientParams) Options() []psrpc.ClientOption {
 	}))
 	opts = append(opts, p.ClientOptions...)
 	return opts
+}
+
+// WithRetries returns the retry option for o, from Retries if set and from
+// psrpc's retry interceptor otherwise.
+func (p *ClientParams) WithRetries(o middleware.RetryOptions) psrpc.ClientOption {
+	if p.Retries != nil {
+		return p.Retries(o)
+	}
+	return middleware.WithRPCRetries(o)
 }
 
 func (p *ClientParams) Args() (psrpc.MessageBus, psrpc.ClientOption) {

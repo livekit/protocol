@@ -93,3 +93,29 @@ func TestServerSkipClaim(t *testing.T) {
 	on.Store(false)
 	require.False(t, psrpcServerSkipClaimEnabled(), "must stay revocable")
 }
+
+func TestClientParamsRetries(t *testing.T) {
+	interceptors := func(p ClientParams) int {
+		var o psrpc.ClientOpts
+		for _, opt := range p.Options() {
+			opt(&o)
+		}
+		return len(o.RpcInterceptors)
+	}
+
+	p := ClientParams{PSRPCConfig: PSRPCConfig{MaxAttempts: 5, Timeout: time.Second, Backoff: 2 * time.Second}}
+	withPSRPCRetries := interceptors(p)
+
+	var got []middleware.RetryOptions
+	p.Retries = func(o middleware.RetryOptions) psrpc.ClientOption {
+		got = append(got, o)
+		return func(*psrpc.ClientOpts) {}
+	}
+	require.Equal(t, withPSRPCRetries-1, interceptors(p), "Retries must replace psrpc's retry interceptor")
+	require.Equal(t, []middleware.RetryOptions{{MaxAttempts: 5, Timeout: time.Second, Backoff: 2 * time.Second}}, got)
+
+	got = nil
+	p.PSRPCConfig = PSRPCConfig{}
+	p.Options()
+	require.Empty(t, got, "no retry settings, no retries")
+}
