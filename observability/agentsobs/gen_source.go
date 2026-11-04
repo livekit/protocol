@@ -55,12 +55,12 @@ const (
 	JoinOutcomeFailed        JoinOutcome = "failed"
 )
 
-type SLAClass string
+type LatencyScope string
 
 const (
-	SLAClassUndefined SLAClass = ""
-	SLAClassCounted   SLAClass = "counted"
-	SLAClassExcluded  SLAClass = "excluded"
+	LatencyScopeUndefined LatencyScope = ""
+	LatencyScopeCounted   LatencyScope = "counted"
+	LatencyScopeExcluded  LatencyScope = "excluded"
 )
 
 type Rollup string

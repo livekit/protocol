@@ -174,7 +174,7 @@ func (r *noopJobReporter) ReportJoinLatency(v uint32)                       {}
 func (r *noopJobReporter) ReportSIPInviteLatency(v uint32)                  {}
 func (r *noopJobReporter) ReportUserArrivedAt(v time.Time)                  {}
 func (r *noopJobReporter) ReportJoinOutcome(v JoinOutcome)                  {}
-func (r *noopJobReporter) ReportSLAClass(v SLAClass)                        {}
+func (r *noopJobReporter) ReportLatencyScope(v LatencyScope)                {}
 func (r *noopJobReporter) ReportAttempts(v uint8)                           {}
 func (r *noopJobReporter) ReportTotalLatencyMs(v uint32)                    {}
 func (r *noopJobReporter) ReportAttributableLatencyMs(v uint32)             {}
@@ -198,7 +198,7 @@ func (t *noopJobTx) ReportJoinLatency(v uint32)           {}
 func (t *noopJobTx) ReportSIPInviteLatency(v uint32)      {}
 func (t *noopJobTx) ReportUserArrivedAt(v time.Time)      {}
 func (t *noopJobTx) ReportJoinOutcome(v JoinOutcome)      {}
-func (t *noopJobTx) ReportSLAClass(v SLAClass)            {}
+func (t *noopJobTx) ReportLatencyScope(v LatencyScope)    {}
 func (t *noopJobTx) ReportAttempts(v uint8)               {}
 func (t *noopJobTx) ReportTotalLatencyMs(v uint32)        {}
 func (t *noopJobTx) ReportAttributableLatencyMs(v uint32) {}

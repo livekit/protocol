@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_AHGR81G = true
+const Version_B85FQHG = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -130,7 +130,7 @@ type jobReporter interface {
 	ReportSIPInviteLatency(v uint32)
 	ReportUserArrivedAt(v time.Time)
 	ReportJoinOutcome(v JoinOutcome)
-	ReportSLAClass(v SLAClass)
+	ReportLatencyScope(v LatencyScope)
 	ReportAttempts(v uint8)
 	ReportTotalLatencyMs(v uint32)
 	ReportAttributableLatencyMs(v uint32)
