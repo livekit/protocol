@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_59CN0A0 = true
+const Version_IP7ILN8 = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -111,26 +111,7 @@ type jobReporter interface {
 	ReportEndTime(v time.Time)
 	ReportJoinLatency(v uint32)
 	ReportSIPInviteLatency(v uint32)
-	ReportOrigin(v JobOrigin)
-	ReportDispatchTrigger(v DispatchTrigger)
-	ReportLaunchWarm(v LaunchWarm)
-	ReportMeasuredParticipantID(v string)
 	ReportUserArrivedAt(v time.Time)
-	ReportFirstPublishedAt(v time.Time)
-	ReportDispatchCreatedAt(v time.Time)
-	ReportWorkerRegisteredAt(v time.Time)
-	ReportFirstRequestedAt(v time.Time)
-	ReportRequestedAt(v time.Time)
-	ReportAcceptedAt(v time.Time)
-	ReportAssignedAt(v time.Time)
-	ReportAgentJoinedAt(v time.Time)
-	ReportAgentActiveAt(v time.Time)
-	ReportSdkAcceptUs(v uint32)
-	ReportSdkAssignmentWaitUs(v uint32)
-	ReportSdkLaunchUs(v uint32)
-	ReportSdkEntrypointStartUs(v uint32)
-	ReportSdkEntrypointToConnectUs(v uint32)
-	ReportSdkConnectUs(v uint32)
 	ReportJoinOutcome(v JoinOutcome)
 	ReportSLAClass(v SLAClass)
 	ReportAttempts(v uint8)
