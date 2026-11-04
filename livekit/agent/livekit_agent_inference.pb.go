@@ -628,8 +628,14 @@ func (*SessionClose) Descriptor() ([]byte, []int) {
 }
 
 type InferenceStart struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	RequestId     string                 `protobuf:"bytes,1,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	RequestId string                 `protobuf:"bytes,1,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	// Length of the current user turn, in samples at the session sample rate.
+	// Count from the start of the user turn, or from the last session_flush when
+	// the start is unknown, through the last input_audio sent before this
+	// message. The end-of-turn model reads it as the turn duration, which can be
+	// longer than the audio window it scores. 0 means unknown.
+	TurnSamples   uint32 `protobuf:"varint,2,opt,name=turn_samples,json=turnSamples,proto3" json:"turn_samples,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -669,6 +675,13 @@ func (x *InferenceStart) GetRequestId() string {
 		return x.RequestId
 	}
 	return ""
+}
+
+func (x *InferenceStart) GetTurnSamples() uint32 {
+	if x != nil {
+		return x.TurnSamples
+	}
+	return 0
 }
 
 type InferenceStop struct {
@@ -2017,10 +2030,11 @@ const file_agent_livekit_agent_inference_proto_rawDesc = "" +
 	"\x13EotInputChatContext\x126\n" +
 	"\bmessages\x18\x01 \x03(\v2\x1a.livekit.agent.ChatMessageR\bmessages\"\x0e\n" +
 	"\fSessionFlush\"\x0e\n" +
-	"\fSessionClose\"/\n" +
+	"\fSessionClose\"R\n" +
 	"\x0eInferenceStart\x12\x1d\n" +
 	"\n" +
-	"request_id\x18\x01 \x01(\tR\trequestId\".\n" +
+	"request_id\x18\x01 \x01(\tR\trequestId\x12!\n" +
+	"\fturn_samples\x18\x02 \x01(\rR\vturnSamples\".\n" +
 	"\rInferenceStop\x12\x1d\n" +
 	"\n" +
 	"request_id\x18\x01 \x01(\tR\trequestId\"\r\n" +
