@@ -2622,8 +2622,10 @@ type SimulationRun_Create_Request struct {
 	SipCallTo string `protobuf:"bytes,15,opt,name=sip_call_to,json=sipCallTo,proto3" json:"sip_call_to,omitempty"`
 	// Outbound trunk to dial through. Empty dials from sip_number, which must
 	// then be a LiveKit phone number the project owns.
-	SipTrunkId    string `protobuf:"bytes,16,opt,name=sip_trunk_id,json=sipTrunkId,proto3" json:"sip_trunk_id,omitempty"`
-	SipNumber     string `protobuf:"bytes,17,opt,name=sip_number,json=sipNumber,proto3" json:"sip_number,omitempty"`
+	SipTrunkId string `protobuf:"bytes,16,opt,name=sip_trunk_id,json=sipTrunkId,proto3" json:"sip_trunk_id,omitempty"`
+	SipNumber  string `protobuf:"bytes,17,opt,name=sip_number,json=sipNumber,proto3" json:"sip_number,omitempty"`
+	// Named deployment of agent_name to dispatch to; empty is production.
+	Deployment    string `protobuf:"bytes,18,opt,name=deployment,proto3" json:"deployment,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2759,6 +2761,13 @@ func (x *SimulationRun_Create_Request) GetSipTrunkId() string {
 func (x *SimulationRun_Create_Request) GetSipNumber() string {
 	if x != nil {
 		return x.SipNumber
+	}
+	return ""
+}
+
+func (x *SimulationRun_Create_Request) GetDeployment() string {
+	if x != nil {
+		return x.Deployment
 	}
 	return ""
 }
@@ -3605,7 +3614,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\xe1T\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\x81U\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -3876,8 +3885,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x05actor\x18\x06 \x01(\tR\x05actor\x1aH\n" +
 	"\x0fSamplingOptions\x12\x18\n" +
 	"\asamples\x18\x01 \x01(\x05R\asamples\x12\x1b\n" +
-	"\tpass_rate\x18\x02 \x01(\x01R\bpassRate\x1a\xe5\x06\n" +
-	"\x06Create\x1a\xcc\x05\n" +
+	"\tpass_rate\x18\x02 \x01(\x01R\bpassRate\x1a\x85\a\n" +
+	"\x06Create\x1a\xec\x05\n" +
 	"\aRequest\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1d\n" +
@@ -3899,7 +3908,10 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\fsip_trunk_id\x18\x10 \x01(\tR\n" +
 	"sipTrunkId\x12\x1d\n" +
 	"\n" +
-	"sip_number\x18\x11 \x01(\tR\tsipNumberB\x11\n" +
+	"sip_number\x18\x11 \x01(\tR\tsipNumber\x12\x1e\n" +
+	"\n" +
+	"deployment\x18\x12 \x01(\tR\n" +
+	"deploymentB\x11\n" +
 	"\x0f_scenario_groupB\x0e\n" +
 	"\f_concurrencyB\x05\n" +
 	"\x03_ciB\v\n" +

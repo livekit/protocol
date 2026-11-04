@@ -319,6 +319,9 @@ message SimulationRun {
       // then be a LiveKit phone number the project owns.
       string sip_trunk_id = 16;
       string sip_number = 17;
+
+      // Named deployment of agent_name to dispatch to; empty is production.
+      string deployment = 18;
     }
     message Response {
       string simulation_run_id = 1;
