@@ -273,11 +273,8 @@ message AgentSessionEvent {
     uint32 turn_id = 6;
     // The stage after this prediction. Never AMD_WAIT.
     AmdCategory stage = 7;
-    // Whether this prediction left the recommended transitions to correct an
-    // earlier stage.
-    bool corrects_stage = 8;
     // Unset when the turn ran no inference.
-    google.protobuf.Duration inference_duration = 9;
+    google.protobuf.Duration inference_duration = 8;
   }
 
   // Once per AMD run.

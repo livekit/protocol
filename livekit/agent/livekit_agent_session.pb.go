@@ -3259,11 +3259,8 @@ type AgentSessionEvent_AmdPrediction struct {
 	TurnId         uint32                 `protobuf:"varint,6,opt,name=turn_id,json=turnId,proto3" json:"turn_id,omitempty"`
 	// The stage after this prediction. Never AMD_WAIT.
 	Stage AmdCategory `protobuf:"varint,7,opt,name=stage,proto3,enum=livekit.agent.AmdCategory" json:"stage,omitempty"`
-	// Whether this prediction left the recommended transitions to correct an
-	// earlier stage.
-	CorrectsStage bool `protobuf:"varint,8,opt,name=corrects_stage,json=correctsStage,proto3" json:"corrects_stage,omitempty"`
 	// Unset when the turn ran no inference.
-	InferenceDuration *durationpb.Duration `protobuf:"bytes,9,opt,name=inference_duration,json=inferenceDuration,proto3" json:"inference_duration,omitempty"`
+	InferenceDuration *durationpb.Duration `protobuf:"bytes,8,opt,name=inference_duration,json=inferenceDuration,proto3" json:"inference_duration,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -3345,13 +3342,6 @@ func (x *AgentSessionEvent_AmdPrediction) GetStage() AmdCategory {
 		return x.Stage
 	}
 	return AmdCategory_AMD_UNKNOWN
-}
-
-func (x *AgentSessionEvent_AmdPrediction) GetCorrectsStage() bool {
-	if x != nil {
-		return x.CorrectsStage
-	}
-	return false
 }
 
 func (x *AgentSessionEvent_AmdPrediction) GetInferenceDuration() *durationpb.Duration {
@@ -5388,7 +5378,7 @@ const file_agent_livekit_agent_session_proto_rawDesc = "" +
 	"\vmodel_usage\x18\x01 \x03(\v2\x19.livekit.agent.ModelUsageR\n" +
 	"modelUsage\"A\n" +
 	"\fDebugMessage\x121\n" +
-	"\apayload\x18\x01 \x01(\v2\x17.google.protobuf.StructR\apayload\"\xca#\n" +
+	"\apayload\x18\x01 \x01(\v2\x17.google.protobuf.StructR\apayload\"\xa3#\n" +
 	"\x11AgentSessionEvent\x129\n" +
 	"\n" +
 	"created_at\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12d\n" +
@@ -5436,7 +5426,7 @@ const file_agent_livekit_agent_session_proto_rawDesc = "" +
 	"\x0fdetection_delay\x18\x03 \x01(\x01R\x0edetectionDelay\x12;\n" +
 	"\vdetected_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
 	"detectedAtB\x15\n" +
-	"\x13_overlap_started_at\x1a\xb0\x03\n" +
+	"\x13_overlap_started_at\x1a\x89\x03\n" +
 	"\rAmdPrediction\x12B\n" +
 	"\x0fspeech_duration\x18\x01 \x01(\v2\x19.google.protobuf.DurationR\x0espeechDuration\x126\n" +
 	"\bcategory\x18\x02 \x01(\x0e2\x1a.livekit.agent.AmdCategoryR\bcategory\x12\x16\n" +
@@ -5446,9 +5436,8 @@ const file_agent_livekit_agent_session_proto_rawDesc = "" +
 	"transcript\x12/\n" +
 	"\x05delay\x18\x05 \x01(\v2\x19.google.protobuf.DurationR\x05delay\x12\x17\n" +
 	"\aturn_id\x18\x06 \x01(\rR\x06turnId\x120\n" +
-	"\x05stage\x18\a \x01(\x0e2\x1a.livekit.agent.AmdCategoryR\x05stage\x12%\n" +
-	"\x0ecorrects_stage\x18\b \x01(\bR\rcorrectsStage\x12H\n" +
-	"\x12inference_duration\x18\t \x01(\v2\x19.google.protobuf.DurationR\x11inferenceDuration\x1a\xe8\x01\n" +
+	"\x05stage\x18\a \x01(\x0e2\x1a.livekit.agent.AmdCategoryR\x05stage\x12H\n" +
+	"\x12inference_duration\x18\b \x01(\v2\x19.google.protobuf.DurationR\x11inferenceDuration\x1a\xe8\x01\n" +
 	"\fAmdCompleted\x126\n" +
 	"\bcategory\x18\x01 \x01(\x0e2\x1a.livekit.agent.AmdCategoryR\bcategory\x12\x16\n" +
 	"\x06reason\x18\x02 \x01(\tR\x06reason\x128\n" +
