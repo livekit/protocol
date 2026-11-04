@@ -286,7 +286,7 @@ message AgentSessionEvent {
     string reason = 2;
     bool voicemail_message_played = 3;
     // Unset when the run ended before any prediction.
-    AmdPrediction last_prediction = 4;
+    AmdPrediction prediction = 4;
   }
 
   message EotPrediction {
