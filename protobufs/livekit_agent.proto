@@ -36,6 +36,8 @@ message Job {
   string deployment = 11;
   map<string, string> attributes = 12 [(logger.sensitivity) = SENSITIVITY_PII];
   bool enable_redaction = 13;
+  // when the server created the job, in Unix nanoseconds
+  int64 created_at = 14;
 }
 
 message JobState {
@@ -49,6 +51,10 @@ message JobState {
   string agent_id = 8 [(logger.name) = "agentID"];
   // why the job has no agent, for JS_PENDING and JS_CANCELLED jobs
   JobStateReason reason = 9;
+  // when the server received the worker's accept for this attempt, in Unix nanoseconds
+  int64 accepted_at = 10;
+  // when the server sent the assignment for this attempt, in Unix nanoseconds
+  int64 assigned_at = 11;
 }
 
 // from Worker to Server
