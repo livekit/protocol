@@ -39,8 +39,10 @@ const (
 type JobRestartPolicy int32
 
 const (
-	JobRestartPolicy_JRP_ON_FAILURE JobRestartPolicy = 0 // restart when the job fails (default)
-	JobRestartPolicy_JRP_NEVER      JobRestartPolicy = 1 // never restart
+	// Restart the job when it fails. This is the default.
+	JobRestartPolicy_JRP_ON_FAILURE JobRestartPolicy = 0
+	// Never restart the job.
+	JobRestartPolicy_JRP_NEVER JobRestartPolicy = 1
 )
 
 // Enum value maps for JobRestartPolicy.
@@ -223,12 +225,13 @@ func (x *CreateAgentDispatchRequest) GetAttributes() map[string]string {
 }
 
 type RoomAgentDispatch struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	AgentName     string                 `protobuf:"bytes,1,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
-	Metadata      string                 `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
-	RestartPolicy JobRestartPolicy       `protobuf:"varint,3,opt,name=restart_policy,json=restartPolicy,proto3,enum=livekit.JobRestartPolicy" json:"restart_policy,omitempty"` // cloud only
-	Deployment    string                 `protobuf:"bytes,4,opt,name=deployment,proto3" json:"deployment,omitempty"`
-	Attributes    map[string]string      `protobuf:"bytes,5,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	AgentName string                 `protobuf:"bytes,1,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
+	Metadata  string                 `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	// The restart policy of the job. Applies only on LiveKit Cloud.
+	RestartPolicy JobRestartPolicy  `protobuf:"varint,3,opt,name=restart_policy,json=restartPolicy,proto3,enum=livekit.JobRestartPolicy" json:"restart_policy,omitempty"`
+	Deployment    string            `protobuf:"bytes,4,opt,name=deployment,proto3" json:"deployment,omitempty"`
+	Attributes    map[string]string `protobuf:"bytes,5,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

@@ -43,9 +43,9 @@ type SimulationMode int32
 
 const (
 	SimulationMode_SIMULATION_MODE_UNSPECIFIED SimulationMode = 0
-	// The simulator chats over text streams (no audio).
+	// The simulated user chats over text streams, with no audio.
 	SimulationMode_SIMULATION_MODE_TEXT SimulationMode = 1
-	// The simulator publishes/subscribes audio in the room.
+	// The simulated user publishes and subscribes to audio in the room.
 	SimulationMode_SIMULATION_MODE_AUDIO SimulationMode = 2
 )
 
@@ -210,7 +210,7 @@ type SimulationRun_Job_FailureReason int32
 
 const (
 	SimulationRun_Job_FAILURE_REASON_UNSPECIFIED SimulationRun_Job_FailureReason = 0
-	// The agent under test never joined the simulation's room.
+	// The agent under test did not join the simulation room.
 	SimulationRun_Job_FAILURE_REASON_AGENT_JOIN_TIMEOUT SimulationRun_Job_FailureReason = 1
 )
 
@@ -256,13 +256,19 @@ func (SimulationRun_Job_FailureReason) EnumDescriptor() ([]byte, []int) {
 type SimulationRun_JobMetrics_EndReason int32
 
 const (
-	SimulationRun_JobMetrics_END_REASON_UNSPECIFIED        SimulationRun_JobMetrics_EndReason = 0
-	SimulationRun_JobMetrics_END_REASON_SCENARIO_COMPLETED SimulationRun_JobMetrics_EndReason = 1 // the caller finished the scenario
-	SimulationRun_JobMetrics_END_REASON_AGENT_ENDED        SimulationRun_JobMetrics_EndReason = 2 // the agent under test ended the call
-	SimulationRun_JobMetrics_END_REASON_INACTIVITY         SimulationRun_JobMetrics_EndReason = 3 // the agent under test went silent
-	SimulationRun_JobMetrics_END_REASON_TURN_LIMIT         SimulationRun_JobMetrics_EndReason = 4 // the caller ran out of turns
-	SimulationRun_JobMetrics_END_REASON_EMPTY_RESPONSE     SimulationRun_JobMetrics_EndReason = 5 // the agent under test kept replying with nothing
-	SimulationRun_JobMetrics_END_REASON_AGENT_ERROR        SimulationRun_JobMetrics_EndReason = 6 // the agent under test failed mid-call
+	SimulationRun_JobMetrics_END_REASON_UNSPECIFIED SimulationRun_JobMetrics_EndReason = 0
+	// The caller finished the scenario.
+	SimulationRun_JobMetrics_END_REASON_SCENARIO_COMPLETED SimulationRun_JobMetrics_EndReason = 1
+	// The agent under test ended the call.
+	SimulationRun_JobMetrics_END_REASON_AGENT_ENDED SimulationRun_JobMetrics_EndReason = 2
+	// The agent under test stopped speaking.
+	SimulationRun_JobMetrics_END_REASON_INACTIVITY SimulationRun_JobMetrics_EndReason = 3
+	// The caller used all of its turns.
+	SimulationRun_JobMetrics_END_REASON_TURN_LIMIT SimulationRun_JobMetrics_EndReason = 4
+	// The agent under test replied with nothing again and again.
+	SimulationRun_JobMetrics_END_REASON_EMPTY_RESPONSE SimulationRun_JobMetrics_EndReason = 5
+	// The agent under test failed during the call.
+	SimulationRun_JobMetrics_END_REASON_AGENT_ERROR SimulationRun_JobMetrics_EndReason = 6
 )
 
 // Enum value maps for SimulationRun_JobMetrics_EndReason.
@@ -414,24 +420,28 @@ type SimulationRun struct {
 	PassedCount      int32                  `protobuf:"varint,13,opt,name=passed_count,json=passedCount,proto3" json:"passed_count,omitempty"`
 	FailedCount      int32                  `protobuf:"varint,14,opt,name=failed_count,json=failedCount,proto3" json:"failed_count,omitempty"`
 	NumSimulations   int32                  `protobuf:"varint,15,opt,name=num_simulations,json=numSimulations,proto3" json:"num_simulations,omitempty"`
-	// Aggregate usage across all jobs in this run (sum of Job.usage).
+	// The total usage over all jobs of this run: the sum of `Job.usage`.
 	Usage *SimulationRun_Usage `protobuf:"bytes,16,opt,name=usage,proto3" json:"usage,omitempty"`
-	// Maximum simulate jobs running in parallel for this run (0 = server default).
+	// The maximum number of jobs of this run that run in parallel. 0 means the
+	// default.
 	Concurrency int32 `protobuf:"varint,17,opt,name=concurrency,proto3" json:"concurrency,omitempty"`
-	// Conversation mode for every job in this run; unspecified = TEXT.
+	// The conversation mode of every job in this run.
+	// `SIMULATION_MODE_UNSPECIFIED` means `SIMULATION_MODE_TEXT`.
 	Mode SimulationMode `protobuf:"varint,18,opt,name=mode,proto3,enum=livekit.SimulationMode" json:"mode,omitempty"`
-	// Run-level aggregates over this run's jobs.
+	// The aggregate metrics over the jobs of this run.
 	Metrics *SimulationRun_RunMetrics `protobuf:"bytes,19,opt,name=metrics,proto3" json:"metrics,omitempty"`
-	// zstd-compressed SimulationRunSummary: decompress, then proto.Unmarshal.
-	// Compressed by default so the blob ships as-is on every hop.
+	// The `SimulationRunSummary` of the run, compressed with zstd. To read it,
+	// decompress it, then unmarshal it as a `SimulationRunSummary`.
 	SummaryZstd []byte `protobuf:"bytes,20,opt,name=summary_zstd,json=summaryZstd,proto3" json:"summary_zstd,omitempty"`
-	// How many issues the stored summary flagged. Present only once a summary
-	// landed — absent and 0 differ ("never summarized" vs "no issues") — and
-	// List responses carry it without the summary blob itself.
+	// The number of issues in the summary of the run. Set only after the run
+	// has a summary. Unset and 0 have different meanings: unset means that the
+	// run has no summary, and 0 means that the summary has no issues. `List`
+	// responses include this field, but not the summary.
 	IssueCount *int32 `protobuf:"varint,21,opt,name=issue_count,json=issueCount,proto3,oneof" json:"issue_count,omitempty"`
-	// The pipeline this run came from; unset when it did not come from one.
+	// The CI pipeline that started the run. Unset when no pipeline started it.
 	Ci *SimulationRun_CI `protobuf:"bytes,22,opt,name=ci,proto3,oneof" json:"ci,omitempty"`
-	// Absent when the run ran each scenario once and required it to pass.
+	// The sampling options of the run. Unset when the run ran each scenario
+	// once and required each scenario to pass.
 	Sampling      *SimulationRun_SamplingOptions `protobuf:"bytes,23,opt,name=sampling,proto3,oneof" json:"sampling,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -621,20 +631,23 @@ func (x *SimulationRun) GetSampling() *SimulationRun_SamplingOptions {
 	return nil
 }
 
-// A single scenario, mirroring one entry in a scenarios.yaml file. Scenarios
-// are no longer stored server-side; the yaml file is the source of truth.
+// A scenario of a simulation run. It has the same fields as one entry of a
+// `scenarios.yaml` file.
 type Scenario struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
 	Label             string                 `protobuf:"bytes,1,opt,name=label,proto3" json:"label,omitempty"`
 	Instructions      string                 `protobuf:"bytes,2,opt,name=instructions,proto3" json:"instructions,omitempty"`
 	AgentExpectations string                 `protobuf:"bytes,3,opt,name=agent_expectations,json=agentExpectations,proto3" json:"agent_expectations,omitempty"`
-	// Surfaced to the agent under test as SimulationContext scenario tags.
+	// The tags that the agent under test gets as the scenario tags of
+	// `SimulationContext`.
 	Tags map[string]string `protobuf:"bytes,4,rep,name=tags,proto3" json:"tags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	// Arbitrary JSON-encoded object, surfaced to the agent under test as
-	// SimulationContext userdata (e.g. inputs and benchmark target state).
+	// A JSON-encoded object of any shape. The agent under test gets it as the
+	// userdata of `SimulationContext`, for example inputs and the target state
+	// of a benchmark.
 	Userdata string `protobuf:"bytes,5,opt,name=userdata,proto3" json:"userdata,omitempty"`
-	// SCN_-prefixed guid. Stable across edits to label, instructions, or
-	// expectations, so runs of the same scenario can be correlated over time.
+	// The ID of the scenario, with the prefix `SCN_`. It stays the same when
+	// you edit `label`, `instructions`, or `agent_expectations`, so you can
+	// correlate the runs of one scenario over time.
 	Id            string `protobuf:"bytes,6,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -712,13 +725,14 @@ func (x *Scenario) GetId() string {
 	return ""
 }
 
-// A named group of scenarios, mirroring a whole scenarios.yaml file.
+// A named group of scenarios. It has the same contents as a `scenarios.yaml`
+// file.
 type ScenarioGroup struct {
 	state     protoimpl.MessageState `protogen:"open.v1"`
 	Name      string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Scenarios []*Scenario            `protobuf:"bytes,2,rep,name=scenarios,proto3" json:"scenarios,omitempty"`
-	// SCNG_-prefixed guid. Stable identity of the scenarios file, independent
-	// of its name.
+	// The ID of the group, with the prefix `SCNG_`. It identifies the scenarios
+	// file, and it does not change with `name`.
 	Id            string `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -775,7 +789,8 @@ func (x *ScenarioGroup) GetId() string {
 	return ""
 }
 
-// What the simulated caller's audio went through before the agent heard it.
+// The impairments applied to the audio of the simulated caller before the
+// agent heard it.
 type SimulationImpairments struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
 	BackgroundNoise      bool                   `protobuf:"varint,1,opt,name=background_noise,json=backgroundNoise,proto3" json:"background_noise,omitempty"`
@@ -836,9 +851,10 @@ func (x *SimulationImpairments) GetPacketLoss() bool {
 	return false
 }
 
-// Carried (protojson-encoded) in the Job's lk.simulator.dispatch attribute, set
-// on the agent dispatch, so the agent under test can read the scenario + run
-// identity synchronously at job start.
+// The scenario and run identity of a simulation job. The job attribute
+// `lk.simulator.dispatch` holds it, encoded as protojson. The agent dispatch
+// sets the attribute, so the agent under test can read the scenario and the
+// run identity synchronously when the job starts.
 type SimulationDispatch struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	SimulationRunId string                 `protobuf:"bytes,1,opt,name=simulation_run_id,json=simulationRunId,proto3" json:"simulation_run_id,omitempty"`
@@ -981,15 +997,18 @@ type SimulationRun_Job struct {
 	EndedAt           *timestamppb.Timestamp   `protobuf:"bytes,11,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
 	RoomId            string                   `protobuf:"bytes,12,opt,name=room_id,json=roomId,proto3" json:"room_id,omitempty"`
 	Usage             *SimulationRun_Job_Usage `protobuf:"bytes,13,opt,name=usage,proto3" json:"usage,omitempty"`
-	// Quality metrics for this job's call. Unset when the job produced none.
+	// The call quality metrics of this job. Unset when the job produced no
+	// metrics.
 	Metrics *SimulationRun_JobMetrics `protobuf:"bytes,14,opt,name=metrics,proto3" json:"metrics,omitempty"`
-	// The Scenario.id this job ran; empty for generated runs. Every sample
-	// of one scenario shares it, so a run's jobs group back into scenarios.
+	// The `id` of the `Scenario` that this job ran. Empty for a run with
+	// generated scenarios. All samples of a scenario have the same value, so
+	// you can group the jobs of a run by scenario.
 	ScenarioId string `protobuf:"bytes,15,opt,name=scenario_id,json=scenarioId,proto3" json:"scenario_id,omitempty"`
-	// 1-based sample of that scenario within the run; always 1 when the run's
-	// samples is 1.
+	// The sample number of the scenario in the run, starting at 1. Always 1
+	// when the run has one sample for each scenario.
 	Sample int32 `protobuf:"varint,16,opt,name=sample,proto3" json:"sample,omitempty"`
-	// Set on a failed job whose cause is known; error stays the detail.
+	// The cause of a failed job, when the cause is known. `error` still has
+	// the details.
 	FailureReason SimulationRun_Job_FailureReason `protobuf:"varint,19,opt,name=failure_reason,json=failureReason,proto3,enum=livekit.SimulationRun_Job_FailureReason" json:"failure_reason,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1138,35 +1157,59 @@ func (x *SimulationRun_Job) GetFailureReason() SimulationRun_Job_FailureReason {
 }
 
 type SimulationRun_JobMetrics struct {
-	state          protoimpl.MessageState                 `protogen:"open.v1"`
-	TaskCompletion *float32                               `protobuf:"fixed32,3,opt,name=task_completion,json=taskCompletion,proto3,oneof" json:"task_completion,omitempty"` // the scenario verdict as 1/0
-	OverallScore   *float32                               `protobuf:"fixed32,20,opt,name=overall_score,json=overallScore,proto3,oneof" json:"overall_score,omitempty"`      // weighted mean of the judged and heard scores
-	Stt            *SimulationRun_JobMetrics_STT          `protobuf:"bytes,4,opt,name=stt,proto3" json:"stt,omitempty"`
-	Llm            *SimulationRun_JobMetrics_LLM          `protobuf:"bytes,5,opt,name=llm,proto3" json:"llm,omitempty"`
-	Tts            *SimulationRun_JobMetrics_TTS          `protobuf:"bytes,6,opt,name=tts,proto3" json:"tts,omitempty"`
-	Conversation   *SimulationRun_JobMetrics_Conversation `protobuf:"bytes,7,opt,name=conversation,proto3" json:"conversation,omitempty"`
-	// One entry per turn, both speakers.
-	Turns            []*SimulationRun_JobMetrics_Turn `protobuf:"bytes,9,rep,name=turns,proto3" json:"turns,omitempty"`
-	JudgeModel       string                           `protobuf:"bytes,10,opt,name=judge_model,json=judgeModel,proto3" json:"judge_model,omitempty"`                      // text judge for judged scores; "" if none ran
-	HasRemoteSession bool                             `protobuf:"varint,12,opt,name=has_remote_session,json=hasRemoteSession,proto3" json:"has_remote_session,omitempty"` // false = waveform-only capture (e.g. SIP)
-	T0               *timestamppb.Timestamp           `protobuf:"bytes,13,opt,name=t0,proto3" json:"t0,omitempty"`                                                        // audio only; call start (first speech edge); turn times relative to it
-	// Judged over the authored dialog (text and audio); needs the text judge.
-	Conciseness *float32 `protobuf:"fixed32,14,opt,name=conciseness,proto3,oneof" json:"conciseness,omitempty"` // judged {0, 0.5, 1} per agent turn; job = mean
-	// Whole-call issue flags; true = present, absent = not judged.
-	UnnecessaryToolCalls    *bool    `protobuf:"varint,15,opt,name=unnecessary_tool_calls,json=unnecessaryToolCalls,proto3,oneof" json:"unnecessary_tool_calls,omitempty"`
-	InformationLoss         *bool    `protobuf:"varint,16,opt,name=information_loss,json=informationLoss,proto3,oneof" json:"information_loss,omitempty"`
-	RedundantStatements     *bool    `protobuf:"varint,17,opt,name=redundant_statements,json=redundantStatements,proto3,oneof" json:"redundant_statements,omitempty"`
-	PoorQuestionQuality     *bool    `protobuf:"varint,18,opt,name=poor_question_quality,json=poorQuestionQuality,proto3,oneof" json:"poor_question_quality,omitempty"`
-	ConversationProgression *float32 `protobuf:"fixed32,19,opt,name=conversation_progression,json=conversationProgression,proto3,oneof" json:"conversation_progression,omitempty"` // 0-1, derived from the flags above
-	// How the call ended. A failing end also sets the job's error.
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The verdict of the scenario: 1 when it passed, 0 when it failed. Unset
+	// when the simulator spoiled the call.
+	TaskCompletion *float32 `protobuf:"fixed32,3,opt,name=task_completion,json=taskCompletion,proto3,oneof" json:"task_completion,omitempty"`
+	// The overall score of the job, from 0 to 1: the weighted mean of the
+	// judged scores and the heard scores. Unset when the simulator spoiled the
+	// call.
+	OverallScore *float32                               `protobuf:"fixed32,20,opt,name=overall_score,json=overallScore,proto3,oneof" json:"overall_score,omitempty"`
+	Stt          *SimulationRun_JobMetrics_STT          `protobuf:"bytes,4,opt,name=stt,proto3" json:"stt,omitempty"`
+	Llm          *SimulationRun_JobMetrics_LLM          `protobuf:"bytes,5,opt,name=llm,proto3" json:"llm,omitempty"`
+	Tts          *SimulationRun_JobMetrics_TTS          `protobuf:"bytes,6,opt,name=tts,proto3" json:"tts,omitempty"`
+	Conversation *SimulationRun_JobMetrics_Conversation `protobuf:"bytes,7,opt,name=conversation,proto3" json:"conversation,omitempty"`
+	// The turns of the call, one item for each turn of either speaker.
+	Turns []*SimulationRun_JobMetrics_Turn `protobuf:"bytes,9,rep,name=turns,proto3" json:"turns,omitempty"`
+	// The text judge model that produced the judged scores. Empty when no
+	// judge ran.
+	JudgeModel string `protobuf:"bytes,10,opt,name=judge_model,json=judgeModel,proto3" json:"judge_model,omitempty"`
+	// True when the job has a `RemoteSession` of the agent. When false, the
+	// job has only a waveform capture, for example on a SIP call.
+	HasRemoteSession bool `protobuf:"varint,12,opt,name=has_remote_session,json=hasRemoteSession,proto3" json:"has_remote_session,omitempty"`
+	// The start of the call: the first edge of speech. The turn times are
+	// relative to this time. Audio only.
+	T0 *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=t0,proto3" json:"t0,omitempty"`
+	// The conciseness score of the agent, judged over the dialog for text and
+	// audio. Each agent turn scores 0, 0.5, or 1, and the job value is the
+	// mean of the turns. Requires the text judge.
+	Conciseness *float32 `protobuf:"fixed32,14,opt,name=conciseness,proto3,oneof" json:"conciseness,omitempty"`
+	// True when the judge found unnecessary tool calls in the call. Unset when
+	// the call was not judged.
+	UnnecessaryToolCalls *bool `protobuf:"varint,15,opt,name=unnecessary_tool_calls,json=unnecessaryToolCalls,proto3,oneof" json:"unnecessary_tool_calls,omitempty"`
+	// True when the judge found information loss in the call. Unset when the
+	// call was not judged.
+	InformationLoss *bool `protobuf:"varint,16,opt,name=information_loss,json=informationLoss,proto3,oneof" json:"information_loss,omitempty"`
+	// True when the judge found redundant statements in the call. Unset when
+	// the call was not judged.
+	RedundantStatements *bool `protobuf:"varint,17,opt,name=redundant_statements,json=redundantStatements,proto3,oneof" json:"redundant_statements,omitempty"`
+	// True when the judge found questions of poor quality in the call. Unset
+	// when the call was not judged.
+	PoorQuestionQuality *bool `protobuf:"varint,18,opt,name=poor_question_quality,json=poorQuestionQuality,proto3,oneof" json:"poor_question_quality,omitempty"`
+	// The progression score of the conversation, from 0 to 1. It is derived
+	// from the issue flags.
+	ConversationProgression *float32 `protobuf:"fixed32,19,opt,name=conversation_progression,json=conversationProgression,proto3,oneof" json:"conversation_progression,omitempty"`
+	// How the call ended. When the end is a failure, `error` of the job is
+	// also set.
 	EndReason SimulationRun_JobMetrics_EndReason `protobuf:"varint,21,opt,name=end_reason,json=endReason,proto3,enum=livekit.SimulationRun_JobMetrics_EndReason" json:"end_reason,omitempty"`
-	// The simulated caller's language, as a language tag: what it spoke or wrote.
+	// The language that the simulated caller spoke or wrote, as a language
+	// tag.
 	CallerLanguage string `protobuf:"bytes,22,opt,name=caller_language,json=callerLanguage,proto3" json:"caller_language,omitempty"`
-	// Audio only: the language the caller transcribed the agent in; "" means
-	// caller_language.
+	// The language that the caller used to transcribe the agent. Empty means
+	// the same language as `caller_language`. Audio only.
 	CallerListenLanguage string `protobuf:"bytes,23,opt,name=caller_listen_language,json=callerListenLanguage,proto3" json:"caller_listen_language,omitempty"`
-	// Audio only: what the caller's audio went through before the agent heard
-	// it. Absent for a clean call.
+	// The impairments applied to the audio of the caller before the agent
+	// heard it. Unset for a clean call. Audio only.
 	Impairments   *SimulationImpairments `protobuf:"bytes,24,opt,name=impairments,proto3" json:"impairments,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1342,18 +1385,22 @@ func (x *SimulationRun_JobMetrics) GetImpairments() *SimulationImpairments {
 	return nil
 }
 
-// Aggregates over this run's jobs, so a run summary does not have to pull
-// every job and turn. Reuses the JobMetrics group shapes.
+// The aggregate metrics over the jobs of a run. Use them to summarize a run
+// without reading each job and turn. The groups have the same shapes as in
+// `JobMetrics`.
 type SimulationRun_RunMetrics struct {
-	state            protoimpl.MessageState                 `protogen:"open.v1"`
-	ScenarioPassRate *float32                               `protobuf:"fixed32,3,opt,name=scenario_pass_rate,json=scenarioPassRate,proto3,oneof" json:"scenario_pass_rate,omitempty"` // share of jobs whose scenario verdict passed
-	OverallScore     *float32                               `protobuf:"fixed32,10,opt,name=overall_score,json=overallScore,proto3,oneof" json:"overall_score,omitempty"`              // mean over scored jobs
-	Stt              *SimulationRun_JobMetrics_STT          `protobuf:"bytes,4,opt,name=stt,proto3" json:"stt,omitempty"`
-	Llm              *SimulationRun_JobMetrics_LLM          `protobuf:"bytes,5,opt,name=llm,proto3" json:"llm,omitempty"`
-	Tts              *SimulationRun_JobMetrics_TTS          `protobuf:"bytes,6,opt,name=tts,proto3" json:"tts,omitempty"`
-	Conversation     *SimulationRun_JobMetrics_Conversation `protobuf:"bytes,7,opt,name=conversation,proto3" json:"conversation,omitempty"`
-	// Means over the jobs that report them.
-	Conciseness             *float32 `protobuf:"fixed32,8,opt,name=conciseness,proto3,oneof" json:"conciseness,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The fraction of jobs that passed the scenario verdict.
+	ScenarioPassRate *float32 `protobuf:"fixed32,3,opt,name=scenario_pass_rate,json=scenarioPassRate,proto3,oneof" json:"scenario_pass_rate,omitempty"`
+	// The mean `overall_score` over the scored jobs.
+	OverallScore *float32                               `protobuf:"fixed32,10,opt,name=overall_score,json=overallScore,proto3,oneof" json:"overall_score,omitempty"`
+	Stt          *SimulationRun_JobMetrics_STT          `protobuf:"bytes,4,opt,name=stt,proto3" json:"stt,omitempty"`
+	Llm          *SimulationRun_JobMetrics_LLM          `protobuf:"bytes,5,opt,name=llm,proto3" json:"llm,omitempty"`
+	Tts          *SimulationRun_JobMetrics_TTS          `protobuf:"bytes,6,opt,name=tts,proto3" json:"tts,omitempty"`
+	Conversation *SimulationRun_JobMetrics_Conversation `protobuf:"bytes,7,opt,name=conversation,proto3" json:"conversation,omitempty"`
+	// The mean `conciseness` over the jobs that report it.
+	Conciseness *float32 `protobuf:"fixed32,8,opt,name=conciseness,proto3,oneof" json:"conciseness,omitempty"`
+	// The mean `conversation_progression` over the jobs that report it.
 	ConversationProgression *float32 `protobuf:"fixed32,9,opt,name=conversation_progression,json=conversationProgression,proto3,oneof" json:"conversation_progression,omitempty"`
 	unknownFields           protoimpl.UnknownFields
 	sizeCache               protoimpl.SizeCache
@@ -1445,16 +1492,19 @@ func (x *SimulationRun_RunMetrics) GetConversationProgression() float32 {
 	return 0
 }
 
-// The pipeline this run came from. Set by the client from its CI
-// environment; absent for runs not started by a pipeline.
+// The CI pipeline that started a run. The client sets it from its CI
+// environment.
 type SimulationRun_CI struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Provider      string                 `protobuf:"bytes,1,opt,name=provider,proto3" json:"provider,omitempty"` // e.g. "github_actions"
-	CommitSha     string                 `protobuf:"bytes,2,opt,name=commit_sha,json=commitSha,proto3" json:"commit_sha,omitempty"`
-	Ref           string                 `protobuf:"bytes,3,opt,name=ref,proto3" json:"ref,omitempty"` // branch or tag
-	PullRequest   string                 `protobuf:"bytes,4,opt,name=pull_request,json=pullRequest,proto3" json:"pull_request,omitempty"`
-	RunUrl        string                 `protobuf:"bytes,5,opt,name=run_url,json=runUrl,proto3" json:"run_url,omitempty"` // link back to the CI job
-	Actor         string                 `protobuf:"bytes,6,opt,name=actor,proto3" json:"actor,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The CI provider, for example `github_actions`.
+	Provider  string `protobuf:"bytes,1,opt,name=provider,proto3" json:"provider,omitempty"`
+	CommitSha string `protobuf:"bytes,2,opt,name=commit_sha,json=commitSha,proto3" json:"commit_sha,omitempty"`
+	// The branch or tag.
+	Ref         string `protobuf:"bytes,3,opt,name=ref,proto3" json:"ref,omitempty"`
+	PullRequest string `protobuf:"bytes,4,opt,name=pull_request,json=pullRequest,proto3" json:"pull_request,omitempty"`
+	// The URL of the CI job.
+	RunUrl        string `protobuf:"bytes,5,opt,name=run_url,json=runUrl,proto3" json:"run_url,omitempty"`
+	Actor         string `protobuf:"bytes,6,opt,name=actor,proto3" json:"actor,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1531,16 +1581,19 @@ func (x *SimulationRun_CI) GetActor() string {
 	return ""
 }
 
-// Runs each scenario more than once, so a flaky sample is distinguishable
-// from a broken scenario. Both fields are required when it is present.
+// The options to run each scenario more than once. With several samples, you
+// can tell a flaky sample from a broken scenario. When you set the options,
+// both fields are required.
 type SimulationRun_SamplingOptions struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Samples per scenario, > 1. The run holds scenarios × samples jobs,
-	// subject to the usual job cap.
+	// The number of samples of each scenario. Must be greater than 1. The run
+	// has one job for each sample of each scenario, and the job limit of the
+	// run still applies.
 	Samples int32 `protobuf:"varint,1,opt,name=samples,proto3" json:"samples,omitempty"`
-	// The share of a scenario's samples that must pass for that scenario to
-	// pass, 0-1. A scenario needs round(rate × samples) of them, so 1
-	// requires every sample and 0.67 of 3 requires 2.
+	// The fraction of the samples of a scenario that must pass for the
+	// scenario to pass, from 0 to 1. A scenario needs round(`pass_rate` ×
+	// `samples`) passed samples. Thus, 1 requires every sample, and 0.67 with
+	// 3 samples requires 2.
 	PassRate      float64 `protobuf:"fixed64,2,opt,name=pass_rate,json=passRate,proto3" json:"pass_rate,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1734,8 +1787,8 @@ func (*SimulationRun_List) Descriptor() ([]byte, []int) {
 	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{1, 8}
 }
 
-// Counts of the runs `List` would return over the same window, bucketed by
-// created_at instead of paginated.
+// The number of runs that `List` returns for the same window and filters,
+// counted in time buckets on `created_at` in place of pages.
 type SimulationRun_Counts struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -1914,24 +1967,44 @@ func (x *SimulationRun_Job_Usage) GetAudioTurnsCount() int32 {
 
 // The agent's perception of the caller. Audio only.
 type SimulationRun_JobMetrics_STT struct {
-	state      protoimpl.MessageState `protogen:"open.v1"`
-	Wer        *float32               `protobuf:"fixed32,1,opt,name=wer,proto3,oneof" json:"wer,omitempty"`                                  // needs the RemoteSession; word_errors / words
-	Words      *uint32                `protobuf:"varint,2,opt,name=words,proto3,oneof" json:"words,omitempty"`                               // needs the RemoteSession
-	WordErrors *uint32                `protobuf:"varint,3,opt,name=word_errors,json=wordErrors,proto3,oneof" json:"word_errors,omitempty"`   // needs the RemoteSession
-	Cer        *float32               `protobuf:"fixed32,4,opt,name=cer,proto3,oneof" json:"cer,omitempty"`                                  // needs the RemoteSession; char_errors / chars
-	Chars      *uint32                `protobuf:"varint,9,opt,name=chars,proto3,oneof" json:"chars,omitempty"`                               // needs the RemoteSession
-	CharErrors *uint32                `protobuf:"varint,10,opt,name=char_errors,json=charErrors,proto3,oneof" json:"char_errors,omitempty"`  // needs the RemoteSession
-	SttDelayMs *uint32                `protobuf:"varint,8,opt,name=stt_delay_ms,json=sttDelayMs,proto3,oneof" json:"stt_delay_ms,omitempty"` // needs the RemoteSession; agent-reported STT/endpointing delay
-	// Key entities (names, IDs, amounts) the caller said. Needs the text judge.
-	EntityRecognition  *float32 `protobuf:"fixed32,11,opt,name=entity_recognition,json=entityRecognition,proto3,oneof" json:"entity_recognition,omitempty"` // recognized / uttered
-	EntitiesUttered    *uint32  `protobuf:"varint,12,opt,name=entities_uttered,json=entitiesUttered,proto3,oneof" json:"entities_uttered,omitempty"`
-	EntitiesRecognized *uint32  `protobuf:"varint,13,opt,name=entities_recognized,json=entitiesRecognized,proto3,oneof" json:"entities_recognized,omitempty"`
-	// Retention: an entity is acquired at the first saying heard right, and
-	// these count only the sayings after that, so recall separates keeping an
-	// entity from ever getting it.
-	EntityRecall               *float32 `protobuf:"fixed32,14,opt,name=entity_recall,json=entityRecall,proto3,oneof" json:"entity_recall,omitempty"` // acquired_recognized / acquired_uttered
-	EntitiesAcquiredUttered    *uint32  `protobuf:"varint,15,opt,name=entities_acquired_uttered,json=entitiesAcquiredUttered,proto3,oneof" json:"entities_acquired_uttered,omitempty"`
-	EntitiesAcquiredRecognized *uint32  `protobuf:"varint,16,opt,name=entities_acquired_recognized,json=entitiesAcquiredRecognized,proto3,oneof" json:"entities_acquired_recognized,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The word error rate: `word_errors` / `words`. Requires a
+	// `RemoteSession`.
+	Wer *float32 `protobuf:"fixed32,1,opt,name=wer,proto3,oneof" json:"wer,omitempty"`
+	// The word count for `wer`. Requires a `RemoteSession`.
+	Words *uint32 `protobuf:"varint,2,opt,name=words,proto3,oneof" json:"words,omitempty"`
+	// The word error count for `wer`. Requires a `RemoteSession`.
+	WordErrors *uint32 `protobuf:"varint,3,opt,name=word_errors,json=wordErrors,proto3,oneof" json:"word_errors,omitempty"`
+	// The character error rate: `char_errors` / `chars`. Requires a
+	// `RemoteSession`.
+	Cer *float32 `protobuf:"fixed32,4,opt,name=cer,proto3,oneof" json:"cer,omitempty"`
+	// The character count for `cer`. Requires a `RemoteSession`.
+	Chars *uint32 `protobuf:"varint,9,opt,name=chars,proto3,oneof" json:"chars,omitempty"`
+	// The character error count for `cer`. Requires a `RemoteSession`.
+	CharErrors *uint32 `protobuf:"varint,10,opt,name=char_errors,json=charErrors,proto3,oneof" json:"char_errors,omitempty"`
+	// The STT and endpointing delay that the agent reported, in
+	// milliseconds. Requires a `RemoteSession`.
+	SttDelayMs *uint32 `protobuf:"varint,8,opt,name=stt_delay_ms,json=sttDelayMs,proto3,oneof" json:"stt_delay_ms,omitempty"`
+	// The entity recognition rate: `entities_recognized` /
+	// `entities_uttered`. Entities are the key items, such as names, IDs, and
+	// amounts, that the caller said. Requires the text judge.
+	EntityRecognition *float32 `protobuf:"fixed32,11,opt,name=entity_recognition,json=entityRecognition,proto3,oneof" json:"entity_recognition,omitempty"`
+	// The number of entities that the caller said.
+	EntitiesUttered *uint32 `protobuf:"varint,12,opt,name=entities_uttered,json=entitiesUttered,proto3,oneof" json:"entities_uttered,omitempty"`
+	// The number of entities that the agent recognized correctly.
+	EntitiesRecognized *uint32 `protobuf:"varint,13,opt,name=entities_recognized,json=entitiesRecognized,proto3,oneof" json:"entities_recognized,omitempty"`
+	// The entity recall rate: `entities_acquired_recognized` /
+	// `entities_acquired_uttered`. An entity is acquired the first time that
+	// the agent recognizes it correctly. These counts include only the times
+	// that the caller said an entity after it was acquired. Thus, recall
+	// measures whether the agent keeps an entity, separately from whether
+	// the agent got it at all.
+	EntityRecall *float32 `protobuf:"fixed32,14,opt,name=entity_recall,json=entityRecall,proto3,oneof" json:"entity_recall,omitempty"`
+	// The number of times that the caller said an acquired entity.
+	EntitiesAcquiredUttered *uint32 `protobuf:"varint,15,opt,name=entities_acquired_uttered,json=entitiesAcquiredUttered,proto3,oneof" json:"entities_acquired_uttered,omitempty"`
+	// The number of times that the agent recognized an acquired entity
+	// correctly.
+	EntitiesAcquiredRecognized *uint32 `protobuf:"varint,16,opt,name=entities_acquired_recognized,json=entitiesAcquiredRecognized,proto3,oneof" json:"entities_acquired_recognized,omitempty"`
 	unknownFields              protoimpl.UnknownFields
 	sizeCache                  protoimpl.SizeCache
 }
@@ -2058,10 +2131,14 @@ func (x *SimulationRun_JobMetrics_STT) GetEntitiesAcquiredRecognized() uint32 {
 }
 
 type SimulationRun_JobMetrics_LLM struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	TtftMs          *uint32                `protobuf:"varint,1,opt,name=ttft_ms,json=ttftMs,proto3,oneof" json:"ttft_ms,omitempty"`                               // needs the RemoteSession; time to first token
-	TtfsMs          *uint32                `protobuf:"varint,2,opt,name=ttfs_ms,json=ttfsMs,proto3,oneof" json:"ttfs_ms,omitempty"`                               // needs the RemoteSession; time to first sentence, the smallest speakable unit
-	TokensPerSecond *float32               `protobuf:"fixed32,3,opt,name=tokens_per_second,json=tokensPerSecond,proto3,oneof" json:"tokens_per_second,omitempty"` // needs the RemoteSession
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The time to first token, in milliseconds. Requires a `RemoteSession`.
+	TtftMs *uint32 `protobuf:"varint,1,opt,name=ttft_ms,json=ttftMs,proto3,oneof" json:"ttft_ms,omitempty"`
+	// The time to first sentence, in milliseconds. A sentence is the
+	// smallest unit that the agent can speak. Requires a `RemoteSession`.
+	TtfsMs *uint32 `protobuf:"varint,2,opt,name=ttfs_ms,json=ttfsMs,proto3,oneof" json:"ttfs_ms,omitempty"`
+	// The number of tokens per second. Requires a `RemoteSession`.
+	TokensPerSecond *float32 `protobuf:"fixed32,3,opt,name=tokens_per_second,json=tokensPerSecond,proto3,oneof" json:"tokens_per_second,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -2119,19 +2196,35 @@ func (x *SimulationRun_JobMetrics_LLM) GetTokensPerSecond() float32 {
 
 // The agent's voice. Audio only.
 type SimulationRun_JobMetrics_TTS struct {
-	state      protoimpl.MessageState `protogen:"open.v1"`
-	TtfbMs     *uint32                `protobuf:"varint,2,opt,name=ttfb_ms,json=ttfbMs,proto3,oneof" json:"ttfb_ms,omitempty"`              // needs the RemoteSession; provider byte-level TTFB
-	Wer        *float32               `protobuf:"fixed32,3,opt,name=wer,proto3,oneof" json:"wer,omitempty"`                                 // needs the RemoteSession; word_errors / words
-	Words      *uint32                `protobuf:"varint,7,opt,name=words,proto3,oneof" json:"words,omitempty"`                              // needs the RemoteSession
-	WordErrors *uint32                `protobuf:"varint,8,opt,name=word_errors,json=wordErrors,proto3,oneof" json:"word_errors,omitempty"`  // needs the RemoteSession
-	Cer        *float32               `protobuf:"fixed32,9,opt,name=cer,proto3,oneof" json:"cer,omitempty"`                                 // needs the RemoteSession; char_errors / chars
-	Chars      *uint32                `protobuf:"varint,10,opt,name=chars,proto3,oneof" json:"chars,omitempty"`                             // needs the RemoteSession
-	CharErrors *uint32                `protobuf:"varint,11,opt,name=char_errors,json=charErrors,proto3,oneof" json:"char_errors,omitempty"` // needs the RemoteSession
-	// Key entities the agent said, as the caller heard them. Needs the text judge.
-	EntityRecognition          *float32 `protobuf:"fixed32,14,opt,name=entity_recognition,json=entityRecognition,proto3,oneof" json:"entity_recognition,omitempty"` // recognized / uttered
-	EntitiesUttered            *uint32  `protobuf:"varint,15,opt,name=entities_uttered,json=entitiesUttered,proto3,oneof" json:"entities_uttered,omitempty"`
-	EntitiesRecognized         *uint32  `protobuf:"varint,16,opt,name=entities_recognized,json=entitiesRecognized,proto3,oneof" json:"entities_recognized,omitempty"`
-	EntityRecall               *float32 `protobuf:"fixed32,17,opt,name=entity_recall,json=entityRecall,proto3,oneof" json:"entity_recall,omitempty"` // acquired_recognized / acquired_uttered
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The time to first byte from the TTS provider, in milliseconds.
+	// Requires a `RemoteSession`.
+	TtfbMs *uint32 `protobuf:"varint,2,opt,name=ttfb_ms,json=ttfbMs,proto3,oneof" json:"ttfb_ms,omitempty"`
+	// The word error rate: `word_errors` / `words`. Requires a
+	// `RemoteSession`.
+	Wer *float32 `protobuf:"fixed32,3,opt,name=wer,proto3,oneof" json:"wer,omitempty"`
+	// The word count for `wer`. Requires a `RemoteSession`.
+	Words *uint32 `protobuf:"varint,7,opt,name=words,proto3,oneof" json:"words,omitempty"`
+	// The word error count for `wer`. Requires a `RemoteSession`.
+	WordErrors *uint32 `protobuf:"varint,8,opt,name=word_errors,json=wordErrors,proto3,oneof" json:"word_errors,omitempty"`
+	// The character error rate: `char_errors` / `chars`. Requires a
+	// `RemoteSession`.
+	Cer *float32 `protobuf:"fixed32,9,opt,name=cer,proto3,oneof" json:"cer,omitempty"`
+	// The character count for `cer`. Requires a `RemoteSession`.
+	Chars *uint32 `protobuf:"varint,10,opt,name=chars,proto3,oneof" json:"chars,omitempty"`
+	// The character error count for `cer`. Requires a `RemoteSession`.
+	CharErrors *uint32 `protobuf:"varint,11,opt,name=char_errors,json=charErrors,proto3,oneof" json:"char_errors,omitempty"`
+	// The entity recognition rate: `entities_recognized` /
+	// `entities_uttered`. Entities are the key items that the agent said, as
+	// the caller heard them. Requires the text judge.
+	EntityRecognition *float32 `protobuf:"fixed32,14,opt,name=entity_recognition,json=entityRecognition,proto3,oneof" json:"entity_recognition,omitempty"`
+	// The number of entities that the agent said.
+	EntitiesUttered *uint32 `protobuf:"varint,15,opt,name=entities_uttered,json=entitiesUttered,proto3,oneof" json:"entities_uttered,omitempty"`
+	// The number of entities that the caller heard correctly.
+	EntitiesRecognized *uint32 `protobuf:"varint,16,opt,name=entities_recognized,json=entitiesRecognized,proto3,oneof" json:"entities_recognized,omitempty"`
+	// The entity recall rate: `entities_acquired_recognized` /
+	// `entities_acquired_uttered`. See `STT.entity_recall`.
+	EntityRecall               *float32 `protobuf:"fixed32,17,opt,name=entity_recall,json=entityRecall,proto3,oneof" json:"entity_recall,omitempty"`
 	EntitiesAcquiredUttered    *uint32  `protobuf:"varint,18,opt,name=entities_acquired_uttered,json=entitiesAcquiredUttered,proto3,oneof" json:"entities_acquired_uttered,omitempty"`
 	EntitiesAcquiredRecognized *uint32  `protobuf:"varint,19,opt,name=entities_acquired_recognized,json=entitiesAcquiredRecognized,proto3,oneof" json:"entities_acquired_recognized,omitempty"`
 	unknownFields              protoimpl.UnknownFields
@@ -2259,25 +2352,50 @@ func (x *SimulationRun_JobMetrics_TTS) GetEntitiesAcquiredRecognized() uint32 {
 	return 0
 }
 
-// Audio only.
+// The turn-taking metrics of the call. Audio only.
 type SimulationRun_JobMetrics_Conversation struct {
-	state                  protoimpl.MessageState `protogen:"open.v1"`
-	TurnTakingScore        *float32               `protobuf:"fixed32,1,opt,name=turn_taking_score,json=turnTakingScore,proto3,oneof" json:"turn_taking_score,omitempty"`                   // 0-1
-	HeardE2ELatencyP50Ms   *int32                 `protobuf:"varint,2,opt,name=heard_e2e_latency_p50_ms,json=heardE2eLatencyP50Ms,proto3,oneof" json:"heard_e2e_latency_p50_ms,omitempty"` // floor-transfer offset; a gap is > 0, an overlap < 0
-	HeardE2ELatencyP95Ms   *int32                 `protobuf:"varint,3,opt,name=heard_e2e_latency_p95_ms,json=heardE2eLatencyP95Ms,proto3,oneof" json:"heard_e2e_latency_p95_ms,omitempty"`
-	HeardE2ELatencyP99Ms   *int32                 `protobuf:"varint,4,opt,name=heard_e2e_latency_p99_ms,json=heardE2eLatencyP99Ms,proto3,oneof" json:"heard_e2e_latency_p99_ms,omitempty"`
-	TimeToYieldMs          *uint32                `protobuf:"varint,5,opt,name=time_to_yield_ms,json=timeToYieldMs,proto3,oneof" json:"time_to_yield_ms,omitempty"`                       // agent audio continuing past a barge-in
-	EotMispredictionCount  *uint32                `protobuf:"varint,6,opt,name=eot_misprediction_count,json=eotMispredictionCount,proto3,oneof" json:"eot_misprediction_count,omitempty"` // agent started before the caller's turn ended
-	OverlapRatio           *float32               `protobuf:"fixed32,7,opt,name=overlap_ratio,json=overlapRatio,proto3,oneof" json:"overlap_ratio,omitempty"`                             // overlapping speech / total speech
-	OverlapSpeechMs        *uint32                `protobuf:"varint,8,opt,name=overlap_speech_ms,json=overlapSpeechMs,proto3,oneof" json:"overlap_speech_ms,omitempty"`                   // pooling stats for overlap_ratio
-	TotalSpeechMs          *uint32                `protobuf:"varint,9,opt,name=total_speech_ms,json=totalSpeechMs,proto3,oneof" json:"total_speech_ms,omitempty"`
-	AwkwardSilenceCount    *uint32                `protobuf:"varint,11,opt,name=awkward_silence_count,json=awkwardSilenceCount,proto3,oneof" json:"awkward_silence_count,omitempty"`          // gaps past the natural-pause threshold
-	UnansweredTurns        *uint32                `protobuf:"varint,12,opt,name=unanswered_turns,json=unansweredTurns,proto3,oneof" json:"unanswered_turns,omitempty"`                        // the simulated party spoke, the agent never responded
-	FalseInterruptionCount *uint32                `protobuf:"varint,13,opt,name=false_interruption_count,json=falseInterruptionCount,proto3,oneof" json:"false_interruption_count,omitempty"` // needs the RemoteSession; agent paused for a non-interruption
-	E2ELatencyMs           *uint32                `protobuf:"varint,15,opt,name=e2e_latency_ms,json=e2eLatencyMs,proto3,oneof" json:"e2e_latency_ms,omitempty"`                               // needs the RemoteSession; the agent's own claim
-	BackchannelCount       *uint32                `protobuf:"varint,16,opt,name=backchannel_count,json=backchannelCount,proto3,oneof" json:"backchannel_count,omitempty"`                     // the caller's acknowledgements over the agent's speech
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The turn-taking score, from 0 to 1.
+	TurnTakingScore *float32 `protobuf:"fixed32,1,opt,name=turn_taking_score,json=turnTakingScore,proto3,oneof" json:"turn_taking_score,omitempty"`
+	// The median heard end-to-end latency, in milliseconds. This is the
+	// floor-transfer offset: a gap is greater than 0, and an overlap is less
+	// than 0.
+	HeardE2ELatencyP50Ms *int32 `protobuf:"varint,2,opt,name=heard_e2e_latency_p50_ms,json=heardE2eLatencyP50Ms,proto3,oneof" json:"heard_e2e_latency_p50_ms,omitempty"`
+	// The 95th percentile of the heard end-to-end latency, in milliseconds.
+	// See `heard_e2e_latency_p50_ms`.
+	HeardE2ELatencyP95Ms *int32 `protobuf:"varint,3,opt,name=heard_e2e_latency_p95_ms,json=heardE2eLatencyP95Ms,proto3,oneof" json:"heard_e2e_latency_p95_ms,omitempty"`
+	// The 99th percentile of the heard end-to-end latency, in milliseconds.
+	// See `heard_e2e_latency_p50_ms`.
+	HeardE2ELatencyP99Ms *int32 `protobuf:"varint,4,opt,name=heard_e2e_latency_p99_ms,json=heardE2eLatencyP99Ms,proto3,oneof" json:"heard_e2e_latency_p99_ms,omitempty"`
+	// The time that the agent audio continues after a barge-in, in
+	// milliseconds.
+	TimeToYieldMs *uint32 `protobuf:"varint,5,opt,name=time_to_yield_ms,json=timeToYieldMs,proto3,oneof" json:"time_to_yield_ms,omitempty"`
+	// The number of times that the agent started to speak before the turn of
+	// the caller ended.
+	EotMispredictionCount *uint32 `protobuf:"varint,6,opt,name=eot_misprediction_count,json=eotMispredictionCount,proto3,oneof" json:"eot_misprediction_count,omitempty"`
+	// The ratio of overlapping speech to total speech.
+	OverlapRatio *float32 `protobuf:"fixed32,7,opt,name=overlap_ratio,json=overlapRatio,proto3,oneof" json:"overlap_ratio,omitempty"`
+	// The overlapping speech, in milliseconds. With `total_speech_ms`, use
+	// it to pool `overlap_ratio` over several jobs.
+	OverlapSpeechMs *uint32 `protobuf:"varint,8,opt,name=overlap_speech_ms,json=overlapSpeechMs,proto3,oneof" json:"overlap_speech_ms,omitempty"`
+	// The total speech, in milliseconds. See `overlap_speech_ms`.
+	TotalSpeechMs *uint32 `protobuf:"varint,9,opt,name=total_speech_ms,json=totalSpeechMs,proto3,oneof" json:"total_speech_ms,omitempty"`
+	// The number of gaps that are longer than the natural-pause threshold.
+	AwkwardSilenceCount *uint32 `protobuf:"varint,11,opt,name=awkward_silence_count,json=awkwardSilenceCount,proto3,oneof" json:"awkward_silence_count,omitempty"`
+	// The number of turns in which the simulated party spoke and the agent
+	// did not respond.
+	UnansweredTurns *uint32 `protobuf:"varint,12,opt,name=unanswered_turns,json=unansweredTurns,proto3,oneof" json:"unanswered_turns,omitempty"`
+	// The number of times that the agent paused for something that was not
+	// an interruption. Requires a `RemoteSession`.
+	FalseInterruptionCount *uint32 `protobuf:"varint,13,opt,name=false_interruption_count,json=falseInterruptionCount,proto3,oneof" json:"false_interruption_count,omitempty"`
+	// The end-to-end latency that the agent reported, in milliseconds.
+	// Requires a `RemoteSession`.
+	E2ELatencyMs *uint32 `protobuf:"varint,15,opt,name=e2e_latency_ms,json=e2eLatencyMs,proto3,oneof" json:"e2e_latency_ms,omitempty"`
+	// The number of acknowledgements that the caller made while the agent
+	// spoke.
+	BackchannelCount *uint32 `protobuf:"varint,16,opt,name=backchannel_count,json=backchannelCount,proto3,oneof" json:"backchannel_count,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *SimulationRun_JobMetrics_Conversation) Reset() {
@@ -2408,33 +2526,51 @@ func (x *SimulationRun_JobMetrics_Conversation) GetBackchannelCount() uint32 {
 	return 0
 }
 
-// Rows exist for text and audio. The groups above hold the means and pools
-// over these; anything not measured for a turn stays unset.
+// A turn of the call, for text and audio. The metric groups of
+// `JobMetrics` hold the means and pooled values over the turns. A metric
+// that is not measured for a turn is unset.
 type SimulationRun_JobMetrics_Turn struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	Index uint32                 `protobuf:"varint,1,opt,name=index,proto3" json:"index,omitempty"`                           // 1-based, conversation order
-	Role  agent.ChatRole         `protobuf:"varint,2,opt,name=role,proto3,enum=livekit.agent.ChatRole" json:"role,omitempty"` // ASSISTANT = the agent under test, USER = simulator persona
-	// The words the judges read for this turn: the speaker's own, or as the
-	// other side heard them when those are unknown (the agent's, without a
-	// RemoteSession).
-	Text              string   `protobuf:"bytes,18,opt,name=text,proto3" json:"text,omitempty"`
-	StartMs           *uint32  `protobuf:"varint,3,opt,name=start_ms,json=startMs,proto3,oneof" json:"start_ms,omitempty"`                   // audio only; relative to t0; unset if the turn could not be aligned to the audio
-	EndMs             *uint32  `protobuf:"varint,4,opt,name=end_ms,json=endMs,proto3,oneof" json:"end_ms,omitempty"`                         // audio only
-	SttDelayMs        *uint32  `protobuf:"varint,5,opt,name=stt_delay_ms,json=sttDelayMs,proto3,oneof" json:"stt_delay_ms,omitempty"`        // needs the RemoteSession
-	LlmTtftMs         *uint32  `protobuf:"varint,6,opt,name=llm_ttft_ms,json=llmTtftMs,proto3,oneof" json:"llm_ttft_ms,omitempty"`           // needs the RemoteSession
-	LlmTtfsMs         *uint32  `protobuf:"varint,7,opt,name=llm_ttfs_ms,json=llmTtfsMs,proto3,oneof" json:"llm_ttfs_ms,omitempty"`           // needs the RemoteSession
-	LlmTps            *float32 `protobuf:"fixed32,8,opt,name=llm_tps,json=llmTps,proto3,oneof" json:"llm_tps,omitempty"`                     // needs the RemoteSession
-	TtsTtfbMs         *uint32  `protobuf:"varint,9,opt,name=tts_ttfb_ms,json=ttsTtfbMs,proto3,oneof" json:"tts_ttfb_ms,omitempty"`           // needs the RemoteSession
-	E2ELatencyMs      *uint32  `protobuf:"varint,10,opt,name=e2e_latency_ms,json=e2eLatencyMs,proto3,oneof" json:"e2e_latency_ms,omitempty"` // needs the RemoteSession
+	// The position of the turn in the conversation, starting at 1.
+	Index uint32 `protobuf:"varint,1,opt,name=index,proto3" json:"index,omitempty"`
+	// The speaker of the turn. `ASSISTANT` is the agent under test, and
+	// `USER` is the simulated user.
+	Role agent.ChatRole `protobuf:"varint,2,opt,name=role,proto3,enum=livekit.agent.ChatRole" json:"role,omitempty"`
+	// The words that the judges read for this turn. These are the words of
+	// the speaker. When those are not known, these are the words as the other
+	// side heard them, as for the agent without a `RemoteSession`.
+	Text string `protobuf:"bytes,18,opt,name=text,proto3" json:"text,omitempty"`
+	// The start of the turn, in milliseconds after `t0`. Unset when the turn
+	// cannot be aligned to the audio. Audio only.
+	StartMs *uint32 `protobuf:"varint,3,opt,name=start_ms,json=startMs,proto3,oneof" json:"start_ms,omitempty"`
+	// The end of the turn, in milliseconds, on the same scale as `start_ms`.
+	// Audio only.
+	EndMs *uint32 `protobuf:"varint,4,opt,name=end_ms,json=endMs,proto3,oneof" json:"end_ms,omitempty"`
+	// The STT delay of the turn, in milliseconds. Requires a `RemoteSession`.
+	SttDelayMs *uint32 `protobuf:"varint,5,opt,name=stt_delay_ms,json=sttDelayMs,proto3,oneof" json:"stt_delay_ms,omitempty"`
+	// The LLM time to first token, in milliseconds. Requires a
+	// `RemoteSession`.
+	LlmTtftMs *uint32 `protobuf:"varint,6,opt,name=llm_ttft_ms,json=llmTtftMs,proto3,oneof" json:"llm_ttft_ms,omitempty"`
+	// The LLM time to first sentence, in milliseconds. Requires a
+	// `RemoteSession`.
+	LlmTtfsMs *uint32 `protobuf:"varint,7,opt,name=llm_ttfs_ms,json=llmTtfsMs,proto3,oneof" json:"llm_ttfs_ms,omitempty"`
+	// The LLM tokens per second. Requires a `RemoteSession`.
+	LlmTps *float32 `protobuf:"fixed32,8,opt,name=llm_tps,json=llmTps,proto3,oneof" json:"llm_tps,omitempty"`
+	// The TTS time to first byte, in milliseconds. Requires a
+	// `RemoteSession`.
+	TtsTtfbMs *uint32 `protobuf:"varint,9,opt,name=tts_ttfb_ms,json=ttsTtfbMs,proto3,oneof" json:"tts_ttfb_ms,omitempty"`
+	// The end-to-end latency, in milliseconds. Requires a `RemoteSession`.
+	E2ELatencyMs      *uint32  `protobuf:"varint,10,opt,name=e2e_latency_ms,json=e2eLatencyMs,proto3,oneof" json:"e2e_latency_ms,omitempty"`
 	HeardE2ELatencyMs *int32   `protobuf:"varint,11,opt,name=heard_e2e_latency_ms,json=heardE2eLatencyMs,proto3,oneof" json:"heard_e2e_latency_ms,omitempty"`
 	TimeToYieldMs     *uint32  `protobuf:"varint,12,opt,name=time_to_yield_ms,json=timeToYieldMs,proto3,oneof" json:"time_to_yield_ms,omitempty"`
 	TurnTakingScore   *float32 `protobuf:"fixed32,13,opt,name=turn_taking_score,json=turnTakingScore,proto3,oneof" json:"turn_taking_score,omitempty"`
-	Conciseness       *float32 `protobuf:"fixed32,14,opt,name=conciseness,proto3,oneof" json:"conciseness,omitempty"` // needs the text judge
-	EotMisprediction  *bool    `protobuf:"varint,15,opt,name=eot_misprediction,json=eotMisprediction,proto3,oneof" json:"eot_misprediction,omitempty"`
-	AwkwardSilence    *bool    `protobuf:"varint,16,opt,name=awkward_silence,json=awkwardSilence,proto3,oneof" json:"awkward_silence,omitempty"`
-	Unanswered        *bool    `protobuf:"varint,17,opt,name=unanswered,proto3,oneof" json:"unanswered,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	// The conciseness score of the turn. Requires the text judge.
+	Conciseness      *float32 `protobuf:"fixed32,14,opt,name=conciseness,proto3,oneof" json:"conciseness,omitempty"`
+	EotMisprediction *bool    `protobuf:"varint,15,opt,name=eot_misprediction,json=eotMisprediction,proto3,oneof" json:"eot_misprediction,omitempty"`
+	AwkwardSilence   *bool    `protobuf:"varint,16,opt,name=awkward_silence,json=awkwardSilence,proto3,oneof" json:"awkward_silence,omitempty"`
+	Unanswered       *bool    `protobuf:"varint,17,opt,name=unanswered,proto3,oneof" json:"unanswered,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *SimulationRun_JobMetrics_Turn) Reset() {
@@ -2599,29 +2735,39 @@ type SimulationRun_Create_Request struct {
 	AgentName      string                 `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
 	NumSimulations int32                  `protobuf:"varint,4,opt,name=num_simulations,json=numSimulations,proto3" json:"num_simulations,omitempty"`
 	Region         string                 `protobuf:"bytes,6,opt,name=region,proto3" json:"region,omitempty"`
-	// When set, run these scenarios (loaded from a scenarios.yaml).
-	// When unset, generate num_simulations scenarios from the uploaded agent source.
+	// The scenarios to run, for example the contents of a `scenarios.yaml`
+	// file. When unset, the run generates `num_simulations` scenarios from
+	// the uploaded agent source.
 	ScenarioGroup *ScenarioGroup `protobuf:"bytes,7,opt,name=scenario_group,json=scenarioGroup,proto3,oneof" json:"scenario_group,omitempty"`
-	// Maximum simulate jobs running in parallel for this run. Clamped to the
-	// project's concurrency quota; 0/unset uses the server default.
+	// The maximum number of jobs of this run that run in parallel. The value
+	// is clamped to the concurrency quota of the project. When unset or 0,
+	// the default applies.
 	Concurrency *int32 `protobuf:"varint,8,opt,name=concurrency,proto3,oneof" json:"concurrency,omitempty"`
-	// Conversation mode for every job in this run; unspecified = TEXT.
+	// The conversation mode of every job in this run.
+	// `SIMULATION_MODE_UNSPECIFIED` means `SIMULATION_MODE_TEXT`.
 	Mode SimulationMode `protobuf:"varint,9,opt,name=mode,proto3,enum=livekit.SimulationMode" json:"mode,omitempty"`
-	// Impairments applied to the simulated user's audio; AUDIO mode only.
-	// TODO(u9g): migrate these to SimulationImpairments.
-	BackgroundNoise      bool              `protobuf:"varint,10,opt,name=background_noise,json=backgroundNoise,proto3" json:"background_noise,omitempty"`
-	LowQualityMicrophone bool              `protobuf:"varint,11,opt,name=low_quality_microphone,json=lowQualityMicrophone,proto3" json:"low_quality_microphone,omitempty"`
-	PacketLoss           bool              `protobuf:"varint,12,opt,name=packet_loss,json=packetLoss,proto3" json:"packet_loss,omitempty"`
-	Ci                   *SimulationRun_CI `protobuf:"bytes,13,opt,name=ci,proto3,oneof" json:"ci,omitempty"`
-	// Absent runs each scenario once and requires it to pass. Requires
-	// scenario_group. The run fails if any scenario fails; pass@k and
-	// pass^k report over scenarios and neither gates.
+	// When true, adds background noise to the audio of the simulated user.
+	// `SIMULATION_MODE_AUDIO` only.
+	BackgroundNoise bool `protobuf:"varint,10,opt,name=background_noise,json=backgroundNoise,proto3" json:"background_noise,omitempty"`
+	// When true, makes the audio of the simulated user sound like a
+	// low-quality microphone. `SIMULATION_MODE_AUDIO` only.
+	LowQualityMicrophone bool `protobuf:"varint,11,opt,name=low_quality_microphone,json=lowQualityMicrophone,proto3" json:"low_quality_microphone,omitempty"`
+	// When true, applies packet loss to the audio of the simulated user.
+	// `SIMULATION_MODE_AUDIO` only.
+	PacketLoss bool              `protobuf:"varint,12,opt,name=packet_loss,json=packetLoss,proto3" json:"packet_loss,omitempty"`
+	Ci         *SimulationRun_CI `protobuf:"bytes,13,opt,name=ci,proto3,oneof" json:"ci,omitempty"`
+	// The sampling options of the run. Requires `scenario_group`. When
+	// unset, the run runs each scenario once, and each scenario must pass.
+	// The run fails when any scenario fails. pass@k and pass^k are reported
+	// over scenarios, and neither one decides whether the run passes.
 	Sampling *SimulationRun_SamplingOptions `protobuf:"bytes,14,opt,name=sampling,proto3,oneof" json:"sampling,omitempty"`
-	// When set, every job dials this number over SIP instead of dispatching
-	// agent_name, as CreateSIPParticipantRequest would. AUDIO mode only.
+	// The phone number that every job dials over SIP, in place of a dispatch
+	// of `agent_name`. The call is the same as one that
+	// `CreateSIPParticipantRequest` makes. `SIMULATION_MODE_AUDIO` only.
 	SipCallTo string `protobuf:"bytes,15,opt,name=sip_call_to,json=sipCallTo,proto3" json:"sip_call_to,omitempty"`
-	// Outbound trunk to dial through. Empty dials from sip_number, which must
-	// then be a LiveKit phone number the project owns.
+	// The ID of the outbound trunk to dial through. When empty, the call
+	// uses `sip_number`, which must then be a LiveKit phone number of the
+	// project.
 	SipTrunkId    string `protobuf:"bytes,16,opt,name=sip_trunk_id,json=sipTrunkId,proto3" json:"sip_trunk_id,omitempty"`
 	SipNumber     string `protobuf:"bytes,17,opt,name=sip_number,json=sipNumber,proto3" json:"sip_number,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -3012,16 +3158,20 @@ type SimulationRun_List_Request struct {
 	ProjectId string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
 	Status    *SimulationRun_Status  `protobuf:"varint,2,opt,name=status,proto3,enum=livekit.SimulationRun_Status,oneof" json:"status,omitempty"`
 	PageToken *TokenPagination       `protobuf:"bytes,3,opt,name=page_token,json=pageToken,proto3,oneof" json:"page_token,omitempty"`
-	// Half-open window [start_time, end_time) on created_at, the leading key
-	// of this list's keyset. Unset bounds mean no window, so existing callers
-	// keep their unbounded scan; the histogram's selected range sets both.
+	// The start of the window on `created_at`, inclusive. When unset, the
+	// window has no start.
 	StartTime *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=start_time,json=startTime,proto3,oneof" json:"start_time,omitempty"`
-	EndTime   *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=end_time,json=endTime,proto3,oneof" json:"end_time,omitempty"`
-	// Exact agent name. Unset means every agent — including the runs whose
-	// name is empty, which a bare string could not tell from no filter.
+	// The end of the window on `created_at`, exclusive. When unset, the
+	// window has no end.
+	EndTime *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=end_time,json=endTime,proto3,oneof" json:"end_time,omitempty"`
+	// The exact name of an agent. Returns only the runs of this agent. When
+	// unset, returns the runs of all agents, including the runs with an empty
+	// name.
 	AgentName *string `protobuf:"bytes,6,opt,name=agent_name,json=agentName,proto3,oneof" json:"agent_name,omitempty"`
-	// Absent applies no mode filter. TEXT matches runs stored as TEXT or
-	// UNSPECIFIED, which `SimulationRun.mode` defines as the same mode.
+	// A conversation mode. Returns only the runs in this mode. When unset,
+	// returns the runs in all modes. `SIMULATION_MODE_TEXT` also matches the
+	// runs with `SIMULATION_MODE_UNSPECIFIED`, because `SimulationRun.mode`
+	// defines them as the same mode.
 	Mode          *SimulationMode `protobuf:"varint,7,opt,name=mode,proto3,enum=livekit.SimulationMode,oneof" json:"mode,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -3161,12 +3311,12 @@ func (x *SimulationRun_List_Response) GetNextPageToken() *TokenPagination {
 type SimulationRun_Counts_Request struct {
 	state     protoimpl.MessageState `protogen:"open.v1"`
 	ProjectId string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
-	// Both bounds required: a bucketed scan of a project's whole history is
-	// never what a caller wants.
+	// The start of the window on `created_at`, inclusive. Required.
 	StartTime *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
-	EndTime   *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
-	// Applied as `List` applies it: a filter the rows honour and the bars
-	// above them drop would make the histogram an answer about a wider set.
+	// The end of the window on `created_at`, exclusive. Required.
+	EndTime *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
+	// A run status. Returns only the counts of the runs in this status, as
+	// `List` filters them.
 	Status        *SimulationRun_Status `protobuf:"varint,4,opt,name=status,proto3,enum=livekit.SimulationRun_Status,oneof" json:"status,omitempty"`
 	AgentName     *string               `protobuf:"bytes,5,opt,name=agent_name,json=agentName,proto3,oneof" json:"agent_name,omitempty"`
 	Mode          *SimulationMode       `protobuf:"varint,6,opt,name=mode,proto3,enum=livekit.SimulationMode,oneof" json:"mode,omitempty"`
@@ -3248,12 +3398,12 @@ func (x *SimulationRun_Counts_Request) GetMode() SimulationMode {
 
 type SimulationRun_Counts_Response struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Buckets holding at least one run, ascending by bucket_start. Empty
-	// buckets are omitted; each run lands in exactly one bucket, so the
-	// counts sum to the number of runs in the window.
+	// The buckets that have at least one run, in ascending `bucket_start`
+	// order. The list does not include empty buckets. Each run is in exactly
+	// one bucket, so the counts add up to the number of runs in the window.
 	Buckets []*SimulationRun_Counts_Bucket `protobuf:"bytes,1,rep,name=buckets,proto3" json:"buckets,omitempty"`
-	// The bucket width the server chose from the window, so the client
-	// zero-fills the omitted buckets on the grid the counts were built on.
+	// The width of each bucket, chosen from the window. Use it to fill the
+	// omitted buckets with zero on the same grid as the counts.
 	Interval      *durationpb.Duration `protobuf:"bytes,2,opt,name=interval,proto3" json:"interval,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

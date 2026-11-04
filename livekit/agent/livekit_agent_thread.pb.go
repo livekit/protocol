@@ -44,7 +44,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Direction of a listing. Each request documents what unset means.
+// The sort direction of a list. Each request tells what unset means.
 type AgentThread_SortOrder int32
 
 const (
@@ -94,7 +94,7 @@ func (AgentThread_SortOrder) EnumDescriptor() ([]byte, []int) {
 	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 0}
 }
 
-// A task is never UNSPECIFIED.
+// The status of a task. A task is never `UNSPECIFIED`.
 type AgentTask_Status int32
 
 const (
@@ -186,8 +186,8 @@ func (*AgentThread) Descriptor() ([]byte, []int) {
 	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0}
 }
 
-// AgentTask: background work an agent runs within a thread, such as a booking
-// that takes minutes.
+// Background work that an agent runs in a thread, such as a booking that
+// takes minutes.
 type AgentTask struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -226,11 +226,12 @@ func (*AgentTask) Descriptor() ([]byte, []int) {
 
 type AgentThread_CreateRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Groups threads, e.g. by user: an application-defined value, typically the
-	// user's identity. An AgentThreadGrant is scoped by it.
+	// The scope of the thread: a value that your application defines to group
+	// threads, such as by user. It is typically the identity of the user. An
+	// `AgentThreadGrant` is scoped by it.
 	Scope      string            `protobuf:"bytes,1,opt,name=scope,proto3" json:"scope,omitempty"`
 	Attributes map[string]string `protobuf:"bytes,2,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	// Unset takes the server default.
+	// The idle TTL of the thread. When unset, the default idle TTL applies.
 	IdleTtl       *durationpb.Duration `protobuf:"bytes,3,opt,name=idle_ttl,json=idleTtl,proto3" json:"idle_ttl,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -331,11 +332,12 @@ func (x *AgentThread_GetRequest) GetThreadId() string {
 	return ""
 }
 
-// The threads of one scope, newest first.
+// A request for the threads of one scope, newest first.
 type AgentThread_ListRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	Scope string                 `protobuf:"bytes,1,opt,name=scope,proto3" json:"scope,omitempty"`
-	// next_page_token of the previous ListResponse; empty for the first page.
+	// The `next_page_token` of the previous `ListResponse`. Empty for the first
+	// page.
 	PageToken     string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	Limit         int32  `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -396,7 +398,7 @@ func (x *AgentThread_ListRequest) GetLimit() int32 {
 type AgentThread_ListResponse struct {
 	state   protoimpl.MessageState `protogen:"open.v1"`
 	Threads []*AgentThread_Thread  `protobuf:"bytes,1,rep,name=threads,proto3" json:"threads,omitempty"`
-	// Empty when exhausted.
+	// The token of the next page. Empty when there are no more pages.
 	NextPageToken string `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -449,9 +451,12 @@ func (x *AgentThread_ListResponse) GetNextPageToken() string {
 type AgentThread_UpdateRequest struct {
 	state    protoimpl.MessageState `protogen:"open.v1"`
 	ThreadId string                 `protobuf:"bytes,1,opt,name=thread_id,json=threadId,proto3" json:"thread_id,omitempty"`
-	// Added to the existing attributes; an empty value deletes the entry.
-	Attributes    map[string]string    `protobuf:"bytes,2,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	IdleTtl       *durationpb.Duration `protobuf:"bytes,3,opt,name=idle_ttl,json=idleTtl,proto3" json:"idle_ttl,omitempty"` // Every update counts as activity and pushes expires_at out by idle_ttl.
+	// The attributes to add to the existing attributes. An empty value deletes
+	// the entry.
+	Attributes map[string]string `protobuf:"bytes,2,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	// The idle TTL of the thread. Each update counts as activity and moves
+	// `expires_at` out by `idle_ttl`.
+	IdleTtl       *durationpb.Duration `protobuf:"bytes,3,opt,name=idle_ttl,json=idleTtl,proto3" json:"idle_ttl,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -587,17 +592,21 @@ func (*AgentThread_DeleteResponse) Descriptor() ([]byte, []int) {
 	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 6}
 }
 
-// The thread's chat items, oldest first unless sort_order says otherwise.
+// A request for the chat items of a thread. The items are oldest first,
+// unless `sort_order` sets a different order.
 type AgentThread_GetItemsRequest struct {
 	state    protoimpl.MessageState `protogen:"open.v1"`
 	ThreadId string                 `protobuf:"bytes,1,opt,name=thread_id,json=threadId,proto3" json:"thread_id,omitempty"`
-	// One agent's items; empty for every agent's.
+	// The agent to return items for. When empty, returns the items of all
+	// agents.
 	Agent string `protobuf:"bytes,2,opt,name=agent,proto3" json:"agent,omitempty"`
-	// next_page_token of the previous GetItemsResponse; empty for the first page.
+	// The `next_page_token` of the previous `GetItemsResponse`. Empty for the
+	// first page.
 	PageToken string `protobuf:"bytes,3,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	Limit     int32  `protobuf:"varint,4,opt,name=limit,proto3" json:"limit,omitempty"`
-	// Unset or ASC is oldest first. DESC starts from the latest item and each
-	// next_page_token walks back through older ones.
+	// The sort order of the items. Unset or `SORT_ORDER_ASC` means oldest
+	// first. With `SORT_ORDER_DESC`, the list starts from the latest item, and
+	// each `next_page_token` goes back to older items.
 	SortOrder     AgentThread_SortOrder `protobuf:"varint,5,opt,name=sort_order,json=sortOrder,proto3,enum=livekit.agent.AgentThread_SortOrder" json:"sort_order,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -671,7 +680,7 @@ func (x *AgentThread_GetItemsRequest) GetSortOrder() AgentThread_SortOrder {
 type AgentThread_GetItemsResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	Items []*AgentThread_Item    `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
-	// Empty when exhausted.
+	// The token of the next page. Empty when there are no more pages.
 	NextPageToken string `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -721,14 +730,13 @@ func (x *AgentThread_GetItemsResponse) GetNextPageToken() string {
 	return ""
 }
 
-// One chat item of an agent. Stored as the JSON of
-// ChatContext.ChatItem (items.payload in thread_schema_v1.sql).
+// A chat item of an agent in a thread.
 type AgentThread_Item struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	Agent string                 `protobuf:"bytes,1,opt,name=agent,proto3" json:"agent,omitempty"`
-	// Position in the agent's history.
+	// The position of the item in the history of the agent.
 	Seq int64 `protobuf:"varint,2,opt,name=seq,proto3" json:"seq,omitempty"`
-	// The A2A message the item came from.
+	// The ID of the A2A message that the item came from.
 	MessageId     string                `protobuf:"bytes,3,opt,name=message_id,json=messageId,proto3" json:"message_id,omitempty"`
 	Item          *ChatContext_ChatItem `protobuf:"bytes,4,opt,name=item,proto3" json:"item,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -800,11 +808,13 @@ type AgentThread_Thread struct {
 	Attributes map[string]string      `protobuf:"bytes,3,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	CreatedAt  *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	LastActive *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=last_active,json=lastActive,proto3" json:"last_active,omitempty"`
-	// last_active + idle_ttl; every update pushes it out. The thread and its
-	// database are deleted once it passes.
+	// The time that the thread expires: `last_active` plus `idle_ttl`. Each
+	// update moves it out. When this time passes, the thread and its database
+	// are deleted.
 	ExpiresAt *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
 	IdleTtl   *durationpb.Duration   `protobuf:"bytes,7,opt,name=idle_ttl,json=idleTtl,proto3" json:"idle_ttl,omitempty"`
-	// The thread's database ("DB_..."), created with the thread.
+	// The ID of the thread database (`DB_...`). The database is created
+	// with the thread.
 	DatabaseId    string `protobuf:"bytes,8,opt,name=database_id,json=databaseId,proto3" json:"database_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -896,13 +906,15 @@ func (x *AgentThread_Thread) GetDatabaseId() string {
 	return ""
 }
 
-// A thread's tasks, oldest first.
+// A request for the tasks of a thread, oldest first.
 type AgentTask_GetTasksRequest struct {
 	state    protoimpl.MessageState `protogen:"open.v1"`
 	ThreadId string                 `protobuf:"bytes,1,opt,name=thread_id,json=threadId,proto3" json:"thread_id,omitempty"`
-	// Unset for every status.
+	// A task status. Returns only the tasks with this status. When unset,
+	// returns the tasks of all statuses.
 	Status *AgentTask_Status `protobuf:"varint,2,opt,name=status,proto3,enum=livekit.agent.AgentTask_Status,oneof" json:"status,omitempty"`
-	// next_page_token of the previous GetTasksResponse; empty for the first page.
+	// The `next_page_token` of the previous `GetTasksResponse`. Empty for the
+	// first page.
 	PageToken     string `protobuf:"bytes,3,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	Limit         int32  `protobuf:"varint,4,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -970,7 +982,7 @@ func (x *AgentTask_GetTasksRequest) GetLimit() int32 {
 type AgentTask_GetTasksResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	Tasks []*AgentTask_Task      `protobuf:"bytes,1,rep,name=tasks,proto3" json:"tasks,omitempty"`
-	// Empty when exhausted.
+	// The token of the next page. Empty when there are no more pages.
 	NextPageToken string `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1024,7 +1036,7 @@ type AgentTask_Task struct {
 	state    protoimpl.MessageState `protogen:"open.v1"`
 	TaskId   string                 `protobuf:"bytes,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
 	ThreadId string                 `protobuf:"bytes,2,opt,name=thread_id,json=threadId,proto3" json:"thread_id,omitempty"`
-	// The task's name, as the agent defines it.
+	// The name of the task, as the agent defines it.
 	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	Status        AgentTask_Status       `protobuf:"varint,4,opt,name=status,proto3,enum=livekit.agent.AgentTask_Status" json:"status,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`

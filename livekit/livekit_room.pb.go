@@ -1169,26 +1169,32 @@ func (x *UpdateRoomMetadataRequest) GetMetadata() string {
 
 type RoomConfiguration struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	Name  string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"` // Used as ID, must be unique
-	// number of seconds to keep the room open if no one joins
+	// The name of the room configuration. The name is the ID of the
+	// configuration, so it must be unique.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The number of seconds to keep the room open when no participant joins.
 	EmptyTimeout uint32 `protobuf:"varint,2,opt,name=empty_timeout,json=emptyTimeout,proto3" json:"empty_timeout,omitempty"`
-	// number of seconds to keep the room open after everyone leaves
+	// The number of seconds to keep the room open after the last participant
+	// leaves.
 	DepartureTimeout uint32 `protobuf:"varint,3,opt,name=departure_timeout,json=departureTimeout,proto3" json:"departure_timeout,omitempty"`
-	// limit number of participants that can be in a room, excluding Egress and Agent participants
+	// The maximum number of participants in the room. Egress and agent
+	// participants do not count toward the limit.
 	MaxParticipants uint32 `protobuf:"varint,4,opt,name=max_participants,json=maxParticipants,proto3" json:"max_participants,omitempty"`
-	// metadata of room
+	// The metadata of the room.
 	Metadata string `protobuf:"bytes,11,opt,name=metadata,proto3" json:"metadata,omitempty"`
-	// egress
+	// The egress settings of the room.
 	Egress *RoomEgress `protobuf:"bytes,5,opt,name=egress,proto3" json:"egress,omitempty"`
-	// playout delay of subscriber
+	// The minimum playout delay of subscribers.
 	MinPlayoutDelay uint32 `protobuf:"varint,7,opt,name=min_playout_delay,json=minPlayoutDelay,proto3" json:"min_playout_delay,omitempty"`
+	// The maximum playout delay of subscribers.
 	MaxPlayoutDelay uint32 `protobuf:"varint,8,opt,name=max_playout_delay,json=maxPlayoutDelay,proto3" json:"max_playout_delay,omitempty"`
-	// improves A/V sync when playout_delay set to a value larger than 200ms. It will disables transceiver re-use
-	// so not recommended for rooms with frequent subscription changes
+	// When true, LiveKit improves A/V sync when the playout delay is larger than
+	// 200 ms. This turns off transceiver reuse, so do not use it for rooms with
+	// frequent subscription changes.
 	SyncStreams bool `protobuf:"varint,9,opt,name=sync_streams,json=syncStreams,proto3" json:"sync_streams,omitempty"`
-	// Define agents that should be dispatched to this room
+	// The agents to dispatch to the room.
 	Agents []*RoomAgentDispatch `protobuf:"bytes,10,rep,name=agents,proto3" json:"agents,omitempty"`
-	// Tags to attach to the room
+	// The tags to attach to the room.
 	Tags          map[string]string `protobuf:"bytes,12,rep,name=tags,proto3" json:"tags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
