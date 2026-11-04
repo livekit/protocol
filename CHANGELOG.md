@@ -1,5 +1,13 @@
 # github.com/livekit/protocol
 
+## 1.53.3
+
+### Patch Changes
+
+- AMD v2 in agent session events (`livekit_agent_session.proto`): `AmdCategory` adds `AMD_MACHINE_SCREENING` and `AMD_WAIT`, `AmdPrediction` adds the turn ID, the stage, and the inference time, and a new `AmdCompleted` event reports the final result and the last prediction once per AMD run. - [#1880](https://github.com/livekit/protocol/pull/1880) ([@chenghao-mou](https://github.com/chenghao-mou))
+
+- agent_simulation: dispatch a simulation run to a named agent deployment - [#1932](https://github.com/livekit/protocol/pull/1932) ([@u9g](https://github.com/u9g))
+
 ## 1.53.2
 
 ### Patch Changes
