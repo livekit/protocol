@@ -1,0 +1,23 @@
+.changeset/amd-v2-session-events.md
+  s_aaf78334cb7322::t_30d2d2e8ede29d 6
+livekit/agent/livekit_agent_session.pb.go
+  s_aaf78334cb7322::t_086288943e3636 3263,5381,5429,5439-5440
+protobufs/agent/livekit_agent_session.proto
+  s_aaf78334cb7322::t_630c3883952f61 277
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4c5f10304406679ea836209f50066e7655afeeef",
+  "prompts": {},
+  "sessions": {
+    "s_aaf78334cb7322": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d2193486-0057-4a50-bb24-44082ff248d9",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Chenghao Mou <chenghao.mou@livekit.io>"
+    }
+  }
+}
