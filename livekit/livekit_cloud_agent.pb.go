@@ -788,6 +788,8 @@ func (x *PromoteAgentResponse) GetVersionTag() string {
 	return ""
 }
 
+// A presigned POST for a file upload. Send the file as a multipart form POST
+// to `url`, with each entry of `values` as a form field.
 type PresignedPostRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Url           string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`

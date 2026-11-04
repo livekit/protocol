@@ -88,15 +88,25 @@ func (AudioChannel) EnumDescriptor() ([]byte, []int) {
 type EncodingOptionsPreset int32
 
 const (
-	EncodingOptionsPreset_H264_720P_30           EncodingOptionsPreset = 0 //  1280x720, 30fps, 3000kpbs, H.264_MAIN / OPUS
-	EncodingOptionsPreset_H264_720P_60           EncodingOptionsPreset = 1 //  1280x720, 60fps, 4500kbps, H.264_MAIN / OPUS
-	EncodingOptionsPreset_H264_1080P_30          EncodingOptionsPreset = 2 // 1920x1080, 30fps, 4500kbps, H.264_MAIN / OPUS
-	EncodingOptionsPreset_H264_1080P_60          EncodingOptionsPreset = 3 // 1920x1080, 60fps, 6000kbps, H.264_MAIN / OPUS
-	EncodingOptionsPreset_PORTRAIT_H264_720P_30  EncodingOptionsPreset = 4 //  720x1280, 30fps, 3000kpbs, H.264_MAIN / OPUS
-	EncodingOptionsPreset_PORTRAIT_H264_720P_60  EncodingOptionsPreset = 5 //  720x1280, 60fps, 4500kbps, H.264_MAIN / OPUS
-	EncodingOptionsPreset_PORTRAIT_H264_1080P_30 EncodingOptionsPreset = 6 // 1080x1920, 30fps, 4500kbps, H.264_MAIN / OPUS
-	EncodingOptionsPreset_PORTRAIT_H264_1080P_60 EncodingOptionsPreset = 7 // 1080x1920, 60fps, 6000kbps, H.264_MAIN / OPUS
-	EncodingOptionsPreset_PASSTHROUGH            EncodingOptionsPreset = 8 // Skip transcoding. Valid only when specifying a single track with MediaSource
+	// 1280x720 at 30 fps and 3000 kbps, with `H264_MAIN` video and `OPUS` audio.
+	EncodingOptionsPreset_H264_720P_30 EncodingOptionsPreset = 0
+	// 1280x720 at 60 fps and 4500 kbps, with `H264_MAIN` video and `OPUS` audio.
+	EncodingOptionsPreset_H264_720P_60 EncodingOptionsPreset = 1
+	// 1920x1080 at 30 fps and 4500 kbps, with `H264_MAIN` video and `OPUS` audio.
+	EncodingOptionsPreset_H264_1080P_30 EncodingOptionsPreset = 2
+	// 1920x1080 at 60 fps and 6000 kbps, with `H264_MAIN` video and `OPUS` audio.
+	EncodingOptionsPreset_H264_1080P_60 EncodingOptionsPreset = 3
+	// 720x1280 at 30 fps and 3000 kbps, with `H264_MAIN` video and `OPUS` audio.
+	EncodingOptionsPreset_PORTRAIT_H264_720P_30 EncodingOptionsPreset = 4
+	// 720x1280 at 60 fps and 4500 kbps, with `H264_MAIN` video and `OPUS` audio.
+	EncodingOptionsPreset_PORTRAIT_H264_720P_60 EncodingOptionsPreset = 5
+	// 1080x1920 at 30 fps and 4500 kbps, with `H264_MAIN` video and `OPUS` audio.
+	EncodingOptionsPreset_PORTRAIT_H264_1080P_30 EncodingOptionsPreset = 6
+	// 1080x1920 at 60 fps and 6000 kbps, with `H264_MAIN` video and `OPUS` audio.
+	EncodingOptionsPreset_PORTRAIT_H264_1080P_60 EncodingOptionsPreset = 7
+	// No transcoding. Valid only when the request names a single track with
+	// `MediaSource`.
+	EncodingOptionsPreset_PASSTHROUGH EncodingOptionsPreset = 8
 )
 
 // Enum value maps for EncodingOptionsPreset.
@@ -155,11 +165,13 @@ func (EncodingOptionsPreset) EnumDescriptor() ([]byte, []int) {
 type EncodedFileType int32
 
 const (
-	EncodedFileType_DEFAULT_FILETYPE EncodedFileType = 0 // file type chosen based on codecs
+	// LiveKit chooses the file type from the codecs.
+	EncodedFileType_DEFAULT_FILETYPE EncodedFileType = 0
 	EncodedFileType_MP4              EncodedFileType = 1
 	EncodedFileType_OGG              EncodedFileType = 2
 	EncodedFileType_MP3              EncodedFileType = 3
-	EncodedFileType_MCAP             EncodedFileType = 4 // One channel per captured track
+	// An MCAP file, with one channel for each captured track.
+	EncodedFileType_MCAP EncodedFileType = 4
 )
 
 // Enum value maps for EncodedFileType.
@@ -210,7 +222,8 @@ func (EncodedFileType) EnumDescriptor() ([]byte, []int) {
 type StreamProtocol int32
 
 const (
-	StreamProtocol_DEFAULT_PROTOCOL StreamProtocol = 0 // protocol chosen based on urls
+	// LiveKit chooses the protocol from the URLs.
+	StreamProtocol_DEFAULT_PROTOCOL StreamProtocol = 0
 	StreamProtocol_RTMP             StreamProtocol = 1
 	StreamProtocol_SRT              StreamProtocol = 2
 	StreamProtocol_WEBSOCKET        StreamProtocol = 3
@@ -263,8 +276,10 @@ type SegmentedFileProtocol int32
 
 const (
 	SegmentedFileProtocol_DEFAULT_SEGMENTED_FILE_PROTOCOL SegmentedFileProtocol = 0
-	SegmentedFileProtocol_HLS_PROTOCOL                    SegmentedFileProtocol = 1 // MPEG-TS segments
-	SegmentedFileProtocol_HLS_FMP4_PROTOCOL               SegmentedFileProtocol = 2 // fragmented MP4 segments
+	// HLS with MPEG-TS segments.
+	SegmentedFileProtocol_HLS_PROTOCOL SegmentedFileProtocol = 1
+	// HLS with fragmented MP4 segments.
+	SegmentedFileProtocol_HLS_FMP4_PROTOCOL SegmentedFileProtocol = 2
 )
 
 // Enum value maps for SegmentedFileProtocol.
@@ -357,9 +372,10 @@ func (SegmentedFileSuffix) EnumDescriptor() ([]byte, []int) {
 type ImageFileSuffix int32
 
 const (
-	ImageFileSuffix_IMAGE_SUFFIX_INDEX          ImageFileSuffix = 0
-	ImageFileSuffix_IMAGE_SUFFIX_TIMESTAMP      ImageFileSuffix = 1
-	ImageFileSuffix_IMAGE_SUFFIX_NONE_OVERWRITE ImageFileSuffix = 2 // Do not append any suffix and overwrite the existing image with the latest
+	ImageFileSuffix_IMAGE_SUFFIX_INDEX     ImageFileSuffix = 0
+	ImageFileSuffix_IMAGE_SUFFIX_TIMESTAMP ImageFileSuffix = 1
+	// No suffix. Each new image overwrites the previous image.
+	ImageFileSuffix_IMAGE_SUFFIX_NONE_OVERWRITE ImageFileSuffix = 2
 )
 
 // Enum value maps for ImageFileSuffix.
@@ -1574,23 +1590,37 @@ func (*DataSelector_TrackId) isDataSelector_Match() {}
 func (*DataSelector_ParticipantIdentity) isDataSelector_Match() {}
 
 type EncodingOptions struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	Width            int32                  `protobuf:"varint,1,opt,name=width,proto3" json:"width,omitempty"`                                                     // (default 1920)
-	Height           int32                  `protobuf:"varint,2,opt,name=height,proto3" json:"height,omitempty"`                                                   // (default 1080)
-	Depth            int32                  `protobuf:"varint,3,opt,name=depth,proto3" json:"depth,omitempty"`                                                     // (default 24)
-	Framerate        int32                  `protobuf:"varint,4,opt,name=framerate,proto3" json:"framerate,omitempty"`                                             // (default 30)
-	AudioCodec       AudioCodec             `protobuf:"varint,5,opt,name=audio_codec,json=audioCodec,proto3,enum=livekit.AudioCodec" json:"audio_codec,omitempty"` // (default OPUS)
-	AudioBitrate     int32                  `protobuf:"varint,6,opt,name=audio_bitrate,json=audioBitrate,proto3" json:"audio_bitrate,omitempty"`                   // (default 128)
-	AudioFrequency   int32                  `protobuf:"varint,7,opt,name=audio_frequency,json=audioFrequency,proto3" json:"audio_frequency,omitempty"`             // (default 44100)
-	VideoCodec       VideoCodec             `protobuf:"varint,8,opt,name=video_codec,json=videoCodec,proto3,enum=livekit.VideoCodec" json:"video_codec,omitempty"` // (default H264_MAIN)
-	VideoBitrate     int32                  `protobuf:"varint,9,opt,name=video_bitrate,json=videoBitrate,proto3" json:"video_bitrate,omitempty"`                   // (default 4500)
-	KeyFrameInterval float64                `protobuf:"fixed64,10,opt,name=key_frame_interval,json=keyFrameInterval,proto3" json:"key_frame_interval,omitempty"`   // in seconds (default 4s for streaming, segment duration for segmented output, encoder default for files)
-	// --- Deprecated ---
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The width of the video, in pixels. Defaults to 1920.
+	Width int32 `protobuf:"varint,1,opt,name=width,proto3" json:"width,omitempty"`
+	// The height of the video, in pixels. Defaults to 1080.
+	Height int32 `protobuf:"varint,2,opt,name=height,proto3" json:"height,omitempty"`
+	// The color depth. Defaults to 24.
+	Depth int32 `protobuf:"varint,3,opt,name=depth,proto3" json:"depth,omitempty"`
+	// The frame rate, in frames per second. Defaults to 30.
+	Framerate int32 `protobuf:"varint,4,opt,name=framerate,proto3" json:"framerate,omitempty"`
+	// The audio codec. Defaults to `OPUS`.
+	AudioCodec AudioCodec `protobuf:"varint,5,opt,name=audio_codec,json=audioCodec,proto3,enum=livekit.AudioCodec" json:"audio_codec,omitempty"`
+	// The audio bitrate. Defaults to 128.
+	AudioBitrate int32 `protobuf:"varint,6,opt,name=audio_bitrate,json=audioBitrate,proto3" json:"audio_bitrate,omitempty"`
+	// The audio sample rate, in Hz. Defaults to 44100.
+	AudioFrequency int32 `protobuf:"varint,7,opt,name=audio_frequency,json=audioFrequency,proto3" json:"audio_frequency,omitempty"`
+	// The video codec. Defaults to `H264_MAIN`.
+	VideoCodec VideoCodec `protobuf:"varint,8,opt,name=video_codec,json=videoCodec,proto3,enum=livekit.VideoCodec" json:"video_codec,omitempty"`
+	// The video bitrate. Defaults to 4500.
+	VideoBitrate int32 `protobuf:"varint,9,opt,name=video_bitrate,json=videoBitrate,proto3" json:"video_bitrate,omitempty"`
+	// The interval between key frames, in seconds. Defaults to 4 seconds for a
+	// stream output, to the segment duration for a segmented output, and to the
+	// default of the encoder for a file output.
+	KeyFrameInterval float64 `protobuf:"fixed64,10,opt,name=key_frame_interval,json=keyFrameInterval,proto3" json:"key_frame_interval,omitempty"`
+	// Deprecated. The quality setting of the audio encoder.
 	//
 	// Deprecated: Marked as deprecated in livekit_egress.proto.
-	AudioQuality int32 `protobuf:"varint,11,opt,name=audio_quality,json=audioQuality,proto3" json:"audio_quality,omitempty"` // quality setting on audio encoder
+	AudioQuality int32 `protobuf:"varint,11,opt,name=audio_quality,json=audioQuality,proto3" json:"audio_quality,omitempty"`
+	// Deprecated. The quality setting of the video encoder.
+	//
 	// Deprecated: Marked as deprecated in livekit_egress.proto.
-	VideoQuality  int32 `protobuf:"varint,12,opt,name=video_quality,json=videoQuality,proto3" json:"video_quality,omitempty"` // quality setting on video encoder
+	VideoQuality  int32 `protobuf:"varint,12,opt,name=video_quality,json=videoQuality,proto3" json:"video_quality,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1897,10 +1927,13 @@ func (x *FileOutput) GetDisableManifest() bool {
 }
 
 type StreamOutput struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Protocol      StreamProtocol         `protobuf:"varint,1,opt,name=protocol,proto3,enum=livekit.StreamProtocol" json:"protocol,omitempty"` // required
-	Urls          []string               `protobuf:"bytes,2,rep,name=urls,proto3" json:"urls,omitempty"`                                      // urls or destinations required
-	Destinations  []*StreamDestination   `protobuf:"bytes,3,rep,name=destinations,proto3" json:"destinations,omitempty"`                      // urls or destinations required
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The streaming protocol. Required.
+	Protocol StreamProtocol `protobuf:"varint,1,opt,name=protocol,proto3,enum=livekit.StreamProtocol" json:"protocol,omitempty"`
+	// The URLs to stream to. Set `urls` or `destinations`.
+	Urls []string `protobuf:"bytes,2,rep,name=urls,proto3" json:"urls,omitempty"`
+	// The destinations to stream to. Set `urls` or `destinations`.
+	Destinations  []*StreamDestination `protobuf:"bytes,3,rep,name=destinations,proto3" json:"destinations,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1957,9 +1990,11 @@ func (x *StreamOutput) GetDestinations() []*StreamDestination {
 }
 
 type StreamDestination struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`   // required
-	Url           string                 `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty"` // required
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The ID of the destination. Required.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// The URL of the destination. Required.
+	Url           string `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2008,18 +2043,24 @@ func (x *StreamDestination) GetUrl() string {
 	return ""
 }
 
-// Used to generate HLS segments or other kind of segmented output
+// A segmented file output, such as HLS segments.
 type SegmentedFileOutput struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	Protocol         SegmentedFileProtocol  `protobuf:"varint,1,opt,name=protocol,proto3,enum=livekit.SegmentedFileProtocol" json:"protocol,omitempty"`                                  // (optional)
-	FilenamePrefix   string                 `protobuf:"bytes,2,opt,name=filename_prefix,json=filenamePrefix,proto3" json:"filename_prefix,omitempty"`                                    // (optional)
-	PlaylistName     string                 `protobuf:"bytes,3,opt,name=playlist_name,json=playlistName,proto3" json:"playlist_name,omitempty"`                                          // (optional)
-	LivePlaylistName string                 `protobuf:"bytes,11,opt,name=live_playlist_name,json=livePlaylistName,proto3" json:"live_playlist_name,omitempty"`                           // (optional, disabled if not provided). Path of a live playlist
-	SegmentDuration  uint32                 `protobuf:"varint,4,opt,name=segment_duration,json=segmentDuration,proto3" json:"segment_duration,omitempty"`                                // in seconds (optional)
-	FilenameSuffix   SegmentedFileSuffix    `protobuf:"varint,10,opt,name=filename_suffix,json=filenameSuffix,proto3,enum=livekit.SegmentedFileSuffix" json:"filename_suffix,omitempty"` // (optional, default INDEX)
-	DisableManifest  bool                   `protobuf:"varint,8,opt,name=disable_manifest,json=disableManifest,proto3" json:"disable_manifest,omitempty"`                                // disable upload of manifest file (default false)
-	// TODO: deprecate
-	//
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The segment protocol. Optional.
+	Protocol SegmentedFileProtocol `protobuf:"varint,1,opt,name=protocol,proto3,enum=livekit.SegmentedFileProtocol" json:"protocol,omitempty"`
+	// The prefix of the segment file names. Optional.
+	FilenamePrefix string `protobuf:"bytes,2,opt,name=filename_prefix,json=filenamePrefix,proto3" json:"filename_prefix,omitempty"`
+	// The name of the playlist file. Optional.
+	PlaylistName string `protobuf:"bytes,3,opt,name=playlist_name,json=playlistName,proto3" json:"playlist_name,omitempty"`
+	// The path of a live playlist. Optional. When empty, LiveKit does not write
+	// a live playlist.
+	LivePlaylistName string `protobuf:"bytes,11,opt,name=live_playlist_name,json=livePlaylistName,proto3" json:"live_playlist_name,omitempty"`
+	// The duration of each segment, in seconds. Optional.
+	SegmentDuration uint32 `protobuf:"varint,4,opt,name=segment_duration,json=segmentDuration,proto3" json:"segment_duration,omitempty"`
+	// The suffix of the segment file names. Defaults to `INDEX`.
+	FilenameSuffix SegmentedFileSuffix `protobuf:"varint,10,opt,name=filename_suffix,json=filenameSuffix,proto3,enum=livekit.SegmentedFileSuffix" json:"filename_suffix,omitempty"`
+	// When true, LiveKit does not upload the manifest file. Defaults to `false`.
+	DisableManifest bool `protobuf:"varint,8,opt,name=disable_manifest,json=disableManifest,proto3" json:"disable_manifest,omitempty"`
 	// Types that are valid to be assigned to Output:
 	//
 	//	*SegmentedFileOutput_S3
@@ -2181,18 +2222,23 @@ func (*SegmentedFileOutput_Azure) isSegmentedFileOutput_Output() {}
 
 func (*SegmentedFileOutput_AliOSS) isSegmentedFileOutput_Output() {}
 
-// Capture images at a specified interval
+// An image output that captures images at a fixed interval.
 type ImageOutput struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	CaptureInterval uint32                 `protobuf:"varint,1,opt,name=capture_interval,json=captureInterval,proto3" json:"capture_interval,omitempty"`                           // in seconds (required)
-	Width           int32                  `protobuf:"varint,2,opt,name=width,proto3" json:"width,omitempty"`                                                                      // (optional, defaults to track width)
-	Height          int32                  `protobuf:"varint,3,opt,name=height,proto3" json:"height,omitempty"`                                                                    // (optional, defaults to track height)
-	FilenamePrefix  string                 `protobuf:"bytes,4,opt,name=filename_prefix,json=filenamePrefix,proto3" json:"filename_prefix,omitempty"`                               // (optional)
-	FilenameSuffix  ImageFileSuffix        `protobuf:"varint,5,opt,name=filename_suffix,json=filenameSuffix,proto3,enum=livekit.ImageFileSuffix" json:"filename_suffix,omitempty"` // (optional, default INDEX)
-	ImageCodec      ImageCodec             `protobuf:"varint,6,opt,name=image_codec,json=imageCodec,proto3,enum=livekit.ImageCodec" json:"image_codec,omitempty"`                  // (optional)
-	DisableManifest bool                   `protobuf:"varint,7,opt,name=disable_manifest,json=disableManifest,proto3" json:"disable_manifest,omitempty"`                           // disable upload of manifest file (default false)
-	// TODO: deprecate
-	//
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The interval between captures, in seconds. Required.
+	CaptureInterval uint32 `protobuf:"varint,1,opt,name=capture_interval,json=captureInterval,proto3" json:"capture_interval,omitempty"`
+	// The width of the images. Optional. Defaults to the width of the track.
+	Width int32 `protobuf:"varint,2,opt,name=width,proto3" json:"width,omitempty"`
+	// The height of the images. Optional. Defaults to the height of the track.
+	Height int32 `protobuf:"varint,3,opt,name=height,proto3" json:"height,omitempty"`
+	// The prefix of the image file names. Optional.
+	FilenamePrefix string `protobuf:"bytes,4,opt,name=filename_prefix,json=filenamePrefix,proto3" json:"filename_prefix,omitempty"`
+	// The suffix of the image file names. Defaults to `IMAGE_SUFFIX_INDEX`.
+	FilenameSuffix ImageFileSuffix `protobuf:"varint,5,opt,name=filename_suffix,json=filenameSuffix,proto3,enum=livekit.ImageFileSuffix" json:"filename_suffix,omitempty"`
+	// The image codec. Optional.
+	ImageCodec ImageCodec `protobuf:"varint,6,opt,name=image_codec,json=imageCodec,proto3,enum=livekit.ImageCodec" json:"image_codec,omitempty"`
+	// When true, LiveKit does not upload the manifest file. Defaults to `false`.
+	DisableManifest bool `protobuf:"varint,7,opt,name=disable_manifest,json=disableManifest,proto3" json:"disable_manifest,omitempty"`
 	// Types that are valid to be assigned to Output:
 	//
 	//	*ImageOutput_S3
@@ -2469,22 +2515,28 @@ func (*StorageConfig_Azure) isStorageConfig_Provider() {}
 func (*StorageConfig_AliOSS) isStorageConfig_Provider() {}
 
 type S3Upload struct {
-	state                protoimpl.MessageState `protogen:"open.v1"`
-	AccessKey            string                 `protobuf:"bytes,1,opt,name=access_key,json=accessKey,proto3" json:"access_key,omitempty"`
-	Secret               string                 `protobuf:"bytes,2,opt,name=secret,proto3" json:"secret,omitempty"`
-	SessionToken         string                 `protobuf:"bytes,11,opt,name=session_token,json=sessionToken,proto3" json:"session_token,omitempty"`
-	AssumeRoleArn        string                 `protobuf:"bytes,12,opt,name=assume_role_arn,json=assumeRoleArn,proto3" json:"assume_role_arn,omitempty"`                        // ARN of the role to assume for file upload. Egress will make an AssumeRole API call using the provided access_key and secret to assume that role. On LiveKit cloud, this is only available on accounts that have the feature enabled
-	AssumeRoleExternalId string                 `protobuf:"bytes,13,opt,name=assume_role_external_id,json=assumeRoleExternalId,proto3" json:"assume_role_external_id,omitempty"` // ExternalID to use when assuming role for upload
-	Region               string                 `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
-	Endpoint             string                 `protobuf:"bytes,4,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
-	Bucket               string                 `protobuf:"bytes,5,opt,name=bucket,proto3" json:"bucket,omitempty"`
-	ForcePathStyle       bool                   `protobuf:"varint,6,opt,name=force_path_style,json=forcePathStyle,proto3" json:"force_path_style,omitempty"`
-	Metadata             map[string]string      `protobuf:"bytes,7,rep,name=metadata,proto3" json:"metadata,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	Tagging              string                 `protobuf:"bytes,8,opt,name=tagging,proto3" json:"tagging,omitempty"`
-	ContentDisposition   string                 `protobuf:"bytes,9,opt,name=content_disposition,json=contentDisposition,proto3" json:"content_disposition,omitempty"` // Content-Disposition header
-	Proxy                *ProxyConfig           `protobuf:"bytes,10,opt,name=proxy,proto3" json:"proxy,omitempty"`
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
+	state        protoimpl.MessageState `protogen:"open.v1"`
+	AccessKey    string                 `protobuf:"bytes,1,opt,name=access_key,json=accessKey,proto3" json:"access_key,omitempty"`
+	Secret       string                 `protobuf:"bytes,2,opt,name=secret,proto3" json:"secret,omitempty"`
+	SessionToken string                 `protobuf:"bytes,11,opt,name=session_token,json=sessionToken,proto3" json:"session_token,omitempty"`
+	// The ARN of the role to assume for the upload. Egress calls the AWS
+	// `AssumeRole` API with `access_key` and `secret` to assume this role. On
+	// LiveKit Cloud, this is available only to accounts that have the feature
+	// enabled.
+	AssumeRoleArn string `protobuf:"bytes,12,opt,name=assume_role_arn,json=assumeRoleArn,proto3" json:"assume_role_arn,omitempty"`
+	// The external ID to use when Egress assumes the role.
+	AssumeRoleExternalId string            `protobuf:"bytes,13,opt,name=assume_role_external_id,json=assumeRoleExternalId,proto3" json:"assume_role_external_id,omitempty"`
+	Region               string            `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
+	Endpoint             string            `protobuf:"bytes,4,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
+	Bucket               string            `protobuf:"bytes,5,opt,name=bucket,proto3" json:"bucket,omitempty"`
+	ForcePathStyle       bool              `protobuf:"varint,6,opt,name=force_path_style,json=forcePathStyle,proto3" json:"force_path_style,omitempty"`
+	Metadata             map[string]string `protobuf:"bytes,7,rep,name=metadata,proto3" json:"metadata,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Tagging              string            `protobuf:"bytes,8,opt,name=tagging,proto3" json:"tagging,omitempty"`
+	// The `Content-Disposition` header of the uploaded file.
+	ContentDisposition string       `protobuf:"bytes,9,opt,name=content_disposition,json=contentDisposition,proto3" json:"content_disposition,omitempty"`
+	Proxy              *ProxyConfig `protobuf:"bytes,10,opt,name=proxy,proto3" json:"proxy,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *S3Upload) Reset() {
@@ -2610,7 +2662,8 @@ func (x *S3Upload) GetProxy() *ProxyConfig {
 
 type GCPUpload struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// service account credentials serialized in JSON "credentials.json"
+	// The service account credentials, as the JSON content of a
+	// `credentials.json` file.
 	Credentials   string       `protobuf:"bytes,1,opt,name=credentials,proto3" json:"credentials,omitempty"`
 	Bucket        string       `protobuf:"bytes,2,opt,name=bucket,proto3" json:"bucket,omitempty"`
 	Proxy         *ProxyConfig `protobuf:"bytes,3,opt,name=proxy,proto3" json:"proxy,omitempty"`
@@ -3861,11 +3914,13 @@ type isAutoParticipantEgress_Options interface {
 }
 
 type AutoParticipantEgress_Preset struct {
-	Preset EncodingOptionsPreset `protobuf:"varint,1,opt,name=preset,proto3,enum=livekit.EncodingOptionsPreset,oneof"` // (default H264_720P_30)
+	// The encoding preset. Defaults to `H264_720P_30`.
+	Preset EncodingOptionsPreset `protobuf:"varint,1,opt,name=preset,proto3,enum=livekit.EncodingOptionsPreset,oneof"`
 }
 
 type AutoParticipantEgress_Advanced struct {
-	Advanced *EncodingOptions `protobuf:"bytes,2,opt,name=advanced,proto3,oneof"` // (optional)
+	// The encoding options, in place of `preset`. Optional.
+	Advanced *EncodingOptions `protobuf:"bytes,2,opt,name=advanced,proto3,oneof"`
 }
 
 func (*AutoParticipantEgress_Preset) isAutoParticipantEgress_Options() {}
@@ -3873,9 +3928,13 @@ func (*AutoParticipantEgress_Preset) isAutoParticipantEgress_Options() {}
 func (*AutoParticipantEgress_Advanced) isAutoParticipantEgress_Options() {}
 
 type AutoTrackEgress struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	Filepath        string                 `protobuf:"bytes,1,opt,name=filepath,proto3" json:"filepath,omitempty"`                                       // see docs for templating (default {track_id}-{time})
-	DisableManifest bool                   `protobuf:"varint,5,opt,name=disable_manifest,json=disableManifest,proto3" json:"disable_manifest,omitempty"` // disables upload of json manifest file (default false)
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The path of the file. It can use template variables, such as `{track_id}`
+	// and `{time}`. Defaults to `{track_id}-{time}`.
+	Filepath string `protobuf:"bytes,1,opt,name=filepath,proto3" json:"filepath,omitempty"`
+	// When true, LiveKit does not upload the JSON manifest file. Defaults to
+	// `false`.
+	DisableManifest bool `protobuf:"varint,5,opt,name=disable_manifest,json=disableManifest,proto3" json:"disable_manifest,omitempty"`
 	// Types that are valid to be assigned to Output:
 	//
 	//	*AutoTrackEgress_S3

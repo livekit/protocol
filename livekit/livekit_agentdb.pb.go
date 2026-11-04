@@ -140,8 +140,8 @@ func (AgentDB_Wire_ValueType) EnumDescriptor() ([]byte, []int) {
 	return file_livekit_agentdb_proto_rawDescGZIP(), []int{0, 10, 1}
 }
 
-// Nested so that names like Value and Ping need not be unique across the
-// livekit package. `tip` throughout is the latest durable commit sequence.
+// The messages of agent databases: SQLite databases that an agent keeps. In
+// each message, `tip` is the sequence number of the latest durable commit.
 type AgentDB struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -180,8 +180,9 @@ func (*AgentDB) Descriptor() ([]byte, []int) {
 
 type AgentDB_CreateRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Unset: never expires, and expires_at is then unset everywhere.
-	// Otherwise clamped to the server cap, and never extended.
+	// The time to live of the database. When unset, the database never
+	// expires, and `expires_at` is unset in all messages. Otherwise, the TTL is
+	// clamped to a maximum value. The TTL is never extended.
 	Ttl           *durationpb.Duration `protobuf:"bytes,1,opt,name=ttl,proto3" json:"ttl,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -225,8 +226,9 @@ func (x *AgentDB_CreateRequest) GetTtl() *durationpb.Duration {
 }
 
 type AgentDB_CreateResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	DatabaseId    string                 `protobuf:"bytes,1,opt,name=database_id,json=databaseId,proto3" json:"database_id,omitempty"` // "DB_..."
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The ID of the database (`DB_...`).
+	DatabaseId    string                 `protobuf:"bytes,1,opt,name=database_id,json=databaseId,proto3" json:"database_id,omitempty"`
 	ExpiresAt     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -321,9 +323,11 @@ func (x *AgentDB_GetRequest) GetDatabaseId() string {
 }
 
 type AgentDB_ListRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	PageSize      int32                  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"` // server-clamped
-	PageToken     string                 `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The maximum number of databases in a page. The value is clamped to a
+	// maximum.
+	PageSize      int32  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	PageToken     string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -373,9 +377,10 @@ func (x *AgentDB_ListRequest) GetPageToken() string {
 }
 
 type AgentDB_ListResponse struct {
-	state         protoimpl.MessageState   `protogen:"open.v1"`
-	Databases     []*AgentDB_AgentDatabase `protobuf:"bytes,1,rep,name=databases,proto3" json:"databases,omitempty"`
-	NextPageToken string                   `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"` // empty when exhausted
+	state     protoimpl.MessageState   `protogen:"open.v1"`
+	Databases []*AgentDB_AgentDatabase `protobuf:"bytes,1,rep,name=databases,proto3" json:"databases,omitempty"`
+	// The token of the next page. Empty when there are no more pages.
+	NextPageToken string `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -424,7 +429,7 @@ func (x *AgentDB_ListResponse) GetNextPageToken() string {
 	return ""
 }
 
-// One database, as get and list both report it.
+// An agent database, as the get and list requests return it.
 type AgentDB_AgentDatabase struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	DatabaseId    string                 `protobuf:"bytes,1,opt,name=database_id,json=databaseId,proto3" json:"database_id,omitempty"`
@@ -626,10 +631,14 @@ func (x *AgentDB_ExportRequest) GetDatabaseId() string {
 }
 
 type AgentDB_ExportResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	DownloadUrl   string                 `protobuf:"bytes,1,opt,name=download_url,json=downloadUrl,proto3" json:"download_url,omitempty"` // pre-authenticated object-storage URL
-	ExpiresAt     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`       // of the URL, not the database
-	Tip           int64                  `protobuf:"varint,3,opt,name=tip,proto3" json:"tip,omitempty"`                                   // what the export is consistent at
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// A pre-authenticated URL that downloads the database.
+	DownloadUrl string `protobuf:"bytes,1,opt,name=download_url,json=downloadUrl,proto3" json:"download_url,omitempty"`
+	// The time that `download_url` expires. This is not the expiry of the
+	// database.
+	ExpiresAt *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	// The commit sequence number that the export is consistent at.
+	Tip           int64 `protobuf:"varint,3,opt,name=tip,proto3" json:"tip,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -685,9 +694,11 @@ func (x *AgentDB_ExportResponse) GetTip() int64 {
 	return 0
 }
 
-// Data plane: one WebSocket per database, one message per frame, correlated
-// by a client-chosen request_id. Result batches are paced by Credit, so the
-// server never sends more un-consumed batches than granted.
+// The messages of the WebSocket connection that runs queries on a database.
+// Each connection serves one database, and each frame holds one message. A
+// `request_id` that the client chooses correlates the messages. `Credit`
+// paces the result batches, so the server never sends more unconsumed
+// batches than the client granted.
 type AgentDB_Wire struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -883,19 +894,24 @@ type isAgentDB_Wire_ClientMessage_Message interface {
 }
 
 type AgentDB_Wire_ClientMessage_Hello struct {
-	Hello *AgentDB_Wire_Hello `protobuf:"bytes,2,opt,name=hello,proto3,oneof"` // must be first on the socket
+	// Must be the first message on the connection.
+	Hello *AgentDB_Wire_Hello `protobuf:"bytes,2,opt,name=hello,proto3,oneof"`
 }
 
 type AgentDB_Wire_ClientMessage_Exec struct {
-	Exec *AgentDB_Wire_Statement `protobuf:"bytes,3,opt,name=exec,proto3,oneof"` // answers ExecResult
+	// Answered with `ExecResult`.
+	Exec *AgentDB_Wire_Statement `protobuf:"bytes,3,opt,name=exec,proto3,oneof"`
 }
 
 type AgentDB_Wire_ClientMessage_Query struct {
-	Query *AgentDB_Wire_Statement `protobuf:"bytes,4,opt,name=query,proto3,oneof"` // answers Columns + ColumnBatch* + Done
+	// Answered with `Columns`, then zero or more `ColumnBatch` messages,
+	// then `Done`.
+	Query *AgentDB_Wire_Statement `protobuf:"bytes,4,opt,name=query,proto3,oneof"`
 }
 
 type AgentDB_Wire_ClientMessage_Batch struct {
-	Batch *AgentDB_Wire_Batch `protobuf:"bytes,5,opt,name=batch,proto3,oneof"` // answers one result per statement, then Done
+	// Answered with one result for each statement, then `Done`.
+	Batch *AgentDB_Wire_Batch `protobuf:"bytes,5,opt,name=batch,proto3,oneof"`
 }
 
 type AgentDB_Wire_ClientMessage_Begin struct {
@@ -1112,7 +1128,7 @@ func (*AgentDB_Wire_ServerMessage_Error) isAgentDB_Wire_ServerMessage_Message() 
 
 func (*AgentDB_Wire_ServerMessage_Pong) isAgentDB_Wire_ServerMessage_Message() {}
 
-// SQLite's five storage classes.
+// A value in one of the five SQLite storage classes.
 type AgentDB_Wire_Value struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to Value:
@@ -1214,7 +1230,8 @@ type isAgentDB_Wire_Value_Value interface {
 }
 
 type AgentDB_Wire_Value_NullValue struct {
-	NullValue bool `protobuf:"varint,1,opt,name=null_value,json=nullValue,proto3,oneof"` // always true when set
+	// Always `true` when set.
+	NullValue bool `protobuf:"varint,1,opt,name=null_value,json=nullValue,proto3,oneof"`
 }
 
 type AgentDB_Wire_Value_IntValue struct {
@@ -1244,9 +1261,10 @@ func (*AgentDB_Wire_Value_TextValue) isAgentDB_Wire_Value_Value() {}
 func (*AgentDB_Wire_Value_BlobValue) isAgentDB_Wire_Value_Value() {}
 
 type AgentDB_Wire_Statement struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Sql           string                 `protobuf:"bytes,1,opt,name=sql,proto3" json:"sql,omitempty"`
-	Params        []*AgentDB_Wire_Value  `protobuf:"bytes,2,rep,name=params,proto3" json:"params,omitempty"` // positional
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Sql   string                 `protobuf:"bytes,1,opt,name=sql,proto3" json:"sql,omitempty"`
+	// The positional parameters of the statement.
+	Params        []*AgentDB_Wire_Value  `protobuf:"bytes,2,rep,name=params,proto3" json:"params,omitempty"`
 	Lang          AgentDB_Wire_QueryLang `protobuf:"varint,3,opt,name=lang,proto3,enum=livekit.AgentDB_Wire_QueryLang" json:"lang,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1303,12 +1321,13 @@ func (x *AgentDB_Wire_Statement) GetLang() AgentDB_Wire_QueryLang {
 	return AgentDB_Wire_SQL
 }
 
-// Applied atomically, in order, and answered with one result per
-// statement, in order: Columns then ColumnBatch frames for a statement
-// that returns rows, one ExecResult for one that does not, each tagged
-// with the statement's 0-based index, then a single Done for the whole
-// batch. A statement that returns no rows still sends its Columns. Credit
-// paces the ColumnBatch frames of the batch as a whole.
+// Statements that run atomically, in order. The answer has one result for
+// each statement, in order, and then one `Done` for the whole batch. A
+// statement that returns rows gets `Columns` and then `ColumnBatch`
+// frames. A statement that does not return rows gets one `ExecResult`.
+// Each result has the 0-based index of its statement. A statement that
+// returns no rows still sends its `Columns`. `Credit` paces the
+// `ColumnBatch` frames of the batch as a whole.
 type AgentDB_Wire_Batch struct {
 	state         protoimpl.MessageState    `protogen:"open.v1"`
 	Statements    []*AgentDB_Wire_Statement `protobuf:"bytes,1,rep,name=statements,proto3" json:"statements,omitempty"`
@@ -1498,8 +1517,9 @@ func (*AgentDB_Wire_Cancel) Descriptor() ([]byte, []int) {
 }
 
 type AgentDB_Wire_Credit struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Batches       uint32                 `protobuf:"varint,1,opt,name=batches,proto3" json:"batches,omitempty"` // additional batches the client can absorb
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The number of additional batches that the client can accept.
+	Batches       uint32 `protobuf:"varint,1,opt,name=batches,proto3" json:"batches,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1750,9 +1770,10 @@ func (x *AgentDB_Wire_HelloOk) GetPingTimeoutMs() uint32 {
 }
 
 type AgentDB_Wire_Columns struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Names         []string               `protobuf:"bytes,1,rep,name=names,proto3" json:"names,omitempty"`
-	Statement     uint32                 `protobuf:"varint,2,opt,name=statement,proto3" json:"statement,omitempty"` // index within a Batch; 0 and unused for a Query
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Names []string               `protobuf:"bytes,1,rep,name=names,proto3" json:"names,omitempty"`
+	// The index of the statement in a `Batch`. Zero and unused for a query.
+	Statement     uint32 `protobuf:"varint,2,opt,name=statement,proto3" json:"statement,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1801,20 +1822,22 @@ func (x *AgentDB_Wire_Columns) GetStatement() uint32 {
 	return 0
 }
 
-// Values are typed per row, as SQLite types them, so a column may mix
-// classes: walk `types` and take the next entry from the matching array. Text
-// and blobs are concatenated with one exclusive end offset each, so value i
-// is data[ends[i-1]:ends[i]] with 0 implied before the first. A NULL occupies
-// a tag only.
+// A column of results. Each value has its own type, as SQLite types it, so
+// a column can mix storage classes. To read the values, walk `types` and
+// take the next entry from the matching array. Text and blobs are
+// concatenated, with one exclusive end offset for each value, so value `i`
+// is `data[ends[i-1]:ends[i]]`, with `0` before the first value. A NULL
+// uses only a type tag.
 type AgentDB_Wire_Column struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Types         []byte                 `protobuf:"bytes,1,opt,name=types,proto3" json:"types,omitempty"` // one ValueType per row
-	Ints          []int64                `protobuf:"zigzag64,2,rep,packed,name=ints,proto3" json:"ints,omitempty"`
-	Doubles       []float64              `protobuf:"fixed64,3,rep,packed,name=doubles,proto3" json:"doubles,omitempty"`
-	TextData      []byte                 `protobuf:"bytes,4,opt,name=text_data,json=textData,proto3" json:"text_data,omitempty"`
-	TextEnds      []uint32               `protobuf:"varint,5,rep,packed,name=text_ends,json=textEnds,proto3" json:"text_ends,omitempty"`
-	BlobData      []byte                 `protobuf:"bytes,6,opt,name=blob_data,json=blobData,proto3" json:"blob_data,omitempty"`
-	BlobEnds      []uint32               `protobuf:"varint,7,rep,packed,name=blob_ends,json=blobEnds,proto3" json:"blob_ends,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// One `ValueType` for each row.
+	Types         []byte    `protobuf:"bytes,1,opt,name=types,proto3" json:"types,omitempty"`
+	Ints          []int64   `protobuf:"zigzag64,2,rep,packed,name=ints,proto3" json:"ints,omitempty"`
+	Doubles       []float64 `protobuf:"fixed64,3,rep,packed,name=doubles,proto3" json:"doubles,omitempty"`
+	TextData      []byte    `protobuf:"bytes,4,opt,name=text_data,json=textData,proto3" json:"text_data,omitempty"`
+	TextEnds      []uint32  `protobuf:"varint,5,rep,packed,name=text_ends,json=textEnds,proto3" json:"text_ends,omitempty"`
+	BlobData      []byte    `protobuf:"bytes,6,opt,name=blob_data,json=blobData,proto3" json:"blob_data,omitempty"`
+	BlobEnds      []uint32  `protobuf:"varint,7,rep,packed,name=blob_ends,json=blobEnds,proto3" json:"blob_ends,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1899,10 +1922,12 @@ func (x *AgentDB_Wire_Column) GetBlobEnds() []uint32 {
 }
 
 type AgentDB_Wire_ColumnBatch struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Columns       []*AgentDB_Wire_Column `protobuf:"bytes,1,rep,name=columns,proto3" json:"columns,omitempty"` // one per name in Columns
-	Rows          uint32                 `protobuf:"varint,2,opt,name=rows,proto3" json:"rows,omitempty"`
-	Statement     uint32                 `protobuf:"varint,3,opt,name=statement,proto3" json:"statement,omitempty"` // index within a Batch; 0 and unused for a Query
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// One column for each name in `Columns`.
+	Columns []*AgentDB_Wire_Column `protobuf:"bytes,1,rep,name=columns,proto3" json:"columns,omitempty"`
+	Rows    uint32                 `protobuf:"varint,2,opt,name=rows,proto3" json:"rows,omitempty"`
+	// The index of the statement in a `Batch`. Zero and unused for a query.
+	Statement     uint32 `protobuf:"varint,3,opt,name=statement,proto3" json:"statement,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1959,11 +1984,12 @@ func (x *AgentDB_Wire_ColumnBatch) GetStatement() uint32 {
 }
 
 type AgentDB_Wire_ExecResult struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	RowsAffected  int64                  `protobuf:"varint,1,opt,name=rows_affected,json=rowsAffected,proto3" json:"rows_affected,omitempty"`
-	LastInsertId  int64                  `protobuf:"varint,2,opt,name=last_insert_id,json=lastInsertId,proto3" json:"last_insert_id,omitempty"`
-	Tip           int64                  `protobuf:"varint,3,opt,name=tip,proto3" json:"tip,omitempty"`
-	Statement     uint32                 `protobuf:"varint,4,opt,name=statement,proto3" json:"statement,omitempty"` // index within a Batch; 0 and unused for an Exec
+	state        protoimpl.MessageState `protogen:"open.v1"`
+	RowsAffected int64                  `protobuf:"varint,1,opt,name=rows_affected,json=rowsAffected,proto3" json:"rows_affected,omitempty"`
+	LastInsertId int64                  `protobuf:"varint,2,opt,name=last_insert_id,json=lastInsertId,proto3" json:"last_insert_id,omitempty"`
+	Tip          int64                  `protobuf:"varint,3,opt,name=tip,proto3" json:"tip,omitempty"`
+	// The index of the statement in a `Batch`. Zero and unused for an exec.
+	Statement     uint32 `protobuf:"varint,4,opt,name=statement,proto3" json:"statement,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2027,9 +2053,10 @@ func (x *AgentDB_Wire_ExecResult) GetStatement() uint32 {
 }
 
 type AgentDB_Wire_Done struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Tip           int64                  `protobuf:"varint,1,opt,name=tip,proto3" json:"tip,omitempty"` // the snapshot the query ran at
-	TotalRows     uint64                 `protobuf:"varint,2,opt,name=total_rows,json=totalRows,proto3" json:"total_rows,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The snapshot that the query ran at.
+	Tip           int64  `protobuf:"varint,1,opt,name=tip,proto3" json:"tip,omitempty"`
+	TotalRows     uint64 `protobuf:"varint,2,opt,name=total_rows,json=totalRows,proto3" json:"total_rows,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2079,9 +2106,10 @@ func (x *AgentDB_Wire_Done) GetTotalRows() uint64 {
 }
 
 type AgentDB_Wire_Error struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Code          string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"` // stable, machine-readable
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// A stable, machine-readable error code.
+	Code          string `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

@@ -96,6 +96,8 @@ message PromoteAgentResponse {
   string version_tag = 6;
 }
 
+// A presigned POST for a file upload. Send the file as a multipart form POST
+// to `url`, with each entry of `values` as a form field.
 message PresignedPostRequest {
   string url = 1;
   map<string, string> values = 2 [(logger.sensitivity) = SENSITIVITY_SECRET];

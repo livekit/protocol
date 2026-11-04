@@ -245,31 +245,37 @@ message UpdateRoomMetadataRequest {
 }
 
 message RoomConfiguration {
-  string name = 1;  // Used as ID, must be unique
-  // number of seconds to keep the room open if no one joins
+  // The name of the room configuration. The name is the ID of the
+  // configuration, so it must be unique.
+  string name = 1;
+  // The number of seconds to keep the room open when no participant joins.
   uint32 empty_timeout = 2;
-  // number of seconds to keep the room open after everyone leaves
+  // The number of seconds to keep the room open after the last participant
+  // leaves.
   uint32 departure_timeout = 3;
-  // limit number of participants that can be in a room, excluding Egress and Agent participants
+  // The maximum number of participants in the room. Egress and agent
+  // participants do not count toward the limit.
   uint32 max_participants = 4;
-  // metadata of room
+  // The metadata of the room.
   string metadata = 11 [
     (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
-  // egress
+  // The egress settings of the room.
   RoomEgress egress = 5;
-  // playout delay of subscriber
+  // The minimum playout delay of subscribers.
   uint32 min_playout_delay = 7;
+  // The maximum playout delay of subscribers.
   uint32 max_playout_delay = 8;
-  // improves A/V sync when playout_delay set to a value larger than 200ms. It will disables transceiver re-use
-  // so not recommended for rooms with frequent subscription changes
+  // When true, LiveKit improves A/V sync when the playout delay is larger than
+  // 200 ms. This turns off transceiver reuse, so do not use it for rooms with
+  // frequent subscription changes.
   bool sync_streams = 9;
 
-  // Define agents that should be dispatched to this room
+  // The agents to dispatch to the room.
   repeated RoomAgentDispatch agents = 10;
 
-  // Tags to attach to the room
+  // The tags to attach to the room.
   map<string, string> tags = 12;
 
   // NEXT_ID: 13

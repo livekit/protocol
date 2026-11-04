@@ -73,15 +73,18 @@ message SimulationRun {
     google.protobuf.Timestamp ended_at = 11;
     string room_id = 12;
     Usage usage = 13;
-    // Quality metrics for this job's call. Unset when the job produced none.
+    // The call quality metrics of this job. Unset when the job produced no
+    // metrics.
     JobMetrics metrics = 14;
-    // The Scenario.id this job ran; empty for generated runs. Every sample
-    // of one scenario shares it, so a run's jobs group back into scenarios.
+    // The `id` of the `Scenario` that this job ran. Empty for a run with
+    // generated scenarios. All samples of a scenario have the same value, so
+    // you can group the jobs of a run by scenario.
     string scenario_id = 15;
-    // 1-based sample of that scenario within the run; always 1 when the run's
-    // samples is 1.
+    // The sample number of the scenario in the run, starting at 1. Always 1
+    // when the run has one sample for each scenario.
     int32 sample = 16;
-    // Set on a failed job whose cause is known; error stays the detail.
+    // The cause of a failed job, when the cause is known. `error` still has
+    // the details.
     FailureReason failure_reason = 19;
 
     message Usage {
@@ -91,148 +94,260 @@ message SimulationRun {
 
     enum FailureReason {
       FAILURE_REASON_UNSPECIFIED = 0;
-      // The agent under test never joined the simulation's room.
+      // The agent under test did not join the simulation room.
       FAILURE_REASON_AGENT_JOIN_TIMEOUT = 1;
     }
   }
 
   message JobMetrics {
-    // Headline scores, 0-1. All absent when the simulator spoiled the call.
     reserved 1, 2;  // was accuracy_score, experience_score (merged into overall_score)
     reserved "accuracy_score", "experience_score";
-    optional float task_completion = 3;  // the scenario verdict as 1/0
-    optional float overall_score = 20;   // weighted mean of the judged and heard scores
+    // The verdict of the scenario: 1 when it passed, 0 when it failed. Unset
+    // when the simulator spoiled the call.
+    optional float task_completion = 3;
+    // The overall score of the job, from 0 to 1: the weighted mean of the
+    // judged scores and the heard scores. Unset when the simulator spoiled the
+    // call.
+    optional float overall_score = 20;
 
     STT stt = 4;
     LLM llm = 5;
     TTS tts = 6;
     Conversation conversation = 7;
 
-    // One entry per turn, both speakers.
+    // The turns of the call, one item for each turn of either speaker.
     repeated Turn turns = 9;
 
-    string judge_model = 10;            // text judge for judged scores; "" if none ran
-    bool has_remote_session = 12;       // false = waveform-only capture (e.g. SIP)
-    google.protobuf.Timestamp t0 = 13;  // audio only; call start (first speech edge); turn times relative to it
+    // The text judge model that produced the judged scores. Empty when no
+    // judge ran.
+    string judge_model = 10;
+    // True when the job has a `RemoteSession` of the agent. When false, the
+    // job has only a waveform capture, for example on a SIP call.
+    bool has_remote_session = 12;
+    // The start of the call: the first edge of speech. The turn times are
+    // relative to this time. Audio only.
+    google.protobuf.Timestamp t0 = 13;
 
-    // Judged over the authored dialog (text and audio); needs the text judge.
-    optional float conciseness = 14;  // judged {0, 0.5, 1} per agent turn; job = mean
-    // Whole-call issue flags; true = present, absent = not judged.
+    // The conciseness score of the agent, judged over the dialog for text and
+    // audio. Each agent turn scores 0, 0.5, or 1, and the job value is the
+    // mean of the turns. Requires the text judge.
+    optional float conciseness = 14;
+    // True when the judge found unnecessary tool calls in the call. Unset when
+    // the call was not judged.
     optional bool unnecessary_tool_calls = 15;
+    // True when the judge found information loss in the call. Unset when the
+    // call was not judged.
     optional bool information_loss = 16;
+    // True when the judge found redundant statements in the call. Unset when
+    // the call was not judged.
     optional bool redundant_statements = 17;
+    // True when the judge found questions of poor quality in the call. Unset
+    // when the call was not judged.
     optional bool poor_question_quality = 18;
-    optional float conversation_progression = 19;  // 0-1, derived from the flags above
+    // The progression score of the conversation, from 0 to 1. It is derived
+    // from the issue flags.
+    optional float conversation_progression = 19;
 
-    // How the call ended. A failing end also sets the job's error.
+    // How the call ended. When the end is a failure, `error` of the job is
+    // also set.
     EndReason end_reason = 21;
-    // The simulated caller's language, as a language tag: what it spoke or wrote.
+    // The language that the simulated caller spoke or wrote, as a language
+    // tag.
     string caller_language = 22;
-    // Audio only: the language the caller transcribed the agent in; "" means
-    // caller_language.
+    // The language that the caller used to transcribe the agent. Empty means
+    // the same language as `caller_language`. Audio only.
     string caller_listen_language = 23;
-    // Audio only: what the caller's audio went through before the agent heard
-    // it. Absent for a clean call.
+    // The impairments applied to the audio of the caller before the agent
+    // heard it. Unset for a clean call. Audio only.
     SimulationImpairments impairments = 24;
 
     enum EndReason {
       END_REASON_UNSPECIFIED = 0;
-      END_REASON_SCENARIO_COMPLETED = 1;  // the caller finished the scenario
-      END_REASON_AGENT_ENDED = 2;         // the agent under test ended the call
-      END_REASON_INACTIVITY = 3;          // the agent under test went silent
-      END_REASON_TURN_LIMIT = 4;          // the caller ran out of turns
-      END_REASON_EMPTY_RESPONSE = 5;      // the agent under test kept replying with nothing
-      END_REASON_AGENT_ERROR = 6;         // the agent under test failed mid-call
+      // The caller finished the scenario.
+      END_REASON_SCENARIO_COMPLETED = 1;
+      // The agent under test ended the call.
+      END_REASON_AGENT_ENDED = 2;
+      // The agent under test stopped speaking.
+      END_REASON_INACTIVITY = 3;
+      // The caller used all of its turns.
+      END_REASON_TURN_LIMIT = 4;
+      // The agent under test replied with nothing again and again.
+      END_REASON_EMPTY_RESPONSE = 5;
+      // The agent under test failed during the call.
+      END_REASON_AGENT_ERROR = 6;
     }
 
     // The agent's perception of the caller. Audio only.
     message STT {
-      optional float wer = 1;                       // needs the RemoteSession; word_errors / words
-      optional uint32 words = 2;                    // needs the RemoteSession
-      optional uint32 word_errors = 3;              // needs the RemoteSession
-      optional float cer = 4;                       // needs the RemoteSession; char_errors / chars
-      optional uint32 chars = 9;                    // needs the RemoteSession
-      optional uint32 char_errors = 10;             // needs the RemoteSession
-      optional uint32 stt_delay_ms = 8;             // needs the RemoteSession; agent-reported STT/endpointing delay
+      // The word error rate: `word_errors` / `words`. Requires a
+      // `RemoteSession`.
+      optional float wer = 1;
+      // The word count for `wer`. Requires a `RemoteSession`.
+      optional uint32 words = 2;
+      // The word error count for `wer`. Requires a `RemoteSession`.
+      optional uint32 word_errors = 3;
+      // The character error rate: `char_errors` / `chars`. Requires a
+      // `RemoteSession`.
+      optional float cer = 4;
+      // The character count for `cer`. Requires a `RemoteSession`.
+      optional uint32 chars = 9;
+      // The character error count for `cer`. Requires a `RemoteSession`.
+      optional uint32 char_errors = 10;
+      // The STT and endpointing delay that the agent reported, in
+      // milliseconds. Requires a `RemoteSession`.
+      optional uint32 stt_delay_ms = 8;
 
-      // Key entities (names, IDs, amounts) the caller said. Needs the text judge.
-      optional float entity_recognition = 11;  // recognized / uttered
+      // The entity recognition rate: `entities_recognized` /
+      // `entities_uttered`. Entities are the key items, such as names, IDs, and
+      // amounts, that the caller said. Requires the text judge.
+      optional float entity_recognition = 11;
+      // The number of entities that the caller said.
       optional uint32 entities_uttered = 12;
+      // The number of entities that the agent recognized correctly.
       optional uint32 entities_recognized = 13;
-      // Retention: an entity is acquired at the first saying heard right, and
-      // these count only the sayings after that, so recall separates keeping an
-      // entity from ever getting it.
-      optional float entity_recall = 14;  // acquired_recognized / acquired_uttered
+      // The entity recall rate: `entities_acquired_recognized` /
+      // `entities_acquired_uttered`. An entity is acquired the first time that
+      // the agent recognizes it correctly. These counts include only the times
+      // that the caller said an entity after it was acquired. Thus, recall
+      // measures whether the agent keeps an entity, separately from whether
+      // the agent got it at all.
+      optional float entity_recall = 14;
+      // The number of times that the caller said an acquired entity.
       optional uint32 entities_acquired_uttered = 15;
+      // The number of times that the agent recognized an acquired entity
+      // correctly.
       optional uint32 entities_acquired_recognized = 16;
     }
 
     message LLM {
-      optional uint32 ttft_ms = 1;            // needs the RemoteSession; time to first token
-      optional uint32 ttfs_ms = 2;            // needs the RemoteSession; time to first sentence, the smallest speakable unit
-      optional float tokens_per_second = 3;   // needs the RemoteSession
+      // The time to first token, in milliseconds. Requires a `RemoteSession`.
+      optional uint32 ttft_ms = 1;
+      // The time to first sentence, in milliseconds. A sentence is the
+      // smallest unit that the agent can speak. Requires a `RemoteSession`.
+      optional uint32 ttfs_ms = 2;
+      // The number of tokens per second. Requires a `RemoteSession`.
+      optional float tokens_per_second = 3;
     }
 
     // The agent's voice. Audio only.
     message TTS {
-      optional uint32 ttfb_ms = 2;             // needs the RemoteSession; provider byte-level TTFB
-      optional float wer = 3;                  // needs the RemoteSession; word_errors / words
-      optional uint32 words = 7;               // needs the RemoteSession
-      optional uint32 word_errors = 8;         // needs the RemoteSession
-      optional float cer = 9;                  // needs the RemoteSession; char_errors / chars
-      optional uint32 chars = 10;              // needs the RemoteSession
-      optional uint32 char_errors = 11;        // needs the RemoteSession
+      // The time to first byte from the TTS provider, in milliseconds.
+      // Requires a `RemoteSession`.
+      optional uint32 ttfb_ms = 2;
+      // The word error rate: `word_errors` / `words`. Requires a
+      // `RemoteSession`.
+      optional float wer = 3;
+      // The word count for `wer`. Requires a `RemoteSession`.
+      optional uint32 words = 7;
+      // The word error count for `wer`. Requires a `RemoteSession`.
+      optional uint32 word_errors = 8;
+      // The character error rate: `char_errors` / `chars`. Requires a
+      // `RemoteSession`.
+      optional float cer = 9;
+      // The character count for `cer`. Requires a `RemoteSession`.
+      optional uint32 chars = 10;
+      // The character error count for `cer`. Requires a `RemoteSession`.
+      optional uint32 char_errors = 11;
 
-      // Key entities the agent said, as the caller heard them. Needs the text judge.
-      optional float entity_recognition = 14;  // recognized / uttered
+      // The entity recognition rate: `entities_recognized` /
+      // `entities_uttered`. Entities are the key items that the agent said, as
+      // the caller heard them. Requires the text judge.
+      optional float entity_recognition = 14;
+      // The number of entities that the agent said.
       optional uint32 entities_uttered = 15;
+      // The number of entities that the caller heard correctly.
       optional uint32 entities_recognized = 16;
-      optional float entity_recall = 17;  // acquired_recognized / acquired_uttered
+      // The entity recall rate: `entities_acquired_recognized` /
+      // `entities_acquired_uttered`. See `STT.entity_recall`.
+      optional float entity_recall = 17;
       optional uint32 entities_acquired_uttered = 18;
       optional uint32 entities_acquired_recognized = 19;
     }
 
-    // Audio only.
+    // The turn-taking metrics of the call. Audio only.
     message Conversation {
-      optional float turn_taking_score = 1;              // 0-1
-      optional int32 heard_e2e_latency_p50_ms = 2;       // floor-transfer offset; a gap is > 0, an overlap < 0
+      // The turn-taking score, from 0 to 1.
+      optional float turn_taking_score = 1;
+      // The median heard end-to-end latency, in milliseconds. This is the
+      // floor-transfer offset: a gap is greater than 0, and an overlap is less
+      // than 0.
+      optional int32 heard_e2e_latency_p50_ms = 2;
+      // The 95th percentile of the heard end-to-end latency, in milliseconds.
+      // See `heard_e2e_latency_p50_ms`.
       optional int32 heard_e2e_latency_p95_ms = 3;
+      // The 99th percentile of the heard end-to-end latency, in milliseconds.
+      // See `heard_e2e_latency_p50_ms`.
       optional int32 heard_e2e_latency_p99_ms = 4;
-      optional uint32 time_to_yield_ms = 5;              // agent audio continuing past a barge-in
-      optional uint32 eot_misprediction_count = 6;       // agent started before the caller's turn ended
-      optional float overlap_ratio = 7;                  // overlapping speech / total speech
-      optional uint32 overlap_speech_ms = 8;             // pooling stats for overlap_ratio
+      // The time that the agent audio continues after a barge-in, in
+      // milliseconds.
+      optional uint32 time_to_yield_ms = 5;
+      // The number of times that the agent started to speak before the turn of
+      // the caller ended.
+      optional uint32 eot_misprediction_count = 6;
+      // The ratio of overlapping speech to total speech.
+      optional float overlap_ratio = 7;
+      // The overlapping speech, in milliseconds. With `total_speech_ms`, use
+      // it to pool `overlap_ratio` over several jobs.
+      optional uint32 overlap_speech_ms = 8;
+      // The total speech, in milliseconds. See `overlap_speech_ms`.
       optional uint32 total_speech_ms = 9;
-      optional uint32 awkward_silence_count = 11;        // gaps past the natural-pause threshold
-      optional uint32 unanswered_turns = 12;             // the simulated party spoke, the agent never responded
-      optional uint32 false_interruption_count = 13;     // needs the RemoteSession; agent paused for a non-interruption
-      optional uint32 e2e_latency_ms = 15;               // needs the RemoteSession; the agent's own claim
-      optional uint32 backchannel_count = 16;            // the caller's acknowledgements over the agent's speech
+      // The number of gaps that are longer than the natural-pause threshold.
+      optional uint32 awkward_silence_count = 11;
+      // The number of turns in which the simulated party spoke and the agent
+      // did not respond.
+      optional uint32 unanswered_turns = 12;
+      // The number of times that the agent paused for something that was not
+      // an interruption. Requires a `RemoteSession`.
+      optional uint32 false_interruption_count = 13;
+      // The end-to-end latency that the agent reported, in milliseconds.
+      // Requires a `RemoteSession`.
+      optional uint32 e2e_latency_ms = 15;
+      // The number of acknowledgements that the caller made while the agent
+      // spoke.
+      optional uint32 backchannel_count = 16;
     }
 
-    // Rows exist for text and audio. The groups above hold the means and pools
-    // over these; anything not measured for a turn stays unset.
+    // A turn of the call, for text and audio. The metric groups of
+    // `JobMetrics` hold the means and pooled values over the turns. A metric
+    // that is not measured for a turn is unset.
     message Turn {
-      uint32 index = 1;                 // 1-based, conversation order
-      livekit.agent.ChatRole role = 2;  // ASSISTANT = the agent under test, USER = simulator persona
-      // The words the judges read for this turn: the speaker's own, or as the
-      // other side heard them when those are unknown (the agent's, without a
-      // RemoteSession).
+      // The position of the turn in the conversation, starting at 1.
+      uint32 index = 1;
+      // The speaker of the turn. `ASSISTANT` is the agent under test, and
+      // `USER` is the simulated user.
+      livekit.agent.ChatRole role = 2;
+      // The words that the judges read for this turn. These are the words of
+      // the speaker. When those are not known, these are the words as the other
+      // side heard them, as for the agent without a `RemoteSession`.
       string text = 18;
-      optional uint32 start_ms = 3;     // audio only; relative to t0; unset if the turn could not be aligned to the audio
-      optional uint32 end_ms = 4;       // audio only
+      // The start of the turn, in milliseconds after `t0`. Unset when the turn
+      // cannot be aligned to the audio. Audio only.
+      optional uint32 start_ms = 3;
+      // The end of the turn, in milliseconds, on the same scale as `start_ms`.
+      // Audio only.
+      optional uint32 end_ms = 4;
 
-      optional uint32 stt_delay_ms = 5;    // needs the RemoteSession
-      optional uint32 llm_ttft_ms = 6;     // needs the RemoteSession
-      optional uint32 llm_ttfs_ms = 7;     // needs the RemoteSession
-      optional float llm_tps = 8;          // needs the RemoteSession
-      optional uint32 tts_ttfb_ms = 9;     // needs the RemoteSession
-      optional uint32 e2e_latency_ms = 10; // needs the RemoteSession
+      // The STT delay of the turn, in milliseconds. Requires a `RemoteSession`.
+      optional uint32 stt_delay_ms = 5;
+      // The LLM time to first token, in milliseconds. Requires a
+      // `RemoteSession`.
+      optional uint32 llm_ttft_ms = 6;
+      // The LLM time to first sentence, in milliseconds. Requires a
+      // `RemoteSession`.
+      optional uint32 llm_ttfs_ms = 7;
+      // The LLM tokens per second. Requires a `RemoteSession`.
+      optional float llm_tps = 8;
+      // The TTS time to first byte, in milliseconds. Requires a
+      // `RemoteSession`.
+      optional uint32 tts_ttfb_ms = 9;
+      // The end-to-end latency, in milliseconds. Requires a `RemoteSession`.
+      optional uint32 e2e_latency_ms = 10;
 
       optional int32 heard_e2e_latency_ms = 11;
       optional uint32 time_to_yield_ms = 12;
       optional float turn_taking_score = 13;
-      optional float conciseness = 14;     // needs the text judge
+      // The conciseness score of the turn. Requires the text judge.
+      optional float conciseness = 14;
 
       optional bool eot_misprediction = 15;
       optional bool awkward_silence = 16;
@@ -240,44 +355,54 @@ message SimulationRun {
     }
   }
 
-  // Aggregates over this run's jobs, so a run summary does not have to pull
-  // every job and turn. Reuses the JobMetrics group shapes.
+  // The aggregate metrics over the jobs of a run. Use them to summarize a run
+  // without reading each job and turn. The groups have the same shapes as in
+  // `JobMetrics`.
   message RunMetrics {
     reserved 1, 2;  // was accuracy_score, experience_score (merged into overall_score)
     reserved "accuracy_score", "experience_score";
-    optional float scenario_pass_rate = 3; // share of jobs whose scenario verdict passed
-    optional float overall_score = 10;     // mean over scored jobs
+    // The fraction of jobs that passed the scenario verdict.
+    optional float scenario_pass_rate = 3;
+    // The mean `overall_score` over the scored jobs.
+    optional float overall_score = 10;
 
     JobMetrics.STT stt = 4;
     JobMetrics.LLM llm = 5;
     JobMetrics.TTS tts = 6;
     JobMetrics.Conversation conversation = 7;
 
-    // Means over the jobs that report them.
+    // The mean `conciseness` over the jobs that report it.
     optional float conciseness = 8;
+    // The mean `conversation_progression` over the jobs that report it.
     optional float conversation_progression = 9;
   }
 
-  // The pipeline this run came from. Set by the client from its CI
-  // environment; absent for runs not started by a pipeline.
+  // The CI pipeline that started a run. The client sets it from its CI
+  // environment.
   message CI {
-    string provider = 1;  // e.g. "github_actions"
+    // The CI provider, for example `github_actions`.
+    string provider = 1;
     string commit_sha = 2;
-    string ref = 3;  // branch or tag
+    // The branch or tag.
+    string ref = 3;
     string pull_request = 4;
-    string run_url = 5;  // link back to the CI job
+    // The URL of the CI job.
+    string run_url = 5;
     string actor = 6;
   }
 
-  // Runs each scenario more than once, so a flaky sample is distinguishable
-  // from a broken scenario. Both fields are required when it is present.
+  // The options to run each scenario more than once. With several samples, you
+  // can tell a flaky sample from a broken scenario. When you set the options,
+  // both fields are required.
   message SamplingOptions {
-    // Samples per scenario, > 1. The run holds scenarios × samples jobs,
-    // subject to the usual job cap.
+    // The number of samples of each scenario. Must be greater than 1. The run
+    // has one job for each sample of each scenario, and the job limit of the
+    // run still applies.
     int32 samples = 1;
-    // The share of a scenario's samples that must pass for that scenario to
-    // pass, 0-1. A scenario needs round(rate × samples) of them, so 1
-    // requires every sample and 0.67 of 3 requires 2.
+    // The fraction of the samples of a scenario that must pass for the
+    // scenario to pass, from 0 to 1. A scenario needs round(`pass_rate` ×
+    // `samples`) passed samples. Thus, 1 requires every sample, and 0.67 with
+    // 3 samples requires 2.
     double pass_rate = 2;
   }
 
@@ -290,33 +415,45 @@ message SimulationRun {
       int32 num_simulations = 4;
       string region = 6;
 
-      // When set, run these scenarios (loaded from a scenarios.yaml).
-      // When unset, generate num_simulations scenarios from the uploaded agent source.
+      // The scenarios to run, for example the contents of a `scenarios.yaml`
+      // file. When unset, the run generates `num_simulations` scenarios from
+      // the uploaded agent source.
       optional ScenarioGroup scenario_group = 7;
 
-      // Maximum simulate jobs running in parallel for this run. Clamped to the
-      // project's concurrency quota; 0/unset uses the server default.
+      // The maximum number of jobs of this run that run in parallel. The value
+      // is clamped to the concurrency quota of the project. When unset or 0,
+      // the default applies.
       optional int32 concurrency = 8;
 
-      // Conversation mode for every job in this run; unspecified = TEXT.
+      // The conversation mode of every job in this run.
+      // `SIMULATION_MODE_UNSPECIFIED` means `SIMULATION_MODE_TEXT`.
       SimulationMode mode = 9;
 
-      // Impairments applied to the simulated user's audio; AUDIO mode only.
       // TODO(u9g): migrate these to SimulationImpairments.
+
+      // When true, adds background noise to the audio of the simulated user.
+      // `SIMULATION_MODE_AUDIO` only.
       bool background_noise = 10;
+      // When true, makes the audio of the simulated user sound like a
+      // low-quality microphone. `SIMULATION_MODE_AUDIO` only.
       bool low_quality_microphone = 11;
+      // When true, applies packet loss to the audio of the simulated user.
+      // `SIMULATION_MODE_AUDIO` only.
       bool packet_loss = 12;
       optional CI ci = 13;
-      // Absent runs each scenario once and requires it to pass. Requires
-      // scenario_group. The run fails if any scenario fails; pass@k and
-      // pass^k report over scenarios and neither gates.
+      // The sampling options of the run. Requires `scenario_group`. When
+      // unset, the run runs each scenario once, and each scenario must pass.
+      // The run fails when any scenario fails. pass@k and pass^k are reported
+      // over scenarios, and neither one decides whether the run passes.
       optional SamplingOptions sampling = 14;
 
-      // When set, every job dials this number over SIP instead of dispatching
-      // agent_name, as CreateSIPParticipantRequest would. AUDIO mode only.
+      // The phone number that every job dials over SIP, in place of a dispatch
+      // of `agent_name`. The call is the same as one that
+      // `CreateSIPParticipantRequest` makes. `SIMULATION_MODE_AUDIO` only.
       string sip_call_to = 15;
-      // Outbound trunk to dial through. Empty dials from sip_number, which must
-      // then be a LiveKit phone number the project owns.
+      // The ID of the outbound trunk to dial through. When empty, the call
+      // uses `sip_number`, which must then be a LiveKit phone number of the
+      // project.
       string sip_trunk_id = 16;
       string sip_number = 17;
     }
@@ -350,16 +487,29 @@ message SimulationRun {
       string project_id = 1;
       optional Status status = 2;
       optional TokenPagination page_token = 3;
-      // Half-open window [start_time, end_time) on created_at, the leading key
-      // of this list's keyset. Unset bounds mean no window, so existing callers
-      // keep their unbounded scan; the histogram's selected range sets both.
+
+      // created_at is the leading key of this list's keyset. Unset bounds keep
+      // the unbounded scan for existing callers; the histogram's selected range
+      // sets both.
+
+      // The start of the window on `created_at`, inclusive. When unset, the
+      // window has no start.
       optional google.protobuf.Timestamp start_time = 4;
+      // The end of the window on `created_at`, exclusive. When unset, the
+      // window has no end.
       optional google.protobuf.Timestamp end_time = 5;
-      // Exact agent name. Unset means every agent — including the runs whose
-      // name is empty, which a bare string could not tell from no filter.
+
+      // optional, because a bare string could not tell the runs with an empty
+      // name from no filter.
+
+      // The exact name of an agent. Returns only the runs of this agent. When
+      // unset, returns the runs of all agents, including the runs with an empty
+      // name.
       optional string agent_name = 6;
-      // Absent applies no mode filter. TEXT matches runs stored as TEXT or
-      // UNSPECIFIED, which `SimulationRun.mode` defines as the same mode.
+      // A conversation mode. Returns only the runs in this mode. When unset,
+      // returns the runs in all modes. `SIMULATION_MODE_TEXT` also matches the
+      // runs with `SIMULATION_MODE_UNSPECIFIED`, because `SimulationRun.mode`
+      // defines them as the same mode.
       optional SimulationMode mode = 7;
     }
     message Response {
@@ -368,28 +518,37 @@ message SimulationRun {
     }
   }
 
-  // Counts of the runs `List` would return over the same window, bucketed by
-  // created_at instead of paginated.
+  // The number of runs that `List` returns for the same window and filters,
+  // counted in time buckets on `created_at` in place of pages.
   message Counts {
     message Request {
       string project_id = 1;
-      // Both bounds required: a bucketed scan of a project's whole history is
-      // never what a caller wants.
+
+      // Both bounds are required: a bucketed scan of a project's whole history
+      // is never what a caller wants.
+
+      // The start of the window on `created_at`, inclusive. Required.
       google.protobuf.Timestamp start_time = 2;
+      // The end of the window on `created_at`, exclusive. Required.
       google.protobuf.Timestamp end_time = 3;
-      // Applied as `List` applies it: a filter the rows honour and the bars
-      // above them drop would make the histogram an answer about a wider set.
+
+      // The filters apply as `List` applies them: a filter that the rows honour
+      // and the bars above them drop would make the histogram an answer about a
+      // wider set.
+
+      // A run status. Returns only the counts of the runs in this status, as
+      // `List` filters them.
       optional Status status = 4;
       optional string agent_name = 5;
       optional SimulationMode mode = 6;
     }
     message Response {
-      // Buckets holding at least one run, ascending by bucket_start. Empty
-      // buckets are omitted; each run lands in exactly one bucket, so the
-      // counts sum to the number of runs in the window.
+      // The buckets that have at least one run, in ascending `bucket_start`
+      // order. The list does not include empty buckets. Each run is in exactly
+      // one bucket, so the counts add up to the number of runs in the window.
       repeated Bucket buckets = 1;
-      // The bucket width the server chose from the window, so the client
-      // zero-fills the omitted buckets on the grid the counts were built on.
+      // The width of each bucket, chosen from the window. Use it to fill the
+      // omitted buckets with zero on the same grid as the counts.
       google.protobuf.Duration interval = 2;
     }
     message Bucket {
@@ -423,24 +582,31 @@ message SimulationRun {
   int32 passed_count = 13;
   int32 failed_count = 14;
   int32 num_simulations = 15;
-  // Aggregate usage across all jobs in this run (sum of Job.usage).
+  // The total usage over all jobs of this run: the sum of `Job.usage`.
   Usage usage = 16;
-  // Maximum simulate jobs running in parallel for this run (0 = server default).
+  // The maximum number of jobs of this run that run in parallel. 0 means the
+  // default.
   int32 concurrency = 17;
-  // Conversation mode for every job in this run; unspecified = TEXT.
+  // The conversation mode of every job in this run.
+  // `SIMULATION_MODE_UNSPECIFIED` means `SIMULATION_MODE_TEXT`.
   SimulationMode mode = 18;
-  // Run-level aggregates over this run's jobs.
+  // The aggregate metrics over the jobs of this run.
   RunMetrics metrics = 19;
-  // zstd-compressed SimulationRunSummary: decompress, then proto.Unmarshal.
+
   // Compressed by default so the blob ships as-is on every hop.
+
+  // The `SimulationRunSummary` of the run, compressed with zstd. To read it,
+  // decompress it, then unmarshal it as a `SimulationRunSummary`.
   bytes summary_zstd = 20;
-  // How many issues the stored summary flagged. Present only once a summary
-  // landed — absent and 0 differ ("never summarized" vs "no issues") — and
-  // List responses carry it without the summary blob itself.
+  // The number of issues in the summary of the run. Set only after the run
+  // has a summary. Unset and 0 have different meanings: unset means that the
+  // run has no summary, and 0 means that the summary has no issues. `List`
+  // responses include this field, but not the summary.
   optional int32 issue_count = 21;
-  // The pipeline this run came from; unset when it did not come from one.
+  // The CI pipeline that started the run. Unset when no pipeline started it.
   optional CI ci = 22;
-  // Absent when the run ran each scenario once and required it to pass.
+  // The sampling options of the run. Unset when the run ran each scenario
+  // once and required each scenario to pass.
   optional SamplingOptions sampling = 23;
 
   message Usage {
@@ -449,8 +615,11 @@ message SimulationRun {
   }
 }
 
-// A single scenario, mirroring one entry in a scenarios.yaml file. Scenarios
-// are no longer stored server-side; the yaml file is the source of truth.
+// Scenarios are not stored server-side; the scenarios.yaml file is the source
+// of truth.
+
+// A scenario of a simulation run. It has the same fields as one entry of a
+// `scenarios.yaml` file.
 message Scenario {
   message CreateFromSession {
     message Request {
@@ -466,50 +635,57 @@ message Scenario {
   string label = 1;
   string instructions = 2;
   string agent_expectations = 3;
-  // Surfaced to the agent under test as SimulationContext scenario tags.
+  // The tags that the agent under test gets as the scenario tags of
+  // `SimulationContext`.
   map<string, string> tags = 4;
-  // Arbitrary JSON-encoded object, surfaced to the agent under test as
-  // SimulationContext userdata (e.g. inputs and benchmark target state).
+  // A JSON-encoded object of any shape. The agent under test gets it as the
+  // userdata of `SimulationContext`, for example inputs and the target state
+  // of a benchmark.
   string userdata = 5;
-  // SCN_-prefixed guid. Stable across edits to label, instructions, or
-  // expectations, so runs of the same scenario can be correlated over time.
+  // The ID of the scenario, with the prefix `SCN_`. It stays the same when
+  // you edit `label`, `instructions`, or `agent_expectations`, so you can
+  // correlate the runs of one scenario over time.
   string id = 6;
 }
 
-// A named group of scenarios, mirroring a whole scenarios.yaml file.
+// A named group of scenarios. It has the same contents as a `scenarios.yaml`
+// file.
 message ScenarioGroup {
   string name = 1;
   repeated Scenario scenarios = 2;
-  // SCNG_-prefixed guid. Stable identity of the scenarios file, independent
-  // of its name.
+  // The ID of the group, with the prefix `SCNG_`. It identifies the scenarios
+  // file, and it does not change with `name`.
   string id = 3;
 }
 
 // How the simulated user interacts with the agent under test.
 enum SimulationMode {
   SIMULATION_MODE_UNSPECIFIED = 0;
-  // The simulator chats over text streams (no audio).
+  // The simulated user chats over text streams, with no audio.
   SIMULATION_MODE_TEXT = 1;
-  // The simulator publishes/subscribes audio in the room.
+  // The simulated user publishes and subscribes to audio in the room.
   SIMULATION_MODE_AUDIO = 2;
 }
 
-// What the simulated caller's audio went through before the agent heard it.
+// The impairments applied to the audio of the simulated caller before the
+// agent heard it.
 message SimulationImpairments {
   bool background_noise = 1;
   bool low_quality_microphone = 2;
   bool packet_loss = 3;
 }
 
-// Carried (protojson-encoded) in the Job's lk.simulator.dispatch attribute, set
-// on the agent dispatch, so the agent under test can read the scenario + run
-// identity synchronously at job start.
+// The scenario and run identity of a simulation job. The job attribute
+// `lk.simulator.dispatch` holds it, encoded as protojson. The agent dispatch
+// sets the attribute, so the agent under test can read the scenario and the
+// run identity synchronously when the job starts.
 message SimulationDispatch {
   string simulation_run_id = 1;
   string job_id = 2;
   Scenario scenario = 3;
   SimulationMode mode = 4;
 }
+
 
 service AgentSimulation {
   rpc CreateSimulationRun(SimulationRun.Create.Request) returns (SimulationRun.Create.Response);

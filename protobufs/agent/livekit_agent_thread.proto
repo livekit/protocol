@@ -30,7 +30,7 @@ import "agent/livekit_agent_session.proto";
 import "logger/options.proto";
 
 message AgentThread {
-  // Direction of a listing. Each request documents what unset means.
+  // The sort direction of a list. Each request tells what unset means.
   enum SortOrder {
     SORT_ORDER_UNSPECIFIED = 0;
     SORT_ORDER_ASC = 1;
@@ -38,11 +38,12 @@ message AgentThread {
   }
 
   message CreateRequest {
-    // Groups threads, e.g. by user: an application-defined value, typically the
-    // user's identity. An AgentThreadGrant is scoped by it.
+    // The scope of the thread: a value that your application defines to group
+    // threads, such as by user. It is typically the identity of the user. An
+    // `AgentThreadGrant` is scoped by it.
     string scope = 1 [(logger.sensitivity) = SENSITIVITY_PII];
     map<string, string> attributes = 2 [(logger.sensitivity) = SENSITIVITY_PII];
-    // Unset takes the server default.
+    // The idle TTL of the thread. When unset, the default idle TTL applies.
     google.protobuf.Duration idle_ttl = 3;
   }
 
@@ -50,26 +51,29 @@ message AgentThread {
     string thread_id = 1 [(logger.name) = "threadID"];
   }
 
-  // The threads of one scope, newest first.
+  // A request for the threads of one scope, newest first.
   message ListRequest {
     string scope = 1 [(logger.sensitivity) = SENSITIVITY_PII];
-    // next_page_token of the previous ListResponse; empty for the first page.
+    // The `next_page_token` of the previous `ListResponse`. Empty for the first
+    // page.
     string page_token = 2;
     int32 limit = 3;
   }
 
   message ListResponse {
     repeated Thread threads = 1;
-    // Empty when exhausted.
+    // The token of the next page. Empty when there are no more pages.
     string next_page_token = 2;
   }
 
   message UpdateRequest {
     string thread_id = 1 [(logger.name) = "threadID"];
-    // Added to the existing attributes; an empty value deletes the entry.
+    // The attributes to add to the existing attributes. An empty value deletes
+    // the entry.
     map<string, string> attributes = 2 [(logger.sensitivity) = SENSITIVITY_PII];
+    // The idle TTL of the thread. Each update counts as activity and moves
+    // `expires_at` out by `idle_ttl`.
     google.protobuf.Duration idle_ttl = 3;
-    // Every update counts as activity and pushes expires_at out by idle_ttl.
   }
 
   message DeleteRequest {
@@ -78,32 +82,38 @@ message AgentThread {
 
   message DeleteResponse {}
 
-  // The thread's chat items, oldest first unless sort_order says otherwise.
+  // A request for the chat items of a thread. The items are oldest first,
+  // unless `sort_order` sets a different order.
   message GetItemsRequest {
     string thread_id = 1 [(logger.name) = "threadID"];
-    // One agent's items; empty for every agent's.
+    // The agent to return items for. When empty, returns the items of all
+    // agents.
     string agent = 2;
-    // next_page_token of the previous GetItemsResponse; empty for the first page.
+    // The `next_page_token` of the previous `GetItemsResponse`. Empty for the
+    // first page.
     string page_token = 3;
     int32 limit = 4;
-    // Unset or ASC is oldest first. DESC starts from the latest item and each
-    // next_page_token walks back through older ones.
+    // The sort order of the items. Unset or `SORT_ORDER_ASC` means oldest
+    // first. With `SORT_ORDER_DESC`, the list starts from the latest item, and
+    // each `next_page_token` goes back to older items.
     SortOrder sort_order = 5;
   }
 
   message GetItemsResponse {
     repeated Item items = 1;
-    // Empty when exhausted.
+    // The token of the next page. Empty when there are no more pages.
     string next_page_token = 2;
   }
 
-  // One chat item of an agent. Stored as the JSON of
-  // ChatContext.ChatItem (items.payload in thread_schema_v1.sql).
+  // Stored as the JSON of ChatContext.ChatItem (items.payload in
+  // thread_schema_v1.sql).
+
+  // A chat item of an agent in a thread.
   message Item {
     string agent = 1;
-    // Position in the agent's history.
+    // The position of the item in the history of the agent.
     int64 seq = 2;
-    // The A2A message the item came from.
+    // The ID of the A2A message that the item came from.
     string message_id = 3;
     ChatContext.ChatItem item = 4 [(logger.sensitivity) = SENSITIVITY_PII];
   }
@@ -114,19 +124,21 @@ message AgentThread {
     map<string, string> attributes = 3 [(logger.sensitivity) = SENSITIVITY_PII];
     google.protobuf.Timestamp created_at = 4;
     google.protobuf.Timestamp last_active = 5;
-    // last_active + idle_ttl; every update pushes it out. The thread and its
-    // database are deleted once it passes.
+    // The time that the thread expires: `last_active` plus `idle_ttl`. Each
+    // update moves it out. When this time passes, the thread and its database
+    // are deleted.
     google.protobuf.Timestamp expires_at = 6;
     google.protobuf.Duration idle_ttl = 7;
-    // The thread's database ("DB_..."), created with the thread.
+    // The ID of the thread database (`DB_...`). The database is created
+    // with the thread.
     string database_id = 8;
   }
 }
 
-// AgentTask: background work an agent runs within a thread, such as a booking
-// that takes minutes.
+// Background work that an agent runs in a thread, such as a booking that
+// takes minutes.
 message AgentTask {
-  // A task is never UNSPECIFIED.
+  // The status of a task. A task is never `UNSPECIFIED`.
   enum Status {
     UNSPECIFIED = 0;
     RUNNING = 1;
@@ -135,26 +147,28 @@ message AgentTask {
     CANCELED = 4;
   }
 
-  // A thread's tasks, oldest first.
+  // A request for the tasks of a thread, oldest first.
   message GetTasksRequest {
     string thread_id = 1 [(logger.name) = "threadID"];
-    // Unset for every status.
+    // A task status. Returns only the tasks with this status. When unset,
+    // returns the tasks of all statuses.
     optional Status status = 2;
-    // next_page_token of the previous GetTasksResponse; empty for the first page.
+    // The `next_page_token` of the previous `GetTasksResponse`. Empty for the
+    // first page.
     string page_token = 3;
     int32 limit = 4;
   }
 
   message GetTasksResponse {
     repeated Task tasks = 1;
-    // Empty when exhausted.
+    // The token of the next page. Empty when there are no more pages.
     string next_page_token = 2;
   }
 
   message Task {
     string task_id = 1;
     string thread_id = 2 [(logger.name) = "threadID"];
-    // The task's name, as the agent defines it.
+    // The name of the task, as the agent defines it.
     string name = 3;
     Status status = 4;
     google.protobuf.Timestamp updated_at = 5;

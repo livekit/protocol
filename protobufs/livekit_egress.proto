@@ -170,32 +170,57 @@ message DataSelector {
 // --- Encoding ---
 
 enum EncodingOptionsPreset {
-  H264_720P_30 = 0;            //  1280x720, 30fps, 3000kpbs, H.264_MAIN / OPUS
-  H264_720P_60 = 1;            //  1280x720, 60fps, 4500kbps, H.264_MAIN / OPUS
-  H264_1080P_30 = 2;           // 1920x1080, 30fps, 4500kbps, H.264_MAIN / OPUS
-  H264_1080P_60 = 3;           // 1920x1080, 60fps, 6000kbps, H.264_MAIN / OPUS
-  PORTRAIT_H264_720P_30 = 4;   //  720x1280, 30fps, 3000kpbs, H.264_MAIN / OPUS
-  PORTRAIT_H264_720P_60 = 5;   //  720x1280, 60fps, 4500kbps, H.264_MAIN / OPUS
-  PORTRAIT_H264_1080P_30 = 6;  // 1080x1920, 30fps, 4500kbps, H.264_MAIN / OPUS
-  PORTRAIT_H264_1080P_60 = 7;  // 1080x1920, 60fps, 6000kbps, H.264_MAIN / OPUS
-  PASSTHROUGH = 8;             // Skip transcoding. Valid only when specifying a single track with MediaSource
+  // 1280x720 at 30 fps and 3000 kbps, with `H264_MAIN` video and `OPUS` audio.
+  H264_720P_30 = 0;
+  // 1280x720 at 60 fps and 4500 kbps, with `H264_MAIN` video and `OPUS` audio.
+  H264_720P_60 = 1;
+  // 1920x1080 at 30 fps and 4500 kbps, with `H264_MAIN` video and `OPUS` audio.
+  H264_1080P_30 = 2;
+  // 1920x1080 at 60 fps and 6000 kbps, with `H264_MAIN` video and `OPUS` audio.
+  H264_1080P_60 = 3;
+  // 720x1280 at 30 fps and 3000 kbps, with `H264_MAIN` video and `OPUS` audio.
+  PORTRAIT_H264_720P_30 = 4;
+  // 720x1280 at 60 fps and 4500 kbps, with `H264_MAIN` video and `OPUS` audio.
+  PORTRAIT_H264_720P_60 = 5;
+  // 1080x1920 at 30 fps and 4500 kbps, with `H264_MAIN` video and `OPUS` audio.
+  PORTRAIT_H264_1080P_30 = 6;
+  // 1080x1920 at 60 fps and 6000 kbps, with `H264_MAIN` video and `OPUS` audio.
+  PORTRAIT_H264_1080P_60 = 7;
+  // No transcoding. Valid only when the request names a single track with
+  // `MediaSource`.
+  PASSTHROUGH = 8;
 }
 
 message EncodingOptions {
-  int32 width = 1;                 // (default 1920)
-  int32 height = 2;                // (default 1080)
-  int32 depth = 3;                 // (default 24)
-  int32 framerate = 4;             // (default 30)
-  AudioCodec audio_codec = 5;      // (default OPUS)
-  int32 audio_bitrate = 6;         // (default 128)
-  int32 audio_frequency = 7;       // (default 44100)
-  VideoCodec video_codec = 8;      // (default H264_MAIN)
-  int32 video_bitrate = 9;         // (default 4500)
-  double key_frame_interval = 10;  // in seconds (default 4s for streaming, segment duration for segmented output, encoder default for files)
+  // The width of the video, in pixels. Defaults to 1920.
+  int32 width = 1;
+  // The height of the video, in pixels. Defaults to 1080.
+  int32 height = 2;
+  // The color depth. Defaults to 24.
+  int32 depth = 3;
+  // The frame rate, in frames per second. Defaults to 30.
+  int32 framerate = 4;
+  // The audio codec. Defaults to `OPUS`.
+  AudioCodec audio_codec = 5;
+  // The audio bitrate. Defaults to 128.
+  int32 audio_bitrate = 6;
+  // The audio sample rate, in Hz. Defaults to 44100.
+  int32 audio_frequency = 7;
+  // The video codec. Defaults to `H264_MAIN`.
+  VideoCodec video_codec = 8;
+  // The video bitrate. Defaults to 4500.
+  int32 video_bitrate = 9;
+  // The interval between key frames, in seconds. Defaults to 4 seconds for a
+  // stream output, to the segment duration for a segmented output, and to the
+  // default of the encoder for a file output.
+  double key_frame_interval = 10;
 
   // --- Deprecated ---
-  int32 audio_quality = 11 [deprecated = true];        // quality setting on audio encoder
-  int32 video_quality = 12 [deprecated = true];        // quality setting on video encoder
+
+  // Deprecated. The quality setting of the audio encoder.
+  int32 audio_quality = 11 [deprecated = true];
+  // Deprecated. The quality setting of the video encoder.
+  int32 video_quality = 12 [deprecated = true];
 }
 
 // --- Output Types ---
@@ -222,42 +247,59 @@ message FileOutput {
 }
 
 enum EncodedFileType {
-  DEFAULT_FILETYPE = 0;  // file type chosen based on codecs
+  // LiveKit chooses the file type from the codecs.
+  DEFAULT_FILETYPE = 0;
   MP4 = 1;
   OGG = 2;
   MP3 = 3;
-  MCAP = 4;  // One channel per captured track
+  // An MCAP file, with one channel for each captured track.
+  MCAP = 4;
 }
 
 message StreamOutput {
-  StreamProtocol protocol = 1;                  // required
-  repeated string urls = 2;                     // urls or destinations required
-  repeated StreamDestination destinations = 3;  // urls or destinations required
+  // The streaming protocol. Required.
+  StreamProtocol protocol = 1;
+  // The URLs to stream to. Set `urls` or `destinations`.
+  repeated string urls = 2;
+  // The destinations to stream to. Set `urls` or `destinations`.
+  repeated StreamDestination destinations = 3;
 }
 
 message StreamDestination {
-  string id = 1;   // required
-  string url = 2;  // required
+  // The ID of the destination. Required.
+  string id = 1;
+  // The URL of the destination. Required.
+  string url = 2;
 }
 
 enum StreamProtocol {
-  DEFAULT_PROTOCOL = 0;  // protocol chosen based on urls
+  // LiveKit chooses the protocol from the URLs.
+  DEFAULT_PROTOCOL = 0;
   RTMP = 1;
   SRT = 2;
   WEBSOCKET = 3;
 }
 
-// Used to generate HLS segments or other kind of segmented output
+// A segmented file output, such as HLS segments.
 message SegmentedFileOutput {
-  SegmentedFileProtocol protocol = 1;        // (optional)
-  string filename_prefix = 2;                // (optional)
-  string playlist_name = 3;                  // (optional)
-  string live_playlist_name = 11;            // (optional, disabled if not provided). Path of a live playlist
-  uint32 segment_duration = 4;               // in seconds (optional)
-  SegmentedFileSuffix filename_suffix = 10;  // (optional, default INDEX)
-  bool disable_manifest = 8;                 // disable upload of manifest file (default false)
+  // The segment protocol. Optional.
+  SegmentedFileProtocol protocol = 1;
+  // The prefix of the segment file names. Optional.
+  string filename_prefix = 2;
+  // The name of the playlist file. Optional.
+  string playlist_name = 3;
+  // The path of a live playlist. Optional. When empty, LiveKit does not write
+  // a live playlist.
+  string live_playlist_name = 11;
+  // The duration of each segment, in seconds. Optional.
+  uint32 segment_duration = 4;
+  // The suffix of the segment file names. Defaults to `INDEX`.
+  SegmentedFileSuffix filename_suffix = 10;
+  // When true, LiveKit does not upload the manifest file. Defaults to `false`.
+  bool disable_manifest = 8;
 
   // TODO: deprecate
+
   oneof output {
     S3Upload s3 = 5;
     GCPUpload gcp = 6;
@@ -268,8 +310,10 @@ message SegmentedFileOutput {
 
 enum SegmentedFileProtocol {
   DEFAULT_SEGMENTED_FILE_PROTOCOL = 0;
-  HLS_PROTOCOL = 1;        // MPEG-TS segments
-  HLS_FMP4_PROTOCOL = 2;   // fragmented MP4 segments
+  // HLS with MPEG-TS segments.
+  HLS_PROTOCOL = 1;
+  // HLS with fragmented MP4 segments.
+  HLS_FMP4_PROTOCOL = 2;
 }
 
 enum SegmentedFileSuffix {
@@ -277,17 +321,25 @@ enum SegmentedFileSuffix {
   TIMESTAMP = 1;
 }
 
-// Capture images at a specified interval
+// An image output that captures images at a fixed interval.
 message ImageOutput {
-  uint32 capture_interval = 1;          // in seconds (required)
-  int32 width = 2;                      // (optional, defaults to track width)
-  int32 height = 3;                     // (optional, defaults to track height)
-  string filename_prefix = 4;           // (optional)
-  ImageFileSuffix filename_suffix = 5;  // (optional, default INDEX)
-  ImageCodec image_codec = 6;           // (optional)
-  bool disable_manifest = 7;            // disable upload of manifest file (default false)
+  // The interval between captures, in seconds. Required.
+  uint32 capture_interval = 1;
+  // The width of the images. Optional. Defaults to the width of the track.
+  int32 width = 2;
+  // The height of the images. Optional. Defaults to the height of the track.
+  int32 height = 3;
+  // The prefix of the image file names. Optional.
+  string filename_prefix = 4;
+  // The suffix of the image file names. Defaults to `IMAGE_SUFFIX_INDEX`.
+  ImageFileSuffix filename_suffix = 5;
+  // The image codec. Optional.
+  ImageCodec image_codec = 6;
+  // When true, LiveKit does not upload the manifest file. Defaults to `false`.
+  bool disable_manifest = 7;
 
   // TODO: deprecate
+
   oneof output {
     S3Upload s3 = 8;
     GCPUpload gcp = 9;
@@ -299,7 +351,8 @@ message ImageOutput {
 enum ImageFileSuffix {
   IMAGE_SUFFIX_INDEX = 0;
   IMAGE_SUFFIX_TIMESTAMP = 1;
-  IMAGE_SUFFIX_NONE_OVERWRITE = 2;  // Do not append any suffix and overwrite the existing image with the latest
+  // No suffix. Each new image overwrites the previous image.
+  IMAGE_SUFFIX_NONE_OVERWRITE = 2;
 }
 
 // --- Storage ---
@@ -317,22 +370,29 @@ message S3Upload {
   string access_key = 1 [(logger.sensitivity) = SENSITIVITY_SECRET];
   string secret = 2 [(logger.sensitivity) = SENSITIVITY_SECRET];
   string session_token = 11 [(logger.sensitivity) = SENSITIVITY_SECRET];
-  string assume_role_arn = 12 [(logger.sensitivity) = SENSITIVITY_PII]; // ARN of the role to assume for file upload. Egress will make an AssumeRole API call using the provided access_key and secret to assume that role. On LiveKit cloud, this is only available on accounts that have the feature enabled
-  string assume_role_external_id = 13 [(logger.sensitivity) = SENSITIVITY_SECRET, (logger.name) = "assumeRoleExternalID"];  // ExternalID to use when assuming role for upload
+  // The ARN of the role to assume for the upload. Egress calls the AWS
+  // `AssumeRole` API with `access_key` and `secret` to assume this role. On
+  // LiveKit Cloud, this is available only to accounts that have the feature
+  // enabled.
+  string assume_role_arn = 12 [(logger.sensitivity) = SENSITIVITY_PII];
+  // The external ID to use when Egress assumes the role.
+  string assume_role_external_id = 13 [(logger.sensitivity) = SENSITIVITY_SECRET, (logger.name) = "assumeRoleExternalID"];
   string region = 3;
   string endpoint = 4;
   string bucket = 5;
   bool force_path_style = 6;
   map<string, string> metadata = 7 [(logger.sensitivity) = SENSITIVITY_PII];
   string tagging = 8 [(logger.sensitivity) = SENSITIVITY_PII];
-  string content_disposition = 9 [(logger.sensitivity) = SENSITIVITY_PII];  // Content-Disposition header
+  // The `Content-Disposition` header of the uploaded file.
+  string content_disposition = 9 [(logger.sensitivity) = SENSITIVITY_PII];
   ProxyConfig proxy = 10;
 
   // NEXT_ID: 14
 }
 
 message GCPUpload {
-  // service account credentials serialized in JSON "credentials.json"
+  // The service account credentials, as the JSON content of a
+  // `credentials.json` file.
   string credentials = 1 [(logger.sensitivity) = SENSITIVITY_SECRET];
   string bucket = 2;
   ProxyConfig proxy = 3;
@@ -492,16 +552,22 @@ message ImagesInfo {
 
 message AutoParticipantEgress {
   oneof options {
-    EncodingOptionsPreset preset = 1;  // (default H264_720P_30)
-    EncodingOptions advanced = 2;      // (optional)
+    // The encoding preset. Defaults to `H264_720P_30`.
+    EncodingOptionsPreset preset = 1;
+    // The encoding options, in place of `preset`. Optional.
+    EncodingOptions advanced = 2;
   }
   repeated EncodedFileOutput file_outputs = 3;
   repeated SegmentedFileOutput segment_outputs = 4;
 }
 
 message AutoTrackEgress {
-  string filepath = 1;        // see docs for templating (default {track_id}-{time})
-  bool disable_manifest = 5;  // disables upload of json manifest file (default false)
+  // The path of the file. It can use template variables, such as `{track_id}`
+  // and `{time}`. Defaults to `{track_id}-{time}`.
+  string filepath = 1;
+  // When true, LiveKit does not upload the JSON manifest file. Defaults to
+  // `false`.
+  bool disable_manifest = 5;
   oneof output {
     S3Upload s3 = 2;
     GCPUpload gcp = 3;

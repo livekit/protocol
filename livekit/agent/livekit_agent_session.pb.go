@@ -285,8 +285,8 @@ func (ToolReplyStatus) EnumDescriptor() ([]byte, []int) {
 	return file_agent_livekit_agent_session_proto_rawDescGZIP(), []int{4}
 }
 
-// Why an agent session closed. Agent evals read it from the recording upload's session
-// summary (MetricsRecordingHeader.session_summary), as the value name.
+// Why an agent session closed. Agent evals read it, as the value name, from the
+// session summary of the recording upload (MetricsRecordingHeader.session_summary).
 type CloseReason int32
 
 const (
@@ -710,9 +710,10 @@ type FunctionCall struct {
 	Arguments string                 `protobuf:"bytes,3,opt,name=arguments,proto3" json:"arguments,omitempty"`
 	Name      string                 `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
 	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	// Framework metadata recorded on the call, kept with the history. A delegating call records
-	// where the request went: lk.delegation.task_id, lk.delegation.endpoint,
-	// lk.delegation.transport and lk.delegation.profile.
+	// The metadata that the Agents framework records on the call. It is kept with
+	// the chat history. A call that delegates records where the request went:
+	// `lk.delegation.task_id`, `lk.delegation.endpoint`,
+	// `lk.delegation.transport`, and `lk.delegation.profile`.
 	Extra         map[string]string `protobuf:"bytes,6,rep,name=extra,proto3" json:"extra,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
