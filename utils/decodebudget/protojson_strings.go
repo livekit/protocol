@@ -26,42 +26,56 @@ import (
 // for a string it has to rebuild, the buffers its appends grow through.
 func jsonStringCost(raw []byte, decodedLen int) int {
 	in := raw[bytes.IndexByte(raw, '"')+1 : len(raw)-1]
-	i := indexRebuild(in)
-	if i == len(in) {
+	r := rebuildScan{in: in, slash: -1, fffd: -1}
+	pos := r.next(0)
+	if pos == len(in) {
 		return allocSize(decodedLen)
 	}
-	cost, l, c := 0, i, i
+	cost, l, c := 0, pos, pos
 	grow := func(add int) {
 		mem, newCap := appendGrow(l, c, add, 1)
 		cost, l, c = cost+mem, l+add, newCap
 	}
-	for in = in[i:]; len(in) > 0; {
-		if in[0] == '\\' {
-			n, size := jsonEscapeLen(in)
+	for pos < len(in) {
+		if in[pos] == '\\' {
+			n, size := jsonEscapeLen(in[pos:])
 			grow(n)
-			in = in[size:]
+			pos += size
 			continue
 		}
-		_, n := utf8.DecodeRune(in)
-		n += indexRebuild(in[n:])
-		grow(n)
-		in = in[n:]
+		_, n := utf8.DecodeRune(in[pos:])
+		end := r.next(pos + n)
+		grow(end - pos)
+		pos = end
 	}
 	return cost + allocSize(decodedLen)
 }
 
 const replacementChar = string(utf8.RuneError)
 
-// indexRebuild is where protojson's parseString stops aliasing its input.
-func indexRebuild(in []byte) int {
-	i := bytes.IndexByte(in, '\\')
-	if i < 0 {
-		i = len(in)
+// rebuildScan finds where protojson's parseString stops aliasing its input: a
+// backslash or U+FFFD. It remembers the next of each so that a string of
+// either is scanned once, not once per occurrence.
+type rebuildScan struct {
+	in          []byte
+	slash, fffd int
+}
+
+func (r *rebuildScan) next(from int) int {
+	if r.slash < from {
+		r.slash = indexFrom(r.in, from, func(b []byte) int { return bytes.IndexByte(b, '\\') })
 	}
-	if j := bytes.Index(in[:i], []byte(replacementChar)); j >= 0 {
-		return j
+	if r.fffd < from {
+		r.fffd = indexFrom(r.in, from, func(b []byte) int { return bytes.Index(b, []byte(replacementChar)) })
 	}
-	return i
+	return min(r.slash, r.fffd)
+}
+
+func indexFrom(in []byte, from int, index func([]byte) int) int {
+	if i := index(in[from:]); i >= 0 {
+		return from + i
+	}
+	return len(in)
 }
 
 // jsonEscapeLen returns the decoded length and raw size of the escape at the
