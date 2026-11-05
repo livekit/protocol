@@ -15,7 +15,9 @@
 package auth_test
 
 import (
+	"encoding/base64"
 	"encoding/json"
+	"strings"
 	"testing"
 	"time"
 
@@ -67,6 +69,71 @@ func TestVerifier(t *testing.T) {
 
 		_, _, err = v.Verify(secret)
 		require.Error(t, err)
+	})
+
+	t.Run("empty secret is rejected", func(t *testing.T) {
+		// anyone can sign with the empty HMAC key, so it must never verify
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+			"iss":   "APIunknown",
+			"exp":   jwt.NewNumericDate(time.Now().Add(time.Minute)),
+			"video": map[string]interface{}{"roomAdmin": true},
+		})
+		authToken, err := token.SignedString([]byte{})
+		require.NoError(t, err)
+
+		v, err := auth.ParseAPIToken(authToken)
+		require.NoError(t, err)
+
+		for _, key := range []interface{}{nil, "", []byte(""), []byte(nil)} {
+			_, _, err = v.Verify(key)
+			require.ErrorIs(t, err, auth.ErrKeysMissing, "key %#v", key)
+		}
+	})
+
+	t.Run("token issued in the future is rejected", func(t *testing.T) {
+		sign := func(iat time.Time) string {
+			token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+				"iss": apiKey,
+				"iat": jwt.NewNumericDate(iat),
+				"exp": jwt.NewNumericDate(iat.Add(time.Hour)),
+			}).SignedString([]byte(secret))
+			require.NoError(t, err)
+			return token
+		}
+
+		v, err := auth.ParseAPIToken(sign(time.Now().Add(time.Hour)))
+		require.NoError(t, err)
+		_, _, err = v.Verify(secret)
+		require.ErrorIs(t, err, jwt.ErrTokenUsedBeforeIssued)
+
+		// small clock skew stays within the leeway
+		v, err = auth.ParseAPIToken(sign(time.Now().Add(30 * time.Second)))
+		require.NoError(t, err)
+		_, _, err = v.Verify(secret)
+		require.NoError(t, err)
+	})
+
+	t.Run("unsigned claims are not decoded before the signature check", func(t *testing.T) {
+		enc := base64.RawURLEncoding.EncodeToString
+		const n = 10000
+		header := `{"alg":"HS256","typ":"JWT"}`
+		claims := `{"iss":"` + apiKey + `"}`
+		tokens := map[string]string{
+			"header": enc([]byte(`{"alg":"HS256","x":[`+strings.Repeat(`{"":0},`, n)+`0]}`)) + "." + enc([]byte(claims)),
+			"aud":    enc([]byte(header)) + "." + enc([]byte(`{"iss":"`+apiKey+`","aud":[`+strings.Repeat(`{"":0},`, n)+`0]}`)),
+			"grants": enc([]byte(header)) + "." + enc([]byte(`{"iss":"`+apiKey+`","roomConfig":{"egress":{"room":{"segmentOutputs":[`+strings.Repeat(`{},`, n)+`{}]}}}}`)),
+		}
+		for name, token := range tokens {
+			token += ".AAAA"
+			allocs := testing.AllocsPerRun(1, func() {
+				v, err := auth.ParseAPIToken(token)
+				if err == nil {
+					_, _, err = v.Verify(secret)
+				}
+				require.Error(t, err)
+			})
+			require.Less(t, allocs, float64(100), name)
+		}
 	})
 
 	t.Run("unexpired token is verified", func(t *testing.T) {
