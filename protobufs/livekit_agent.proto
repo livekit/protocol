@@ -59,6 +59,10 @@ message JobState {
   uint32 attempts = 12;
   // started_at of the first attempt assigned to a worker, in Unix nanoseconds
   int64 first_started_at = 13;
+  // time spent in attempts the agent's own code failed before the agent
+  // joined, as an entrypoint that fails before it connects: from each such
+  // attempt's start to the next attempt's start, in nanoseconds
+  int64 agent_failed_attempts_ns = 14;
 }
 
 // from Worker to Server

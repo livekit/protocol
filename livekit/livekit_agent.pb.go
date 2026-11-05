@@ -535,8 +535,12 @@ type JobState struct {
 	Attempts uint32 `protobuf:"varint,12,opt,name=attempts,proto3" json:"attempts,omitempty"`
 	// started_at of the first attempt assigned to a worker, in Unix nanoseconds
 	FirstStartedAt int64 `protobuf:"varint,13,opt,name=first_started_at,json=firstStartedAt,proto3" json:"first_started_at,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// time spent in attempts the agent's own code failed before the agent
+	// joined, as an entrypoint that fails before it connects: from each such
+	// attempt's start to the next attempt's start, in nanoseconds
+	AgentFailedAttemptsNs int64 `protobuf:"varint,14,opt,name=agent_failed_attempts_ns,json=agentFailedAttemptsNs,proto3" json:"agent_failed_attempts_ns,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *JobState) Reset() {
@@ -656,6 +660,13 @@ func (x *JobState) GetAttempts() uint32 {
 func (x *JobState) GetFirstStartedAt() int64 {
 	if x != nil {
 		return x.FirstStartedAt
+	}
+	return 0
+}
+
+func (x *JobState) GetAgentFailedAttemptsNs() int64 {
+	if x != nil {
+		return x.AgentFailedAttemptsNs
 	}
 	return 0
 }
@@ -2265,7 +2276,7 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x0e\n" +
-	"\f_participant\"\xe2\x03\n" +
+	"\f_participant\"\x9b\x04\n" +
 	"\bJobState\x12*\n" +
 	"\x06status\x18\x01 \x01(\x0e2\x12.livekit.JobStatusR\x06status\x12\x14\n" +
 	"\x05error\x18\x02 \x01(\tR\x05error\x12\x1d\n" +
@@ -2285,7 +2296,8 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\vassigned_at\x18\v \x01(\x03R\n" +
 	"assignedAt\x12\x1a\n" +
 	"\battempts\x18\f \x01(\rR\battempts\x12(\n" +
-	"\x10first_started_at\x18\r \x01(\x03R\x0efirstStartedAt\"\xc8\x03\n" +
+	"\x10first_started_at\x18\r \x01(\x03R\x0efirstStartedAt\x127\n" +
+	"\x18agent_failed_attempts_ns\x18\x0e \x01(\x03R\x15agentFailedAttemptsNs\"\xc8\x03\n" +
 	"\rWorkerMessage\x12<\n" +
 	"\bregister\x18\x01 \x01(\v2\x1e.livekit.RegisterWorkerRequestH\x00R\bregister\x12C\n" +
 	"\favailability\x18\x02 \x01(\v2\x1d.livekit.AvailabilityResponseH\x00R\favailability\x12B\n" +
