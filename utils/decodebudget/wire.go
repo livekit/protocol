@@ -42,6 +42,8 @@ type fieldState struct {
 	field protoreflect.FieldDescriptor
 	len   int
 	cap   int
+	// hasMap is set once a map field's header has been charged.
+	hasMap bool
 	// child is the state of a singular message field. The decoder merges each
 	// later occurrence into the same message, so its slices keep growing.
 	child *messageState
@@ -181,7 +183,8 @@ func (m *messageState) occurrence(p *Profile, field protoreflect.FieldDescriptor
 	case field.IsMap():
 		// Every entry is taken as a new key; duplicates are over-charged.
 		fs := m.get(field)
-		if fs.len == 0 {
+		if !fs.hasMap {
+			fs.hasMap = true
 			cost += allocSize(mapHeaderSize)
 		}
 		cost += mapInsertCost(field, fs.len)
@@ -211,9 +214,9 @@ func (m *messageState) unknown(n int) int {
 // than the set one, which it then drops without changing the oneof.
 func (m *messageState) mismatch(field protoreflect.FieldDescriptor) int {
 	if field.IsMap() {
-		if fs := m.get(field); fs.len == 0 {
-			fs.len = 1
-			return mapHeaderCost
+		if fs := m.get(field); !fs.hasMap {
+			fs.hasMap = true
+			return allocSize(mapHeaderSize)
 		}
 		return 0
 	}

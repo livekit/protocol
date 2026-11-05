@@ -28,9 +28,6 @@ import (
 // not let its decode allocate more than the estimate. Its tunable constants
 // live in Profile.
 
-// mapHeaderCost is an empty map as reflect.MakeMap returns it.
-const mapHeaderCost = 48
-
 // Go runtime size classes; an allocation is rounded up to the next one.
 var goSizeClasses = []int{
 	8, 16, 24, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176, 192, 208, 224, 240, 256,

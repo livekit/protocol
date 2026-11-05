@@ -308,6 +308,7 @@ func protoCalibrationCases() []calibrationCase {
 		{"wire type mismatch oneof", mismatchedOneof(1 << 18), func() proto.Message { return &logsv1.LogsData{} }},
 		{"wire type mismatch oneof switching", mismatchedOneofSwitching(1600), func() proto.Message { return &livekit.DataPacket{} }},
 		{"wire type mismatch maps", mismatchedMaps(1 << 16), func() proto.Message { return &livekit.ListParticipantsResponse{} }},
+		{"wire type mismatch then map entry", mismatchedThenEntry(1 << 14), func() proto.Message { return &livekit.ListParticipantsResponse{} }},
 		{"unknown varints", unknownVarints(1 << 18), func() proto.Message { return &logsv1.LogsData{} }},
 		{"merged buckets 3000", mergedBuckets(3000), func() proto.Message { return &metricsv1.MetricsData{} }},
 		{"merged resources 64k", mergedResources(1 << 16), func() proto.Message { return &logsv1.LogsData{} }},
@@ -475,4 +476,15 @@ func TestProfile(t *testing.T) {
 			})
 		}
 	}
+}
+
+// A mismatched occurrence charges the map header but must not count as an entry.
+func mismatchedThenEntry(n int) []byte {
+	attrs := num(&livekit.ParticipantInfo{}, "attributes")
+	entry := protowire.AppendString(protowire.AppendTag(nil, 1, protowire.BytesType), "k")
+	entry = protowire.AppendString(protowire.AppendTag(entry, 2, protowire.BytesType), "v")
+	info := protowire.AppendVarint(protowire.AppendTag(nil, attrs, protowire.VarintType), 0)
+	info = protowire.AppendBytes(protowire.AppendTag(info, attrs, protowire.BytesType), entry)
+	one := field(num(&livekit.ListParticipantsResponse{}, "participants"), info)
+	return []byte(strings.Repeat(string(one), n))
 }
