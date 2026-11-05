@@ -107,7 +107,10 @@ func (w *wireWalk) message(data []byte, desc protoreflect.MessageDescriptor, dep
 		// The decoder keeps a field with an unexpected wire type as unknown.
 		if field == nil || !wireTypeMatches(field, kind) {
 			cost := state.unknown(n + size)
-			if field != nil {
+			switch {
+			case w.profile.DynamicMessages:
+				cost += state.dynamicMismatch(w.profile, field)
+			case field != nil:
 				cost += state.mismatch(field)
 			}
 			if err := w.alloc(cost); err != nil {
@@ -137,6 +140,9 @@ func (w *wireWalk) message(data []byte, desc protoreflect.MessageDescriptor, dep
 // messageOccurrence is the allocation for one occurrence of a message field,
 // and the state its contents decode into.
 func (m *messageState) messageOccurrence(p *Profile, field protoreflect.FieldDescriptor) (int, *messageState) {
+	if p.DynamicMessages {
+		return m.dynamicMessageOccurrence(p, field)
+	}
 	if field.IsList() || field.IsMap() {
 		// Every element or map value is a new message.
 		return m.occurrence(p, field, 0), &messageState{}
@@ -172,6 +178,9 @@ func (m *messageState) setOneof(field protoreflect.FieldDescriptor, fs *fieldSta
 // occurrence is the allocation for one occurrence of field with a string or
 // bytes payload of payloadLen. Nested message contents are charged separately.
 func (m *messageState) occurrence(p *Profile, field protoreflect.FieldDescriptor, payloadLen int) int {
+	if p.DynamicMessages {
+		return m.dynamicOccurrence(p, field, payloadLen)
+	}
 	cost := p.fieldAllocCost(field, payloadLen)
 	switch {
 	case field.IsList():
@@ -255,6 +264,9 @@ func (w *wireWalk) packed(value []byte, field protoreflect.FieldDescriptor, stat
 		}
 		count++
 		value = value[consumed:]
+	}
+	if w.profile.DynamicMessages {
+		return w.alloc(state.dynamicPacked(w.profile, field, count))
 	}
 	if count == 0 {
 		return nil

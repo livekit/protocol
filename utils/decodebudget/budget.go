@@ -55,13 +55,14 @@ func (b Proto) Validate(data []byte, desc protoreflect.MessageDescriptor) error 
 }
 
 // Estimate validates data like Validate and returns the estimated bytes the
-// binary decoder allocates for it, including the root message.
+// binary decoder allocates for it, including the root message, decoding into
+// desc's generated type or, with Profile.DynamicMessages, a dynamicpb message.
 func (b Proto) Estimate(data []byte, desc protoreflect.MessageDescriptor) (int, error) {
 	t, err := b.newTally(desc)
 	if err != nil {
 		return 0, err
 	}
-	if err := t.alloc(protoStructSize(desc)); err != nil {
+	if err := t.alloc(t.profile.rootSize(desc)); err != nil {
 		return t.total(), err
 	}
 	err = (&wireWalk{t}).message(data, desc, 1, &messageState{})
@@ -115,6 +116,8 @@ func (t *tally) alloc(n int) error {
 // It discards unknown fields, uses MaxDepth as the decoder recursion limit, and
 // retains the binary decoder's required-field checks. Preflight rejection leaves
 // the destination unchanged; other decode errors follow normal protobuf semantics.
+// A destination without a generated fast path, such as a dynamicpb message, is
+// estimated with Profile.DynamicMessages set.
 func (b Proto) Unmarshal(data []byte, msg proto.Message) error {
 	if msg == nil || (reflect.ValueOf(msg).Kind() == reflect.Pointer && reflect.ValueOf(msg).IsNil()) {
 		return errors.New("protobuf message must be non-nil and mutable")
@@ -123,7 +126,7 @@ func (b Proto) Unmarshal(data []byte, msg proto.Message) error {
 	if !reflected.IsValid() {
 		return errors.New("protobuf message must be non-nil and mutable")
 	}
-	if err := b.Validate(data, reflected.Descriptor()); err != nil {
+	if err := b.forDestination(reflected).Validate(data, reflected.Descriptor()); err != nil {
 		return err
 	}
 	return (proto.UnmarshalOptions{DiscardUnknown: true, RecursionLimit: b.MaxDepth}).Unmarshal(data, msg)

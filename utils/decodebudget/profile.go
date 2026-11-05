@@ -32,6 +32,11 @@ type Profile struct {
 	JSONTokenCost      int
 	JSONListScalarCost int
 	JSONObjectCost     int
+
+	// DynamicMessages prices binary decoding into dynamicpb messages, which
+	// box every field and list element; Unmarshal sets it for such
+	// destinations. EstimateProtoJSON ignores it.
+	DynamicMessages bool
 }
 
 var defaultProfile = Profile{

@@ -61,11 +61,21 @@ func tmpCopySize(n int) int {
 // slice of length l and capacity c, and the resulting capacity, following
 // runtime.growslice.
 func appendGrow(l, c, add, elem int) (mem, newCap int) {
-	newLen := l + add
-	if newLen <= c {
+	newCap = nextSliceCap(l+add, c)
+	if newCap == c {
 		return 0, c
 	}
-	newCap = c + c
+	mem = allocSize(newCap * elem)
+	return mem, mem / elem
+}
+
+// nextSliceCap is the capacity growslice requests, before size-class rounding,
+// to hold newLen elements in a slice of capacity c.
+func nextSliceCap(newLen, c int) int {
+	if newLen <= c {
+		return c
+	}
+	newCap := c + c
 	switch {
 	case newLen > newCap:
 		newCap = newLen
@@ -75,8 +85,7 @@ func appendGrow(l, c, add, elem int) (mem, newCap int) {
 			newCap += (newCap + 3*256) >> 2
 		}
 	}
-	mem = allocSize(newCap * elem)
-	return mem, mem / elem
+	return newCap
 }
 
 // appendAllocBytes is the total size of the backing arrays append allocates

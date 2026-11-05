@@ -22,6 +22,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/descriptorpb"
+	"google.golang.org/protobuf/types/dynamicpb"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/livekit/protocol/livekit"
@@ -440,6 +441,68 @@ func TestProtoEstimateProtoJSONWellKnownTypes(t *testing.T) {
 			require.GreaterOrEqual(t, uint64(est), got, "the estimate must not undercount")
 			// Any is charged for its worst-case marshalled size.
 			require.LessOrEqual(t, float64(est), 1.5*float64(got), "the estimate should stay close enough to admit real payloads")
+		})
+	}
+}
+
+func measureUnmarshal(b Proto, data []byte, newMsg func() proto.Message) (uint64, error) {
+	var best uint64
+	var err error
+	for i := 0; i < 3; i++ {
+		var before, after runtime.MemStats
+		runtime.GC()
+		runtime.ReadMemStats(&before)
+		m := newMsg()
+		err = b.Unmarshal(data, m)
+		runtime.ReadMemStats(&after)
+		runtime.KeepAlive(m)
+		if d := after.TotalAlloc - before.TotalAlloc; best == 0 || d < best {
+			best = d
+		}
+	}
+	return best, err
+}
+
+func TestUnmarshalDynamicWithinBudget(t *testing.T) {
+	data := packedSources(240_000)
+	desc := (&livekit.ParticipantPermission{}).ProtoReflect().Descriptor()
+	budget := Proto{MaxFields: 1 << 20, MaxDepth: 16, MaxDecodedBytes: 1 << 20}
+	for _, tc := range []calibrationCase{
+		{"generated", data, func() proto.Message { return &livekit.ParticipantPermission{} }},
+		{"dynamicpb", data, func() proto.Message { return dynamicpb.NewMessage(desc) }},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := measureUnmarshal(budget, tc.data, tc.newMsg)
+			t.Logf("allocated=%d limit=%d err=%v", got, budget.MaxDecodedBytes, err)
+			if err == nil {
+				require.LessOrEqual(t, got, uint64(budget.MaxDecodedBytes), "an admitted decode must stay within the limit")
+			} else {
+				require.ErrorIs(t, err, ErrMessageComplexity)
+			}
+		})
+	}
+}
+
+func TestProtoEstimateDynamicCalibration(t *testing.T) {
+	p := DefaultProfile()
+	p.DynamicMessages = true
+	budget := Proto{MaxFields: 1 << 30, MaxDepth: 100, Profile: &p}
+	large := protowire.AppendTag(nil, 6, protowire.BytesType) // HistogramDataPoint.bucket_counts
+	large = protowire.AppendBytes(large, []byte(strings.Repeat(string(protowire.AppendFixed64(nil, 1<<40)), 1000)))
+	cases := append(protoCalibrationCases(),
+		calibrationCase{"packed enums 240k", packedSources(240_000), func() proto.Message { return &livekit.ParticipantPermission{} }},
+		calibrationCase{"boxed fixed64s", large, func() proto.Message { return &metricsv1.HistogramDataPoint{} }},
+	)
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			desc := tc.newMsg().ProtoReflect().Descriptor()
+			est, err := budget.Estimate(tc.data, desc)
+			require.NoError(t, err)
+			got := measureDecode(t, tc.data, func() proto.Message { return dynamicpb.NewMessage(desc) })
+			t.Logf("wire=%d measured=%d estimate=%d ratio=%.2f", len(tc.data), got, est, float64(est)/float64(got))
+			require.GreaterOrEqual(t, uint64(est), got, "the estimate must not undercount")
+			// Boxing values under 256 is free, which the model does not track.
+			require.LessOrEqual(t, float64(est), 1.25*float64(got), "the estimate should stay close enough to admit real payloads")
 		})
 	}
 }
