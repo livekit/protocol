@@ -160,28 +160,117 @@ func (w *jsonWalk) anyValue(md protoreflect.MessageDescriptor, depth int) error 
 }
 
 // anyTypeURL looks ahead for the "@type" member of the object whose '{' has
-// just been consumed, as protojson does, and returns "" if there is none.
+// just been consumed, as protojson does, and returns "" if there is none. It
+// scans the input in place: a nested Any repeats the scan over its subtree,
+// so copying members would cost the estimator O(depth × size).
 func (w *jsonWalk) anyTypeURL() string {
-	dec := json.NewDecoder(bytes.NewReader(w.data[w.dec.InputOffset()-1:]))
-	if _, err := dec.Token(); err != nil {
+	s := jsonScanner{data: w.data, i: int(w.dec.InputOffset())}
+	if s.consume('}') {
 		return ""
 	}
-	for dec.More() {
-		key, err := dec.Token()
-		if err != nil {
+	for {
+		key, ok := s.str()
+		if !ok || !s.consume(':') {
 			return ""
 		}
-		if key == "@type" {
-			tok, _ := dec.Token()
-			url, _ := tok.(string)
-			return url
+		if jsonUnquote(key) == "@type" {
+			url, _ := s.str()
+			return jsonUnquote(url)
 		}
-		var member json.RawMessage
-		if err := dec.Decode(&member); err != nil {
+		if !s.skip() || !s.consume(',') {
 			return ""
 		}
 	}
-	return ""
+}
+
+// jsonScanner steps through JSON in place without validating it fully.
+type jsonScanner struct {
+	data []byte
+	i    int
+}
+
+func (s *jsonScanner) space() {
+	for s.i < len(s.data) && strings.IndexByte(" \t\n\r", s.data[s.i]) >= 0 {
+		s.i++
+	}
+}
+
+func (s *jsonScanner) consume(c byte) bool {
+	s.space()
+	if s.i < len(s.data) && s.data[s.i] == c {
+		s.i++
+		return true
+	}
+	return false
+}
+
+// str consumes a string and returns it with its quotes.
+func (s *jsonScanner) str() ([]byte, bool) {
+	s.space()
+	if s.i >= len(s.data) || s.data[s.i] != '"' {
+		return nil, false
+	}
+	for j := s.i + 1; j < len(s.data); j++ {
+		switch s.data[j] {
+		case '\\':
+			j++
+		case '"':
+			quoted := s.data[s.i : j+1]
+			s.i = j + 1
+			return quoted, true
+		}
+	}
+	return nil, false
+}
+
+// skip consumes one value.
+func (s *jsonScanner) skip() bool {
+	for depth := 0; ; {
+		s.space()
+		if s.i >= len(s.data) {
+			return false
+		}
+		switch c := s.data[s.i]; c {
+		case '"':
+			if _, ok := s.str(); !ok {
+				return false
+			}
+		case '{', '[':
+			depth++
+			s.i++
+		case '}', ']', ',', ':':
+			if depth == 0 {
+				return false
+			}
+			if c == '}' || c == ']' {
+				depth--
+			}
+			s.i++
+		default:
+			for s.i < len(s.data) && strings.IndexByte(" \t\n\r,:{}[]\"", s.data[s.i]) < 0 {
+				s.i++
+			}
+		}
+		if depth == 0 {
+			return true
+		}
+	}
+}
+
+// jsonUnquote decodes a quoted string from jsonScanner.str, or returns "" if
+// it is malformed. Only strings with escapes allocate.
+func jsonUnquote(quoted []byte) string {
+	if len(quoted) < 2 {
+		return ""
+	}
+	if bytes.IndexByte(quoted, '\\') < 0 {
+		return string(quoted[1 : len(quoted)-1])
+	}
+	var s string
+	if json.Unmarshal(quoted, &s) != nil {
+		return ""
+	}
+	return s
 }
 
 func isKnownValue(field protoreflect.FieldDescriptor) bool {
