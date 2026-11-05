@@ -1040,7 +1040,8 @@ func (x *SimulationRunSummary_Issue) GetLabel() string {
 // One scenario's call condensed into named phases, plus what went wrong in it, if anything.
 type SimulationRunSummary_ScenarioFlow struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// In call order. Together they cover every item of the job's chat_history exactly once.
+	// In call order. Each starts right after the previous one ends; the first starts at the
+	// job's first chat_history item.
 	Phases []*SimulationRunSummary_ScenarioFlow_Phase `protobuf:"bytes,1,rep,name=phases,proto3" json:"phases,omitempty"`
 	// Unset when nothing went wrong.
 	Problem       *SimulationRunSummary_ScenarioFlow_Problem `protobuf:"bytes,2,opt,name=problem,proto3" json:"problem,omitempty"`
