@@ -209,6 +209,31 @@ func mismatchedVarints(n int) []byte {
 	return inLogRecord([]byte(strings.Repeat(string(one), n)))
 }
 
+// mismatchedOneof sends AnyValue.bytes_value as a varint n times; the decoder
+// allocates and drops a oneof wrapper for each.
+func mismatchedOneof(n int) []byte {
+	one := protowire.AppendVarint(protowire.AppendTag(nil, num(&commonv1.AnyValue{}, "bytes_value"), protowire.VarintType), 0)
+	return inLogRecord(field(num(&logsv1.LogRecord{}, "body"), []byte(strings.Repeat(string(one), n))))
+}
+
+// mismatchedOneofSwitching is n × rpc_response{compressed_payload as varint ×256}
+// rpc_ack{}; switching DataPacket.value makes every RpcResponse a fresh message.
+func mismatchedOneofSwitching(n int) []byte {
+	payload := protowire.AppendVarint(protowire.AppendTag(nil, num(&livekit.RpcResponse{}, "compressed_payload"), protowire.VarintType), 0)
+	packet := &livekit.DataPacket{}
+	unit := field(num(packet, "rpc_response"), []byte(strings.Repeat(string(payload), 256)))
+	unit = append(unit, field(num(packet, "rpc_ack"), nil)...)
+	return []byte(strings.Repeat(string(unit), n))
+}
+
+// mismatchedMaps sends ParticipantInfo.attributes as a varint in each of n
+// participants; the decoder makes the map before it checks the wire type.
+func mismatchedMaps(n int) []byte {
+	attrs := protowire.AppendVarint(protowire.AppendTag(nil, num(&livekit.ParticipantInfo{}, "attributes"), protowire.VarintType), 0)
+	one := field(num(&livekit.ListParticipantsResponse{}, "participants"), attrs)
+	return []byte(strings.Repeat(string(one), n))
+}
+
 func unknownVarints(n int) []byte {
 	one := protowire.AppendVarint(protowire.AppendTag(nil, 1000, protowire.VarintType), 1)
 	return inLogRecord([]byte(strings.Repeat(string(one), n)))
@@ -280,6 +305,9 @@ func protoCalibrationCases() []calibrationCase {
 		{"optional scalars 64k", optionalPoints(1 << 16), func() proto.Message { return &metricsv1.MetricsData{} }},
 		{"wire type mismatch length", mismatchedLength(1 << 20), func() proto.Message { return &logsv1.LogsData{} }},
 		{"wire type mismatch varints", mismatchedVarints(1 << 18), func() proto.Message { return &logsv1.LogsData{} }},
+		{"wire type mismatch oneof", mismatchedOneof(1 << 18), func() proto.Message { return &logsv1.LogsData{} }},
+		{"wire type mismatch oneof switching", mismatchedOneofSwitching(1600), func() proto.Message { return &livekit.DataPacket{} }},
+		{"wire type mismatch maps", mismatchedMaps(1 << 16), func() proto.Message { return &livekit.ListParticipantsResponse{} }},
 		{"unknown varints", unknownVarints(1 << 18), func() proto.Message { return &logsv1.LogsData{} }},
 		{"merged buckets 3000", mergedBuckets(3000), func() proto.Message { return &metricsv1.MetricsData{} }},
 		{"merged resources 64k", mergedResources(1 << 16), func() proto.Message { return &logsv1.LogsData{} }},

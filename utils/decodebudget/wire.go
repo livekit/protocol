@@ -104,7 +104,11 @@ func (w *wireWalk) message(data []byte, desc protoreflect.MessageDescriptor, dep
 
 		// The decoder keeps a field with an unexpected wire type as unknown.
 		if field == nil || !wireTypeMatches(field, kind) {
-			if err := w.alloc(state.unknown(n + size)); err != nil {
+			cost := state.unknown(n + size)
+			if field != nil {
+				cost += state.mismatch(field)
+			}
+			if err := w.alloc(cost); err != nil {
 				return err
 			}
 			continue
@@ -200,6 +204,29 @@ func (m *messageState) unknown(n int) int {
 	m.unknownLen += n
 	m.unknownCap = newCap
 	return mem
+}
+
+// mismatch is what the decoder allocates for a known field before it rejects
+// the wire type: a nil map field's map, and the wrapper of a oneof member other
+// than the set one, which it then drops without changing the oneof.
+func (m *messageState) mismatch(field protoreflect.FieldDescriptor) int {
+	if field.IsMap() {
+		if fs := m.get(field); fs.len == 0 {
+			fs.len = 1
+			return mapHeaderCost
+		}
+		return 0
+	}
+	oneof := field.ContainingOneof()
+	if oneof == nil || oneof.IsSynthetic() {
+		return 0
+	}
+	for _, o := range m.oneofs {
+		if o.oneof == oneof && o.field == field {
+			return 0
+		}
+	}
+	return oneofWrapperCost(field)
 }
 
 // packed walks a packed scalar run; decoders accept one even when the schema
