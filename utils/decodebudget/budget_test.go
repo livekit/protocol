@@ -53,7 +53,7 @@ func TestProtoUnmarshalDynamicDestination(t *testing.T) {
 	wrapped := struct{ *dynamicpb.Message }{dynamicpb.NewMessage(desc)}
 	require.ErrorIs(t, budget.Unmarshal(data, wrapped), ErrMessageComplexity)
 
-	estimate, err := (Proto{MaxFields: 1 << 20, MaxDepth: 16, dynamic: true}).Estimate(data, desc)
+	estimate, err := (Proto{MaxFields: 1 << 20, MaxDepth: 16}).estimate(data, desc, true)
 	require.NoError(t, err)
 	budget.MaxDecodedBytes = estimate
 	require.NoError(t, budget.Unmarshal(data, dynamic))

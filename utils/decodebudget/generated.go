@@ -67,7 +67,7 @@ func fieldAllocCost(field protoreflect.FieldDescriptor, payloadLen int) int {
 	cost := 0
 	// A map value message is charged with its entry.
 	if field.Message() != nil && !field.IsMap() && !field.ContainingMessage().IsMapEntry() {
-		cost += protoStructSize(field.Message())
+		cost += messageCost(field)
 	}
 	if k := field.Kind(); k == protoreflect.StringKind || k == protoreflect.BytesKind {
 		cost += allocSize(payloadLen)

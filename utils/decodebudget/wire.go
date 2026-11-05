@@ -23,10 +23,9 @@ import (
 )
 
 // wireWalk walks the protobuf binary encoding, pricing each occurrence with
-// the model of the decoder that will write it.
+// the model of the decoder that will write its message.
 type wireWalk struct {
 	*tally
-	model  decoderModel
 	states statePool
 }
 
@@ -183,7 +182,7 @@ func (m *messageState) unknown(n int) int {
 
 // message walks the fields of one message into state, which persists across
 // occurrences that the decoder merges into the same message.
-func (w *wireWalk) message(data []byte, desc protoreflect.MessageDescriptor, depth int, state *messageState) error {
+func (w *wireWalk) message(data []byte, desc protoreflect.MessageDescriptor, depth int, state *messageState, model decoderModel) error {
 	if depth > w.budget.MaxDepth {
 		return ErrMessageComplexity
 	}
@@ -225,9 +224,9 @@ func (w *wireWalk) message(data []byte, desc protoreflect.MessageDescriptor, dep
 		if field == nil || !wireTypeMatches(field, kind) {
 			cost := state.unknown(n + size)
 			if field != nil {
-				cost += w.model.mismatch(state, field)
+				cost += model.mismatch(state, field)
 			} else {
-				cost += w.model.unknown(state, desc)
+				cost += model.unknown(state, desc)
 			}
 			if err := w.alloc(cost); err != nil {
 				return err
@@ -237,14 +236,14 @@ func (w *wireWalk) message(data []byte, desc protoreflect.MessageDescriptor, dep
 		var err error
 		switch {
 		case kind == protowire.BytesType && field.Message() != nil:
-			cost, fs := w.model.message(state, field)
+			cost, fs := model.message(state, field)
 			if err = w.alloc(cost); err == nil {
-				err = w.child(value, field.Message(), depth+1, fs)
+				err = w.child(value, field.Message(), depth+1, fs, valueModel(model, field))
 			}
 		case kind == protowire.BytesType && isPackable(field):
-			err = w.packed(value, field, state)
+			err = w.packed(value, field, state, model)
 		default:
-			err = w.alloc(w.model.occurrence(state, field, len(value)))
+			err = w.alloc(model.occurrence(state, field, len(value)))
 		}
 		if err != nil {
 			return err
@@ -253,22 +252,22 @@ func (w *wireWalk) message(data []byte, desc protoreflect.MessageDescriptor, dep
 	return nil
 }
 
-func (w *wireWalk) child(data []byte, desc protoreflect.MessageDescriptor, depth int, fs *fieldState) error {
+func (w *wireWalk) child(data []byte, desc protoreflect.MessageDescriptor, depth int, fs *fieldState, model decoderModel) error {
 	if fs == nil {
 		state := w.states.get()
-		err := w.message(data, desc, depth, state)
+		err := w.message(data, desc, depth, state, model)
 		w.states.put(state)
 		return err
 	}
 	if fs.child == nil {
 		fs.child = w.states.get()
 	}
-	return w.message(data, desc, depth, fs.child)
+	return w.message(data, desc, depth, fs.child, model)
 }
 
 // packed walks a packed scalar run; decoders accept one even when the schema
 // prefers unpacked.
-func (w *wireWalk) packed(value []byte, field protoreflect.FieldDescriptor, state *messageState) error {
+func (w *wireWalk) packed(value []byte, field protoreflect.FieldDescriptor, state *messageState, model decoderModel) error {
 	count := 0
 	for len(value) > 0 {
 		var consumed int
@@ -289,7 +288,7 @@ func (w *wireWalk) packed(value []byte, field protoreflect.FieldDescriptor, stat
 		count++
 		value = value[consumed:]
 	}
-	return w.alloc(w.model.packed(state, field, count))
+	return w.alloc(model.packed(state, field, count))
 }
 
 func wireTypeMatches(field protoreflect.FieldDescriptor, kind protowire.Type) bool {

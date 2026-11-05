@@ -301,7 +301,23 @@ var scalarExtensions = sync.OnceValue(func() []protowire.Number {
 			Extendee: proto.String(".google.protobuf.FieldOptions"),
 		})
 	}
+	fd.MessageType = []*descriptorpb.DescriptorProto{{
+		Name: proto.String("Strings"),
+		Field: []*descriptorpb.FieldDescriptorProto{{
+			Name:   proto.String("values"),
+			Number: proto.Int32(1),
+			Label:  descriptorpb.FieldDescriptorProto_LABEL_REPEATED.Enum(),
+			Type:   descriptorpb.FieldDescriptorProto_TYPE_STRING.Enum(),
+		}},
+	}}
 	fd.Extension = append(fd.Extension, &descriptorpb.FieldDescriptorProto{
+		Name:     proto.String("strings"),
+		Number:   proto.Int32(scalarExtensionBase + n + 1),
+		Label:    descriptorpb.FieldDescriptorProto_LABEL_OPTIONAL.Enum(),
+		Type:     descriptorpb.FieldDescriptorProto_TYPE_MESSAGE.Enum(),
+		TypeName: proto.String(".decodebudget.test.Strings"),
+		Extendee: proto.String(".google.protobuf.FieldOptions"),
+	}, &descriptorpb.FieldDescriptorProto{
 		Name:     proto.String("repeated_scalar"),
 		Number:   proto.Int32(scalarExtensionBase + n),
 		Label:    descriptorpb.FieldDescriptorProto_LABEL_REPEATED.Enum(),
@@ -309,8 +325,10 @@ var scalarExtensions = sync.OnceValue(func() []protowire.Number {
 		Extendee: proto.String(".google.protobuf.FieldOptions"),
 	})
 	file := must(protodesc.NewFile(fd, protoregistry.GlobalFiles))
-	if err := protoregistry.GlobalTypes.RegisterExtension(dynamicpb.NewExtensionType(file.Extensions().Get(n))); err != nil {
-		panic(err)
+	for i := n; i < file.Extensions().Len(); i++ {
+		if err := protoregistry.GlobalTypes.RegisterExtension(dynamicpb.NewExtensionType(file.Extensions().Get(i))); err != nil {
+			panic(err)
+		}
 	}
 	nums := make([]protowire.Number, n)
 	for i := range n {
@@ -457,6 +475,7 @@ func protoCalibrationCases() []calibrationCase {
 		{"dynamic repeated extension as fixed32 64k", repeatedField(scalarExtensionBase+64, protowire.Fixed32Type, 1<<16), fieldOptions},
 		{"empty packed extension runs 64k", repeatedField(scalarExtensionBase+64, protowire.BytesType, 1<<16), fieldOptions},
 		{"unknown fields in extendable options 64k", unknownOptions(1 << 16), func() proto.Message { return &descriptorpb.DescriptorProto{} }},
+		{"dynamic message extension 64k strings", field(scalarExtensionBase+65, repeatedStrings(1, 1<<16, "x")), fieldOptions},
 		{"empty string lists 4k", emptyStringLists(1<<12, 128), func() proto.Message { return &livekit.SubscriptionPermission{} }},
 		{"string extension 16k", repeatedStrings(annotations.E_DefaultHost.TypeDescriptor().Number(), 1<<14, strings.Repeat("h", 40)),
 			func() proto.Message { return &descriptorpb.ServiceOptions{} }},
@@ -630,7 +649,7 @@ func TestUnmarshalDynamicWithinBudget(t *testing.T) {
 }
 
 func TestProtoEstimateDynamicCalibration(t *testing.T) {
-	budget := Proto{MaxFields: 1 << 30, MaxDepth: 100, dynamic: true}
+	budget := Proto{MaxFields: 1 << 30, MaxDepth: 100}
 	large := protowire.AppendTag(nil, 6, protowire.BytesType) // HistogramDataPoint.bucket_counts
 	large = protowire.AppendBytes(large, []byte(strings.Repeat(string(protowire.AppendFixed64(nil, 1<<40)), 1000)))
 	cases := append(protoCalibrationCases(),
@@ -640,7 +659,7 @@ func TestProtoEstimateDynamicCalibration(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			desc := tc.newMsg().ProtoReflect().Descriptor()
-			est, err := budget.Estimate(tc.data, desc)
+			est, err := budget.estimate(tc.data, desc, true)
 			require.NoError(t, err)
 			got := measureDecode(t, tc.data, func() proto.Message { return dynamicpb.NewMessage(desc) })
 			t.Logf("wire=%d measured=%d estimate=%d ratio=%.2f", len(tc.data), got, est, float64(est)/float64(got))

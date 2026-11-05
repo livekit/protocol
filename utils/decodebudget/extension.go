@@ -80,10 +80,30 @@ func extensionValueCost(field protoreflect.FieldDescriptor) int {
 		return extensionListSize
 	case field.Message() == nil:
 		return 0
-	case isGeneratedExtension(field):
-		return protoStructSize(field.Message())
 	}
-	return dynamicMessageCost
+	return messageCost(field)
+}
+
+// messageCost is one new message of field's type, which for an extension
+// follows the extension type: dynamicpb's makes dynamicpb messages.
+func messageCost(field protoreflect.FieldDescriptor) int {
+	if field.IsExtension() {
+		if isGeneratedExtension(field) {
+			return protoStructSize(field.Message())
+		}
+		return dynamicMessageCost
+	}
+	return protoStructSize(field.Message())
+}
+
+// valueModel is the model for the messages field holds, which an extension's
+// type decides: a generated type's messages take the fast path, and
+// dynamicpb's the reflective decoder.
+func valueModel(model decoderModel, field protoreflect.FieldDescriptor) decoderModel {
+	if !field.IsExtension() {
+		return model
+	}
+	return newDecoderModel(!isGeneratedExtension(field))
 }
 
 // extensionCheckCost is a dynamicpb message type-checking a value of a

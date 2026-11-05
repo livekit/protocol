@@ -42,10 +42,6 @@ type Proto struct {
 	// struct of each message, copied strings and bytes, oneof wrappers, and
 	// slice and map growth. Zero leaves it unchecked.
 	MaxDecodedBytes int
-
-	// dynamic prices binary decoding into dynamicpb messages, for Unmarshal
-	// into destinations without a generated fast path.
-	dynamic bool
 }
 
 // Validate checks data against the message descriptor without constructing the
@@ -60,15 +56,22 @@ func (b Proto) Validate(data []byte, desc protoreflect.MessageDescriptor) error 
 // binary decoder allocates for it, including the root message, decoding into
 // desc's generated type, or into a dynamicpb message when desc has none.
 func (b Proto) Estimate(data []byte, desc protoreflect.MessageDescriptor) (int, error) {
+	return b.estimate(data, desc, false)
+}
+
+// estimate is Estimate decoding into a dynamicpb message when dynamic is set,
+// as it must when desc has no generated type.
+func (b Proto) estimate(data []byte, desc protoreflect.MessageDescriptor, dynamic bool) (int, error) {
 	t, err := b.newTally(desc)
 	if err != nil {
 		return 0, err
 	}
-	w := &wireWalk{tally: t, model: newDecoderModel(b.dynamic || layoutOf(desc).generated == nil)}
-	if err := w.alloc(w.model.root(desc)); err != nil {
+	model := newDecoderModel(dynamic || !layoutOf(desc).generated)
+	w := &wireWalk{tally: t}
+	if err := w.alloc(model.root(desc)); err != nil {
 		return t.total(), err
 	}
-	err = w.message(data, desc, 1, &messageState{})
+	err = w.message(data, desc, 1, &messageState{}, model)
 	return t.total(), err
 }
 
@@ -128,7 +131,7 @@ func (b Proto) Unmarshal(data []byte, msg proto.Message) error {
 	if !reflected.IsValid() {
 		return errors.New("protobuf message must be non-nil and mutable")
 	}
-	if err := b.forDestination(reflected).Validate(data, reflected.Descriptor()); err != nil {
+	if _, err := b.estimate(data, reflected.Descriptor(), isDynamicDestination(reflected)); err != nil {
 		return err
 	}
 	return (proto.UnmarshalOptions{DiscardUnknown: true, RecursionLimit: b.MaxDepth}).Unmarshal(data, msg)

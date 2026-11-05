@@ -38,15 +38,11 @@ const (
 	extSlotSize      = 24
 )
 
-// forDestination prices the dynamic layout when msg takes protobuf-go's
-// reflective decoder, as a dynamicpb message does.
-func (b Proto) forDestination(msg protoreflect.Message) Proto {
+// isDynamicDestination reports whether msg takes protobuf-go's reflective
+// decoder, as a dynamicpb message does.
+func isDynamicDestination(msg protoreflect.Message) bool {
 	methods := msg.ProtoMethods()
-	if methods != nil && methods.Unmarshal != nil && methods.Flags&protoiface.SupportUnmarshalDiscardUnknown != 0 {
-		return b
-	}
-	b.dynamic = true
-	return b
+	return methods == nil || methods.Unmarshal == nil || methods.Flags&protoiface.SupportUnmarshalDiscardUnknown == 0
 }
 
 // dynamicBoxCost is the allocation for boxing one value of field into an
@@ -97,9 +93,8 @@ func (d dynamicModel) field(m *messageState, field protoreflect.FieldDescriptor)
 	switch {
 	case field.IsExtension():
 		cost += mapGrowth(m.extensions-1, extSlotSize, true)
-		if md := field.Message(); md != nil && !field.IsList() {
-			// Extension types are generated, so their messages are too.
-			cost += max(dynamicMessageCost, protoStructSize(md))
+		if field.Message() != nil && !field.IsList() {
+			cost += messageCost(field)
 		}
 	case field.IsList():
 		cost += dynamicListCost
@@ -137,8 +132,8 @@ func (d dynamicModel) occurrence(m *messageState, field protoreflect.FieldDescri
 		}
 	case field.IsList() && field.IsExtension():
 		cost += extensionListCost(fs, field, 1, payloadLen, isNew) + extensionCheckCost(field)
-		if md := field.Message(); md != nil {
-			cost += max(dynamicMessageCost, protoStructSize(md))
+		if field.Message() != nil {
+			cost += messageCost(field)
 		}
 	case field.IsList():
 		var mem int

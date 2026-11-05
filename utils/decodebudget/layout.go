@@ -26,11 +26,11 @@ import (
 // The Go memory layout of decoded values: what a descriptor's generated type
 // and field kinds occupy, independent of which decoder fills them.
 
-// messageLayout is desc's generated struct type, nil when it has none, as for
-// a message built at runtime, which only dynamicpb can decode, and the size of
+// messageLayout records whether desc has a generated Go type, which a message
+// built at runtime lacks so that only dynamicpb can decode it, and the size of
 // one decoded message.
 type messageLayout struct {
-	generated reflect.Type
+	generated bool
 	size      int
 }
 
@@ -44,7 +44,7 @@ func layoutOf(desc protoreflect.MessageDescriptor) messageLayout {
 	l := messageLayout{size: 64 + 32*desc.Fields().Len()}
 	if mt, err := protoregistry.GlobalTypes.FindMessageByName(desc.FullName()); err == nil {
 		if t := reflect.TypeOf(mt.Zero().Interface()); t != reflect.TypeFor[*dynamicpb.Message]() && t.Kind() == reflect.Pointer && t.Elem().Kind() == reflect.Struct {
-			l.generated = t.Elem()
+			l.generated = true
 			l.size = int(t.Elem().Size())
 		}
 	}
@@ -53,7 +53,8 @@ func layoutOf(desc protoreflect.MessageDescriptor) messageLayout {
 	return l
 }
 
-// protoStructSize is the allocation for one message of desc's generated Go type.
+// protoStructSize is the allocation for one message of desc: its generated Go
+// struct, or without one, a rough dynamicpb message.
 func protoStructSize(desc protoreflect.MessageDescriptor) int {
 	return layoutOf(desc).size
 }
