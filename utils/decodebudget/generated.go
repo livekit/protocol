@@ -50,9 +50,17 @@ func presenceCost(field protoreflect.FieldDescriptor) int {
 	return allocSize(goValueSize(field))
 }
 
+// extensionCost is a set extension's ExtensionField value, and
+// extensionMapCost the map a message allocates for its first extension: a map
+// header and one 8-slot group.
+const (
+	extensionCost    = 64
+	extensionMapCost = 528
+)
+
 // fieldAllocCost is the allocation for one occurrence of field with a string or
 // bytes payload of payloadLen. Nested message contents are charged separately.
-func (p *Profile) fieldAllocCost(field protoreflect.FieldDescriptor, payloadLen int) int {
+func fieldAllocCost(field protoreflect.FieldDescriptor, payloadLen int) int {
 	cost := 0
 	// A map value message is charged with its entry.
 	if field.Message() != nil && !field.IsMap() && !field.ContainingMessage().IsMapEntry() {
@@ -73,7 +81,7 @@ func (p *Profile) fieldAllocCost(field protoreflect.FieldDescriptor, payloadLen 
 	case field.IsList():
 		// Slice growth depends on earlier occurrences; the caller charges it.
 	case field.IsExtension():
-		cost += p.ExtensionCost
+		cost += extensionCost
 	case field.ContainingOneof() != nil && !field.ContainingOneof().IsSynthetic():
 		cost += oneofWrapperCost(field)
 	}
@@ -82,9 +90,7 @@ func (p *Profile) fieldAllocCost(field protoreflect.FieldDescriptor, payloadLen 
 
 // generatedModel prices protobuf-go's fast-path decoder writing into
 // generated Go structs.
-type generatedModel struct {
-	p *Profile
-}
+type generatedModel struct{}
 
 func (g generatedModel) root(desc protoreflect.MessageDescriptor) int {
 	return protoStructSize(desc)
@@ -100,11 +106,11 @@ func (g generatedModel) message(m *messageState, field protoreflect.FieldDescrip
 	if fs.child != nil {
 		return 0, fs
 	}
-	return g.p.fieldAllocCost(field, 0), fs
+	return fieldAllocCost(field, 0), fs
 }
 
 func (g generatedModel) occurrence(m *messageState, field protoreflect.FieldDescriptor, payloadLen int) int {
-	cost := g.p.fieldAllocCost(field, payloadLen)
+	cost := fieldAllocCost(field, payloadLen)
 	switch {
 	case field.IsList():
 		fs := m.get(field)

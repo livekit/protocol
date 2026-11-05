@@ -42,8 +42,10 @@ type Proto struct {
 	// struct of each message, copied strings and bytes, oneof wrappers, and
 	// slice and map growth. Zero leaves it unchecked.
 	MaxDecodedBytes int
-	// Profile tunes the MaxDecodedBytes cost model; nil uses DefaultProfile.
-	Profile *Profile
+
+	// dynamic prices binary decoding into dynamicpb messages, for Unmarshal
+	// into destinations without a generated fast path.
+	dynamic bool
 }
 
 // Validate checks data against the message descriptor without constructing the
@@ -56,13 +58,13 @@ func (b Proto) Validate(data []byte, desc protoreflect.MessageDescriptor) error 
 
 // Estimate validates data like Validate and returns the estimated bytes the
 // binary decoder allocates for it, including the root message, decoding into
-// desc's generated type or, with Profile.DynamicMessages, a dynamicpb message.
+// desc's generated type.
 func (b Proto) Estimate(data []byte, desc protoreflect.MessageDescriptor) (int, error) {
 	t, err := b.newTally(desc)
 	if err != nil {
 		return 0, err
 	}
-	w := &wireWalk{tally: t, model: newDecoderModel(t.profile)}
+	w := &wireWalk{tally: t, model: newDecoderModel(b.dynamic)}
 	if err := w.alloc(w.model.root(desc)); err != nil {
 		return t.total(), err
 	}
@@ -77,20 +79,15 @@ func (b Proto) newTally(desc protoreflect.MessageDescriptor) (*tally, error) {
 	if desc == nil {
 		return nil, errors.New("protobuf descriptor must not be nil")
 	}
-	p := b.Profile
-	if p == nil {
-		p = &defaultProfile
-	}
-	return &tally{budget: b, profile: p}, nil
+	return &tally{budget: b}, nil
 }
 
 // tally is the running field count and allocation estimate shared by the wire
 // and protojson walks.
 type tally struct {
-	budget  Proto
-	profile *Profile
-	fields  int
-	bytes   int
+	budget Proto
+	fields int
+	bytes  int
 }
 
 func (t *tally) count() error {
@@ -101,8 +98,12 @@ func (t *tally) count() error {
 	return nil
 }
 
+// marginPercent covers allocations the model does not itemize; the calibration
+// tests measured them at under 3%.
+const marginPercent = 5
+
 func (t *tally) total() int {
-	return t.profile.withMargin(t.bytes)
+	return t.bytes + t.bytes*marginPercent/100
 }
 
 func (t *tally) alloc(n int) error {
@@ -118,7 +119,7 @@ func (t *tally) alloc(n int) error {
 // retains the binary decoder's required-field checks. Preflight rejection leaves
 // the destination unchanged; other decode errors follow normal protobuf semantics.
 // A destination without a generated fast path, such as a dynamicpb message, is
-// estimated with Profile.DynamicMessages set.
+// estimated as one.
 func (b Proto) Unmarshal(data []byte, msg proto.Message) error {
 	if msg == nil || (reflect.ValueOf(msg).Kind() == reflect.Pointer && reflect.ValueOf(msg).IsNil()) {
 		return errors.New("protobuf message must be non-nil and mutable")

@@ -47,11 +47,11 @@ type decoderModel interface {
 	mismatch(m *messageState, field protoreflect.FieldDescriptor) int
 }
 
-func newDecoderModel(p *Profile) decoderModel {
-	if p.DynamicMessages {
-		return dynamicModel{p}
+func newDecoderModel(dynamic bool) decoderModel {
+	if dynamic {
+		return dynamicModel{}
 	}
-	return generatedModel{p}
+	return generatedModel{}
 }
 
 // messageState mirrors the decoder state of one message whose cost depends on

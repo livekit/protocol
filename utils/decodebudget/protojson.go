@@ -57,9 +57,15 @@ func (b Proto) EstimateProtoJSON(data []byte, desc protoreflect.MessageDescripto
 	return w.total(), nil
 }
 
-// jsonMapReflectSize is the wrapper protojson allocates for every map field it
-// sees, even an empty one.
-const jsonMapReflectSize = 64
+// protojson allocates per token and per object on top of the decoded message,
+// its reflection-based list setter boxes each scalar element, and it wraps
+// every map field it sees, even an empty one.
+const (
+	jsonTokenCost      = 8
+	jsonObjectCost     = 8
+	jsonListScalarCost = 24
+	jsonMapReflectSize = 64
+)
 
 // jsonWalk walks protojson input with encoding/json tokens.
 type jsonWalk struct {
@@ -79,7 +85,7 @@ func (w *jsonWalk) next() (json.Token, error) {
 	if err != nil {
 		return nil, err
 	}
-	cost := w.profile.JSONTokenCost
+	cost := jsonTokenCost
 	switch v := tok.(type) {
 	case string:
 		cost += jsonStringCost(w.data[start:w.dec.InputOffset()], len(v))
@@ -118,7 +124,7 @@ func (w *jsonWalk) object(desc protoreflect.MessageDescriptor, depth int) error 
 			}
 			if field != nil && !extended {
 				extended = true
-				if err := w.alloc(w.profile.ExtensionMapCost); err != nil {
+				if err := w.alloc(extensionMapCost); err != nil {
 					return err
 				}
 			}
@@ -181,7 +187,7 @@ func (w *jsonWalk) field(field protoreflect.FieldDescriptor, tok json.Token, dep
 			if tok == json.Delim(']') {
 				cost := appendAllocBytes(n, goValueSize(field))
 				if field.Message() == nil {
-					cost += n * w.profile.JSONListScalarCost
+					cost += n * jsonListScalarCost
 				}
 				return w.alloc(cost)
 			}
@@ -244,7 +250,7 @@ func (w *jsonWalk) value(field protoreflect.FieldDescriptor, tok json.Token, dep
 		}
 		return w.alloc(jsonScalarCost(field, tok))
 	}
-	cost := w.profile.fieldAllocCost(field, 0) + jsonScalarCost(field, tok) + presenceCost(field)
+	cost := fieldAllocCost(field, 0) + jsonScalarCost(field, tok) + presenceCost(field)
 	if field.Message() != nil {
 		cost -= protoStructSize(field.Message())
 	}
@@ -261,7 +267,7 @@ func (w *jsonWalk) value(field protoreflect.FieldDescriptor, tok json.Token, dep
 }
 
 func (w *jsonWalk) message(md protoreflect.MessageDescriptor, tok json.Token, depth int) error {
-	if err := w.alloc(protoStructSize(md) + w.profile.JSONObjectCost); err != nil {
+	if err := w.alloc(protoStructSize(md) + jsonObjectCost); err != nil {
 		return err
 	}
 	if done, err := w.wellKnown(md, tok, depth+1); done || err != nil {

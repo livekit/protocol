@@ -484,9 +484,7 @@ func TestUnmarshalDynamicWithinBudget(t *testing.T) {
 }
 
 func TestProtoEstimateDynamicCalibration(t *testing.T) {
-	p := DefaultProfile()
-	p.DynamicMessages = true
-	budget := Proto{MaxFields: 1 << 30, MaxDepth: 100, Profile: &p}
+	budget := Proto{MaxFields: 1 << 30, MaxDepth: 100, dynamic: true}
 	large := protowire.AppendTag(nil, 6, protowire.BytesType) // HistogramDataPoint.bucket_counts
 	large = protowire.AppendBytes(large, []byte(strings.Repeat(string(protowire.AppendFixed64(nil, 1<<40)), 1000)))
 	cases := append(protoCalibrationCases(),
@@ -504,40 +502,6 @@ func TestProtoEstimateDynamicCalibration(t *testing.T) {
 			// Boxing values under 256 is free, which the model does not track.
 			require.LessOrEqual(t, float64(est), 1.25*float64(got), "the estimate should stay close enough to admit real payloads")
 		})
-	}
-}
-
-func TestProfile(t *testing.T) {
-	def := DefaultProfile()
-	pessimistic := DefaultProfile()
-	pessimistic.MarginPercent = 20
-	pessimistic.JSONTokenCost = 16
-	zero := Proto{MaxFields: 1 << 30, MaxDepth: 100}
-	withDefault := Proto{MaxFields: 1 << 30, MaxDepth: 100, Profile: &def}
-	withPessimistic := Proto{MaxFields: 1 << 30, MaxDepth: 100, Profile: &pessimistic}
-
-	estimators := []struct {
-		name     string
-		cases    []calibrationCase
-		estimate func(Proto, []byte, protoreflect.MessageDescriptor) (int, error)
-	}{
-		{"wire", protoCalibrationCases(), Proto.Estimate},
-		{"protojson", protoJSONCalibrationCases(), Proto.EstimateProtoJSON},
-	}
-	for _, e := range estimators {
-		for _, tc := range e.cases {
-			t.Run(e.name+" "+tc.name, func(t *testing.T) {
-				desc := tc.newMsg().ProtoReflect().Descriptor()
-				want, err := e.estimate(zero, tc.data, desc)
-				require.NoError(t, err)
-				got, err := e.estimate(withDefault, tc.data, desc)
-				require.NoError(t, err)
-				require.Equal(t, want, got)
-				got, err = e.estimate(withPessimistic, tc.data, desc)
-				require.NoError(t, err)
-				require.Greater(t, got, want)
-			})
-		}
 	}
 }
 

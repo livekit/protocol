@@ -20,7 +20,7 @@ import (
 )
 
 // Allocations of protobuf-go's reflective decoder writing into dynamicpb
-// messages, which Profile.DynamicMessages prices.
+// messages.
 const (
 	// The Message struct, its known and ext map headers, and the closure
 	// checkInitialized passes to its Range.
@@ -45,12 +45,7 @@ func (b Proto) forDestination(msg protoreflect.Message) Proto {
 	if methods != nil && methods.Unmarshal != nil && methods.Flags&protoiface.SupportUnmarshalDiscardUnknown != 0 {
 		return b
 	}
-	p := defaultProfile
-	if b.Profile != nil {
-		p = *b.Profile
-	}
-	p.DynamicMessages = true
-	b.Profile = &p
+	b.dynamic = true
 	return b
 }
 
@@ -85,9 +80,7 @@ func appendValues(l, c, add int) (mem, newCap int) {
 
 // dynamicModel prices protobuf-go's reflective decoder writing into dynamicpb
 // messages.
-type dynamicModel struct {
-	p *Profile
-}
+type dynamicModel struct{}
 
 func (d dynamicModel) root(protoreflect.MessageDescriptor) int {
 	return dynamicMessageCost + dynamicResetCost
@@ -110,7 +103,7 @@ func (d dynamicModel) field(m *messageState, field protoreflect.FieldDescriptor)
 				extensions++
 			}
 		}
-		cost += mapGrowth(extensions, extSlotSize, true) + d.p.ExtensionCost
+		cost += mapGrowth(extensions, extSlotSize, true) + extensionCost
 		if md := field.Message(); md != nil && !field.IsList() {
 			// Extension types are generated, so their messages are too.
 			cost += max(dynamicMessageCost, protoStructSize(md))
