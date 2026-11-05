@@ -20,8 +20,10 @@ import (
 	"google.golang.org/protobuf/encoding/protowire"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/livekit/protocol/livekit"
+	"github.com/livekit/protocol/livekit/agent"
 	"github.com/livekit/protocol/utils/protojson"
 )
 
@@ -313,6 +315,45 @@ func TestProtoEstimateProtoJSONCalibration(t *testing.T) {
 			t.Logf("json=%d measured=%d estimate=%d ratio=%.2f", len(tc.data), got, est, float64(est)/float64(got))
 			require.GreaterOrEqual(t, uint64(est), got, "the estimate must not undercount")
 			require.LessOrEqual(t, float64(est), 1.15*float64(got), "the estimate should stay close enough to admit real payloads")
+		})
+	}
+}
+
+func TestProtoEstimateProtoJSONWellKnownTypes(t *testing.T) {
+	list := func(element string, n int) string { return strings.TrimSuffix(strings.Repeat(element+",", n), ",") }
+	debug := func(elements string) []byte { return []byte(`{"payload":{"a":[` + elements + `]}}`) }
+	anys := func(elements string) []byte { return []byte(`{"callContext":[` + elements + `]}`) }
+	nested := `{"@type":"type.googleapis.com/google.protobuf.ListValue","value":[` + list(`0`, 1<<16) + `]}`
+	for range 28 {
+		nested = `{"@type":"type.googleapis.com/google.protobuf.Any","value":` + nested + `}`
+	}
+	newDebug := func() proto.Message { return &agent.DebugMessage{} }
+	newCall := func() proto.Message { return &livekit.SIPCallInfo{} }
+	cases := []calibrationCase{
+		{"struct numbers", debug(list(`0`, 1<<16)), newDebug},
+		{"struct nulls", debug(list(`null`, 1<<16)), newDebug},
+		{"struct strings", debug(list(`"aaaaaaaaaaaaaaaaaaaa"`, 1<<16)), newDebug},
+		{"struct objects", debug(list(`{"a":1}`, 1<<16)), newDebug},
+		{"struct lists", debug(list(`[]`, 1<<16)), newDebug},
+		{"root struct", []byte(`{"a":[` + list(`{}`, 1<<16) + `]}`), func() proto.Message { return &structpb.Struct{} }},
+		{"any message", anys(`{"participants":[` + list(`{}`, 1<<16) + `],"@type":"type.googleapis.com/livekit.ListParticipantsResponse"}`), newCall},
+		{"any decoy type", anys(`{"identity":"@type","@type":"type.googleapis.com/livekit.ParticipantInfo","tracks":[` + list(`{}`, 1<<16) + `]}`), newCall},
+		{"any descriptor", anys(`{"@type":"type.googleapis.com/google.protobuf.FileDescriptorProto","messageType":[` + list(`{}`, 1<<16) + `]}`), newCall},
+		{"any struct", anys(`{"@type":"type.googleapis.com/google.protobuf.Struct","value":{"a":[` + list(`0`, 1<<16) + `]}}`), newCall},
+		{"any field mask", anys(`{"@type":"type.googleapis.com/google.protobuf.FieldMask","value":"` + list(`aAAAAAAAAA`, 1<<14) + `"}`), newCall},
+		{"empty anys", anys(list(`{}`, 1<<16)), newCall},
+		{"nested any", anys(nested), newCall},
+	}
+	budget := Proto{MaxFields: 1 << 30, MaxDepth: 100}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			est, err := budget.EstimateProtoJSON(tc.data, tc.newMsg().ProtoReflect().Descriptor())
+			require.NoError(t, err)
+			got := measureJSONDecode(t, tc.data, tc.newMsg)
+			t.Logf("json=%d measured=%d estimate=%d ratio=%.2f", len(tc.data), got, est, float64(est)/float64(got))
+			require.GreaterOrEqual(t, uint64(est), got, "the estimate must not undercount")
+			// Any is charged for its worst-case marshalled size.
+			require.LessOrEqual(t, float64(est), 1.5*float64(got), "the estimate should stay close enough to admit real payloads")
 		})
 	}
 }
