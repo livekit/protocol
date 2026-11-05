@@ -20,6 +20,7 @@ import (
 	"google.golang.org/protobuf/encoding/protowire"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/types/descriptorpb"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/livekit/protocol/livekit"
@@ -292,6 +293,12 @@ func measureJSONDecode(t *testing.T, data []byte, newMsg func() proto.Message) u
 func protoJSONCalibrationCases() []calibrationCase {
 	emptySpans := `{"resourceSpans":[{"scopeSpans":[{"spans":[` + strings.TrimSuffix(strings.Repeat("{},", 1<<18), ",") + `]}]}]}`
 	emptyValues := `{"resourceLogs":[{"scopeLogs":[{"logRecords":[{"body":{"arrayValue":{"values":[` + strings.TrimSuffix(strings.Repeat("{},", 1<<18), ",") + `]}}}]}]}]}`
+	// The livekit package links buf.validate, whose extensions protojson
+	// resolves from the global registry.
+	fieldRules := func(rules, elem string) []byte {
+		return fmt.Appendf(nil, `{"[buf.validate.field]":`+rules+`}`, strings.TrimSuffix(strings.Repeat(elem+",", 1<<15), ","))
+	}
+	fieldOptions := func() proto.Message { return &descriptorpb.FieldOptions{} }
 	return []calibrationCase{
 		{"traces 512", must(protojson.Marshal(calibSpans(512))), func() proto.Message { return &tracev1.TracesData{} }},
 		{"logs 512", must(protojson.Marshal(calibLogs(512))), func() proto.Message { return &logsv1.LogsData{} }},
@@ -302,6 +309,8 @@ func protoJSONCalibrationCases() []calibrationCase {
 		{"enums bytes int64 strings", must(protojson.Marshal(calibEnumBytesLogs(20000))), func() proto.Message { return &logsv1.LogsData{} }},
 		{"proto field names", must(protojson.MarshalOptions{UseProtoNames: true}.Marshal(calibLogs(512))), func() proto.Message { return &logsv1.LogsData{} }},
 		{"optional scalars", must(protojson.Marshal(calibOptionalPoints(16384))), func() proto.Message { return &metricsv1.MetricsData{} }},
+		{"extension bytes", fieldRules(`{"bytes":{"in":[%s]}}`, `""`), fieldOptions},
+		{"extension messages", fieldRules(`{"cel":[%s]}`, `{}`), fieldOptions},
 	}
 }
 

@@ -105,6 +105,7 @@ func (w *jsonWalk) object(desc protoreflect.MessageDescriptor, depth int) error 
 	if depth > w.budget.MaxDepth {
 		return ErrMessageComplexity
 	}
+	extended := false
 	for {
 		tok, err := w.next()
 		if err != nil {
@@ -121,12 +122,23 @@ func (w *jsonWalk) object(desc protoreflect.MessageDescriptor, depth int) error 
 		if field == nil {
 			field = desc.Fields().ByTextName(key)
 		}
+		if field == nil {
+			if field, err = jsonExtension(desc, key); err != nil {
+				return err
+			}
+			if field != nil && !extended {
+				extended = true
+				if err := w.alloc(w.profile.ExtensionMapCost); err != nil {
+					return err
+				}
+			}
+		}
 		tok, err = w.next()
 		if err != nil {
 			return err
 		}
 		if field == nil {
-			// Unknown fields and extensions are discarded or rejected by the decoder.
+			// Unknown fields are discarded or rejected by the decoder.
 			if err := w.skip(tok, depth); err != nil {
 				return err
 			}
@@ -136,6 +148,26 @@ func (w *jsonWalk) object(desc protoreflect.MessageDescriptor, depth int) error 
 			return err
 		}
 	}
+}
+
+// jsonExtension resolves a "[full.name]" key the way protojson's default
+// resolver does, returning nil when the decoder would discard or reject it.
+func jsonExtension(desc protoreflect.MessageDescriptor, key string) (protoreflect.FieldDescriptor, error) {
+	if len(key) < 2 || !strings.HasPrefix(key, "[") || !strings.HasSuffix(key, "]") {
+		return nil, nil
+	}
+	extension, err := protoregistry.GlobalTypes.FindExtensionByName(protoreflect.FullName(key[1 : len(key)-1]))
+	if errors.Is(err, protoregistry.NotFound) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	field := extension.TypeDescriptor()
+	if field.ContainingMessage().FullName() != desc.FullName() || !desc.ExtensionRanges().Has(field.Number()) {
+		return nil, nil
+	}
+	return field, nil
 }
 
 func (w *jsonWalk) field(field protoreflect.FieldDescriptor, tok json.Token, depth int) error {

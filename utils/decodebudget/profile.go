@@ -27,6 +27,9 @@ type Profile struct {
 	MapGrowthFactor  int
 	MapEntryOverhead int
 	ExtensionCost    int
+	// ExtensionMapCost is the map a message allocates for its first
+	// extension: a map header and one 8-slot group.
+	ExtensionMapCost int
 
 	// protojson allocates per token and per object on top of the decoded
 	// message, and its reflection-based list and map setters box each scalar
@@ -42,6 +45,7 @@ var defaultProfile = Profile{
 	MapGrowthFactor:     4,
 	MapEntryOverhead:    16,
 	ExtensionCost:       64,
+	ExtensionMapCost:    528,
 	JSONTokenCost:       8,
 	JSONListScalarCost:  24,
 	JSONMapEntryBoxCost: 32,
