@@ -596,4 +596,31 @@ func TestMetricsBatchBuilder(t *testing.T) {
 		mb := mbb.ToProto()
 		require.True(t, proto.Equal(expected, mb))
 	})
+
+	t.Run("merge str data index beyond int32", func(t *testing.T) {
+		// index past the end must be rejected even where int is 32 bits
+		const huge = ^uint32(0)
+		mbb := NewMetricsBatchBuilder()
+		require.NotPanics(t, func() {
+			mbb.Merge(&livekit.MetricsBatch{
+				StrData: []string{"PA"},
+				TimeSeries: []*livekit.TimeSeriesMetric{
+					{Label: huge, ParticipantIdentity: huge, TrackSid: huge, Rid: huge},
+					{Label: uint32(livekit.MetricLabel_SUBSCRIBER_RTT), ParticipantIdentity: huge},
+				},
+				Events: []*livekit.EventMetric{
+					{Label: huge, ParticipantIdentity: huge, TrackSid: huge, Rid: huge},
+					{Label: uint32(livekit.MetricLabel_SUBSCRIBER_RTT), ParticipantIdentity: huge},
+				},
+			})
+		})
+		mb := mbb.ToProto()
+		require.Len(t, mb.TimeSeries, 2)
+		require.Len(t, mb.Events, 2)
+		require.Empty(t, mb.StrData)
+		for _, ts := range mb.TimeSeries {
+			require.Zero(t, ts.ParticipantIdentity)
+			require.Zero(t, ts.TrackSid)
+		}
+	})
 }
