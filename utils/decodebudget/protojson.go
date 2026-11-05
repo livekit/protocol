@@ -19,32 +19,10 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"strconv"
 	"strings"
-	"unicode/utf16"
-	"unicode/utf8"
 
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/reflect/protoregistry"
-)
-
-// Allocations protojson makes for well-known types beyond the decoded messages,
-// measured against protobuf-go v1.36.12.
-const (
-	// A Value boxes its scalar for the reflective oneof setter. A ListValue's
-	// list is created even when empty; mapEntries charges a Struct's map.
-	jsonKnownValueCost  = 24
-	jsonKnownStructCost = 80
-	jsonKnownListCost   = 24
-	// A FieldMask path is split out, boxed and appended to the paths list.
-	jsonFieldMaskPathCost = 80
-	// An Any's object is tokenized a second time to find "@type", and the
-	// embedded message is marshalled deterministically, sorting map keys as
-	// reflect.Values. Its wire form can be several times its JSON: "0," in a
-	// ListValue is eleven bytes.
-	jsonAnyCost         = 32
-	jsonAnyCopyFactor   = 6
-	jsonAnyMapEntryCost = 80
 )
 
 // ValidateProtoJSON checks protojson input against the budget in protobuf terms: an
@@ -86,9 +64,10 @@ const jsonMapReflectSize = 64
 // jsonWalk walks protojson input with encoding/json tokens.
 type jsonWalk struct {
 	*tally
-	dec   *json.Decoder
-	data  []byte
-	inAny bool
+	dec  *json.Decoder
+	data []byte
+	// anyEntries counts map entries walked since the innermost Any began.
+	anyEntries int
 }
 
 func (w *jsonWalk) next() (json.Token, error) {
@@ -109,67 +88,6 @@ func (w *jsonWalk) next() (json.Token, error) {
 		cost += tmpCopySize(len(v))
 	}
 	return tok, w.alloc(cost)
-}
-
-// jsonStringCost is what protojson's tokenizer allocates for the string token
-// in raw, which may start with separators: one copy of the decoded string, and
-// for a string it has to rebuild, the buffers its appends grow through.
-func jsonStringCost(raw []byte, decodedLen int) int {
-	in := raw[bytes.IndexByte(raw, '"')+1 : len(raw)-1]
-	i := indexRebuild(in)
-	if i == len(in) {
-		return allocSize(decodedLen)
-	}
-	cost, l, c := 0, i, i
-	grow := func(add int) {
-		mem, newCap := appendGrow(l, c, add, 1)
-		cost, l, c = cost+mem, l+add, newCap
-	}
-	for in = in[i:]; len(in) > 0; {
-		if in[0] == '\\' {
-			n, size := jsonEscapeLen(in)
-			grow(n)
-			in = in[size:]
-			continue
-		}
-		_, n := utf8.DecodeRune(in)
-		n += indexRebuild(in[n:])
-		grow(n)
-		in = in[n:]
-	}
-	return cost + allocSize(decodedLen)
-}
-
-const replacementChar = string(utf8.RuneError)
-
-// indexRebuild is where protojson's parseString stops aliasing its input.
-func indexRebuild(in []byte) int {
-	i := bytes.IndexByte(in, '\\')
-	if i < 0 {
-		i = len(in)
-	}
-	if j := bytes.Index(in[:i], []byte(replacementChar)); j >= 0 {
-		return j
-	}
-	return i
-}
-
-// jsonEscapeLen returns the decoded length and raw size of the escape at the
-// start of in.
-func jsonEscapeLen(in []byte) (n, size int) {
-	if len(in) < 6 || in[1] != 'u' {
-		return 1, min(2, len(in))
-	}
-	r := jsonHex4(in[2:6])
-	if utf16.IsSurrogate(r) && len(in) >= 12 && in[6] == '\\' && in[7] == 'u' {
-		return utf8.RuneLen(utf16.DecodeRune(r, jsonHex4(in[8:12]))), 12
-	}
-	return max(utf8.RuneLen(r), 1), 6
-}
-
-func jsonHex4(b []byte) rune {
-	v, _ := strconv.ParseUint(string(b), 16, 16)
-	return rune(v)
 }
 
 // object walks the members of a message whose '{' has been consumed.
@@ -298,10 +216,8 @@ func (w *jsonWalk) mapEntries(field protoreflect.FieldDescriptor, depth int) err
 			return err
 		}
 		// The duplicate-key check boxes the key once more than the set does.
+		w.anyEntries++
 		cost := mapInsertCost(field, n) + 2*mapBoxCost(field.MapKey()) + mapBoxCost(field.MapValue())
-		if w.inAny {
-			cost += jsonAnyMapEntryCost
-		}
 		if err := w.alloc(cost); err != nil {
 			return err
 		}
@@ -348,144 +264,13 @@ func (w *jsonWalk) message(md protoreflect.MessageDescriptor, tok json.Token, de
 	if err := w.alloc(protoStructSize(md) + w.profile.JSONObjectCost); err != nil {
 		return err
 	}
-	switch md.FullName() {
-	case "google.protobuf.Struct", "google.protobuf.ListValue":
-		return w.knownContainer(md, tok, depth+1)
-	case "google.protobuf.Value":
-		return w.knownValue(md, tok, depth+1)
-	case "google.protobuf.Any":
-		if tok == json.Delim('{') {
-			if err := w.alloc(jsonAnyCost); err != nil {
-				return err
-			}
-			// Without a resolvable "@type" the decoder rejects a non-empty Any.
-			if mt, err := protoregistry.GlobalTypes.FindMessageByURL(w.anyTypeURL()); err == nil {
-				return w.any(mt.Descriptor(), depth+1)
-			}
-		}
-	case "google.protobuf.FieldMask":
-		if str, ok := tok.(string); ok {
-			if err := w.alloc(fieldMaskCost(str)); err != nil {
-				return err
-			}
-		}
+	if done, err := w.wellKnown(md, tok, depth+1); done || err != nil {
+		return err
 	}
 	if tok != json.Delim('{') || hasCustomJSON(md) {
 		return w.skip(tok, depth+1)
 	}
 	return w.object(md, depth+1)
-}
-
-// knownContainer walks a Struct or ListValue, whose JSON forms are its single
-// map<string, Value> or repeated Value field.
-func (w *jsonWalk) knownContainer(md protoreflect.MessageDescriptor, tok json.Token, depth int) error {
-	if depth > w.budget.MaxDepth {
-		return ErrMessageComplexity
-	}
-	cost := jsonKnownListCost
-	if md.FullName() == "google.protobuf.Struct" {
-		cost = jsonKnownStructCost
-	}
-	if err := w.alloc(cost); err != nil {
-		return err
-	}
-	return w.field(md.Fields().Get(0), tok, depth)
-}
-
-// knownValue walks a Value; every JSON value, null included, sets a member of
-// its kind oneof.
-func (w *jsonWalk) knownValue(md protoreflect.MessageDescriptor, tok json.Token, depth int) error {
-	if depth > w.budget.MaxDepth {
-		return ErrMessageComplexity
-	}
-	member := md.Fields().ByName(knownValueMember(tok))
-	cost := oneofWrapperCost(member) + jsonKnownValueCost
-	if member.Message() == nil {
-		cost += allocSize(goValueSize(member))
-	}
-	if err := w.alloc(cost); err != nil {
-		return err
-	}
-	if member.Message() != nil {
-		return w.message(member.Message(), tok, depth)
-	}
-	return nil
-}
-
-// any walks the members of an Any whose '{' has been consumed as a message of
-// the embedded type md, which protojson then marshals into the Any's value.
-func (w *jsonWalk) any(md protoreflect.MessageDescriptor, depth int) error {
-	start := w.dec.InputOffset()
-	inAny := w.inAny
-	w.inAny = true
-	var err error
-	if hasCustomJSON(md) {
-		err = w.anyValue(md, depth)
-	} else if err = w.alloc(protoStructSize(md)); err == nil {
-		err = w.object(md, depth)
-	}
-	w.inAny = inAny
-	if err != nil {
-		return err
-	}
-	return w.alloc(jsonAnyCopyFactor * allocSize(int(w.dec.InputOffset()-start)))
-}
-
-// anyValue walks the members of an Any embedding a well-known type whose JSON
-// form is its "value" member.
-func (w *jsonWalk) anyValue(md protoreflect.MessageDescriptor, depth int) error {
-	if depth > w.budget.MaxDepth {
-		return ErrMessageComplexity
-	}
-	for {
-		key, err := w.next()
-		if err != nil {
-			return err
-		}
-		if key == json.Delim('}') {
-			return nil
-		}
-		if err := w.count(); err != nil {
-			return err
-		}
-		tok, err := w.next()
-		if err != nil {
-			return err
-		}
-		if key == "value" {
-			err = w.message(md, tok, depth)
-		} else {
-			err = w.skip(tok, depth)
-		}
-		if err != nil {
-			return err
-		}
-	}
-}
-
-// anyTypeURL looks ahead for the "@type" member of the object whose '{' has
-// just been consumed, as protojson does, and returns "" if there is none.
-func (w *jsonWalk) anyTypeURL() string {
-	dec := json.NewDecoder(bytes.NewReader(w.data[w.dec.InputOffset()-1:]))
-	if _, err := dec.Token(); err != nil {
-		return ""
-	}
-	for dec.More() {
-		key, err := dec.Token()
-		if err != nil {
-			return ""
-		}
-		if key == "@type" {
-			tok, _ := dec.Token()
-			url, _ := tok.(string)
-			return url
-		}
-		var member json.RawMessage
-		if err := dec.Decode(&member); err != nil {
-			return ""
-		}
-	}
-	return ""
 }
 
 // skip walks a value without a descriptor, counting every token as a field.
@@ -531,56 +316,4 @@ func jsonScalarCost(field protoreflect.FieldDescriptor, tok json.Token) int {
 		return 0
 	}
 	return 2 * tmpCopySize(len(str))
-}
-
-func isKnownValue(field protoreflect.FieldDescriptor) bool {
-	md := field.Message()
-	return md != nil && md.FullName() == "google.protobuf.Value"
-}
-
-// knownValueMember is the member of google.protobuf.Value's kind oneof that
-// protojson sets for tok.
-func knownValueMember(tok json.Token) protoreflect.Name {
-	switch tok.(type) {
-	case bool:
-		return "bool_value"
-	case json.Number:
-		return "number_value"
-	case string:
-		return "string_value"
-	}
-	switch tok {
-	case json.Delim('{'):
-		return "struct_value"
-	case json.Delim('['):
-		return "list_value"
-	}
-	return "null_value"
-}
-
-// hasCustomJSON reports whether protojson decodes md from a special JSON form
-// rather than an object of its fields.
-func hasCustomJSON(md protoreflect.MessageDescriptor) bool {
-	if md.FullName().Parent() != "google.protobuf" {
-		return false
-	}
-	switch md.Name() {
-	case "Any", "Timestamp", "Duration", "Struct", "ListValue", "Value", "FieldMask", "Empty",
-		"BoolValue", "Int32Value", "Int64Value", "UInt32Value", "UInt64Value",
-		"FloatValue", "DoubleValue", "StringValue", "BytesValue":
-		return true
-	}
-	return false
-}
-
-// fieldMaskCost is what protojson allocates splitting a FieldMask's JSON
-// string into snake_case paths and appending them to its list.
-func fieldMaskCost(str string) int {
-	n := strings.Count(str, ",") + 1
-	cost := appendAllocBytes(n, 16) + n*jsonFieldMaskPathCost
-	for path := range strings.SplitSeq(str, ",") {
-		// Up to two bytes per byte, appended to a nil slice and then copied.
-		cost += appendAllocBytes(2*len(path), 1) + allocSize(2*len(path))
-	}
-	return cost
 }
