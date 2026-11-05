@@ -97,13 +97,7 @@ func (d dynamicModel) field(m *messageState, field protoreflect.FieldDescriptor)
 	cost := mapGrowth(n, knownSlotSize, true)
 	switch {
 	case field.IsExtension():
-		extensions := 0
-		for i := range m.fields[:n] {
-			if m.fields[i].field.IsExtension() {
-				extensions++
-			}
-		}
-		cost += mapGrowth(extensions, extSlotSize, true) + extensionCost
+		cost += mapGrowth(m.extensions-1, extSlotSize, true) + extensionCost
 		if md := field.Message(); md != nil && !field.IsList() {
 			// Extension types are generated, so their messages are too.
 			cost += max(dynamicMessageCost, protoStructSize(md))

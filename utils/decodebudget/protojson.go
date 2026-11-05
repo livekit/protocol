@@ -124,7 +124,7 @@ func (w *jsonWalk) object(desc protoreflect.MessageDescriptor, depth int) error 
 			}
 			if field != nil && !extended {
 				extended = true
-				if err := w.alloc(extensionMapCost); err != nil {
+				if err := w.alloc(extensionMapSize); err != nil {
 					return err
 				}
 			}

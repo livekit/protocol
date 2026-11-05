@@ -291,6 +291,17 @@ func protoCalibrationCases() []calibrationCase {
 		rl := protowire.AppendBytes(protowire.AppendTag(nil, 2, protowire.BytesType), sl)
 		return protowire.AppendBytes(protowire.AppendTag(nil, 1, protowire.BytesType), rl)
 	}
+	// DescriptorProto{field: n×{options: {[buf.validate.field]: {}}}}: every
+	// FieldOptions gets an extension map.
+	extensionOptions := func(n int) []byte {
+		options := protowire.AppendBytes(protowire.AppendTag(nil, 1159, protowire.BytesType), nil)
+		field := protowire.AppendBytes(protowire.AppendTag(nil, 8, protowire.BytesType), options)
+		var b []byte
+		for range n {
+			b = protowire.AppendBytes(protowire.AppendTag(b, 2, protowire.BytesType), field)
+		}
+		return b
+	}
 	participants := calibParticipants()
 	return []calibrationCase{
 		{"traces 512", must(proto.Marshal(calibSpans(512))), func() proto.Message { return &tracev1.TracesData{} }},
@@ -314,6 +325,7 @@ func protoCalibrationCases() []calibrationCase {
 		{"merged buckets 3000", mergedBuckets(3000), func() proto.Message { return &metricsv1.MetricsData{} }},
 		{"merged resources 64k", mergedResources(1 << 16), func() proto.Message { return &logsv1.LogsData{} }},
 		{"alternating oneof 64k", alternatingOneof(1 << 16), func() proto.Message { return &logsv1.LogsData{} }},
+		{"extension options 16k", extensionOptions(1 << 14), func() proto.Message { return &descriptorpb.DescriptorProto{} }},
 	}
 }
 

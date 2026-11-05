@@ -61,6 +61,8 @@ type messageState struct {
 	oneofs     []oneofState
 	unknownLen int
 	unknownCap int
+	// extensions counts the extension fields in fields.
+	extensions int
 }
 
 type fieldState struct {
@@ -90,6 +92,9 @@ func (m *messageState) get(field protoreflect.FieldDescriptor) *fieldState {
 		}
 	}
 	m.fields = append(m.fields, fieldState{field: field})
+	if field.IsExtension() {
+		m.extensions++
+	}
 	return &m.fields[len(m.fields)-1]
 }
 

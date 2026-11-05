@@ -51,12 +51,21 @@ func presenceCost(field protoreflect.FieldDescriptor) int {
 }
 
 // extensionCost is a set extension's ExtensionField value, and
-// extensionMapCost the map a message allocates for its first extension: a map
+// extensionMapSize the map a message allocates for its first extension: a map
 // header and one 8-slot group.
 const (
 	extensionCost    = 64
-	extensionMapCost = 528
+	extensionMapSize = 528
 )
+
+// extensionMapCost is the extension map a generated message allocates when
+// field is its first extension; call it before m.get records field.
+func extensionMapCost(m *messageState, field protoreflect.FieldDescriptor) int {
+	if !field.IsExtension() || m.extensions > 0 {
+		return 0
+	}
+	return extensionMapSize
+}
 
 // fieldAllocCost is the allocation for one occurrence of field with a string or
 // bytes payload of payloadLen. Nested message contents are charged separately.
@@ -101,16 +110,17 @@ func (g generatedModel) message(m *messageState, field protoreflect.FieldDescrip
 		// Every element or map value is a new message.
 		return g.occurrence(m, field, 0), nil
 	}
+	cost := extensionMapCost(m, field)
 	fs := m.get(field)
 	m.setOneof(field, fs)
 	if fs.child != nil {
-		return 0, fs
+		return cost, fs
 	}
-	return fieldAllocCost(field, 0), fs
+	return cost + fieldAllocCost(field, 0), fs
 }
 
 func (g generatedModel) occurrence(m *messageState, field protoreflect.FieldDescriptor, payloadLen int) int {
-	cost := fieldAllocCost(field, payloadLen)
+	cost := fieldAllocCost(field, payloadLen) + extensionMapCost(m, field)
 	switch {
 	case field.IsList():
 		fs := m.get(field)
