@@ -48,6 +48,15 @@ func allocSize(n int) int {
 	return (n + page - 1) / page * page
 }
 
+// tmpCopySize is the allocation for a temporary copy of n bytes; one that does
+// not escape and fits runtime.tmpBuf stays on the stack.
+func tmpCopySize(n int) int {
+	if n <= 32 {
+		return 0
+	}
+	return allocSize(n)
+}
+
 // appendGrow is the allocation for appending add elements of elem bytes to a
 // slice of length l and capacity c, and the resulting capacity, following
 // runtime.growslice.

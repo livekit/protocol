@@ -10,6 +10,7 @@ import (
 	"runtime"
 	"strings"
 	"testing"
+	"unicode/utf8"
 
 	"github.com/stretchr/testify/require"
 	commonv1 "go.opentelemetry.io/proto/otlp/common/v1"
@@ -299,6 +300,10 @@ func protoJSONCalibrationCases() []calibrationCase {
 		return fmt.Appendf(nil, `{"[buf.validate.field]":`+rules+`}`, strings.TrimSuffix(strings.Repeat(elem+",", 1<<15), ","))
 	}
 	fieldOptions := func() proto.Message { return &descriptorpb.FieldOptions{} }
+	longNumber := "0." + strings.Repeat("0", 1<<18) + "1"
+	chat := func(msg string) []byte { return []byte(`{"chatMessage":{"message":"` + msg + `"}}`) }
+	escapedKeys := strings.TrimSuffix(strings.Repeat(`{"ident\u0069ty":"a","is\u0050ublisher":true,"disconnect\u0052eason":"CLIENT_INITIATED"},`, 8192), ",")
+	newDataPacket := func() proto.Message { return &livekit.DataPacket{} }
 	return []calibrationCase{
 		{"traces 512", must(protojson.Marshal(calibSpans(512))), func() proto.Message { return &tracev1.TracesData{} }},
 		{"logs 512", must(protojson.Marshal(calibLogs(512))), func() proto.Message { return &logsv1.LogsData{} }},
@@ -311,6 +316,13 @@ func protoJSONCalibrationCases() []calibrationCase {
 		{"optional scalars", must(protojson.Marshal(calibOptionalPoints(16384))), func() proto.Message { return &metricsv1.MetricsData{} }},
 		{"extension bytes", fieldRules(`{"bytes":{"in":[%s]}}`, `""`), fieldOptions},
 		{"extension messages", fieldRules(`{"cel":[%s]}`, `{}`), fieldOptions},
+		{"long number", []byte(`{"speaker":{"speakers":[{"level":` + longNumber + `}]}}`), newDataPacket},
+		{"long number string", []byte(`{"speaker":{"speakers":[{"level":"` + longNumber + `"}]}}`), newDataPacket},
+		{"escaped string", chat(strings.Repeat(strings.Repeat("n", 49)+`\n`, 4000)), newDataPacket},
+		{"dense escapes", chat(strings.Repeat(`\"\\\u00e9\ud83d\ude00`, 20000)), newDataPacket},
+		{"single late escape", chat(strings.Repeat("n", 200000) + `\n`), newDataPacket},
+		{"replacement chars", chat(strings.Repeat(strings.Repeat("n", 47)+string(utf8.RuneError), 4000)), newDataPacket},
+		{"escaped keys", []byte(`{"participants":[` + escapedKeys + `]}`), func() proto.Message { return &livekit.ListParticipantsResponse{} }},
 	}
 }
 

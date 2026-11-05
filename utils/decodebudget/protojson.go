@@ -19,7 +19,10 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"strconv"
 	"strings"
+	"unicode/utf16"
+	"unicode/utf8"
 
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/reflect/protoregistry"
@@ -85,6 +88,7 @@ type jsonWalk struct {
 }
 
 func (w *jsonWalk) next() (json.Token, error) {
+	start := w.dec.InputOffset()
 	tok, err := w.dec.Token()
 	if err == io.EOF {
 		return nil, io.ErrUnexpectedEOF
@@ -93,11 +97,75 @@ func (w *jsonWalk) next() (json.Token, error) {
 		return nil, err
 	}
 	cost := w.profile.JSONTokenCost
-	if str, ok := tok.(string); ok {
-		// protojson's tokenizer copies every string, key or value.
-		cost += allocSize(len(str))
+	switch v := tok.(type) {
+	case string:
+		cost += jsonStringCost(w.data[start:w.dec.InputOffset()], len(v))
+	case json.Number:
+		// Token.Float parses from a copy of the literal.
+		cost += tmpCopySize(len(v))
 	}
 	return tok, w.alloc(cost)
+}
+
+// jsonStringCost is what protojson's tokenizer allocates for the string token
+// in raw, which may start with separators: one copy of the decoded string, and
+// for a string it has to rebuild, the buffers its appends grow through.
+func jsonStringCost(raw []byte, decodedLen int) int {
+	in := raw[bytes.IndexByte(raw, '"')+1 : len(raw)-1]
+	i := indexRebuild(in)
+	if i == len(in) {
+		return allocSize(decodedLen)
+	}
+	cost, l, c := 0, i, i
+	grow := func(add int) {
+		mem, newCap := appendGrow(l, c, add, 1)
+		cost, l, c = cost+mem, l+add, newCap
+	}
+	for in = in[i:]; len(in) > 0; {
+		if in[0] == '\\' {
+			n, size := jsonEscapeLen(in)
+			grow(n)
+			in = in[size:]
+			continue
+		}
+		_, n := utf8.DecodeRune(in)
+		n += indexRebuild(in[n:])
+		grow(n)
+		in = in[n:]
+	}
+	return cost + allocSize(decodedLen)
+}
+
+var replacementChar = []byte(string(utf8.RuneError))
+
+// indexRebuild is where protojson's parseString stops aliasing its input.
+func indexRebuild(in []byte) int {
+	i := bytes.IndexByte(in, '\\')
+	if i < 0 {
+		i = len(in)
+	}
+	if j := bytes.Index(in[:i], replacementChar); j >= 0 {
+		return j
+	}
+	return i
+}
+
+// jsonEscapeLen returns the decoded length and raw size of the escape at the
+// start of in.
+func jsonEscapeLen(in []byte) (n, size int) {
+	if len(in) < 6 || in[1] != 'u' {
+		return 1, min(2, len(in))
+	}
+	r := jsonHex4(in[2:6])
+	if utf16.IsSurrogate(r) && len(in) >= 12 && in[6] == '\\' && in[7] == 'u' {
+		return utf8.RuneLen(utf16.DecodeRune(r, jsonHex4(in[8:12]))), 12
+	}
+	return max(utf8.RuneLen(r), 1), 6
+}
+
+func jsonHex4(b []byte) rune {
+	v, _ := strconv.ParseUint(string(b), 16, 16)
+	return rune(v)
 }
 
 // object walks the members of a message whose '{' has been consumed.
@@ -440,12 +508,21 @@ func (w *jsonWalk) skip(tok json.Token, depth int) error {
 }
 
 // jsonScalarCost is what decoding a scalar token allocates beyond the copy the
-// tokenizer already made: base64 bytes are decoded into a new buffer.
+// tokenizer already made: base64 bytes are decoded into a new buffer, and a
+// number in a string is tokenized again from a copy and parsed from another.
 func jsonScalarCost(field protoreflect.FieldDescriptor, tok json.Token) int {
-	if str, ok := tok.(string); ok && field.Kind() == protoreflect.BytesKind {
-		return allocSize(len(str) * 3 / 4)
+	str, ok := tok.(string)
+	if !ok {
+		return 0
 	}
-	return 0
+	switch field.Kind() {
+	case protoreflect.BytesKind:
+		return allocSize(len(str) * 3 / 4)
+	case protoreflect.StringKind, protoreflect.BoolKind, protoreflect.EnumKind,
+		protoreflect.MessageKind, protoreflect.GroupKind:
+		return 0
+	}
+	return 2 * tmpCopySize(len(str))
 }
 
 func isKnownValue(field protoreflect.FieldDescriptor) bool {
