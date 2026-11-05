@@ -87,10 +87,7 @@ func extensionValueCost(field protoreflect.FieldDescriptor) int {
 // messageCost is one new message of field's type, which for an extension
 // follows the extension type: dynamicpb's makes dynamicpb messages.
 func messageCost(field protoreflect.FieldDescriptor) int {
-	if field.IsExtension() {
-		if isGeneratedExtension(field) {
-			return protoStructSize(field.Message())
-		}
+	if field.IsExtension() && !isGeneratedExtension(field) {
 		return dynamicMessageCost
 	}
 	return protoStructSize(field.Message())

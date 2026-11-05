@@ -64,11 +64,11 @@ func (w *jsonWalk) wellKnown(md protoreflect.MessageDescriptor, tok json.Token, 
 				// Discarding unknown fields, the decoder reads an Any without
 				// "@type" once looking for it and again to skip it, copying its
 				// strings each time.
-				before := w.strings
+				start := w.dec.InputOffset()
 				if err := w.skip(tok, depth); err != nil {
 					return true, err
 				}
-				return true, w.alloc(w.strings - before)
+				return true, w.alloc(jsonStringsCost(w.data[start:w.dec.InputOffset()]))
 			}
 			// Without a resolvable "@type" the decoder rejects a non-empty Any.
 			if mt, err := protoregistry.GlobalTypes.FindMessageByURL(url); err == nil {
@@ -294,6 +294,23 @@ func (s *jsonScanner) skip() bool {
 
 // jsonUnquote decodes a quoted string from jsonScanner.str, or returns "" if
 // it is malformed. Only strings with escapes allocate.
+// jsonStringsCost is what tokenizing the strings in raw copies.
+func jsonStringsCost(raw []byte) int {
+	cost := 0
+	for s := (jsonScanner{data: raw}); s.i < len(raw); {
+		if raw[s.i] != '"' {
+			s.i++
+			continue
+		}
+		quoted, ok := s.str()
+		if !ok {
+			break
+		}
+		cost += jsonStringCost(quoted, len(jsonUnquote(quoted)))
+	}
+	return cost
+}
+
 func jsonUnquote(quoted []byte) string {
 	if len(quoted) < 2 {
 		return ""

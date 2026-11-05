@@ -92,8 +92,6 @@ type jsonWalk struct {
 	anyEntries int
 	// dynamic prices the message being walked as a dynamicpb message.
 	dynamic bool
-	// strings totals the string copies charged so far.
-	strings int
 }
 
 func (w *jsonWalk) next() (json.Token, error) {
@@ -108,9 +106,7 @@ func (w *jsonWalk) next() (json.Token, error) {
 	cost := jsonTokenCost
 	switch v := tok.(type) {
 	case string:
-		copied := jsonStringCost(w.data[start:w.dec.InputOffset()], len(v))
-		w.strings += copied
-		cost += copied
+		cost += jsonStringCost(w.data[start:w.dec.InputOffset()], len(v))
 	case json.Number:
 		// Token.Float parses from a copy of the literal.
 		cost += tmpCopySize(len(v))
@@ -123,7 +119,7 @@ func (w *jsonWalk) object(desc protoreflect.MessageDescriptor, depth int) error 
 	if depth > w.budget.MaxDepth {
 		return ErrMessageComplexity
 	}
-	extensions, members := 0, 0
+	var set setFields
 	for {
 		tok, err := w.next()
 		if err != nil {
@@ -136,43 +132,54 @@ func (w *jsonWalk) object(desc protoreflect.MessageDescriptor, depth int) error 
 			return err
 		}
 		key, _ := tok.(string)
-		field := desc.Fields().ByJSONName(key)
-		if field == nil {
-			field = desc.Fields().ByTextName(key)
-		}
-		if field == nil {
-			if field, err = jsonExtension(desc, key); err != nil {
-				return err
-			}
-			if field != nil {
-				if err := w.alloc(w.extensionMapCost(extensions)); err != nil {
-					return err
-				}
-				extensions++
-			}
-		}
-		tok, err = w.next()
+		field, err := jsonField(desc, key)
 		if err != nil {
+			return err
+		}
+		if tok, err = w.next(); err != nil {
 			return err
 		}
 		if field == nil {
 			// Unknown fields are discarded or rejected by the decoder.
-			if err := w.skip(tok, depth); err != nil {
-				return err
-			}
-			continue
+			err = w.skip(tok, depth)
+		} else if err = w.alloc(w.setCost(&set, field)); err == nil {
+			err = w.field(field, tok, depth)
 		}
-		if w.dynamic {
-			// Member names are unique, so each sets a new field.
-			if err := w.alloc(mapGrowth(members, knownSlotSize, true)); err != nil {
-				return err
-			}
-			members++
-		}
-		if err := w.field(field, tok, depth); err != nil {
+		if err != nil {
 			return err
 		}
 	}
+}
+
+// setFields counts the fields and extensions an object has set; its member
+// names are unique, so each sets a new one.
+type setFields struct {
+	fields, extensions int
+}
+
+// setCost is the map growth of setting field in an object.
+func (w *jsonWalk) setCost(set *setFields, field protoreflect.FieldDescriptor) int {
+	cost := 0
+	if field.IsExtension() {
+		cost = w.extensionMapCost(set.extensions)
+		set.extensions++
+	}
+	if w.dynamic {
+		cost += mapGrowth(set.fields, knownSlotSize, true)
+		set.fields++
+	}
+	return cost
+}
+
+// jsonField resolves an object key the way protojson does.
+func jsonField(desc protoreflect.MessageDescriptor, key string) (protoreflect.FieldDescriptor, error) {
+	if field := desc.Fields().ByJSONName(key); field != nil {
+		return field, nil
+	}
+	if field := desc.Fields().ByTextName(key); field != nil {
+		return field, nil
+	}
+	return jsonExtension(desc, key)
 }
 
 // jsonExtension resolves a "[full.name]" key the way protojson's default
@@ -284,10 +291,7 @@ func (w *jsonWalk) value(field protoreflect.FieldDescriptor, tok json.Token, dep
 	}
 	cost := jsonScalarCost(field, tok) + w.boxCost(field, tok)
 	if !w.dynamic {
-		cost += fieldAllocCost(field, 0) + presenceCost(field)
-		if field.Message() != nil {
-			cost -= messageCost(field)
-		}
+		cost += fieldExtraCost(field, 0) + presenceCost(field)
 	}
 	if field.IsExtension() {
 		cost += jsonExtensionCost
@@ -303,10 +307,10 @@ func (w *jsonWalk) value(field protoreflect.FieldDescriptor, tok json.Token, dep
 			return w.message(md, tok, depth)
 		}
 		// An extension's message follows its type.
-		dynamic := w.dynamic
-		w.dynamic = !isGeneratedExtension(field)
-		err := w.message(md, tok, depth)
-		w.dynamic = dynamic
+		sub := *w
+		sub.dynamic = !isGeneratedExtension(field)
+		err := sub.message(md, tok, depth)
+		w.anyEntries = sub.anyEntries
 		return err
 	}
 	if _, ok := tok.(json.Delim); ok {
@@ -361,104 +365,6 @@ func (w *jsonWalk) skip(tok json.Token, depth int) error {
 		}
 	}
 	return nil
-}
-
-// jsonScalarCost is what decoding a scalar token allocates beyond the copy the
-// tokenizer already made: base64 bytes are decoded into a new buffer, a number
-// in a string is tokenized again from a copy and parsed from another, and an
-// integer's digits are normalized into a new string.
-func jsonScalarCost(field protoreflect.FieldDescriptor, tok json.Token) int {
-	cost := 0
-	var lit string
-	switch v := tok.(type) {
-	case json.Number:
-		lit = string(v)
-	case string:
-		switch field.Kind() {
-		case protoreflect.BytesKind:
-			return allocSize(len(v) * 3 / 4)
-		case protoreflect.StringKind, protoreflect.BoolKind, protoreflect.EnumKind,
-			protoreflect.MessageKind, protoreflect.GroupKind:
-			return 0
-		}
-		lit, cost = v, 2*tmpCopySize(len(v))
-	default:
-		return 0
-	}
-	switch field.Kind() {
-	case protoreflect.FloatKind, protoreflect.DoubleKind:
-		return cost
-	}
-	return cost + jsonIntCost(lit)
-}
-
-// jsonIntCost is protojson normalizing an integer literal to its digits: the
-// zeros an exponent adds are appended one at a time to a copy of the integer
-// part, and the digits become a new string. Literals it rejects cost nothing.
-func jsonIntCost(lit string) int {
-	neg := strings.HasPrefix(lit, "-")
-	intp, frac, exp, ok := numberParts(strings.TrimPrefix(lit, "-"))
-	if !ok || (intp == "" && frac == "") {
-		return 0
-	}
-	digits := len(intp) + exp
-	if exp < 0 {
-		if frac != "" || digits < 0 {
-			return 0
-		}
-	} else if len(frac) > exp || digits > 20 {
-		return 0
-	}
-	cost := intStringCost(digits, neg)
-	if exp <= 0 {
-		return cost
-	}
-	l, c := len(intp), len(intp)
-	grow := func(add int) {
-		mem, newCap := appendGrow(l, c, add, 1)
-		cost, l, c = cost+mem, l+add, newCap
-	}
-	if frac != "" {
-		grow(len(frac))
-	}
-	for range exp - len(frac) {
-		grow(1)
-	}
-	return cost
-}
-
-// intStringCost is the string normalizeToIntString returns; Go keeps one-byte
-// strings static, and builds a negative one from a stack copy.
-func intStringCost(digits int, neg bool) int {
-	switch {
-	case neg:
-		return allocSize(digits + 1)
-	case digits <= 1:
-		return 0
-	}
-	return allocSize(digits)
-}
-
-// numberParts splits an unsigned JSON number into its integer and fraction
-// digits and its exponent.
-func numberParts(lit string) (intp, frac string, exp int, ok bool) {
-	end := strings.IndexAny(lit, ".eE")
-	if end < 0 {
-		return lit, "", 0, true
-	}
-	intp, lit = lit[:end], lit[end:]
-	if strings.HasPrefix(lit, ".") {
-		end = strings.IndexAny(lit, "eE")
-		if end < 0 {
-			end = len(lit)
-		}
-		frac, lit = lit[1:end], lit[end:]
-	}
-	if lit == "" {
-		return intp, frac, 0, true
-	}
-	exp, err := strconv.Atoi(strings.TrimPrefix(lit[1:], "+"))
-	return intp, frac, exp, err == nil
 }
 
 // boxCost is a dynamicpb message boxing a value it stores. Go boxes a value

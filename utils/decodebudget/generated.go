@@ -64,9 +64,19 @@ func presenceCost(field protoreflect.FieldDescriptor) int {
 // fieldAllocCost is the allocation for one occurrence of field with a string or
 // bytes payload of payloadLen. Nested message contents are charged separately.
 func fieldAllocCost(field protoreflect.FieldDescriptor, payloadLen int) int {
+	return fieldCost(field, payloadLen, true)
+}
+
+// fieldExtraCost is fieldAllocCost without the field's own message, which the
+// protojson walk charges as it walks it.
+func fieldExtraCost(field protoreflect.FieldDescriptor, payloadLen int) int {
+	return fieldCost(field, payloadLen, false)
+}
+
+func fieldCost(field protoreflect.FieldDescriptor, payloadLen int, withMessage bool) int {
 	cost := 0
 	// A map value message is charged with its entry.
-	if field.Message() != nil && !field.IsMap() && !field.ContainingMessage().IsMapEntry() {
+	if withMessage && field.Message() != nil && !field.IsMap() && !field.ContainingMessage().IsMapEntry() {
 		cost += messageCost(field)
 	}
 	if k := field.Kind(); k == protoreflect.StringKind || k == protoreflect.BytesKind {
