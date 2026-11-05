@@ -22,15 +22,38 @@ import (
 	"google.golang.org/protobuf/reflect/protoregistry"
 )
 
-// wireWalk walks the protobuf binary encoding.
+// wireWalk walks the protobuf binary encoding, pricing each occurrence with
+// the model of the decoder that will write it.
 type wireWalk struct {
 	*tally
+	model decoderModel
+}
+
+// decoderModel prices what one protobuf-go decoder allocates for each event of
+// the wire walk, reading and updating the mirrored decoder state.
+type decoderModel interface {
+	root(desc protoreflect.MessageDescriptor) int
+	// message is the allocation for one occurrence of a message field, and the
+	// state its contents decode into.
+	message(m *messageState, field protoreflect.FieldDescriptor) (int, *messageState)
+	// occurrence is the allocation for one occurrence of field with a string or
+	// bytes payload of payloadLen.
+	occurrence(m *messageState, field protoreflect.FieldDescriptor, payloadLen int) int
+	packed(m *messageState, field protoreflect.FieldDescriptor, count int) int
+	// mismatch is what the decoder allocates for a known field before it
+	// rejects an unexpected wire type.
+	mismatch(m *messageState, field protoreflect.FieldDescriptor) int
+}
+
+func newDecoderModel(p *Profile) decoderModel {
+	if p.DynamicMessages {
+		return dynamicModel{p}
+	}
+	return generatedModel{p}
 }
 
 // messageState mirrors the decoder state of one message whose cost depends on
-// earlier occurrences: each repeated field's slice, each map's entry count,
-// whether a presence field's pointer exists, which member of each oneof is set,
-// and the unknown-fields slice.
+// earlier occurrences.
 type messageState struct {
 	fields     []fieldState
 	oneofs     []oneofState
@@ -40,10 +63,14 @@ type messageState struct {
 
 type fieldState struct {
 	field protoreflect.FieldDescriptor
-	len   int
-	cap   int
-	// hasMap is set once a map field's header has been charged.
-	hasMap bool
+	// len and cap mirror a repeated field's slice.
+	len, cap int
+	// entries counts a map field's insertions, and allocated records that the
+	// map itself exists.
+	entries   int
+	allocated bool
+	// present records that a presence field's pointer exists.
+	present bool
 	// child is the state of a singular message field. The decoder merges each
 	// later occurrence into the same message, so its slices keep growing.
 	child *messageState
@@ -62,6 +89,43 @@ func (m *messageState) get(field protoreflect.FieldDescriptor) *fieldState {
 	}
 	m.fields = append(m.fields, fieldState{field: field})
 	return &m.fields[len(m.fields)-1]
+}
+
+// setOneof records field as its oneof's set member. Switching members discards
+// the previous member's value, so a later return to field starts over.
+func (m *messageState) setOneof(field protoreflect.FieldDescriptor, fs *fieldState) {
+	oneof := field.ContainingOneof()
+	if oneof == nil || oneof.IsSynthetic() {
+		return
+	}
+	for i := range m.oneofs {
+		if m.oneofs[i].oneof == oneof {
+			if m.oneofs[i].field != field {
+				*fs = fieldState{field: field}
+				m.oneofs[i].field = field
+			}
+			return
+		}
+	}
+	m.oneofs = append(m.oneofs, oneofState{oneof: oneof, field: field})
+}
+
+func (m *messageState) isSet(oneof protoreflect.OneofDescriptor, field protoreflect.FieldDescriptor) bool {
+	for _, o := range m.oneofs {
+		if o.oneof == oneof && o.field == field {
+			return true
+		}
+	}
+	return false
+}
+
+// unknown is the allocation for retaining an n-byte field in the message's
+// unknown-fields slice.
+func (m *messageState) unknown(n int) int {
+	mem, newCap := appendGrow(m.unknownLen, m.unknownCap, n, 1)
+	m.unknownLen += n
+	m.unknownCap = newCap
+	return mem
 }
 
 // message walks the fields of one message into state, which persists across
@@ -107,11 +171,8 @@ func (w *wireWalk) message(data []byte, desc protoreflect.MessageDescriptor, dep
 		// The decoder keeps a field with an unexpected wire type as unknown.
 		if field == nil || !wireTypeMatches(field, kind) {
 			cost := state.unknown(n + size)
-			switch {
-			case w.profile.DynamicMessages:
-				cost += state.dynamicMismatch(w.profile, field)
-			case field != nil:
-				cost += state.mismatch(field)
+			if field != nil {
+				cost += w.model.mismatch(state, field)
 			}
 			if err := w.alloc(cost); err != nil {
 				return err
@@ -121,14 +182,14 @@ func (w *wireWalk) message(data []byte, desc protoreflect.MessageDescriptor, dep
 		var err error
 		switch {
 		case kind == protowire.BytesType && field.Message() != nil:
-			cost, child := state.messageOccurrence(w.profile, field)
+			cost, child := w.model.message(state, field)
 			if err = w.alloc(cost); err == nil {
 				err = w.message(value, field.Message(), depth+1, child)
 			}
 		case kind == protowire.BytesType && isPackable(field):
 			err = w.packed(value, field, state)
 		default:
-			err = w.alloc(state.occurrence(w.profile, field, len(value)))
+			err = w.alloc(w.model.occurrence(state, field, len(value)))
 		}
 		if err != nil {
 			return err
@@ -137,113 +198,8 @@ func (w *wireWalk) message(data []byte, desc protoreflect.MessageDescriptor, dep
 	return nil
 }
 
-// messageOccurrence is the allocation for one occurrence of a message field,
-// and the state its contents decode into.
-func (m *messageState) messageOccurrence(p *Profile, field protoreflect.FieldDescriptor) (int, *messageState) {
-	if p.DynamicMessages {
-		return m.dynamicMessageOccurrence(p, field)
-	}
-	if field.IsList() || field.IsMap() {
-		// Every element or map value is a new message.
-		return m.occurrence(p, field, 0), &messageState{}
-	}
-	fs := m.get(field)
-	m.setOneof(field, fs)
-	if fs.child != nil {
-		return 0, fs.child
-	}
-	fs.child = &messageState{}
-	return p.fieldAllocCost(field, 0), fs.child
-}
-
-// setOneof records field as its oneof's set member. Switching members discards
-// the previous member's value, so a later return to field starts over.
-func (m *messageState) setOneof(field protoreflect.FieldDescriptor, fs *fieldState) {
-	oneof := field.ContainingOneof()
-	if oneof == nil || oneof.IsSynthetic() {
-		return
-	}
-	for i := range m.oneofs {
-		if m.oneofs[i].oneof == oneof {
-			if m.oneofs[i].field != field {
-				*fs = fieldState{field: field}
-				m.oneofs[i].field = field
-			}
-			return
-		}
-	}
-	m.oneofs = append(m.oneofs, oneofState{oneof: oneof, field: field})
-}
-
-// occurrence is the allocation for one occurrence of field with a string or
-// bytes payload of payloadLen. Nested message contents are charged separately.
-func (m *messageState) occurrence(p *Profile, field protoreflect.FieldDescriptor, payloadLen int) int {
-	if p.DynamicMessages {
-		return m.dynamicOccurrence(p, field, payloadLen)
-	}
-	cost := p.fieldAllocCost(field, payloadLen)
-	switch {
-	case field.IsList():
-		fs := m.get(field)
-		var mem int
-		mem, fs.cap = appendGrow(fs.len, fs.cap, 1, goValueSize(field))
-		fs.len++
-		cost += mem
-	case field.IsMap():
-		// Every entry is taken as a new key; duplicates are over-charged.
-		fs := m.get(field)
-		if !fs.hasMap {
-			fs.hasMap = true
-			cost += allocSize(mapHeaderSize)
-		}
-		cost += mapInsertCost(field, fs.len)
-		fs.len++
-	case presenceCost(field) > 0:
-		if fs := m.get(field); fs.len == 0 {
-			fs.len = 1
-			cost += presenceCost(field)
-		}
-	case field.ContainingOneof() != nil:
-		m.setOneof(field, m.get(field))
-	}
-	return cost
-}
-
-// unknown is the allocation for retaining an n-byte field in the message's
-// unknown-fields slice.
-func (m *messageState) unknown(n int) int {
-	mem, newCap := appendGrow(m.unknownLen, m.unknownCap, n, 1)
-	m.unknownLen += n
-	m.unknownCap = newCap
-	return mem
-}
-
-// mismatch is what the decoder allocates for a known field before it rejects
-// the wire type: a nil map field's map, and the wrapper of a oneof member other
-// than the set one, which it then drops without changing the oneof.
-func (m *messageState) mismatch(field protoreflect.FieldDescriptor) int {
-	if field.IsMap() {
-		if fs := m.get(field); !fs.hasMap {
-			fs.hasMap = true
-			return allocSize(mapHeaderSize)
-		}
-		return 0
-	}
-	oneof := field.ContainingOneof()
-	if oneof == nil || oneof.IsSynthetic() {
-		return 0
-	}
-	for _, o := range m.oneofs {
-		if o.oneof == oneof && o.field == field {
-			return 0
-		}
-	}
-	return oneofWrapperCost(field)
-}
-
 // packed walks a packed scalar run; decoders accept one even when the schema
-// prefers unpacked. Each run reallocates the field's slice at exactly its new
-// length, so many small runs cost quadratically.
+// prefers unpacked.
 func (w *wireWalk) packed(value []byte, field protoreflect.FieldDescriptor, state *messageState) error {
 	count := 0
 	for len(value) > 0 {
@@ -265,16 +221,7 @@ func (w *wireWalk) packed(value []byte, field protoreflect.FieldDescriptor, stat
 		count++
 		value = value[consumed:]
 	}
-	if w.profile.DynamicMessages {
-		return w.alloc(state.dynamicPacked(w.profile, field, count))
-	}
-	if count == 0 {
-		return nil
-	}
-	fs := state.get(field)
-	fs.len += count
-	fs.cap = fs.len
-	return w.alloc(allocSize(fs.len * goValueSize(field)))
+	return w.alloc(w.model.packed(state, field, count))
 }
 
 func wireTypeMatches(field protoreflect.FieldDescriptor, kind protowire.Type) bool {

@@ -54,69 +54,6 @@ func (b Proto) forDestination(msg protoreflect.Message) Proto {
 	return b
 }
 
-func (p *Profile) rootSize(desc protoreflect.MessageDescriptor) int {
-	if p.DynamicMessages {
-		return dynamicMessageCost + dynamicResetCost
-	}
-	return protoStructSize(desc)
-}
-
-// swissMapGrowth is the allocation for inserting a map's nth entry, following
-// internal/runtime/maps: one group of 8 slots, then a 16-slot table doubling
-// at 7/8 load up to 1024 slots, then full tables splitting in two.
-func swissMapGrowth(n, slot int) int {
-	const groupSlots, maxCapacity, tableSize = 8, 1024, 32
-	group := groupSlots + groupSlots*slot
-	table := func(capacity int) int {
-		size, _ := pointerAlloc(capacity / groupSlots * group)
-		return size + tableSize
-	}
-	const full = maxCapacity * 7 / 8
-	switch {
-	case n == 1:
-		size, _ := pointerAlloc(group)
-		return size
-	case n <= groupSlots:
-		return 0
-	case n == groupSlots+1:
-		return table(2*groupSlots) + 8 // and a one-table directory
-	case n <= full:
-		for capacity := 2 * groupSlots; capacity < maxCapacity; capacity *= 2 {
-			if n == capacity*7/8+1 {
-				return table(2 * capacity)
-			}
-		}
-		return 0
-	}
-	// Seeded hashes keep tables evenly filled, so the 2^k tables split
-	// together as each nears full; charge every such wave at 7/8 of that, with
-	// 64 bytes per split for the directory.
-	for tables := 1; ; tables *= 2 {
-		at := full + 1
-		if tables > 1 {
-			at = tables*full*7/8 + 1
-		}
-		switch {
-		case n == at:
-			return tables * (2*table(maxCapacity) + 64)
-		case n < at:
-			return 0
-		}
-	}
-}
-
-// pointerAlloc is allocSize for an object holding pointers, which carries an
-// 8-byte malloc header between 512 bytes and 32 KiB, and the usable size.
-func pointerAlloc(n int) (size, usable int) {
-	const minHeader, maxSmall, header = 512, 32768, 8
-	if n > minHeader && n <= maxSmall-header {
-		size = allocSize(n + header)
-		return size, size - header
-	}
-	size = allocSize(n)
-	return size, size
-}
-
 // dynamicBoxCost is the allocation for boxing one value of field into an
 // interface, which dynamicpb does to type-check every value it stores.
 func dynamicBoxCost(field protoreflect.FieldDescriptor, payloadLen int) int {
@@ -146,24 +83,34 @@ func appendValues(l, c, add int) (mem, newCap int) {
 	return mem, c
 }
 
-// dynamicField is the known-map growth for the first occurrence of field in a
+// dynamicModel prices protobuf-go's reflective decoder writing into dynamicpb
+// messages.
+type dynamicModel struct {
+	p *Profile
+}
+
+func (d dynamicModel) root(protoreflect.MessageDescriptor) int {
+	return dynamicMessageCost + dynamicResetCost
+}
+
+// field is the known-map growth for the first occurrence of field in a
 // dynamic message, plus the list, map or extension value Mutable creates then.
-func (m *messageState) dynamicField(p *Profile, field protoreflect.FieldDescriptor) (*fieldState, int) {
+func (d dynamicModel) field(m *messageState, field protoreflect.FieldDescriptor) (*fieldState, int) {
 	n := len(m.fields)
 	fs := m.get(field)
 	if len(m.fields) == n || field.ContainingMessage().IsMapEntry() {
 		return fs, 0
 	}
-	cost := swissMapGrowth(len(m.fields), knownSlotSize)
+	cost := mapGrowth(n, knownSlotSize, true)
 	switch {
 	case field.IsExtension():
 		extensions := 0
-		for i := range m.fields {
+		for i := range m.fields[:n] {
 			if m.fields[i].field.IsExtension() {
 				extensions++
 			}
 		}
-		cost += swissMapGrowth(extensions, extSlotSize) + p.ExtensionCost
+		cost += mapGrowth(extensions, extSlotSize, true) + d.p.ExtensionCost
 		if md := field.Message(); md != nil && !field.IsList() {
 			// Extension types are generated, so their messages are too.
 			cost += max(dynamicMessageCost, protoStructSize(md))
@@ -176,11 +123,11 @@ func (m *messageState) dynamicField(p *Profile, field protoreflect.FieldDescript
 	return fs, cost
 }
 
-func (m *messageState) dynamicMessageOccurrence(p *Profile, field protoreflect.FieldDescriptor) (int, *messageState) {
+func (d dynamicModel) message(m *messageState, field protoreflect.FieldDescriptor) (int, *messageState) {
 	if field.IsList() || field.IsMap() {
-		return m.dynamicOccurrence(p, field, 0), &messageState{}
+		return d.occurrence(m, field, 0), &messageState{}
 	}
-	fs, cost := m.dynamicField(p, field)
+	fs, cost := d.field(m, field)
 	m.setOneof(field, fs)
 	if fs.child == nil {
 		fs.child = &messageState{}
@@ -192,15 +139,15 @@ func (m *messageState) dynamicMessageOccurrence(p *Profile, field protoreflect.F
 	return cost, fs.child
 }
 
-func (m *messageState) dynamicOccurrence(p *Profile, field protoreflect.FieldDescriptor, payloadLen int) int {
-	fs, cost := m.dynamicField(p, field)
+func (d dynamicModel) occurrence(m *messageState, field protoreflect.FieldDescriptor, payloadLen int) int {
+	fs, cost := d.field(m, field)
 	if k := field.Kind(); k == protoreflect.StringKind || k == protoreflect.BytesKind {
 		cost += allocSize(payloadLen)
 	}
 	switch {
 	case field.IsMap():
-		fs.len++
-		cost += swissMapGrowth(fs.len, mapEntrySlotSize)
+		cost += mapGrowth(fs.entries, mapEntrySlotSize, true)
+		fs.entries++
 		if field.MapValue().Message() != nil {
 			cost += dynamicMessageCost
 		}
@@ -223,20 +170,20 @@ func (m *messageState) dynamicOccurrence(p *Profile, field protoreflect.FieldDes
 	return cost
 }
 
-func (m *messageState) dynamicPacked(p *Profile, field protoreflect.FieldDescriptor, count int) int {
-	fs, cost := m.dynamicField(p, field)
+func (d dynamicModel) packed(m *messageState, field protoreflect.FieldDescriptor, count int) int {
+	fs, cost := d.field(m, field)
 	mem, newCap := appendValues(fs.len, fs.cap, count)
 	fs.len += count
 	fs.cap = newCap
 	return cost + mem + count*dynamicBoxCost(field, 0)
 }
 
-// dynamicMismatch is what a field with an unexpected wire type allocates: the
+// mismatch is what a field with an unexpected wire type allocates: the
 // reflective decoder creates a list or map before checking the wire type.
-func (m *messageState) dynamicMismatch(p *Profile, field protoreflect.FieldDescriptor) int {
-	if !p.DynamicMessages || field == nil || !(field.IsList() || field.IsMap()) {
+func (d dynamicModel) mismatch(m *messageState, field protoreflect.FieldDescriptor) int {
+	if !field.IsList() && !field.IsMap() {
 		return 0
 	}
-	_, cost := m.dynamicField(p, field)
+	_, cost := d.field(m, field)
 	return cost
 }

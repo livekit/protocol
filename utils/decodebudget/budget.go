@@ -62,10 +62,11 @@ func (b Proto) Estimate(data []byte, desc protoreflect.MessageDescriptor) (int, 
 	if err != nil {
 		return 0, err
 	}
-	if err := t.alloc(t.profile.rootSize(desc)); err != nil {
+	w := &wireWalk{tally: t, model: newDecoderModel(t.profile)}
+	if err := w.alloc(w.model.root(desc)); err != nil {
 		return t.total(), err
 	}
-	err = (&wireWalk{t}).message(data, desc, 1, &messageState{})
+	err = w.message(data, desc, 1, &messageState{})
 	return t.total(), err
 }
 

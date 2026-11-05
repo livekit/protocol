@@ -15,18 +15,12 @@
 package decodebudget
 
 import (
-	"reflect"
 	"slices"
-	"sync"
-
-	"google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/reflect/protoregistry"
-	"google.golang.org/protobuf/types/dynamicpb"
 )
 
 // The cost model overestimates on purpose: a budget that admits a payload must
-// not let its decode allocate more than the estimate. Its tunable constants
-// live in Profile.
+// not let its decode allocate more than the estimate. This file models the Go
+// allocator; generated.go and dynamic.go model what each decoder asks it for.
 
 // Go runtime size classes; an allocation is rounded up to the next one.
 var goSizeClasses = []int{
@@ -46,6 +40,18 @@ func allocSize(n int) int {
 	}
 	const page = 8192
 	return (n + page - 1) / page * page
+}
+
+// pointerAlloc is allocSize for an object holding pointers, which carries an
+// 8-byte malloc header between 512 bytes and 32 KiB, and the usable size.
+func pointerAlloc(n int) (size, usable int) {
+	const minHeader, maxSmall, header = 512, 32768, 8
+	if n > minHeader && n <= maxSmall-header {
+		size = allocSize(n + header)
+		return size, size - header
+	}
+	size = allocSize(n)
+	return size, size
 }
 
 // tmpCopySize is the allocation for a temporary copy of n bytes; one that does
@@ -100,44 +106,6 @@ func appendAllocBytes(n, elem int) int {
 	return total
 }
 
-var protoStructSizes sync.Map // protoreflect.FullName -> int
-
-// protoStructSize is the allocation for one message of desc's generated Go type.
-func protoStructSize(desc protoreflect.MessageDescriptor) int {
-	if v, ok := protoStructSizes.Load(desc.FullName()); ok {
-		return v.(int)
-	}
-	// A dynamicpb message keeps its fields in a map.
-	size := 64 + 32*desc.Fields().Len()
-	if mt, err := protoregistry.GlobalTypes.FindMessageByName(desc.FullName()); err == nil {
-		if t := reflect.TypeOf(mt.Zero().Interface()); t != reflect.TypeFor[*dynamicpb.Message]() && t.Kind() == reflect.Pointer && t.Elem().Kind() == reflect.Struct {
-			size = int(t.Elem().Size())
-		}
-	}
-	size = allocSize(size)
-	protoStructSizes.Store(desc.FullName(), size)
-	return size
-}
-
-// goValueSize is the size of one value of field's kind as a slice element, map
-// slot or oneof wrapper field.
-func goValueSize(field protoreflect.FieldDescriptor) int {
-	switch field.Kind() {
-	case protoreflect.BoolKind:
-		return 1
-	case protoreflect.EnumKind, protoreflect.Int32Kind, protoreflect.Sint32Kind, protoreflect.Uint32Kind,
-		protoreflect.FloatKind, protoreflect.Fixed32Kind, protoreflect.Sfixed32Kind:
-		return 4
-	case protoreflect.StringKind:
-		return 16
-	case protoreflect.BytesKind:
-		return 24
-	default:
-		// 64-bit scalars and message pointers.
-		return 8
-	}
-}
-
 // Go's map layout (internal/runtime/maps): a header, then one group of 8
 // slots, then a table that doubles at 7/8 load up to 1024 slots, after which
 // each full table splits into two new ones.
@@ -148,26 +116,23 @@ const (
 	mapMaxTableSlots = 1024
 )
 
-// mapBoxCost is the allocation for passing one map key or value of field's
-// kind through reflect: a scalar is boxed by Interface and again by Convert.
-func mapBoxCost(field protoreflect.FieldDescriptor) int {
-	if field.Message() != nil {
-		return 0
+// mapGrowth is the allocation for inserting a new key into a map holding n
+// entries, excluding the header, for slots of slot bytes.
+func mapGrowth(n, slot int, pointers bool) int {
+	group := mapGroupSlots + mapGroupSlots*slot
+	alloc := func(n int) int {
+		if !pointers {
+			return allocSize(n)
+		}
+		size, _ := pointerAlloc(n)
+		return size
 	}
-	return 2 * allocSize(goValueSize(field))
-}
-
-// mapInsertCost is the allocation for inserting a new key into a map of
-// field's type that holds n entries, excluding the map header.
-func mapInsertCost(field protoreflect.FieldDescriptor, n int) int {
-	slot := (goValueSize(field.MapKey()) + goValueSize(field.MapValue()) + 7) &^ 7
-	group := 8 + mapGroupSlots*slot
 	table := func(slots int) int {
-		return allocSize(mapTableSize) + allocSize(slots/mapGroupSlots*group)
+		return allocSize(mapTableSize) + alloc(slots/mapGroupSlots*group)
 	}
 	switch {
 	case n == 0:
-		return allocSize(group)
+		return alloc(group)
 	case n < mapGroupSlots:
 		return 0
 	case n == mapGroupSlots:
@@ -204,54 +169,4 @@ func mapSplitCost(n, table int) int {
 	round := 2*t*table + allocSize(2*t*8)
 	span := full - begin + 1
 	return round*(n-begin+1)/span - round*(n-begin)/span
-}
-
-func oneofWrapperCost(field protoreflect.FieldDescriptor) int {
-	switch field.Kind() {
-	case protoreflect.StringKind, protoreflect.BytesKind, protoreflect.MessageKind, protoreflect.GroupKind:
-		return allocSize(goValueSize(field))
-	default:
-		return allocSize(goValueSize(field))
-	}
-}
-
-// presenceCost is the pointer a generated struct allocates the first time a
-// scalar field with explicit presence, such as proto3 optional, is set.
-func presenceCost(field protoreflect.FieldDescriptor) int {
-	if !field.HasPresence() || field.IsList() || field.Message() != nil || field.IsExtension() ||
-		(field.ContainingOneof() != nil && !field.ContainingOneof().IsSynthetic()) ||
-		field.ContainingMessage().IsMapEntry() {
-		return 0
-	}
-	return allocSize(goValueSize(field))
-}
-
-// fieldAllocCost is the allocation for one occurrence of field with a string or
-// bytes payload of payloadLen. Nested message contents are charged separately.
-func (p *Profile) fieldAllocCost(field protoreflect.FieldDescriptor, payloadLen int) int {
-	cost := 0
-	// A map value message is charged with its entry.
-	if field.Message() != nil && !field.IsMap() && !field.ContainingMessage().IsMapEntry() {
-		cost += protoStructSize(field.Message())
-	}
-	if k := field.Kind(); k == protoreflect.StringKind || k == protoreflect.BytesKind {
-		cost += allocSize(payloadLen)
-	}
-	switch {
-	case field.IsMap():
-		// The decoder allocates a message value before reading the entry,
-		// whether or not the entry has one. Map growth depends on earlier
-		// entries; the caller charges it.
-		cost += mapBoxCost(field.MapKey()) + mapBoxCost(field.MapValue())
-		if value := field.MapValue().Message(); value != nil {
-			cost += protoStructSize(value)
-		}
-	case field.IsList():
-		// Slice growth depends on earlier occurrences; the caller charges it.
-	case field.IsExtension():
-		cost += p.ExtensionCost
-	case field.ContainingOneof() != nil && !field.ContainingOneof().IsSynthetic():
-		cost += oneofWrapperCost(field)
-	}
-	return cost
 }
