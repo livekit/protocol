@@ -168,6 +168,29 @@ func TestGrants(t *testing.T) {
 	})
 }
 
+func TestVideoGrantPermissionLeavesAgent(t *testing.T) {
+	t.Run("permission agent does not set the grant", func(t *testing.T) {
+		v := &VideoGrant{RoomJoin: true, RoomAdmin: true, Room: "room"}
+		perm := v.ToPermission()
+		perm.Agent = true
+		require.True(t, v.MatchesPermission(perm))
+		v.UpdateFromPermission(perm)
+		require.False(t, v.Agent)
+	})
+
+	t.Run("permission without agent keeps the grant", func(t *testing.T) {
+		v := &VideoGrant{RoomJoin: true, Room: "room", Agent: true}
+		perm := v.ToPermission()
+		require.True(t, perm.Agent)
+		perm.Agent = false
+		perm.CanPublish = false
+		require.False(t, v.MatchesPermission(perm))
+		v.UpdateFromPermission(perm)
+		require.True(t, v.Agent)
+		require.False(t, v.GetCanPublish())
+	})
+}
+
 func TestParticipantKind(t *testing.T) {
 	const kindMin, kindMax = livekit.ParticipantInfo_STANDARD, livekit.ParticipantInfo_AGENT
 	for k := kindMin; k <= kindMax; k++ {
@@ -350,6 +373,36 @@ func TestRoomConfiguration_CheckCredentials(t *testing.T) {
 							},
 						},
 					},
+				},
+			},
+		}
+		require.NoError(t, config.CheckCredentials())
+	})
+
+	t.Run("every output type with credentials fails", func(t *testing.T) {
+		s3 := &livekit.S3Upload{AccessKey: "access", Secret: "secret", Bucket: "bucket"}
+		file := &livekit.EncodedFileOutput{Output: &livekit.EncodedFileOutput_S3{S3: s3}}
+		for name, room := range map[string]*livekit.RoomCompositeEgressRequest{
+			"image s3":       {ImageOutputs: []*livekit.ImageOutput{{Output: &livekit.ImageOutput_S3{S3: s3}}}},
+			"image gcp":      {ImageOutputs: []*livekit.ImageOutput{{Output: &livekit.ImageOutput_Gcp{Gcp: &livekit.GCPUpload{Credentials: "creds"}}}}},
+			"image azure":    {ImageOutputs: []*livekit.ImageOutput{{Output: &livekit.ImageOutput_Azure{Azure: &livekit.AzureBlobUpload{AccountKey: "key"}}}}},
+			"image alioss":   {ImageOutputs: []*livekit.ImageOutput{{Output: &livekit.ImageOutput_AliOSS{AliOSS: &livekit.AliOSSUpload{Secret: "secret"}}}}},
+			"single file":    {Output: &livekit.RoomCompositeEgressRequest_File{File: file}},
+			"single segment": {Output: &livekit.RoomCompositeEgressRequest_Segments{Segments: &livekit.SegmentedFileOutput{Output: &livekit.SegmentedFileOutput_S3{S3: s3}}}},
+			"single stream":  {Output: &livekit.RoomCompositeEgressRequest_Stream{Stream: &livekit.StreamOutput{Urls: []string{"rtmp://host/app/key"}}}},
+			"s3 proxy":       {FileOutputs: []*livekit.EncodedFileOutput{{Output: &livekit.EncodedFileOutput_S3{S3: &livekit.S3Upload{Bucket: "bucket", Proxy: &livekit.ProxyConfig{Password: "pw"}}}}}},
+			"gcp proxy":      {FileOutputs: []*livekit.EncodedFileOutput{{Output: &livekit.EncodedFileOutput_Gcp{Gcp: &livekit.GCPUpload{Bucket: "bucket", Proxy: &livekit.ProxyConfig{Password: "pw"}}}}}},
+		} {
+			config := &RoomConfiguration{Egress: &livekit.RoomEgress{Room: room}}
+			require.ErrorIs(t, config.CheckCredentials(), ErrSensitiveCredentials, name)
+		}
+	})
+
+	t.Run("nil uploads pass", func(t *testing.T) {
+		config := &RoomConfiguration{
+			Egress: &livekit.RoomEgress{
+				Room: &livekit.RoomCompositeEgressRequest{
+					FileOutputs: []*livekit.EncodedFileOutput{nil, {Output: &livekit.EncodedFileOutput_S3{}}},
 				},
 			},
 		}

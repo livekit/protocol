@@ -61,99 +61,69 @@ func (c *RoomConfiguration) CheckCredentials() error {
 
 	if c.Egress.Participant != nil {
 		for _, output := range c.Egress.Participant.FileOutputs {
-			if err := checkOutputForCredentials(output.Output); err != nil {
+			if err := checkUploadForCredentials(output); err != nil {
 				return err
 			}
 		}
 		for _, output := range c.Egress.Participant.SegmentOutputs {
-			if err := checkOutputForCredentials(output.Output); err != nil {
+			if err := checkUploadForCredentials(output); err != nil {
 				return err
 			}
 		}
 	}
 	if c.Egress.Room != nil {
 		for _, output := range c.Egress.Room.FileOutputs {
-			if err := checkOutputForCredentials(output.Output); err != nil {
+			if err := checkUploadForCredentials(output); err != nil {
 				return err
 			}
 		}
 		for _, output := range c.Egress.Room.SegmentOutputs {
-			if err := checkOutputForCredentials(output.Output); err != nil {
+			if err := checkUploadForCredentials(output); err != nil {
 				return err
 			}
 		}
 		for _, output := range c.Egress.Room.ImageOutputs {
-			if err := checkOutputForCredentials(output.Output); err != nil {
+			if err := checkUploadForCredentials(output); err != nil {
 				return err
 			}
 		}
-		if len(c.Egress.Room.StreamOutputs) > 0 {
+		// deprecated single outputs are still honoured by egress
+		if err := checkUploadForCredentials(c.Egress.Room.GetFile()); err != nil {
+			return err
+		}
+		if err := checkUploadForCredentials(c.Egress.Room.GetSegments()); err != nil {
+			return err
+		}
+		if len(c.Egress.Room.StreamOutputs) > 0 || c.Egress.Room.GetStream() != nil {
 			// do not leak stream key
 			return ErrSensitiveCredentials
 		}
 	}
 	if c.Egress.Tracks != nil {
-		if err := checkOutputForCredentials(c.Egress.Tracks.Output); err != nil {
+		if err := checkUploadForCredentials(c.Egress.Tracks); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func checkOutputForCredentials(output any) error {
-	if output == nil {
-		return nil
-	}
+// uploadOutput is implemented by every egress output message that carries an upload.
+type uploadOutput interface {
+	GetS3() *livekit.S3Upload
+	GetGcp() *livekit.GCPUpload
+	GetAzure() *livekit.AzureBlobUpload
+	GetAliOSS() *livekit.AliOSSUpload
+}
 
-	switch msg := output.(type) {
-	case *livekit.EncodedFileOutput_S3:
-		if msg.S3.Secret != "" {
-			return ErrSensitiveCredentials
-		}
-	case *livekit.SegmentedFileOutput_S3:
-		if msg.S3.Secret != "" {
-			return ErrSensitiveCredentials
-		}
-	case *livekit.AutoTrackEgress_S3:
-		if msg.S3.Secret != "" {
-			return ErrSensitiveCredentials
-		}
-	case *livekit.EncodedFileOutput_Gcp:
-		if msg.Gcp.Credentials != "" {
-			return ErrSensitiveCredentials
-		}
-	case *livekit.SegmentedFileOutput_Gcp:
-		if msg.Gcp.Credentials != "" {
-			return ErrSensitiveCredentials
-		}
-	case *livekit.AutoTrackEgress_Gcp:
-		if msg.Gcp.Credentials != "" {
-			return ErrSensitiveCredentials
-		}
-	case *livekit.EncodedFileOutput_Azure:
-		if msg.Azure.AccountKey != "" {
-			return ErrSensitiveCredentials
-		}
-	case *livekit.SegmentedFileOutput_Azure:
-		if msg.Azure.AccountKey != "" {
-			return ErrSensitiveCredentials
-		}
-	case *livekit.AutoTrackEgress_Azure:
-		if msg.Azure.AccountKey != "" {
-			return ErrSensitiveCredentials
-		}
-	case *livekit.EncodedFileOutput_AliOSS:
-		if msg.AliOSS.Secret != "" {
-			return ErrSensitiveCredentials
-		}
-	case *livekit.SegmentedFileOutput_AliOSS:
-		if msg.AliOSS.Secret != "" {
-			return ErrSensitiveCredentials
-		}
-	case *livekit.AutoTrackEgress_AliOSS:
-		if msg.AliOSS.Secret != "" {
-			return ErrSensitiveCredentials
-		}
+func checkUploadForCredentials(output uploadOutput) error {
+	if s3 := output.GetS3(); s3.GetSecret() != "" || s3.GetProxy().GetPassword() != "" {
+		return ErrSensitiveCredentials
+	}
+	if gcp := output.GetGcp(); gcp.GetCredentials() != "" || gcp.GetProxy().GetPassword() != "" {
+		return ErrSensitiveCredentials
+	}
+	if output.GetAzure().GetAccountKey() != "" || output.GetAliOSS().GetSecret() != "" {
+		return ErrSensitiveCredentials
 	}
 	return nil
 }
@@ -418,9 +388,6 @@ func (v *VideoGrant) MatchesPermission(permission *livekit.ParticipantPermission
 	if v.Recorder != permission.Recorder {
 		return false
 	}
-	if v.Agent != permission.Agent {
-		return false
-	}
 	if !slices.Equal(v.GetCanPublishSources(), permission.CanPublishSources) {
 		return false
 	}
@@ -446,7 +413,7 @@ func (v *VideoGrant) UpdateFromPermission(permission *livekit.ParticipantPermiss
 	v.SetCanUpdateOwnMetadata(permission.CanUpdateMetadata)
 	v.Hidden = permission.Hidden
 	v.Recorder = permission.Recorder
-	v.Agent = permission.Agent
+	// Agent is not copied: it allows agent worker registration for any room, so only the token issuer sets it
 	v.SetCanSubscribeMetrics(permission.CanSubscribeMetrics)
 	v.SetCanManageAgentSession(permission.CanManageAgentSession)
 }
