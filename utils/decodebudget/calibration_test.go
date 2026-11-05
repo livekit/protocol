@@ -28,6 +28,7 @@ import (
 	"google.golang.org/protobuf/types/descriptorpb"
 	"google.golang.org/protobuf/types/dynamicpb"
 	"google.golang.org/protobuf/types/known/structpb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/livekit/agent"
@@ -372,6 +373,16 @@ func repeatedExtensionOptions(number protowire.Number, n, run int, value uint64)
 	return b
 }
 
+// jsonScalarExtensions is FieldOptions setting n distinct int64 extensions.
+func jsonScalarExtensions(n int) []byte {
+	scalarExtensions()
+	members := make([]string, n)
+	for i := range members {
+		members[i] = fmt.Sprintf(`"[decodebudget.test.scalar_%d]":"1099511627776"`, i)
+	}
+	return []byte("{" + strings.Join(members, ",") + "}")
+}
+
 // repeatedField is n zero-valued occurrences of number with wire type typ.
 func repeatedField(number protowire.Number, typ protowire.Type, n int) []byte {
 	scalarExtensions()
@@ -554,6 +565,14 @@ func protoJSONCalibrationCases() []calibrationCase {
 		{"single late escape", chat(strings.Repeat("n", 200000) + `\n`), newDataPacket},
 		{"replacement chars", chat(strings.Repeat(strings.Repeat("n", 47)+string(utf8.RuneError), 4000)), newDataPacket},
 		{"escaped keys", []byte(`{"participants":[` + escapedKeys + `]}`), func() proto.Message { return &livekit.ListParticipantsResponse{} }},
+		{"exponent integers 64k", []byte(`{"dataPoints":[` + strings.TrimSuffix(strings.Repeat(`{"asInt":9e18,"timeUnixNano":"-0e5"},`, 1<<16), ",") + `]}`),
+			func() proto.Message { return &metricsv1.Gauge{} }},
+		{"anys without @type", []byte(`{"callContext":[` + strings.TrimSuffix(strings.Repeat(`{"x":"`+strings.Repeat("a", 1000)+`"},`, 1<<10), ",") + `]}`),
+			func() proto.Message { return &livekit.SIPCallInfo{} }},
+		{"bytes value 1MB", []byte(`"` + strings.Repeat("A", 1<<20) + `"`), func() proto.Message { return &wrapperspb.BytesValue{} }},
+		{"minute zone offsets 64k", []byte(`{"buckets":[` + strings.TrimSuffix(strings.Repeat(`{"bucketStart":"2020-01-01T00:00:00+00:01"},`, 1<<16), ",") + `]}`),
+			func() proto.Message { return &livekit.SimulationRun_Counts_Response{} }},
+		{"json scalar extensions 64", jsonScalarExtensions(64), fieldOptions},
 	}
 }
 
@@ -567,6 +586,23 @@ func TestProtoEstimateProtoJSONCalibration(t *testing.T) {
 			t.Logf("json=%d measured=%d estimate=%d ratio=%.2f", len(tc.data), got, est, float64(est)/float64(got))
 			require.GreaterOrEqual(t, uint64(est), got, "the estimate must not undercount")
 			require.LessOrEqual(t, float64(est), 1.15*float64(got), "the estimate should stay close enough to admit real payloads")
+		})
+	}
+}
+
+func TestProtoEstimateProtoJSONDynamicCalibration(t *testing.T) {
+	budget := Proto{MaxFields: 1 << 30, MaxDepth: 100}
+	for _, tc := range protoJSONCalibrationCases() {
+		t.Run(tc.name, func(t *testing.T) {
+			desc := tc.newMsg().ProtoReflect().Descriptor()
+			est, err := budget.estimateProtoJSON(tc.data, desc, true)
+			require.NoError(t, err)
+			got := measureJSONDecode(t, tc.data, func() proto.Message { return dynamicpb.NewMessage(desc) })
+			t.Logf("json=%d measured=%d estimate=%d ratio=%.2f", len(tc.data), got, est, float64(est)/float64(got))
+			require.GreaterOrEqual(t, uint64(est), got, "the estimate must not undercount")
+			// The per-token cost, fit to generated destinations, overcharges
+			// dynamicpb lists of numbers.
+			require.LessOrEqual(t, float64(est), 1.3*float64(got), "the estimate should stay close enough to admit real payloads")
 		})
 	}
 }

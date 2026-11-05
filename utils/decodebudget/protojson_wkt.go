@@ -17,6 +17,7 @@ package decodebudget
 import (
 	"bytes"
 	"encoding/json"
+	"strconv"
 	"strings"
 
 	"google.golang.org/protobuf/reflect/protoreflect"
@@ -40,6 +41,8 @@ const (
 	jsonAnyCost         = 32
 	jsonAnyCopyFactor   = 6
 	jsonAnyMapEntryCost = 80
+	// A Timestamp whose offset is not a whole hour gets a new time.Location.
+	jsonFixedZoneCost = 160
 )
 
 // wellKnown walks md if protojson gives it a special JSON form, reporting
@@ -56,11 +59,37 @@ func (w *jsonWalk) wellKnown(md protoreflect.MessageDescriptor, tok json.Token, 
 			if err := w.alloc(jsonAnyCost); err != nil {
 				return true, err
 			}
+			url := w.anyTypeURL()
+			if url == "" {
+				// Discarding unknown fields, the decoder reads an Any without
+				// "@type" once looking for it and again to skip it, copying its
+				// strings each time.
+				before := w.strings
+				if err := w.skip(tok, depth); err != nil {
+					return true, err
+				}
+				return true, w.alloc(w.strings - before)
+			}
 			// Without a resolvable "@type" the decoder rejects a non-empty Any.
-			if mt, err := protoregistry.GlobalTypes.FindMessageByURL(w.anyTypeURL()); err == nil {
+			if mt, err := protoregistry.GlobalTypes.FindMessageByURL(url); err == nil {
 				return true, w.any(mt.Descriptor(), depth)
 			}
 		}
+	case "google.protobuf.Timestamp", "google.protobuf.Duration":
+		cost := 0
+		if w.dynamic {
+			// dynamicpb boxes the seconds and nanos it stores.
+			cost = 2 * dynamicBoxCost(md.Fields().Get(0), 0)
+		}
+		if str, ok := tok.(string); ok && md.Name() == "Timestamp" && !wholeHourOffset(str) {
+			cost += jsonFixedZoneCost
+		}
+		return false, w.alloc(cost)
+	case "google.protobuf.BoolValue", "google.protobuf.Int32Value", "google.protobuf.Int64Value",
+		"google.protobuf.UInt32Value", "google.protobuf.UInt64Value", "google.protobuf.FloatValue",
+		"google.protobuf.DoubleValue", "google.protobuf.StringValue", "google.protobuf.BytesValue":
+		value := md.Fields().Get(0)
+		return false, w.alloc(jsonScalarCost(value, tok) + w.boxCost(value, tok))
 	case "google.protobuf.FieldMask":
 		if str, ok := tok.(string); ok {
 			if err := w.alloc(fieldMaskCost(str)); err != nil {
@@ -110,6 +139,12 @@ func (w *jsonWalk) knownValue(md protoreflect.MessageDescriptor, tok json.Token,
 // any walks the members of an Any whose '{' has been consumed as a message of
 // the embedded type md, which protojson then marshals into the Any's value.
 func (w *jsonWalk) any(md protoreflect.MessageDescriptor, depth int) error {
+	if w.dynamic {
+		// The Any sets its type URL and value.
+		if err := w.alloc(mapGrowth(0, knownSlotSize, true)); err != nil {
+			return err
+		}
+	}
 	start, entries := w.dec.InputOffset(), w.anyEntries
 	var err error
 	if hasCustomJSON(md) {
@@ -311,6 +346,26 @@ func hasCustomJSON(md protoreflect.MessageDescriptor) bool {
 		return true
 	}
 	return false
+}
+
+// wholeHourOffset reports whether an RFC 3339 timestamp's zone is one that
+// time.FixedZone caches: Z, or a whole hour from -12 to +14.
+func wholeHourOffset(ts string) bool {
+	if strings.HasSuffix(ts, "Z") || strings.HasSuffix(ts, "z") || len(ts) < 6 {
+		return true
+	}
+	zone := ts[len(ts)-6:]
+	hours, err := strconv.Atoi(zone[1:3])
+	if err != nil || zone[3] != ':' {
+		return true
+	}
+	switch zone[0] {
+	case '+':
+		return zone[4:] == "00" && hours <= 14
+	case '-':
+		return zone[4:] == "00" && hours <= 12
+	}
+	return true
 }
 
 // fieldMaskCost is what protojson allocates splitting a FieldMask's JSON

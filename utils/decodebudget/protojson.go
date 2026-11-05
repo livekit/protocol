@@ -19,6 +19,8 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"math"
+	"strconv"
 	"strings"
 
 	"google.golang.org/protobuf/reflect/protoreflect"
@@ -36,13 +38,24 @@ func (b Proto) ValidateProtoJSON(data []byte, desc protoreflect.MessageDescripto
 // estimated bytes protojson allocates decoding it. Malformed or mistyped input
 // is left for the decoder to reject.
 func (b Proto) EstimateProtoJSON(data []byte, desc protoreflect.MessageDescriptor) (int, error) {
+	return b.estimateProtoJSON(data, desc, false)
+}
+
+// estimateProtoJSON is EstimateProtoJSON decoding into a dynamicpb message when
+// dynamic is set, as it must when desc has no generated type.
+func (b Proto) estimateProtoJSON(data []byte, desc protoreflect.MessageDescriptor, dynamic bool) (int, error) {
 	t, err := b.newTally(desc)
 	if err != nil {
 		return 0, err
 	}
 	dec := json.NewDecoder(bytes.NewReader(data))
 	dec.UseNumber()
-	w := &jsonWalk{tally: t, dec: dec, data: data}
+	w := &jsonWalk{tally: t, dec: dec, data: data, dynamic: dynamic || !layoutOf(desc).generated}
+	if w.dynamic {
+		if err := w.alloc(dynamicResetCost); err != nil {
+			return w.total(), err
+		}
+	}
 
 	tok, err := w.next()
 	if err != nil {
@@ -66,6 +79,8 @@ const (
 	jsonObjectCost     = 8
 	jsonListScalarCost = 24
 	jsonMapReflectSize = 64
+	// A dynamicpb message without the closure binary decoding allocates.
+	jsonDynamicMessageCost = 64 + 2*48
 )
 
 // jsonWalk walks protojson input with encoding/json tokens.
@@ -75,6 +90,10 @@ type jsonWalk struct {
 	data []byte
 	// anyEntries counts map entries walked since the innermost Any began.
 	anyEntries int
+	// dynamic prices the message being walked as a dynamicpb message.
+	dynamic bool
+	// strings totals the string copies charged so far.
+	strings int
 }
 
 func (w *jsonWalk) next() (json.Token, error) {
@@ -89,7 +108,9 @@ func (w *jsonWalk) next() (json.Token, error) {
 	cost := jsonTokenCost
 	switch v := tok.(type) {
 	case string:
-		cost += jsonStringCost(w.data[start:w.dec.InputOffset()], len(v))
+		copied := jsonStringCost(w.data[start:w.dec.InputOffset()], len(v))
+		w.strings += copied
+		cost += copied
 	case json.Number:
 		// Token.Float parses from a copy of the literal.
 		cost += tmpCopySize(len(v))
@@ -102,7 +123,7 @@ func (w *jsonWalk) object(desc protoreflect.MessageDescriptor, depth int) error 
 	if depth > w.budget.MaxDepth {
 		return ErrMessageComplexity
 	}
-	extended := false
+	extensions, members := 0, 0
 	for {
 		tok, err := w.next()
 		if err != nil {
@@ -123,11 +144,11 @@ func (w *jsonWalk) object(desc protoreflect.MessageDescriptor, depth int) error 
 			if field, err = jsonExtension(desc, key); err != nil {
 				return err
 			}
-			if field != nil && !extended {
-				extended = true
-				if err := w.alloc(extensionMapSize); err != nil {
+			if field != nil {
+				if err := w.alloc(w.extensionMapCost(extensions)); err != nil {
 					return err
 				}
+				extensions++
 			}
 		}
 		tok, err = w.next()
@@ -140,6 +161,13 @@ func (w *jsonWalk) object(desc protoreflect.MessageDescriptor, depth int) error 
 				return err
 			}
 			continue
+		}
+		if w.dynamic {
+			// Member names are unique, so each sets a new field.
+			if err := w.alloc(mapGrowth(members, knownSlotSize, true)); err != nil {
+				return err
+			}
+			members++
 		}
 		if err := w.field(field, tok, depth); err != nil {
 			return err
@@ -180,17 +208,18 @@ func (w *jsonWalk) field(field protoreflect.FieldDescriptor, tok json.Token, dep
 		if tok != json.Delim('[') {
 			return w.skip(tok, depth)
 		}
+		if w.dynamic {
+			if err := w.alloc(dynamicListCost); err != nil {
+				return err
+			}
+		}
 		for n := 0; ; n++ {
 			tok, err := w.next()
 			if err != nil {
 				return err
 			}
 			if tok == json.Delim(']') {
-				cost := appendAllocBytes(n, goValueSize(field))
-				if field.Message() == nil {
-					cost += n * jsonListScalarCost
-				}
-				return w.alloc(cost)
+				return w.alloc(w.listCost(field, n))
 			}
 			if err := w.count(); err != nil {
 				return err
@@ -208,7 +237,11 @@ func (w *jsonWalk) mapEntries(field protoreflect.FieldDescriptor, depth int) err
 	if depth+1 > w.budget.MaxDepth {
 		return ErrMessageComplexity
 	}
-	if err := w.alloc(allocSize(mapHeaderSize) + jsonMapReflectSize); err != nil {
+	cost := allocSize(mapHeaderSize) + jsonMapReflectSize
+	if w.dynamic {
+		cost = dynamicMapCost
+	}
+	if err := w.alloc(cost); err != nil {
 		return err
 	}
 	for n := 0; ; n++ {
@@ -222,10 +255,8 @@ func (w *jsonWalk) mapEntries(field protoreflect.FieldDescriptor, depth int) err
 		if err := w.count(); err != nil {
 			return err
 		}
-		// The duplicate-key check boxes the key once more than the set does.
 		w.anyEntries++
-		cost := mapInsertCost(field, n) + 2*mapBoxCost(field.MapKey()) + mapBoxCost(field.MapValue())
-		if err := w.alloc(cost); err != nil {
+		if err := w.alloc(w.mapEntryCost(field, n, tok)); err != nil {
 			return err
 		}
 		tok, err = w.next()
@@ -249,20 +280,34 @@ func (w *jsonWalk) value(field protoreflect.FieldDescriptor, tok json.Token, dep
 		if md := field.Message(); md != nil {
 			return w.message(md, tok, depth)
 		}
-		return w.alloc(jsonScalarCost(field, tok))
+		return w.alloc(jsonScalarCost(field, tok) + w.boxCost(field, tok))
 	}
-	cost := fieldAllocCost(field, 0) + jsonScalarCost(field, tok) + presenceCost(field)
+	cost := jsonScalarCost(field, tok) + w.boxCost(field, tok)
+	if !w.dynamic {
+		cost += fieldAllocCost(field, 0) + presenceCost(field)
+		if field.Message() != nil {
+			cost -= messageCost(field)
+		}
+	}
 	if field.IsExtension() {
 		cost += jsonExtensionCost
-	}
-	if field.Message() != nil {
-		cost -= protoStructSize(field.Message())
+		if !isGeneratedExtension(field) {
+			cost += dynamicExtensionResolveCost + dynamicExtensionCheckCost
+		}
 	}
 	if err := w.alloc(cost); err != nil {
 		return err
 	}
 	if md := field.Message(); md != nil {
-		return w.message(md, tok, depth)
+		if !field.IsExtension() {
+			return w.message(md, tok, depth)
+		}
+		// An extension's message follows its type.
+		dynamic := w.dynamic
+		w.dynamic = !isGeneratedExtension(field)
+		err := w.message(md, tok, depth)
+		w.dynamic = dynamic
+		return err
 	}
 	if _, ok := tok.(json.Delim); ok {
 		return w.skip(tok, depth)
@@ -271,7 +316,15 @@ func (w *jsonWalk) value(field protoreflect.FieldDescriptor, tok json.Token, dep
 }
 
 func (w *jsonWalk) message(md protoreflect.MessageDescriptor, tok json.Token, depth int) error {
-	if err := w.alloc(protoStructSize(md) + jsonObjectCost); err != nil {
+	size := protoStructSize(md)
+	if w.dynamic {
+		size = jsonDynamicMessageCost
+		if hasCustomJSON(md) && md.Fields().Len() > 0 && md.FullName() != "google.protobuf.Any" {
+			// Its JSON form sets fields without walking an object.
+			size += mapGrowth(0, knownSlotSize, true)
+		}
+	}
+	if err := w.alloc(size + jsonObjectCost); err != nil {
 		return err
 	}
 	if done, err := w.wellKnown(md, tok, depth+1); done || err != nil {
@@ -311,19 +364,152 @@ func (w *jsonWalk) skip(tok json.Token, depth int) error {
 }
 
 // jsonScalarCost is what decoding a scalar token allocates beyond the copy the
-// tokenizer already made: base64 bytes are decoded into a new buffer, and a
-// number in a string is tokenized again from a copy and parsed from another.
+// tokenizer already made: base64 bytes are decoded into a new buffer, a number
+// in a string is tokenized again from a copy and parsed from another, and an
+// integer's digits are normalized into a new string.
 func jsonScalarCost(field protoreflect.FieldDescriptor, tok json.Token) int {
-	str, ok := tok.(string)
-	if !ok {
+	cost := 0
+	var lit string
+	switch v := tok.(type) {
+	case json.Number:
+		lit = string(v)
+	case string:
+		switch field.Kind() {
+		case protoreflect.BytesKind:
+			return allocSize(len(v) * 3 / 4)
+		case protoreflect.StringKind, protoreflect.BoolKind, protoreflect.EnumKind,
+			protoreflect.MessageKind, protoreflect.GroupKind:
+			return 0
+		}
+		lit, cost = v, 2*tmpCopySize(len(v))
+	default:
 		return 0
 	}
 	switch field.Kind() {
-	case protoreflect.BytesKind:
-		return allocSize(len(str) * 3 / 4)
-	case protoreflect.StringKind, protoreflect.BoolKind, protoreflect.EnumKind,
-		protoreflect.MessageKind, protoreflect.GroupKind:
+	case protoreflect.FloatKind, protoreflect.DoubleKind:
+		return cost
+	}
+	return cost + jsonIntCost(lit)
+}
+
+// jsonIntCost is protojson normalizing an integer literal to its digits: the
+// zeros an exponent adds are appended one at a time to a copy of the integer
+// part, and the digits become a new string. Literals it rejects cost nothing.
+func jsonIntCost(lit string) int {
+	neg := strings.HasPrefix(lit, "-")
+	intp, frac, exp, ok := numberParts(strings.TrimPrefix(lit, "-"))
+	if !ok || (intp == "" && frac == "") {
 		return 0
 	}
-	return 2 * tmpCopySize(len(str))
+	digits := len(intp) + exp
+	if exp < 0 {
+		if frac != "" || digits < 0 {
+			return 0
+		}
+	} else if len(frac) > exp || digits > 20 {
+		return 0
+	}
+	cost := intStringCost(digits, neg)
+	if exp <= 0 {
+		return cost
+	}
+	l, c := len(intp), len(intp)
+	grow := func(add int) {
+		mem, newCap := appendGrow(l, c, add, 1)
+		cost, l, c = cost+mem, l+add, newCap
+	}
+	if frac != "" {
+		grow(len(frac))
+	}
+	for range exp - len(frac) {
+		grow(1)
+	}
+	return cost
+}
+
+// intStringCost is the string normalizeToIntString returns; Go keeps one-byte
+// strings static, and builds a negative one from a stack copy.
+func intStringCost(digits int, neg bool) int {
+	switch {
+	case neg:
+		return allocSize(digits + 1)
+	case digits <= 1:
+		return 0
+	}
+	return allocSize(digits)
+}
+
+// numberParts splits an unsigned JSON number into its integer and fraction
+// digits and its exponent.
+func numberParts(lit string) (intp, frac string, exp int, ok bool) {
+	end := strings.IndexAny(lit, ".eE")
+	if end < 0 {
+		return lit, "", 0, true
+	}
+	intp, lit = lit[:end], lit[end:]
+	if strings.HasPrefix(lit, ".") {
+		end = strings.IndexAny(lit, "eE")
+		if end < 0 {
+			end = len(lit)
+		}
+		frac, lit = lit[1:end], lit[end:]
+	}
+	if lit == "" {
+		return intp, frac, 0, true
+	}
+	exp, err := strconv.Atoi(strings.TrimPrefix(lit[1:], "+"))
+	return intp, frac, exp, err == nil
+}
+
+// boxCost is a dynamicpb message boxing a value it stores. Go boxes a value
+// whose bits are under 256 without allocating.
+func (w *jsonWalk) boxCost(field protoreflect.FieldDescriptor, tok json.Token) int {
+	if !w.dynamic {
+		return 0
+	}
+	if n, ok := tok.(json.Number); ok {
+		if u, err := strconv.ParseUint(string(n), 10, 64); err == nil && u < 256 {
+			return 0
+		}
+		if f, err := n.Float64(); err == nil && math.Float64bits(f) == 0 {
+			return 0
+		}
+	}
+	str, _ := tok.(string)
+	return dynamicBoxCost(field, len(str))
+}
+
+// listCost is the growth of a list of n elements.
+func (w *jsonWalk) listCost(field protoreflect.FieldDescriptor, n int) int {
+	if w.dynamic {
+		mem, _ := appendValues(0, 0, n)
+		return mem
+	}
+	cost := appendAllocBytes(n, goValueSize(field))
+	if field.Message() == nil {
+		cost += n * jsonListScalarCost
+	}
+	return cost
+}
+
+// mapEntryCost is inserting a new key into a map field holding n entries. The
+// duplicate-key check boxes the key once more than the set does.
+func (w *jsonWalk) mapEntryCost(field protoreflect.FieldDescriptor, n int, key json.Token) int {
+	if !w.dynamic {
+		return mapInsertCost(field, n) + 2*mapBoxCost(field.MapKey()) + mapBoxCost(field.MapValue())
+	}
+	str, _ := key.(string)
+	return mapGrowth(n, mapEntrySlotSize, true) + 3*dynamicBoxCost(field.MapKey(), len(str))
+}
+
+// extensionMapCost is the extension map growth for a message's next
+// extension, having set n.
+func (w *jsonWalk) extensionMapCost(n int) int {
+	switch {
+	case w.dynamic:
+		return mapGrowth(n, extSlotSize, true)
+	case n == 0:
+		return extensionMapSize
+	}
+	return mapGrowth(n, extensionSlotSize, true)
 }
