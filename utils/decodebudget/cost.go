@@ -163,22 +163,19 @@ func mapGrowth(n, slot int, pointers bool) int {
 
 // mapSplitCost charges the round of splits that takes a map from t to 2t
 // full-size tables, plus the directory that doubles for it. Tables fill
-// unevenly, so a round with several tables is spread over the inserts from
-// 3/4 to 7/8 average load.
+// unevenly, so a round with several tables can start at 3/4 average load;
+// the whole round is charged there so the estimate never trails the splits.
 func mapSplitCost(n, table int) int {
 	t := 1
 	for n >= 2*t*mapMaxTableSlots*3/4 {
 		t *= 2
 	}
-	full := t * mapMaxTableSlots * 7 / 8
-	begin := full
+	begin := t * mapMaxTableSlots * 7 / 8
 	if t > 1 {
 		begin = t * mapMaxTableSlots * 3 / 4
 	}
-	if n < begin || n > full {
+	if n != begin {
 		return 0
 	}
-	round := 2*t*table + allocSize(2*t*8)
-	span := full - begin + 1
-	return round*(n-begin+1)/span - round*(n-begin)/span
+	return 2*t*table + allocSize(2*t*8)
 }
