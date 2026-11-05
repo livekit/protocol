@@ -31,10 +31,10 @@ import (
 // Allocations protojson makes for well-known types beyond the decoded messages,
 // measured against protobuf-go v1.36.12.
 const (
-	// A Value boxes its scalar for the reflective oneof setter. A Struct's map
-	// and a ListValue's list are created even when empty.
+	// A Value boxes its scalar for the reflective oneof setter. A ListValue's
+	// list is created even when empty; mapEntries charges a Struct's map.
 	jsonKnownValueCost  = 24
-	jsonKnownStructCost = 192
+	jsonKnownStructCost = 80
 	jsonKnownListCost   = 24
 	// A FieldMask path is split out, boxed and appended to the paths list.
 	jsonFieldMaskPathCost = 80
@@ -78,6 +78,10 @@ func (b Proto) EstimateProtoJSON(data []byte, desc protoreflect.MessageDescripto
 	}
 	return w.total(), nil
 }
+
+// jsonMapReflectSize is the wrapper protojson allocates for every map field it
+// sees, even an empty one.
+const jsonMapReflectSize = 64
 
 // jsonWalk walks protojson input with encoding/json tokens.
 type jsonWalk struct {
@@ -279,7 +283,10 @@ func (w *jsonWalk) mapEntries(field protoreflect.FieldDescriptor, depth int) err
 	if depth+1 > w.budget.MaxDepth {
 		return ErrMessageComplexity
 	}
-	for {
+	if err := w.alloc(allocSize(mapHeaderSize) + jsonMapReflectSize); err != nil {
+		return err
+	}
+	for n := 0; ; n++ {
 		tok, err := w.next()
 		if err != nil {
 			return err
@@ -290,7 +297,8 @@ func (w *jsonWalk) mapEntries(field protoreflect.FieldDescriptor, depth int) err
 		if err := w.count(); err != nil {
 			return err
 		}
-		cost := w.profile.mapEntryCost(field) + w.profile.JSONMapEntryBoxCost
+		// The duplicate-key check boxes the key once more than the set does.
+		cost := mapInsertCost(field, n) + 2*mapBoxCost(field.MapKey()) + mapBoxCost(field.MapValue())
 		if w.inAny {
 			cost += jsonAnyMapEntryCost
 		}

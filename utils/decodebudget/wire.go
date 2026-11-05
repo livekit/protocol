@@ -28,9 +28,9 @@ type wireWalk struct {
 }
 
 // messageState mirrors the decoder state of one message whose cost depends on
-// earlier occurrences: each repeated field's slice, whether a presence field's
-// pointer exists, which member of each oneof is set, and the unknown-fields
-// slice.
+// earlier occurrences: each repeated field's slice, each map's entry count,
+// whether a presence field's pointer exists, which member of each oneof is set,
+// and the unknown-fields slice.
 type messageState struct {
 	fields     []fieldState
 	oneofs     []oneofState
@@ -174,6 +174,14 @@ func (m *messageState) occurrence(p *Profile, field protoreflect.FieldDescriptor
 		mem, fs.cap = appendGrow(fs.len, fs.cap, 1, goValueSize(field))
 		fs.len++
 		cost += mem
+	case field.IsMap():
+		// Every entry is taken as a new key; duplicates are over-charged.
+		fs := m.get(field)
+		if fs.len == 0 {
+			cost += allocSize(mapHeaderSize)
+		}
+		cost += mapInsertCost(field, fs.len)
+		fs.len++
 	case presenceCost(field) > 0:
 		if fs := m.get(field); fs.len == 0 {
 			fs.len = 1

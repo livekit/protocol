@@ -129,8 +129,72 @@ func goValueSize(field protoreflect.FieldDescriptor) int {
 	}
 }
 
-func (p *Profile) mapEntryCost(field protoreflect.FieldDescriptor) int {
-	return p.MapGrowthFactor*(goValueSize(field.MapKey())+goValueSize(field.MapValue())) + p.MapEntryOverhead
+// Go's map layout (internal/runtime/maps): a header, then one group of 8
+// slots, then a table that doubles at 7/8 load up to 1024 slots, after which
+// each full table splits into two new ones.
+const (
+	mapHeaderSize    = 48
+	mapTableSize     = 32
+	mapGroupSlots    = 8
+	mapMaxTableSlots = 1024
+)
+
+// mapBoxCost is the allocation for passing one map key or value of field's
+// kind through reflect: a scalar is boxed by Interface and again by Convert.
+func mapBoxCost(field protoreflect.FieldDescriptor) int {
+	if field.Message() != nil {
+		return 0
+	}
+	return 2 * allocSize(goValueSize(field))
+}
+
+// mapInsertCost is the allocation for inserting a new key into a map of
+// field's type that holds n entries, excluding the map header.
+func mapInsertCost(field protoreflect.FieldDescriptor, n int) int {
+	slot := (goValueSize(field.MapKey()) + goValueSize(field.MapValue()) + 7) &^ 7
+	group := 8 + mapGroupSlots*slot
+	table := func(slots int) int {
+		return allocSize(mapTableSize) + allocSize(slots/mapGroupSlots*group)
+	}
+	switch {
+	case n == 0:
+		return allocSize(group)
+	case n < mapGroupSlots:
+		return 0
+	case n == mapGroupSlots:
+		// The first table comes with a one-entry directory.
+		return table(2*mapGroupSlots) + allocSize(8)
+	case n < mapMaxTableSlots*7/8:
+		for c := 2 * mapGroupSlots; c < mapMaxTableSlots; c *= 2 {
+			if n == c*7/8 {
+				return table(2 * c)
+			}
+		}
+		return 0
+	}
+	return mapSplitCost(n, table(mapMaxTableSlots))
+}
+
+// mapSplitCost charges the round of splits that takes a map from t to 2t
+// full-size tables, plus the directory that doubles for it. Tables fill
+// unevenly, so a round with several tables is spread over the inserts from
+// 3/4 to 7/8 average load.
+func mapSplitCost(n, table int) int {
+	t := 1
+	for n >= 2*t*mapMaxTableSlots*3/4 {
+		t *= 2
+	}
+	full := t * mapMaxTableSlots * 7 / 8
+	begin := full
+	if t > 1 {
+		begin = t * mapMaxTableSlots * 3 / 4
+	}
+	if n < begin || n > full {
+		return 0
+	}
+	round := 2*t*table + allocSize(2*t*8)
+	span := full - begin + 1
+	return round*(n-begin+1)/span - round*(n-begin)/span
 }
 
 func oneofWrapperCost(field protoreflect.FieldDescriptor) int {
@@ -157,7 +221,8 @@ func presenceCost(field protoreflect.FieldDescriptor) int {
 // bytes payload of payloadLen. Nested message contents are charged separately.
 func (p *Profile) fieldAllocCost(field protoreflect.FieldDescriptor, payloadLen int) int {
 	cost := 0
-	if field.Message() != nil && !field.IsMap() {
+	// A map value message is charged with its entry.
+	if field.Message() != nil && !field.IsMap() && !field.ContainingMessage().IsMapEntry() {
 		cost += protoStructSize(field.Message())
 	}
 	if k := field.Kind(); k == protoreflect.StringKind || k == protoreflect.BytesKind {
@@ -165,7 +230,13 @@ func (p *Profile) fieldAllocCost(field protoreflect.FieldDescriptor, payloadLen 
 	}
 	switch {
 	case field.IsMap():
-		cost += p.mapEntryCost(field)
+		// The decoder allocates a message value before reading the entry,
+		// whether or not the entry has one. Map growth depends on earlier
+		// entries; the caller charges it.
+		cost += mapBoxCost(field.MapKey()) + mapBoxCost(field.MapValue())
+		if value := field.MapValue().Message(); value != nil {
+			cost += protoStructSize(value)
+		}
 	case field.IsList():
 		// Slice growth depends on earlier occurrences; the caller charges it.
 	case field.IsExtension():

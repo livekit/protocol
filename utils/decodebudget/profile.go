@@ -22,34 +22,25 @@ type Profile struct {
 	// MarginPercent covers allocations the model does not itemize; the
 	// calibration tests measured them at under 3%.
 	MarginPercent int
-	// MapGrowthFactor scales a map entry's key and value slots: tables grow by
-	// doubling and are at most 7/8 full.
-	MapGrowthFactor  int
-	MapEntryOverhead int
-	ExtensionCost    int
+	ExtensionCost int
 	// ExtensionMapCost is the map a message allocates for its first
 	// extension: a map header and one 8-slot group.
 	ExtensionMapCost int
 
 	// protojson allocates per token and per object on top of the decoded
-	// message, and its reflection-based list and map setters box each scalar
-	// element and map entry.
-	JSONTokenCost       int
-	JSONListScalarCost  int
-	JSONMapEntryBoxCost int
-	JSONObjectCost      int
+	// message, and its reflection-based list setter boxes each scalar element.
+	JSONTokenCost      int
+	JSONListScalarCost int
+	JSONObjectCost     int
 }
 
 var defaultProfile = Profile{
-	MarginPercent:       5,
-	MapGrowthFactor:     4,
-	MapEntryOverhead:    16,
-	ExtensionCost:       64,
-	ExtensionMapCost:    528,
-	JSONTokenCost:       8,
-	JSONListScalarCost:  24,
-	JSONMapEntryBoxCost: 32,
-	JSONObjectCost:      8,
+	MarginPercent:      5,
+	ExtensionCost:      64,
+	ExtensionMapCost:   528,
+	JSONTokenCost:      8,
+	JSONListScalarCost: 24,
+	JSONObjectCost:     8,
 }
 
 // DefaultProfile returns the profile a Proto with a nil Profile uses.

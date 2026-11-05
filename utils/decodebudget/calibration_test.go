@@ -135,6 +135,37 @@ func calibParticipants() *livekit.ListParticipantsResponse {
 	return participants
 }
 
+// calibOneEntryMaps is n agent dispatches with one attribute each, where the
+// map header and first group outweigh the entry.
+func calibOneEntryMaps(n int) *livekit.RoomConfiguration {
+	cfg := &livekit.RoomConfiguration{}
+	for range n {
+		cfg.Agents = append(cfg.Agents, &livekit.RoomAgentDispatch{Attributes: map[string]string{"role": "assistant"}})
+	}
+	return cfg
+}
+
+// calibLargeMap is one map of n entries, past several rounds of table splits.
+func calibLargeMap(n int) *livekit.ParticipantInfo {
+	p := &livekit.ParticipantInfo{Attributes: map[string]string{}}
+	for i := range n {
+		p.Attributes[fmt.Sprintf("attr-%d", i)] = "value"
+	}
+	return p
+}
+
+// valuelessMapEntries is n sub_handles entries with a key and no value; the
+// decoder allocates a value message for each anyway.
+func valuelessMapEntries(n int) []byte {
+	handles := num(&livekit.DataTrackSubscriberHandles{}, "sub_handles")
+	var b []byte
+	for i := range n {
+		key := protowire.AppendVarint(protowire.AppendTag(nil, 1, protowire.VarintType), uint64(i))
+		b = protowire.AppendBytes(protowire.AppendTag(b, handles, protowire.BytesType), key)
+	}
+	return b
+}
+
 func emptyChildren(field protowire.Number, n int) []byte {
 	one := protowire.AppendBytes(protowire.AppendTag(nil, field, protowire.BytesType), nil)
 	return []byte(strings.Repeat(string(one), n))
@@ -242,6 +273,9 @@ func protoCalibrationCases() []calibrationCase {
 		{"empty spans 1M", emptySpans(1 << 20), func() proto.Message { return &tracev1.TracesData{} }},
 		{"empty attributes 1M", emptyAttrs(1 << 20), func() proto.Message { return &logsv1.LogsData{} }},
 		{"participants maps", must(proto.Marshal(participants)), func() proto.Message { return &livekit.ListParticipantsResponse{} }},
+		{"one-entry maps 64k", must(proto.Marshal(calibOneEntryMaps(1 << 16))), func() proto.Message { return &livekit.RoomConfiguration{} }},
+		{"map 128k", must(proto.Marshal(calibLargeMap(1 << 17))), func() proto.Message { return &livekit.ParticipantInfo{} }},
+		{"valueless map entries 64k", valuelessMapEntries(1 << 16), func() proto.Message { return &livekit.DataTrackSubscriberHandles{} }},
 		{"packed runs 3000", packedRuns(3000), func() proto.Message { return &metricsv1.MetricsData{} }},
 		{"optional scalars 64k", optionalPoints(1 << 16), func() proto.Message { return &metricsv1.MetricsData{} }},
 		{"wire type mismatch length", mismatchedLength(1 << 20), func() proto.Message { return &logsv1.LogsData{} }},
@@ -311,6 +345,8 @@ func protoJSONCalibrationCases() []calibrationCase {
 		{"empty spans", []byte(emptySpans), func() proto.Message { return &tracev1.TracesData{} }},
 		{"empty values", []byte(emptyValues), func() proto.Message { return &logsv1.LogsData{} }},
 		{"participants maps", must(protojson.Marshal(calibParticipants())), func() proto.Message { return &livekit.ListParticipantsResponse{} }},
+		{"one-entry maps 16k", must(protojson.Marshal(calibOneEntryMaps(1 << 14))), func() proto.Message { return &livekit.RoomConfiguration{} }},
+		{"map 64k", must(protojson.Marshal(calibLargeMap(1 << 16))), func() proto.Message { return &livekit.ParticipantInfo{} }},
 		{"enums bytes int64 strings", must(protojson.Marshal(calibEnumBytesLogs(20000))), func() proto.Message { return &logsv1.LogsData{} }},
 		{"proto field names", must(protojson.MarshalOptions{UseProtoNames: true}.Marshal(calibLogs(512))), func() proto.Message { return &logsv1.LogsData{} }},
 		{"optional scalars", must(protojson.Marshal(calibOptionalPoints(16384))), func() proto.Message { return &metricsv1.MetricsData{} }},
