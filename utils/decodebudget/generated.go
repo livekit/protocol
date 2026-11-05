@@ -91,11 +91,11 @@ func (g generatedModel) message(m *messageState, field protoreflect.FieldDescrip
 		// Every element or map value is a new message.
 		return g.occurrence(m, field, 0), nil
 	}
+	fs, isNew := m.add(field)
 	cost := 0
 	if field.IsExtension() {
-		cost = extensionCost(m, field)
+		cost = extensionCost(m, field, isNew)
 	}
-	fs := m.get(field)
 	m.setOneof(field, fs)
 	if fs.child != nil {
 		return cost, fs
@@ -106,9 +106,10 @@ func (g generatedModel) message(m *messageState, field protoreflect.FieldDescrip
 func (g generatedModel) occurrence(m *messageState, field protoreflect.FieldDescriptor, payloadLen int) int {
 	cost := fieldAllocCost(field, payloadLen)
 	if field.IsExtension() {
-		cost += extensionCost(m, field)
-		if fs := m.get(field); field.IsList() {
-			cost += extensionListCost(fs, field, 1, payloadLen)
+		fs, isNew := m.add(field)
+		cost += extensionCost(m, field, isNew)
+		if field.IsList() {
+			cost += extensionListCost(fs, field, 1, payloadLen, isNew)
 		}
 		return cost
 	}
@@ -139,12 +140,13 @@ func (g generatedModel) occurrence(m *messageState, field protoreflect.FieldDesc
 // packed reallocates the field's slice at exactly its new length: each run is
 // a fresh allocation, so many small runs cost quadratically.
 func (g generatedModel) packed(m *messageState, field protoreflect.FieldDescriptor, count int) int {
+	if field.IsExtension() {
+		// Even an empty run resolves the extension and sets its list.
+		fs, isNew := m.add(field)
+		return extensionCost(m, field, isNew) + extensionListCost(fs, field, count, 0, isNew)
+	}
 	if count == 0 {
 		return 0
-	}
-	if field.IsExtension() {
-		cost := extensionCost(m, field)
-		return cost + extensionListCost(m.get(field), field, count, 0)
 	}
 	fs := m.get(field)
 	fs.len += count
@@ -153,9 +155,20 @@ func (g generatedModel) packed(m *messageState, field protoreflect.FieldDescript
 }
 
 // mismatch is what the decoder allocates for a known field before it rejects
-// the wire type: a nil map field's map, and the wrapper of a oneof member other
-// than the set one, which it then drops without changing the oneof.
+// the wire type: a nil map field's map, the wrapper of a oneof member other
+// than the set one, which it then drops without changing the oneof, and an
+// unset extension's value, each time.
 func (g generatedModel) mismatch(m *messageState, field protoreflect.FieldDescriptor) int {
+	if field.IsExtension() {
+		cost := extensionMapHeader(m)
+		if !isGeneratedExtension(field) {
+			cost += uncachedExtensionCost
+		}
+		if m.find(field) == nil {
+			cost += extensionValueCost(field)
+		}
+		return cost
+	}
 	if field.IsMap() {
 		return g.allocateMap(m.get(field))
 	}
@@ -164,6 +177,13 @@ func (g generatedModel) mismatch(m *messageState, field protoreflect.FieldDescri
 		return 0
 	}
 	return oneofWrapperCost(field)
+}
+
+func (g generatedModel) unknown(m *messageState, desc protoreflect.MessageDescriptor) int {
+	if desc.ExtensionRanges().Len() == 0 {
+		return 0
+	}
+	return extensionMapHeader(m)
 }
 
 func (g generatedModel) allocateMap(fs *fieldState) int {

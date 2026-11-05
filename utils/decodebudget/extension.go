@@ -20,19 +20,21 @@ import (
 )
 
 // Extension allocations of protobuf-go's binary decoder: a generated message's
-// extension map (a header and one group of 8 slots, then 56-byte slots), a
+// extension map (its header, then one group of 8 slots, then 56-byte slots), a
 // repeated extension's list and the slice header reflect.Append allocates per
 // element, the field info rebuilt per occurrence of an extension type it
-// cannot cache, such as dynamicpb's, and dynamicpb's type check of such a
-// type's values.
+// cannot cache, such as dynamicpb's, and for such a type on a dynamicpb
+// message, the descriptor resolving it allocates and the type check of its
+// singular values.
 const (
-	extensionMapSize          = 528
-	extensionSlotSize         = 56
-	extensionListSize         = 72
-	extensionAppendCost       = 24
-	uncachedExtensionCost     = 96 + 16
-	dynamicExtensionCheckCost = 48
-	dynamicExtensionListCheck = 16
+	extensionGroupSize          = 480
+	extensionMapSize            = 48 + extensionGroupSize
+	extensionSlotSize           = 56
+	extensionListSize           = 72
+	extensionAppendCost         = 24
+	uncachedExtensionCost       = 96 + 16
+	dynamicExtensionResolveCost = 16
+	dynamicExtensionCheckCost   = 48
 )
 
 func isGeneratedExtension(field protoreflect.FieldDescriptor) bool {
@@ -44,22 +46,46 @@ func isGeneratedExtension(field protoreflect.FieldDescriptor) bool {
 	return ok
 }
 
+// extensionMapHeader is the extension map a generated message creates for the
+// first field number it has no field for, extension or not.
+func extensionMapHeader(m *messageState) int {
+	if m.extensionMap {
+		return 0
+	}
+	m.extensionMap = true
+	return allocSize(mapHeaderSize)
+}
+
 // extensionCost is what a generated message allocates for an occurrence of
-// extension field beyond its value: map growth when field is new, so call it
-// before m.get records field, and the field info of a type it cannot cache.
-func extensionCost(m *messageState, field protoreflect.FieldDescriptor) int {
-	cost := 0
+// extension field beyond its value: the field info of a type it cannot cache,
+// and map growth when the field is new.
+func extensionCost(m *messageState, field protoreflect.FieldDescriptor, isNew bool) int {
+	cost := extensionMapHeader(m)
 	if !isGeneratedExtension(field) {
-		cost = uncachedExtensionCost
+		cost += uncachedExtensionCost
 	}
 	switch {
-	case m.has(field):
-	case m.extensions == 0:
-		cost += extensionMapSize
+	case !isNew:
+	case m.extensions == 1:
+		cost += extensionGroupSize
 	default:
-		cost += mapGrowth(m.extensions, extensionSlotSize, true)
+		cost += mapGrowth(m.extensions-1, extensionSlotSize, true)
 	}
 	return cost
+}
+
+// extensionValueCost is the value a decoder creates for an extension that is
+// not yet set before it reads the wire: a message or a list.
+func extensionValueCost(field protoreflect.FieldDescriptor) int {
+	switch {
+	case field.IsList():
+		return extensionListSize
+	case field.Message() == nil:
+		return 0
+	case isGeneratedExtension(field):
+		return protoStructSize(field.Message())
+	}
+	return dynamicMessageCost
 }
 
 // extensionCheckCost is a dynamicpb message type-checking a value of a
@@ -69,16 +95,17 @@ func extensionCheckCost(field protoreflect.FieldDescriptor) int {
 	case !field.IsExtension() || isGeneratedExtension(field):
 		return 0
 	case field.IsList():
-		return dynamicExtensionListCheck
+		return dynamicExtensionResolveCost
 	}
 	return dynamicExtensionCheckCost
 }
 
 // extensionListCost is appending count elements one at a time to a repeated
 // extension, whose list layout follows its extension type, not the message.
-func extensionListCost(fs *fieldState, field protoreflect.FieldDescriptor, count, payloadLen int) int {
+// isNew charges the list itself.
+func extensionListCost(fs *fieldState, field protoreflect.FieldDescriptor, count, payloadLen int, isNew bool) int {
 	cost := 0
-	if fs.len == 0 {
+	if isNew {
 		cost = extensionListSize
 	}
 	if !isGeneratedExtension(field) {

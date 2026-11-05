@@ -354,6 +354,29 @@ func repeatedExtensionOptions(number protowire.Number, n, run int, value uint64)
 	return b
 }
 
+// repeatedField is n zero-valued occurrences of number with wire type typ.
+func repeatedField(number protowire.Number, typ protowire.Type, n int) []byte {
+	scalarExtensions()
+	one := protowire.AppendTag(nil, number, typ)
+	switch typ {
+	case protowire.VarintType:
+		one = protowire.AppendVarint(one, 0)
+	case protowire.Fixed32Type:
+		one = protowire.AppendFixed32(one, 0)
+	case protowire.BytesType:
+		one = protowire.AppendBytes(one, nil)
+	}
+	return []byte(strings.Repeat(string(one), n))
+}
+
+// unknownOptions is DescriptorProto{field: n×{options: {99999: 1}}}: the
+// unknown field creates each FieldOptions' extension map.
+func unknownOptions(n int) []byte {
+	options := protowire.AppendVarint(protowire.AppendTag(nil, 99999, protowire.VarintType), 1)
+	field := protowire.AppendBytes(protowire.AppendTag(nil, 8, protowire.BytesType), options)
+	return []byte(strings.Repeat(string(protowire.AppendBytes(protowire.AppendTag(nil, 2, protowire.BytesType), field)), n))
+}
+
 func repeatedStrings(number protowire.Number, n int, value string) []byte {
 	var b []byte
 	for range n {
@@ -418,6 +441,11 @@ func protoCalibrationCases() []calibrationCase {
 		{"dynamic repeated extension 16k", repeatedExtensionOptions(scalarExtensionBase+64, 1<<14, 0, 1<<40), fieldOptions},
 		{"repeated extension 16k", repeatedExtensionOptions(fieldBehavior, 1<<14, 0, 2), fieldOptions},
 		{"packed extension 32k", repeatedExtensionOptions(fieldBehavior, 1<<15, 1<<14, 2), fieldOptions},
+		{"extension as varint 64k", repeatedField(1159, protowire.VarintType, 1<<16), fieldOptions},
+		{"repeated extension as fixed32 64k", repeatedField(fieldBehavior, protowire.Fixed32Type, 1<<16), fieldOptions},
+		{"dynamic repeated extension as fixed32 64k", repeatedField(scalarExtensionBase+64, protowire.Fixed32Type, 1<<16), fieldOptions},
+		{"empty packed extension runs 64k", repeatedField(scalarExtensionBase+64, protowire.BytesType, 1<<16), fieldOptions},
+		{"unknown fields in extendable options 64k", unknownOptions(1 << 16), func() proto.Message { return &descriptorpb.DescriptorProto{} }},
 		{"string extension 16k", repeatedStrings(annotations.E_DefaultHost.TypeDescriptor().Number(), 1<<14, strings.Repeat("h", 40)),
 			func() proto.Message { return &descriptorpb.ServiceOptions{} }},
 	}

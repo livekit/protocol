@@ -45,6 +45,9 @@ type decoderModel interface {
 	// mismatch is what the decoder allocates for a known field before it
 	// rejects an unexpected wire type.
 	mismatch(m *messageState, field protoreflect.FieldDescriptor) int
+	// unknown is what the decoder allocates for a field number desc does not
+	// know before it keeps the field as unknown.
+	unknown(m *messageState, desc protoreflect.MessageDescriptor) int
 }
 
 func newDecoderModel(dynamic bool) decoderModel {
@@ -61,8 +64,10 @@ type messageState struct {
 	oneofs     []oneofState
 	unknownLen int
 	unknownCap int
-	// extensions counts the extension fields in fields.
-	extensions int
+	// extensions counts the extension fields in fields, and extensionMap
+	// records that a generated message's extension map exists.
+	extensions   int
+	extensionMap bool
 }
 
 type fieldState struct {
@@ -85,26 +90,30 @@ type oneofState struct {
 	field protoreflect.FieldDescriptor
 }
 
-func (m *messageState) has(field protoreflect.FieldDescriptor) bool {
-	for i := range m.fields {
-		if m.fields[i].field == field {
-			return true
-		}
-	}
-	return false
-}
-
-func (m *messageState) get(field protoreflect.FieldDescriptor) *fieldState {
+func (m *messageState) find(field protoreflect.FieldDescriptor) *fieldState {
 	for i := range m.fields {
 		if m.fields[i].field == field {
 			return &m.fields[i]
 		}
 	}
+	return nil
+}
+
+// add returns field's state, reporting whether it was just created.
+func (m *messageState) add(field protoreflect.FieldDescriptor) (*fieldState, bool) {
+	if fs := m.find(field); fs != nil {
+		return fs, false
+	}
 	m.fields = append(m.fields, fieldState{field: field})
 	if field.IsExtension() {
 		m.extensions++
 	}
-	return &m.fields[len(m.fields)-1]
+	return &m.fields[len(m.fields)-1], true
+}
+
+func (m *messageState) get(field protoreflect.FieldDescriptor) *fieldState {
+	fs, _ := m.add(field)
+	return fs
 }
 
 // setOneof records field as its oneof's set member. Switching members discards
@@ -217,6 +226,8 @@ func (w *wireWalk) message(data []byte, desc protoreflect.MessageDescriptor, dep
 			cost := state.unknown(n + size)
 			if field != nil {
 				cost += w.model.mismatch(state, field)
+			} else {
+				cost += w.model.unknown(state, desc)
 			}
 			if err := w.alloc(cost); err != nil {
 				return err

@@ -88,13 +88,12 @@ func (d dynamicModel) root(protoreflect.MessageDescriptor) int {
 
 // field is the known-map growth for the first occurrence of field in a
 // dynamic message, plus the list, map or extension value Mutable creates then.
-func (d dynamicModel) field(m *messageState, field protoreflect.FieldDescriptor) (*fieldState, int) {
-	n := len(m.fields)
-	fs := m.get(field)
-	if len(m.fields) == n || field.ContainingMessage().IsMapEntry() {
-		return fs, 0
+func (d dynamicModel) field(m *messageState, field protoreflect.FieldDescriptor) (fs *fieldState, isNew bool, cost int) {
+	fs, isNew = m.add(field)
+	if !isNew || field.ContainingMessage().IsMapEntry() {
+		return fs, isNew, 0
 	}
-	cost := mapGrowth(n, knownSlotSize, true)
+	cost = mapGrowth(len(m.fields)-1, knownSlotSize, true)
 	switch {
 	case field.IsExtension():
 		cost += mapGrowth(m.extensions-1, extSlotSize, true)
@@ -107,14 +106,14 @@ func (d dynamicModel) field(m *messageState, field protoreflect.FieldDescriptor)
 	case field.IsMap():
 		cost += dynamicMapCost
 	}
-	return fs, cost
+	return fs, isNew, cost
 }
 
 func (d dynamicModel) message(m *messageState, field protoreflect.FieldDescriptor) (int, *fieldState) {
 	if field.IsList() || field.IsMap() {
 		return d.occurrence(m, field, 0), nil
 	}
-	fs, cost := d.field(m, field)
+	fs, _, cost := d.field(m, field)
 	cost += extensionCheckCost(field)
 	m.setOneof(field, fs)
 	// A map value message was charged with its entry.
@@ -125,7 +124,7 @@ func (d dynamicModel) message(m *messageState, field protoreflect.FieldDescripto
 }
 
 func (d dynamicModel) occurrence(m *messageState, field protoreflect.FieldDescriptor, payloadLen int) int {
-	fs, cost := d.field(m, field)
+	fs, isNew, cost := d.field(m, field)
 	if k := field.Kind(); k == protoreflect.StringKind || k == protoreflect.BytesKind {
 		cost += allocSize(payloadLen)
 	}
@@ -137,7 +136,7 @@ func (d dynamicModel) occurrence(m *messageState, field protoreflect.FieldDescri
 			cost += dynamicMessageCost
 		}
 	case field.IsList() && field.IsExtension():
-		cost += extensionListCost(fs, field, 1, payloadLen) + extensionCheckCost(field)
+		cost += extensionListCost(fs, field, 1, payloadLen, isNew) + extensionCheckCost(field)
 		if md := field.Message(); md != nil {
 			cost += max(dynamicMessageCost, protoStructSize(md))
 		}
@@ -161,9 +160,9 @@ func (d dynamicModel) occurrence(m *messageState, field protoreflect.FieldDescri
 }
 
 func (d dynamicModel) packed(m *messageState, field protoreflect.FieldDescriptor, count int) int {
-	fs, cost := d.field(m, field)
+	fs, isNew, cost := d.field(m, field)
 	if field.IsExtension() {
-		return cost + extensionListCost(fs, field, count, 0) + extensionCheckCost(field)
+		return cost + extensionListCost(fs, field, count, 0, isNew) + extensionCheckCost(field)
 	}
 	mem, newCap := appendValues(fs.len, fs.cap, count)
 	fs.len += count
@@ -172,11 +171,23 @@ func (d dynamicModel) packed(m *messageState, field protoreflect.FieldDescriptor
 }
 
 // mismatch is what a field with an unexpected wire type allocates: the
-// reflective decoder creates a list or map before checking the wire type.
+// reflective decoder resolves an extension and creates a list or map before
+// checking the wire type.
 func (d dynamicModel) mismatch(m *messageState, field protoreflect.FieldDescriptor) int {
-	if !field.IsList() && !field.IsMap() {
-		return 0
+	cost := 0
+	if field.IsExtension() && !isGeneratedExtension(field) {
+		cost = dynamicExtensionResolveCost
 	}
-	_, cost := d.field(m, field)
-	return cost
+	if !field.IsList() && !field.IsMap() {
+		return cost
+	}
+	_, isNew, fieldCost := d.field(m, field)
+	if isNew && field.IsExtension() {
+		cost += extensionListSize
+	}
+	return cost + fieldCost
+}
+
+func (d dynamicModel) unknown(*messageState, protoreflect.MessageDescriptor) int {
+	return 0
 }
