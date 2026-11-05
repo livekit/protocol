@@ -58,13 +58,13 @@ func (b Proto) Validate(data []byte, desc protoreflect.MessageDescriptor) error 
 
 // Estimate validates data like Validate and returns the estimated bytes the
 // binary decoder allocates for it, including the root message, decoding into
-// desc's generated type.
+// desc's generated type, or into a dynamicpb message when desc has none.
 func (b Proto) Estimate(data []byte, desc protoreflect.MessageDescriptor) (int, error) {
 	t, err := b.newTally(desc)
 	if err != nil {
 		return 0, err
 	}
-	w := &wireWalk{tally: t, model: newDecoderModel(b.dynamic)}
+	w := &wireWalk{tally: t, model: newDecoderModel(b.dynamic || layoutOf(desc).generated == nil)}
 	if err := w.alloc(w.model.root(desc)); err != nil {
 		return t.total(), err
 	}

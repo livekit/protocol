@@ -26,23 +26,36 @@ import (
 // The Go memory layout of decoded values: what a descriptor's generated type
 // and field kinds occupy, independent of which decoder fills them.
 
-var protoStructSizes sync.Map // protoreflect.FullName -> int
+// messageLayout is desc's generated struct type, nil when it has none, as for
+// a message built at runtime, which only dynamicpb can decode, and the size of
+// one decoded message.
+type messageLayout struct {
+	generated reflect.Type
+	size      int
+}
+
+var messageLayouts sync.Map // protoreflect.FullName -> messageLayout
+
+func layoutOf(desc protoreflect.MessageDescriptor) messageLayout {
+	if v, ok := messageLayouts.Load(desc.FullName()); ok {
+		return v.(messageLayout)
+	}
+	// A dynamicpb message keeps its fields in a map.
+	l := messageLayout{size: 64 + 32*desc.Fields().Len()}
+	if mt, err := protoregistry.GlobalTypes.FindMessageByName(desc.FullName()); err == nil {
+		if t := reflect.TypeOf(mt.Zero().Interface()); t != reflect.TypeFor[*dynamicpb.Message]() && t.Kind() == reflect.Pointer && t.Elem().Kind() == reflect.Struct {
+			l.generated = t.Elem()
+			l.size = int(t.Elem().Size())
+		}
+	}
+	l.size = allocSize(l.size)
+	messageLayouts.Store(desc.FullName(), l)
+	return l
+}
 
 // protoStructSize is the allocation for one message of desc's generated Go type.
 func protoStructSize(desc protoreflect.MessageDescriptor) int {
-	if v, ok := protoStructSizes.Load(desc.FullName()); ok {
-		return v.(int)
-	}
-	// A dynamicpb message keeps its fields in a map.
-	size := 64 + 32*desc.Fields().Len()
-	if mt, err := protoregistry.GlobalTypes.FindMessageByName(desc.FullName()); err == nil {
-		if t := reflect.TypeOf(mt.Zero().Interface()); t != reflect.TypeFor[*dynamicpb.Message]() && t.Kind() == reflect.Pointer && t.Elem().Kind() == reflect.Struct {
-			size = int(t.Elem().Size())
-		}
-	}
-	size = allocSize(size)
-	protoStructSizes.Store(desc.FullName(), size)
-	return size
+	return layoutOf(desc).size
 }
 
 // goValueSize is the size of one value of field's kind as a slice element, map

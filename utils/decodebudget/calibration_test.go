@@ -354,7 +354,7 @@ func repeatedExtensionOptions(number protowire.Number, n, run int, value uint64)
 	return b
 }
 
-func stringExtensions(number protowire.Number, n int, value string) []byte {
+func repeatedStrings(number protowire.Number, n int, value string) []byte {
 	var b []byte
 	for range n {
 		b = protowire.AppendString(protowire.AppendTag(b, number, protowire.BytesType), value)
@@ -418,7 +418,7 @@ func protoCalibrationCases() []calibrationCase {
 		{"dynamic repeated extension 16k", repeatedExtensionOptions(scalarExtensionBase+64, 1<<14, 0, 1<<40), fieldOptions},
 		{"repeated extension 16k", repeatedExtensionOptions(fieldBehavior, 1<<14, 0, 2), fieldOptions},
 		{"packed extension 32k", repeatedExtensionOptions(fieldBehavior, 1<<15, 1<<14, 2), fieldOptions},
-		{"string extension 16k", stringExtensions(annotations.E_DefaultHost.TypeDescriptor().Number(), 1<<14, strings.Repeat("h", 40)),
+		{"string extension 16k", repeatedStrings(annotations.E_DefaultHost.TypeDescriptor().Number(), 1<<14, strings.Repeat("h", 40)),
 			func() proto.Message { return &descriptorpb.ServiceOptions{} }},
 	}
 }
@@ -609,6 +609,32 @@ func TestProtoEstimateDynamicCalibration(t *testing.T) {
 			require.LessOrEqual(t, float64(est), 1.25*float64(got), "the estimate should stay close enough to admit real payloads")
 		})
 	}
+}
+
+// A message built at runtime has no generated type, so Estimate prices the
+// dynamicpb decode it can only take.
+func TestProtoEstimateRuntimeMessage(t *testing.T) {
+	file := must(protodesc.NewFile(&descriptorpb.FileDescriptorProto{
+		Name:    proto.String("decodebudget_runtime_test.proto"),
+		Package: proto.String("decodebudget.runtime"),
+		MessageType: []*descriptorpb.DescriptorProto{{
+			Name: proto.String("Strings"),
+			Field: []*descriptorpb.FieldDescriptorProto{{
+				Name:   proto.String("values"),
+				Number: proto.Int32(1),
+				Label:  descriptorpb.FieldDescriptorProto_LABEL_REPEATED.Enum(),
+				Type:   descriptorpb.FieldDescriptorProto_TYPE_STRING.Enum(),
+			}},
+		}},
+	}, protoregistry.GlobalFiles))
+	desc := file.Messages().Get(0)
+	data := repeatedStrings(1, 1<<16, "x")
+	est, err := Proto{MaxFields: 1 << 30, MaxDepth: 100}.Estimate(data, desc)
+	require.NoError(t, err)
+	got := measureDecode(t, data, func() proto.Message { return dynamicpb.NewMessage(desc) })
+	t.Logf("wire=%d measured=%d estimate=%d ratio=%.2f", len(data), got, est, float64(est)/float64(got))
+	require.GreaterOrEqual(t, uint64(est), got, "the estimate must not undercount")
+	require.LessOrEqual(t, float64(est), 1.25*float64(got), "the estimate should stay close enough to admit real payloads")
 }
 
 // A mismatched occurrence charges the map header but must not count as an entry.
