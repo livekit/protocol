@@ -55,6 +55,10 @@ message JobState {
   int64 accepted_at = 10;
   // when the server sent the assignment for this attempt, in Unix nanoseconds
   int64 assigned_at = 11;
+  // attempts assigned to a worker so far, the current one included
+  uint32 attempts = 12;
+  // started_at of the first attempt assigned to a worker, in Unix nanoseconds
+  int64 first_started_at = 13;
 }
 
 // from Worker to Server
