@@ -70,6 +70,27 @@ func TestSDPUtilFunctions(t *testing.T) {
 	require.Equal(t, "0", bundleMid)
 }
 
+func TestCodecsFromMediaDescriptionRepeatedFormats(t *testing.T) {
+	sd := webrtc.SessionDescription{
+		Type: webrtc.SDPTypeOffer,
+		SDP:  "v=0\r\no=- 1 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=video 9 UDP/TLS/RTP/SAVPF 96 97 96 96 97\r\na=mid:0\r\na=rtpmap:96 VP8/90000\r\na=rtpmap:97 H264/90000\r\na=rtcp-fb:96 nack\r\n",
+	}
+	parsed, err := sd.Unmarshal()
+	require.NoError(t, err)
+
+	codecs, err := CodecsFromMediaDescription(parsed.MediaDescriptions[0])
+	require.NoError(t, err)
+	require.Equal(t, []pionsdp.Codec{
+		{PayloadType: 96, Name: "VP8", ClockRate: 90000, RTCPFeedback: []string{"nack"}},
+		{PayloadType: 97, Name: "H264", ClockRate: 90000},
+	}, codecs)
+
+	// a payload type without an rtpmap is an error
+	parsed.MediaDescriptions[0].MediaName.Formats = []string{"96", "98"}
+	_, err = CodecsFromMediaDescription(parsed.MediaDescriptions[0])
+	require.Error(t, err)
+}
+
 func TestSDPFragment(t *testing.T) {
 	fragment := "a=ice-lite\r\na=ice-options:trickle ice2\r\na=group:BUNDLE 0 1\r\nm=audio 9 UDP/TLS/RTP/SAVPF 111\r\na=mid:0\r\na=ice-ufrag:ysXw\r\na=ice-pwd:vw5LmwG4y/e6dPP/zAP9Gp5k\r\na=candidate:1387637174 1 udp 2122260223 192.0.2.1 61764 typ host generation 0 ufrag EsAw network-id 1\r\na=candidate:3471623853 1 udp 2122194687 198.51.100.2 61765 typ host generation 0 ufrag EsAw network-id 2\r\na=candidate:473322822 1 tcp 1518280447 192.0.2.1 9 typ host tcptype active generation 0 ufrag EsAw network-id 1\r\na=candidate:2154773085 1 tcp 1518214911 198.51.100.2 9 typ host tcptype active generation 0 ufrag EsAw network-id 2\r\na=candidate:393455558 0 tcp 1518283007 [2401:4900:633c:959f:2037:680c:7c40:b3db] 9 typ host tcptype active\r\n"
 
@@ -183,6 +204,42 @@ func TestSDPFragment(t *testing.T) {
 	require.NoError(t, err)
 	expectedMarshalledSDPFragment3 := "a=group:BUNDLE 0 1\r\na=ice-options:trickle ice2\r\nm=video 9 UDP/TLS/RTP/SAVPF 96\r\na=mid:0\r\na=ice-ufrag:ysXw\r\na=ice-pwd:vw5LmwG4y/e6dPP/zAP9Gp5k\r\na=candidate:1387637174 1 udp 2122260223 192.0.2.1 61764 typ host generation 0 ufrag EsAw network-id 1\r\na=candidate:3471623853 1 udp 2122194687 198.51.100.2 61765 typ host generation 0 ufrag EsAw network-id 2\r\na=candidate:473322822 1 tcp 1518280447 192.0.2.1 9 typ host tcptype active generation 0 ufrag EsAw network-id 1\r\na=candidate:2154773085 1 tcp 1518214911 198.51.100.2 9 typ host tcptype active generation 0 ufrag EsAw network-id 2\r\na=candidate:393455558 0 tcp 1518283007 [2401:4900:633c:959f:2037:680c:7c40:b3db] 9 typ host tcptype active\r\n"
 	require.Equal(t, expectedMarshalledSDPFragment3, marshalledSDPFragment3)
+}
+
+func TestSDPFragmentPatchCandidatesIntoMatchingMidOnly(t *testing.T) {
+	section := func(mid string) string {
+		return "m=audio 9 UDP/TLS/RTP/SAVPF 111\r\nc=IN IP4 0.0.0.0\r\na=mid:" + mid + "\r\na=ice-ufrag:old\r\na=ice-pwd:oldpwd\r\na=candidate:1 1 udp 1 192.0.2.9 9 typ host\r\n"
+	}
+	// the repeated mid 0 must not get a second copy of the candidates
+	sd := webrtc.SessionDescription{
+		Type: webrtc.SDPTypeOffer,
+		SDP:  "v=0\r\no=- 1 1 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0 1\r\n" + section("0") + section("1") + section("0"),
+	}
+	parsed, err := sd.Unmarshal()
+	require.NoError(t, err)
+
+	fragment := &SDPFragment{}
+	require.NoError(t, fragment.Unmarshal("a=group:BUNDLE 0 1\r\nm=audio 9 UDP/TLS/RTP/SAVPF 111\r\na=mid:0\r\na=ice-ufrag:new\r\na=ice-pwd:newpwd\r\na=candidate:1 1 udp 2122260223 192.0.2.1 61764 typ host\r\na=candidate:2 1 udp 2122194687 198.51.100.2 61765 typ host\r\n"))
+	require.NoError(t, fragment.PatchICECredentialAndCandidatesIntoSDP(parsed))
+
+	for i, md := range parsed.MediaDescriptions {
+		ufrag, _ := md.Attribute("ice-ufrag")
+		require.Equal(t, "new", ufrag)
+		pwd, _ := md.Attribute("ice-pwd")
+		require.Equal(t, "newpwd", pwd)
+
+		var candidates []string
+		for _, a := range md.Attributes {
+			if a.IsICECandidate() {
+				candidates = append(candidates, a.Value)
+			}
+		}
+		if i == 0 {
+			require.Equal(t, fragment.Candidates(), candidates)
+		} else {
+			require.Empty(t, candidates)
+		}
+	}
 }
 
 func TestSDPFragmentUnmarshalMalformed(t *testing.T) {
