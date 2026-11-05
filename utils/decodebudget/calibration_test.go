@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"runtime"
 	"strings"
+	"sync"
 	"testing"
 	"unicode/utf8"
 
@@ -18,9 +19,12 @@ import (
 	metricsv1 "go.opentelemetry.io/proto/otlp/metrics/v1"
 	resourcev1 "go.opentelemetry.io/proto/otlp/resource/v1"
 	tracev1 "go.opentelemetry.io/proto/otlp/trace/v1"
+	"google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/encoding/protowire"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protodesc"
 	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/reflect/protoregistry"
 	"google.golang.org/protobuf/types/descriptorpb"
 	"google.golang.org/protobuf/types/dynamicpb"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -277,6 +281,87 @@ type calibrationCase struct {
 	newMsg func() proto.Message
 }
 
+// scalarExtensions registers n int64 extensions of FieldOptions, numbered from
+// scalarExtensionBase, and returns their numbers.
+const scalarExtensionBase = 60000
+
+var scalarExtensions = sync.OnceValue(func() []protowire.Number {
+	const n = 64
+	fd := &descriptorpb.FileDescriptorProto{
+		Name:       proto.String("decodebudget_scalar_ext_test.proto"),
+		Package:    proto.String("decodebudget.test"),
+		Dependency: []string{"google/protobuf/descriptor.proto"},
+	}
+	for i := range n {
+		fd.Extension = append(fd.Extension, &descriptorpb.FieldDescriptorProto{
+			Name:     proto.String(fmt.Sprintf("scalar_%d", i)),
+			Number:   proto.Int32(int32(scalarExtensionBase + i)),
+			Label:    descriptorpb.FieldDescriptorProto_LABEL_OPTIONAL.Enum(),
+			Type:     descriptorpb.FieldDescriptorProto_TYPE_INT64.Enum(),
+			Extendee: proto.String(".google.protobuf.FieldOptions"),
+		})
+	}
+	fd.Extension = append(fd.Extension, &descriptorpb.FieldDescriptorProto{
+		Name:     proto.String("repeated_scalar"),
+		Number:   proto.Int32(scalarExtensionBase + n),
+		Label:    descriptorpb.FieldDescriptorProto_LABEL_REPEATED.Enum(),
+		Type:     descriptorpb.FieldDescriptorProto_TYPE_INT64.Enum(),
+		Extendee: proto.String(".google.protobuf.FieldOptions"),
+	})
+	file := must(protodesc.NewFile(fd, protoregistry.GlobalFiles))
+	if err := protoregistry.GlobalTypes.RegisterExtension(dynamicpb.NewExtensionType(file.Extensions().Get(n))); err != nil {
+		panic(err)
+	}
+	nums := make([]protowire.Number, n)
+	for i := range n {
+		xd := file.Extensions().Get(i)
+		if err := protoregistry.GlobalTypes.RegisterExtension(dynamicpb.NewExtensionType(xd)); err != nil {
+			panic(err)
+		}
+		nums[i] = xd.Number()
+	}
+	return nums
+})
+
+// scalarExtensionOptions is n occurrences of FieldOptions' int64 extensions,
+// cycling through the first distinct of them.
+func scalarExtensionOptions(n, distinct int) []byte {
+	nums := scalarExtensions()
+	var b []byte
+	for i := range n {
+		b = protowire.AppendVarint(protowire.AppendTag(b, nums[i%distinct], protowire.VarintType), 1<<40)
+	}
+	return b
+}
+
+// repeatedExtensionOptions is n elements of a repeated extension of
+// FieldOptions, packed into runs of run elements, or unpacked when run is 0.
+func repeatedExtensionOptions(number protowire.Number, n, run int, value uint64) []byte {
+	var b []byte
+	if run == 0 {
+		for range n {
+			b = protowire.AppendVarint(protowire.AppendTag(b, number, protowire.VarintType), value)
+		}
+		return b
+	}
+	for ; n > 0; n -= run {
+		var values []byte
+		for range min(n, run) {
+			values = protowire.AppendVarint(values, value)
+		}
+		b = protowire.AppendBytes(protowire.AppendTag(b, number, protowire.BytesType), values)
+	}
+	return b
+}
+
+func stringExtensions(number protowire.Number, n int, value string) []byte {
+	var b []byte
+	for range n {
+		b = protowire.AppendString(protowire.AppendTag(b, number, protowire.BytesType), value)
+	}
+	return b
+}
+
 func protoCalibrationCases() []calibrationCase {
 	// ScopeSpans{spans: n×{}} inside ResourceSpans inside TracesData.
 	emptySpans := func(n int) []byte {
@@ -302,6 +387,8 @@ func protoCalibrationCases() []calibrationCase {
 		}
 		return b
 	}
+	fieldOptions := func() proto.Message { return &descriptorpb.FieldOptions{} }
+	fieldBehavior := annotations.E_FieldBehavior.TypeDescriptor().Number()
 	participants := calibParticipants()
 	return []calibrationCase{
 		{"traces 512", must(proto.Marshal(calibSpans(512))), func() proto.Message { return &tracev1.TracesData{} }},
@@ -326,6 +413,13 @@ func protoCalibrationCases() []calibrationCase {
 		{"merged resources 64k", mergedResources(1 << 16), func() proto.Message { return &logsv1.LogsData{} }},
 		{"alternating oneof 64k", alternatingOneof(1 << 16), func() proto.Message { return &logsv1.LogsData{} }},
 		{"extension options 16k", extensionOptions(1 << 14), func() proto.Message { return &descriptorpb.DescriptorProto{} }},
+		{"dynamic scalar extension 16k", scalarExtensionOptions(1<<14, 1), fieldOptions},
+		{"dynamic scalar extensions 64", scalarExtensionOptions(64, 64), fieldOptions},
+		{"dynamic repeated extension 16k", repeatedExtensionOptions(scalarExtensionBase+64, 1<<14, 0, 1<<40), fieldOptions},
+		{"repeated extension 16k", repeatedExtensionOptions(fieldBehavior, 1<<14, 0, 2), fieldOptions},
+		{"packed extension 32k", repeatedExtensionOptions(fieldBehavior, 1<<15, 1<<14, 2), fieldOptions},
+		{"string extension 16k", stringExtensions(annotations.E_DefaultHost.TypeDescriptor().Number(), 1<<14, strings.Repeat("h", 40)),
+			func() proto.Message { return &descriptorpb.ServiceOptions{} }},
 	}
 }
 

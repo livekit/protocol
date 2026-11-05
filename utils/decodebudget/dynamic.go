@@ -97,7 +97,7 @@ func (d dynamicModel) field(m *messageState, field protoreflect.FieldDescriptor)
 	cost := mapGrowth(n, knownSlotSize, true)
 	switch {
 	case field.IsExtension():
-		cost += mapGrowth(m.extensions-1, extSlotSize, true) + extensionCost
+		cost += mapGrowth(m.extensions-1, extSlotSize, true)
 		if md := field.Message(); md != nil && !field.IsList() {
 			// Extension types are generated, so their messages are too.
 			cost += max(dynamicMessageCost, protoStructSize(md))
@@ -115,6 +115,7 @@ func (d dynamicModel) message(m *messageState, field protoreflect.FieldDescripto
 		return d.occurrence(m, field, 0), nil
 	}
 	fs, cost := d.field(m, field)
+	cost += extensionCheckCost(field)
 	m.setOneof(field, fs)
 	// A map value message was charged with its entry.
 	if fs.child == nil && !field.IsExtension() && !field.ContainingMessage().IsMapEntry() {
@@ -135,6 +136,11 @@ func (d dynamicModel) occurrence(m *messageState, field protoreflect.FieldDescri
 		if field.MapValue().Message() != nil {
 			cost += dynamicMessageCost
 		}
+	case field.IsList() && field.IsExtension():
+		cost += extensionListCost(fs, field, 1, payloadLen) + extensionCheckCost(field)
+		if md := field.Message(); md != nil {
+			cost += max(dynamicMessageCost, protoStructSize(md))
+		}
 	case field.IsList():
 		var mem int
 		mem, fs.cap = appendValues(fs.len, fs.cap, 1)
@@ -144,7 +150,7 @@ func (d dynamicModel) occurrence(m *messageState, field protoreflect.FieldDescri
 			cost += dynamicMessageCost
 		}
 	default:
-		cost += dynamicBoxCost(field, payloadLen)
+		cost += dynamicBoxCost(field, payloadLen) + extensionCheckCost(field)
 		if field.ContainingMessage().IsMapEntry() && field.Number() == 1 {
 			// The map boxes its key again to store it.
 			cost += dynamicBoxCost(field, payloadLen)
@@ -156,6 +162,9 @@ func (d dynamicModel) occurrence(m *messageState, field protoreflect.FieldDescri
 
 func (d dynamicModel) packed(m *messageState, field protoreflect.FieldDescriptor, count int) int {
 	fs, cost := d.field(m, field)
+	if field.IsExtension() {
+		return cost + extensionListCost(fs, field, count, 0) + extensionCheckCost(field)
+	}
 	mem, newCap := appendValues(fs.len, fs.cap, count)
 	fs.len += count
 	fs.cap = newCap

@@ -50,23 +50,6 @@ func presenceCost(field protoreflect.FieldDescriptor) int {
 	return allocSize(goValueSize(field))
 }
 
-// extensionCost is a set extension's ExtensionField value, and
-// extensionMapSize the map a message allocates for its first extension: a map
-// header and one 8-slot group.
-const (
-	extensionCost    = 64
-	extensionMapSize = 528
-)
-
-// extensionMapCost is the extension map a generated message allocates when
-// field is its first extension; call it before m.get records field.
-func extensionMapCost(m *messageState, field protoreflect.FieldDescriptor) int {
-	if !field.IsExtension() || m.extensions > 0 {
-		return 0
-	}
-	return extensionMapSize
-}
-
 // fieldAllocCost is the allocation for one occurrence of field with a string or
 // bytes payload of payloadLen. Nested message contents are charged separately.
 func fieldAllocCost(field protoreflect.FieldDescriptor, payloadLen int) int {
@@ -89,8 +72,6 @@ func fieldAllocCost(field protoreflect.FieldDescriptor, payloadLen int) int {
 		}
 	case field.IsList():
 		// Slice growth depends on earlier occurrences; the caller charges it.
-	case field.IsExtension():
-		cost += extensionCost
 	case field.ContainingOneof() != nil && !field.ContainingOneof().IsSynthetic():
 		cost += oneofWrapperCost(field)
 	}
@@ -110,7 +91,10 @@ func (g generatedModel) message(m *messageState, field protoreflect.FieldDescrip
 		// Every element or map value is a new message.
 		return g.occurrence(m, field, 0), nil
 	}
-	cost := extensionMapCost(m, field)
+	cost := 0
+	if field.IsExtension() {
+		cost = extensionCost(m, field)
+	}
 	fs := m.get(field)
 	m.setOneof(field, fs)
 	if fs.child != nil {
@@ -120,7 +104,14 @@ func (g generatedModel) message(m *messageState, field protoreflect.FieldDescrip
 }
 
 func (g generatedModel) occurrence(m *messageState, field protoreflect.FieldDescriptor, payloadLen int) int {
-	cost := fieldAllocCost(field, payloadLen) + extensionMapCost(m, field)
+	cost := fieldAllocCost(field, payloadLen)
+	if field.IsExtension() {
+		cost += extensionCost(m, field)
+		if fs := m.get(field); field.IsList() {
+			cost += extensionListCost(fs, field, 1, payloadLen)
+		}
+		return cost
+	}
 	switch {
 	case field.IsList():
 		fs := m.get(field)
@@ -150,6 +141,10 @@ func (g generatedModel) occurrence(m *messageState, field protoreflect.FieldDesc
 func (g generatedModel) packed(m *messageState, field protoreflect.FieldDescriptor, count int) int {
 	if count == 0 {
 		return 0
+	}
+	if field.IsExtension() {
+		cost := extensionCost(m, field)
+		return cost + extensionListCost(m.get(field), field, count, 0)
 	}
 	fs := m.get(field)
 	fs.len += count

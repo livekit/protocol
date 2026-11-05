@@ -58,9 +58,10 @@ func (b Proto) EstimateProtoJSON(data []byte, desc protoreflect.MessageDescripto
 }
 
 // protojson allocates per token and per object on top of the decoded message,
-// its reflection-based list setter boxes each scalar element, and it wraps
-// every map field it sees, even an empty one.
+// its reflection-based list setter boxes each scalar element, it wraps every
+// map field it sees, even an empty one, and it sets each extension value.
 const (
+	jsonExtensionCost  = 64
 	jsonTokenCost      = 8
 	jsonObjectCost     = 8
 	jsonListScalarCost = 24
@@ -251,6 +252,9 @@ func (w *jsonWalk) value(field protoreflect.FieldDescriptor, tok json.Token, dep
 		return w.alloc(jsonScalarCost(field, tok))
 	}
 	cost := fieldAllocCost(field, 0) + jsonScalarCost(field, tok) + presenceCost(field)
+	if field.IsExtension() {
+		cost += jsonExtensionCost
+	}
 	if field.Message() != nil {
 		cost -= protoStructSize(field.Message())
 	}

@@ -85,6 +85,15 @@ type oneofState struct {
 	field protoreflect.FieldDescriptor
 }
 
+func (m *messageState) has(field protoreflect.FieldDescriptor) bool {
+	for i := range m.fields {
+		if m.fields[i].field == field {
+			return true
+		}
+	}
+	return false
+}
+
 func (m *messageState) get(field protoreflect.FieldDescriptor) *fieldState {
 	for i := range m.fields {
 		if m.fields[i].field == field {
