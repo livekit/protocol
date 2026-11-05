@@ -21,8 +21,7 @@ import (
 
 // Extension allocations of protobuf-go's binary decoder: a generated message's
 // extension map (its header, then one group of 8 slots, then 56-byte slots), a
-// repeated extension's list and the slice header reflect.Append allocates per
-// element, the field info rebuilt per occurrence of an extension type it
+// repeated extension's list, the field info rebuilt per occurrence of an extension type it
 // cannot cache, such as dynamicpb's, and for such a type on a dynamicpb
 // message, the descriptor resolving it allocates and the type check of its
 // singular values.
@@ -31,7 +30,6 @@ const (
 	extensionMapSize            = 48 + extensionGroupSize
 	extensionSlotSize           = 56
 	extensionListSize           = 72
-	extensionAppendCost         = 24
 	uncachedExtensionCost       = 96 + 16
 	dynamicExtensionResolveCost = 16
 	dynamicExtensionCheckCost   = 48
@@ -120,10 +118,5 @@ func extensionListCost(fs *fieldState, field protoreflect.FieldDescriptor, count
 		cost += mem
 		fs.cap = mem / size
 	}
-	box := 0
-	if field.Message() == nil {
-		// Boxed scalars come from the tiny allocator, unrounded.
-		box = size
-	}
-	return cost + count*(extensionAppendCost+box)
+	return cost + count*reflectAppendCost(field)
 }

@@ -35,6 +35,17 @@ func mapBoxCost(field protoreflect.FieldDescriptor) int {
 	return 2 * allocSize(goValueSize(field))
 }
 
+// reflectAppendCost is appending one element to a generated list through
+// protoreflect: reflect.Append moves the slice header to the heap, and boxes a
+// scalar, which the tiny allocator leaves unrounded when it has no pointers.
+func reflectAppendCost(field protoreflect.FieldDescriptor) int {
+	const sliceHeader = 24
+	if field.Message() != nil {
+		return sliceHeader
+	}
+	return sliceHeader + goValueSize(field)
+}
+
 func oneofWrapperCost(field protoreflect.FieldDescriptor) int {
 	return allocSize(goValueSize(field))
 }
@@ -116,8 +127,12 @@ func (g generatedModel) occurrence(m *messageState, field protoreflect.FieldDesc
 	switch {
 	case field.IsList():
 		fs := m.get(field)
+		grow := appendGrow
+		if hasPointers(field) {
+			grow = appendGrowPointers
+		}
 		var mem int
-		mem, fs.cap = appendGrow(fs.len, fs.cap, 1, goValueSize(field))
+		mem, fs.cap = grow(fs.len, fs.cap, 1, goValueSize(field))
 		fs.len++
 		cost += mem
 	case field.IsMap():

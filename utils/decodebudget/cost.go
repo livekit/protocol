@@ -87,6 +87,17 @@ func appendGrow(l, c, add, elem int) (mem, newCap int) {
 	return mem, mem / elem
 }
 
+// appendGrowPointers is appendGrow for elements holding pointers, whose
+// backing arrays can carry a malloc header.
+func appendGrowPointers(l, c, add, elem int) (mem, newCap int) {
+	newCap = nextSliceCap(l+add, c)
+	if newCap == c {
+		return 0, c
+	}
+	size, usable := pointerAlloc(newCap * elem)
+	return size, usable / elem
+}
+
 // nextSliceCap is the capacity growslice requests, before size-class rounding,
 // to hold newLen elements in a slice of capacity c.
 func nextSliceCap(newLen, c int) int {

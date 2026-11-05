@@ -377,6 +377,17 @@ func unknownOptions(n int) []byte {
 	return []byte(strings.Repeat(string(protowire.AppendBytes(protowire.AppendTag(nil, 2, protowire.BytesType), field)), n))
 }
 
+// emptyStringLists is SubscriptionPermission{track_permissions: n×{track_sids:
+// each×""}}: a slice of strings carries a malloc header.
+func emptyStringLists(n, each int) []byte {
+	sids := num(&livekit.TrackPermission{}, "track_sids")
+	var tp []byte
+	for range each {
+		tp = protowire.AppendString(protowire.AppendTag(tp, sids, protowire.BytesType), "")
+	}
+	return []byte(strings.Repeat(string(field(num(&livekit.SubscriptionPermission{}, "track_permissions"), tp)), n))
+}
+
 func repeatedStrings(number protowire.Number, n int, value string) []byte {
 	var b []byte
 	for range n {
@@ -446,6 +457,7 @@ func protoCalibrationCases() []calibrationCase {
 		{"dynamic repeated extension as fixed32 64k", repeatedField(scalarExtensionBase+64, protowire.Fixed32Type, 1<<16), fieldOptions},
 		{"empty packed extension runs 64k", repeatedField(scalarExtensionBase+64, protowire.BytesType, 1<<16), fieldOptions},
 		{"unknown fields in extendable options 64k", unknownOptions(1 << 16), func() proto.Message { return &descriptorpb.DescriptorProto{} }},
+		{"empty string lists 4k", emptyStringLists(1<<12, 128), func() proto.Message { return &livekit.SubscriptionPermission{} }},
 		{"string extension 16k", repeatedStrings(annotations.E_DefaultHost.TypeDescriptor().Number(), 1<<14, strings.Repeat("h", 40)),
 			func() proto.Message { return &descriptorpb.ServiceOptions{} }},
 	}
