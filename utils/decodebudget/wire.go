@@ -121,8 +121,6 @@ func (m *messageState) isSet(oneof protoreflect.OneofDescriptor, field protorefl
 	return false
 }
 
-// unknown is the allocation for retaining an n-byte field in the message's
-// unknown-fields slice.
 // statePool recycles the states of list and map elements, which nothing
 // reads once the element is walked, to keep the walk's own allocation down.
 type statePool struct {
@@ -151,6 +149,8 @@ func (p *statePool) put(m *messageState) {
 	p.free = append(p.free, m)
 }
 
+// unknown is the allocation for retaining an n-byte field in the message's
+// unknown-fields slice.
 func (m *messageState) unknown(n int) int {
 	mem, newCap := appendGrow(m.unknownLen, m.unknownCap, n, 1)
 	m.unknownLen += n
@@ -228,8 +228,6 @@ func (w *wireWalk) message(data []byte, desc protoreflect.MessageDescriptor, dep
 	return nil
 }
 
-// packed walks a packed scalar run; decoders accept one even when the schema
-// prefers unpacked.
 func (w *wireWalk) child(data []byte, desc protoreflect.MessageDescriptor, depth int, fs *fieldState) error {
 	if fs == nil {
 		state := w.states.get()
@@ -243,6 +241,8 @@ func (w *wireWalk) child(data []byte, desc protoreflect.MessageDescriptor, depth
 	return w.message(data, desc, depth, fs.child)
 }
 
+// packed walks a packed scalar run; decoders accept one even when the schema
+// prefers unpacked.
 func (w *wireWalk) packed(value []byte, field protoreflect.FieldDescriptor, state *messageState) error {
 	count := 0
 	for len(value) > 0 {
