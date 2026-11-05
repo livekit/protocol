@@ -16,6 +16,7 @@ package datatrack
 
 import (
 	"bytes"
+	"encoding/binary"
 	"testing"
 
 	"github.com/livekit/protocol/livekit"
@@ -314,6 +315,15 @@ func TestPacket(t *testing.T) {
 		}
 		err = unmarshaled.Unmarshal(badPacket)
 		require.Error(t, err)
+
+		// repeated extension id
+		badPacket = []byte{
+			0x14, 0x00, 0x0d, 0x05, 0x1a, 0x0a, 0x27, 0x0f,
+			0xde, 0xad, 0xbe, 0xef, 0x00, 0x01, 0x07, 0x00,
+			0x07, 0x00, 0x00, 0x00, 0xff, 0xfe, 0xfd, 0xfc,
+		}
+		err = unmarshaled.Unmarshal(badPacket)
+		require.ErrorIs(t, err, ErrExtensionDuplicateID)
 	})
 
 	t.Run("oversized extension padding does not panic", func(t *testing.T) {
@@ -349,5 +359,100 @@ func TestPacket(t *testing.T) {
 		}
 		err := unmarshaled.Unmarshal(badPacket)
 		require.Error(t, err)
+	})
+
+	t.Run("many empty extensions are bounded", func(t *testing.T) {
+		// 2-byte (id, size 0) extensions filling a 64 KiB block
+		raw := make([]byte, 65532)
+		raw[0] = 1 << extensionsShift
+		binary.BigEndian.PutUint16(raw[extensionsSizeOffset:], uint16((len(raw)-headerLength)/4-1))
+		for i := extensionsSizeOffset + extensionsSizeLength; i < len(raw); i += 2 {
+			raw[i] = 7
+		}
+
+		var unmarshaled Packet
+		require.ErrorIs(t, unmarshaled.Unmarshal(raw), ErrExtensionDuplicateID)
+		require.LessOrEqual(t, len(unmarshaled.Extensions), 255)
+	})
+
+	t.Run("extensions size above 64 KiB round trips", func(t *testing.T) {
+		// 255 distinct extensions of 255 bytes: 65535 bytes, more than a uint16 total can hold with the size field
+		raw := []byte{0x1c, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00}
+		for id := 1; id <= 255; id++ {
+			raw = append(raw, byte(id), 0xff)
+			raw = append(raw, bytes.Repeat([]byte{byte(id)}, 255)...)
+		}
+		raw = append(raw, 0x00, 0x00, 0x00)
+		raw = append(raw, "payload"...)
+
+		var unmarshaled Packet
+		require.NoError(t, unmarshaled.Unmarshal(raw))
+		buf, err := unmarshaled.Marshal()
+		require.NoError(t, err)
+		require.Equal(t, raw[:extensionsSizeOffset+extensionsSizeLength], buf[:extensionsSizeOffset+extensionsSizeLength])
+		require.True(t, bytes.Equal(raw, buf))
+	})
+
+	t.Run("stale extensions size marshals from the list", func(t *testing.T) {
+		// user timestamp + 1 byte participant SID extension, 4 byte payload
+		rawPacket := []byte{
+			0x1c, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x02, 0x08,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2a,
+			0xff, 0x01, 0x78, 0x00, 0xde, 0xad, 0xbe, 0xef,
+		}
+		var received Packet
+		require.NoError(t, received.Unmarshal(rawPacket))
+
+		extParticipantSid, err := NewExtensionParticipantSid("PA_abcdefghijkl")
+		require.NoError(t, err)
+		ext, err := extParticipantSid.Marshal()
+		require.NoError(t, err)
+
+		// by-value copies share the Extensions backing array, so the second copy's ExtensionsSize lags its list
+		for _, handle := range []uint16{101, 102} {
+			forwarded := received
+			forwarded.Handle = handle
+			forwarded.AddExtension(ext)
+			buf, err := forwarded.Marshal()
+			require.NoError(t, err)
+
+			var unmarshaled Packet
+			require.NoError(t, unmarshaled.Unmarshal(buf))
+			require.Equal(t, handle, unmarshaled.Handle)
+			require.Equal(t, received.Payload, unmarshaled.Payload)
+			got, err := unmarshaled.GetExtension(uint8(livekit.DataTrackExtensionID_DTEI_PARTICIPANT_SID))
+			require.NoError(t, err)
+			require.Equal(t, ext.Data(), got.Data())
+		}
+
+		var larger Packet
+		require.NoError(t, larger.Unmarshal(rawPacket))
+		larger.ExtensionsSize = 52
+		buf, err := larger.Marshal()
+		require.NoError(t, err)
+		require.Equal(t, rawPacket, buf)
+	})
+
+	t.Run("reused packet unmarshal", func(t *testing.T) {
+		rawPacket := []byte{
+			0x14, 0x00, 0x0d, 0x05, 0x1a, 0x0a, 0x27, 0x0f,
+			0xde, 0xad, 0xbe, 0xef, 0x00, 0x03, 0xff, 0x0b,
+			0x70, 0x61, 0x72, 0x74, 0x69, 0x63, 0x69, 0x70,
+			0x61, 0x6e, 0x74, 0x00, 0xff, 0xfe, 0xfd, 0xfc,
+		}
+		var unmarshaled Packet
+		require.NoError(t, unmarshaled.Unmarshal(rawPacket))
+		require.NoError(t, unmarshaled.Unmarshal(rawPacket))
+		require.Len(t, unmarshaled.Extensions, 1)
+		buf, err := unmarshaled.Marshal()
+		require.NoError(t, err)
+		require.Equal(t, rawPacket, buf)
+
+		noExtPacket := append([]byte{0x10}, rawPacket[1:headerLength]...)
+		require.NoError(t, unmarshaled.Unmarshal(noExtPacket))
+		require.False(t, unmarshaled.HasExtensions)
+		require.Empty(t, unmarshaled.Extensions)
+		require.Zero(t, unmarshaled.ExtensionsSize)
 	})
 }
