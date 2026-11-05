@@ -173,7 +173,7 @@ func newHTTPClient(params HTTPClientParams) *retryablehttp.Client {
 	return rhc
 }
 
-// the endpoint picks Retry-After, so it must not stretch the wait past RetryWaitMax
+// the webhook receiver sets Retry-After, so cap the wait at RetryWaitMax
 func cappedBackoff(waitMin, waitMax time.Duration, attemptNum int, resp *http.Response) time.Duration {
 	return min(retryablehttp.DefaultBackoff(waitMin, waitMax, attemptNum, resp), waitMax)
 }
