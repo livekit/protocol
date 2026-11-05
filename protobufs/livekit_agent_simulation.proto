@@ -33,11 +33,46 @@ message SimulationRunSummary {
   string to_improve = 4;
   repeated Issue issues = 5;
   map<string, livekit.agent.ChatContext> chat_history = 6;
+  // Keyed by job id, like chat_history.
+  map<string, ScenarioFlow> scenario_flows = 7;
 
   message Issue {
     string description = 1;
     string suggestion = 2;
     string label = 3;
+  }
+
+  // One scenario's call condensed into named phases, plus what went wrong in it, if anything.
+  message ScenarioFlow {
+    // In call order. Together they cover every item of the job's chat_history exactly once.
+    repeated Phase phases = 1;
+    // Unset when nothing went wrong.
+    Problem problem = 2;
+
+    message Phase {
+      string name = 1;
+      // The phase's last chat_history item; the next phase starts right after it.
+      string end_item_id = 2;
+    }
+
+    message Problem {
+      Category category = 1;
+      // The chat_history item that shows the problem most clearly.
+      string item_id = 2;
+      string note = 3;
+    }
+
+    enum Category {
+      CATEGORY_UNSPECIFIED = 0;
+      CATEGORY_AGENT_BEHAVIOR = 1;
+      CATEGORY_INFRA_OR_HARNESS = 2;
+      // The judge failed a call that met a reasonable reading of the expectations.
+      CATEGORY_JUDGE_TOO_STRICT = 3;
+      // The judge passed a call whose expectations were not actually met.
+      CATEGORY_JUDGE_FALSE_PASS = 4;
+      // The caller's script made the expectations impossible to meet.
+      CATEGORY_SCENARIO_DESIGN = 5;
+    }
   }
 }
 
