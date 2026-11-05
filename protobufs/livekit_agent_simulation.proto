@@ -44,7 +44,8 @@ message SimulationRunSummary {
 
   // One scenario's call condensed into named phases, plus what went wrong in it, if anything.
   message ScenarioFlow {
-    // In call order. Together they cover every item of the job's chat_history exactly once.
+    // In call order. Each starts right after the previous one ends; the first starts at the
+    // job's first chat_history item.
     repeated Phase phases = 1;
     // Unset when nothing went wrong.
     Problem problem = 2;
