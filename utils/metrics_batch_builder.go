@@ -309,7 +309,7 @@ func (m *MetricsBatchBuilder) translateStrDataIndex(strData []string, index uint
 	}
 
 	baseIdx := index - uint32(livekit.MetricLabel_METRIC_LABEL_PREDEFINED_MAX_VALUE)
-	if len(strData) <= int(baseIdx) {
+	if uint64(len(strData)) <= uint64(baseIdx) {
 		return 0, false
 	}
 
@@ -325,7 +325,7 @@ func getStrDataForIndex(mb *livekit.MetricsBatch, index uint32) (string, bool) {
 	}
 
 	baseIdx := index - uint32(livekit.MetricLabel_METRIC_LABEL_PREDEFINED_MAX_VALUE)
-	if len(mb.StrData) <= int(baseIdx) {
+	if uint64(len(mb.StrData)) <= uint64(baseIdx) {
 		return "", false
 	}
 
