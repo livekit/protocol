@@ -140,7 +140,7 @@ func jsonStringCost(raw []byte, decodedLen int) int {
 	return cost + allocSize(decodedLen)
 }
 
-var replacementChar = []byte(string(utf8.RuneError))
+const replacementChar = string(utf8.RuneError)
 
 // indexRebuild is where protojson's parseString stops aliasing its input.
 func indexRebuild(in []byte) int {
@@ -148,7 +148,7 @@ func indexRebuild(in []byte) int {
 	if i < 0 {
 		i = len(in)
 	}
-	if j := bytes.Index(in[:i], replacementChar); j >= 0 {
+	if j := bytes.Index(in[:i], []byte(replacementChar)); j >= 0 {
 		return j
 	}
 	return i
