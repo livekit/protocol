@@ -25,6 +25,7 @@
 package livekit
 
 import (
+	_ "github.com/livekit/protocol/livekit/logger"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
@@ -2133,7 +2134,7 @@ var File_livekit_agentdb_proto protoreflect.FileDescriptor
 
 const file_livekit_agentdb_proto_rawDesc = "" +
 	"\n" +
-	"\x15livekit_agentdb.proto\x12\alivekit\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x9c\x1b\n" +
+	"\x15livekit_agentdb.proto\x12\alivekit\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x14logger/options.proto\"\xa1\x1b\n" +
 	"\aAgentDB\x1a<\n" +
 	"\rCreateRequest\x12+\n" +
 	"\x03ttl\x18\x01 \x01(\v2\x19.google.protobuf.DurationR\x03ttl\x1al\n" +
@@ -2173,7 +2174,7 @@ const file_livekit_agentdb_proto_rawDesc = "" +
 	"\fdownload_url\x18\x01 \x01(\tR\vdownloadUrl\x129\n" +
 	"\n" +
 	"expires_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\x12\x10\n" +
-	"\x03tip\x18\x03 \x01(\x03R\x03tip\x1a\xa8\x14\n" +
+	"\x03tip\x18\x03 \x01(\x03R\x03tip\x1a\xad\x14\n" +
 	"\x04Wire\x1a\xe0\x04\n" +
 	"\rClientMessage\x12\x1d\n" +
 	"\n" +
@@ -2231,9 +2232,9 @@ const file_livekit_agentdb_proto_rawDesc = "" +
 	"\ftimestamp_ms\x18\x01 \x01(\x03R\vtimestampMs\x1a^\n" +
 	"\x04Pong\x123\n" +
 	"\x16last_ping_timestamp_ms\x18\x01 \x01(\x03R\x13lastPingTimestampMs\x12!\n" +
-	"\ftimestamp_ms\x18\x02 \x01(\x03R\vtimestampMs\x1a>\n" +
-	"\x05Hello\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token\x12\x1f\n" +
+	"\ftimestamp_ms\x18\x02 \x01(\x03R\vtimestampMs\x1aC\n" +
+	"\x05Hello\x12\x19\n" +
+	"\x05token\x18\x01 \x01(\tB\x03\xc0P\x02R\x05token\x12\x1f\n" +
 	"\vdatabase_id\x18\x02 \x01(\tR\n" +
 	"databaseId\x1am\n" +
 	"\aHelloOk\x12\x10\n" +

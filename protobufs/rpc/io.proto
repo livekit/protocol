@@ -75,12 +75,12 @@ message CreateIngressResponse {
 // Query an ingress info from an ingress ID or stream key
 message GetIngressInfoRequest {
   string ingress_id = 1 [(logger.name) = "ingressID"];
-  string stream_key = 2;
+  string stream_key = 2 [(logger.sensitivity) = SENSITIVITY_SECRET];
 }
 
 message GetIngressInfoResponse {
   livekit.IngressInfo info = 1;
-  string token = 2;
+  string token = 2 [(logger.sensitivity) = SENSITIVITY_SECRET];
   string ws_url = 3;
   string project_id = 6 [(logger.name) = "projectID"];
   map<string, string> logging_fields = 4;
@@ -161,7 +161,7 @@ message EvaluateSIPDispatchRulesRequest {
   string src_address = 4 [deprecated = true];
 
   // What pin has been entered if any
-  string pin = 5;
+  string pin = 5 [(logger.sensitivity) = SENSITIVITY_SECRET];
 
   // Caller rejected pin prompt, only try public rooms
   bool no_pin = 6;

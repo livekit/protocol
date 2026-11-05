@@ -338,6 +338,24 @@ func TestGetAudioOnly(t *testing.T) {
 			audioOnly: true,
 		},
 		{
+			name: "TrackComposite audio track only",
+			info: &livekit.EgressInfo{
+				Request: &livekit.EgressInfo_TrackComposite{
+					TrackComposite: &livekit.TrackCompositeEgressRequest{AudioTrackId: "TR_audio"},
+				},
+			},
+			audioOnly: true,
+		},
+		{
+			name: "TrackComposite with video track",
+			info: &livekit.EgressInfo{
+				Request: &livekit.EgressInfo_TrackComposite{
+					TrackComposite: &livekit.TrackCompositeEgressRequest{AudioTrackId: "TR_audio", VideoTrackId: "TR_video"},
+				},
+			},
+			audioOnly: false,
+		},
+		{
 			name: "Track request returns false",
 			info: &livekit.EgressInfo{
 				Request: &livekit.EgressInfo_Track{

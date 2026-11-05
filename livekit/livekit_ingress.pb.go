@@ -1485,13 +1485,13 @@ const file_livekit_ingress_proto_rawDesc = "" +
 	"videoCodec\x12\x1d\n" +
 	"\n" +
 	"frame_rate\x18\x02 \x01(\x01R\tframeRate\x12+\n" +
-	"\x06layers\x18\x03 \x03(\v2\x13.livekit.VideoLayerR\x06layers\"\xe8\x05\n" +
+	"\x06layers\x18\x03 \x03(\v2\x13.livekit.VideoLayerR\x06layers\"\xed\x05\n" +
 	"\vIngressInfo\x12+\n" +
 	"\n" +
 	"ingress_id\x18\x01 \x01(\tB\f\xbaP\tingressIDR\tingressId\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1d\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\"\n" +
 	"\n" +
-	"stream_key\x18\x03 \x01(\tR\tstreamKey\x12\x10\n" +
+	"stream_key\x18\x03 \x01(\tB\x03\xc0P\x02R\tstreamKey\x12\x10\n" +
 	"\x03url\x18\x04 \x01(\tR\x03url\x124\n" +
 	"\n" +
 	"input_type\x18\x05 \x01(\x0e2\x15.livekit.IngressInputR\tinputType\x121\n" +

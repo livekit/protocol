@@ -14,13 +14,10 @@
 
 package datatrack
 
-import "encoding/binary"
+import (
+	"encoding/binary"
 
-const (
-	// TODO: once the collision is fully resolved (see #1825), the source of truth for
-	// extension IDs will become the Protobuf enum, `DataTrackExtensionID`, at which point
-	// this const will be removed.
-	ExtensionUserTimestampID uint8 = 2
+	"github.com/livekit/protocol/livekit"
 )
 
 type ExtensionUserTimestamp struct {
@@ -39,13 +36,13 @@ func (e *ExtensionUserTimestamp) Marshal() (Extension, error) {
 	data := make([]byte, binary.Size(e.timestamp))
 	binary.BigEndian.PutUint64(data, e.timestamp)
 	return Extension{
-		id:   ExtensionUserTimestampID,
+		id:   uint8(livekit.DataTrackExtensionID_DTEI_USER_TIMESTAMP),
 		data: data,
 	}, nil
 }
 
 func (e *ExtensionUserTimestamp) Unmarshal(ext Extension) error {
-	if ext.id != ExtensionUserTimestampID {
+	if ext.id != uint8(livekit.DataTrackExtensionID_DTEI_USER_TIMESTAMP) {
 		return ErrExtensionInvalidID
 	}
 

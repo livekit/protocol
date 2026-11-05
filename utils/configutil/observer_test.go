@@ -17,6 +17,7 @@ package configutil
 import (
 	"errors"
 	"os"
+	"sync"
 	"testing"
 	"time"
 
@@ -245,6 +246,81 @@ func TestNewObserverBuilderOnly(t *testing.T) {
 	t.Cleanup(obs.Close)
 	require.Equal(t, &TestConfig{Foo: "new"}, conf)
 	require.Same(t, conf, obs.Load())
+}
+
+func TestObserveCurrentReplays(t *testing.T) {
+	obs := NewStaticObserver(&TestConfig{Foo: "a"})
+	obs.EmitConfigUpdate(&TestConfig{Foo: "b"})
+
+	var seen []string
+	obs.ObserveCurrent(func(c *TestConfig) { seen = append(seen, c.Foo) })
+	require.Equal(t, []string{"b"}, seen)
+
+	obs.EmitConfigUpdate(&TestConfig{Foo: "c"})
+	require.Equal(t, []string{"b", "c"}, seen)
+}
+
+func TestObserveCurrentAfterReload(t *testing.T) {
+	f, err := os.CreateTemp(os.TempDir(), "lk-test-*.yaml")
+	require.NoError(t, err)
+	t.Cleanup(func() { _ = f.Close() })
+	_, err = f.WriteString(testConfig0)
+	require.NoError(t, err)
+
+	obs, _, err := NewObserver(f.Name(), testConfigBuilder{})
+	require.NoError(t, err)
+	t.Cleanup(obs.Close)
+
+	_, err = f.WriteAt([]byte(testConfig1), 0)
+	require.NoError(t, err)
+	require.Eventually(t, func() bool { return obs.Load().Foo == "b" }, time.Second, 5*time.Millisecond)
+
+	got := make(chan string, 1)
+	obs.ObserveCurrent(func(c *TestConfig) { got <- c.Foo })
+	require.Equal(t, "b", <-got)
+}
+
+// A subscriber racing emits must never step back to an older config.
+func TestObserveCurrentOrdering(t *testing.T) {
+	type seqConfig struct{ seq int }
+	const emits, subscribers = 2000, 32
+
+	obs := NewStaticObserver(&seqConfig{})
+	seen := make([][]int, subscribers)
+
+	var wg sync.WaitGroup
+	start := make(chan struct{})
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		<-start
+		for i := 1; i <= emits; i++ {
+			obs.EmitConfigUpdate(&seqConfig{seq: i})
+		}
+	}()
+	for i := range subscribers {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			<-start
+			obs.ObserveCurrent(func(c *seqConfig) { seen[i] = append(seen[i], c.seq) })
+		}()
+	}
+	close(start)
+	wg.Wait()
+
+	for i, s := range seen {
+		require.NotEmpty(t, s, "subscriber %d", i)
+		for j := 1; j < len(s); j++ {
+			require.Greater(t, s[j], s[j-1], "subscriber %d went from %d to %d", i, s[j-1], s[j])
+		}
+		require.Equal(t, emits, s[len(s)-1], "subscriber %d", i)
+	}
+}
+
+func TestObserveCurrentNil(t *testing.T) {
+	var obs *Observer[TestConfig]
+	obs.ObserveCurrent(func(*TestConfig) { t.Fatal("called on nil observer") })()
 }
 
 func gaugeVecValue(g *prometheus.GaugeVec, labels ...string) float64 {

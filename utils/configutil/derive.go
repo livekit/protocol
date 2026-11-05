@@ -25,8 +25,8 @@ package configutil
 // NewAtomic* helpers instead: they cache the result and recompute it on reload.
 //
 // The result holds no state and needs no cleanup: it subscribes to src only
-// while something is subscribed to it, and forwards src's emit semantics
-// unchanged.
+// while something is subscribed to it, and forwards src's Observe and
+// ObserveCurrent semantics unchanged.
 func Derive[Src, Dst any](src Observable[Src], project func(*Src) *Dst) Observable[Dst] {
 	return derived[Src, Dst]{src: src, project: project}
 }
@@ -38,6 +38,10 @@ type derived[Src, Dst any] struct {
 
 func (d derived[Src, Dst]) Observe(cb func(*Dst)) func() {
 	return d.src.Observe(func(c *Src) { cb(d.project(c)) })
+}
+
+func (d derived[Src, Dst]) ObserveCurrent(cb func(*Dst)) func() {
+	return d.src.ObserveCurrent(func(c *Src) { cb(d.project(c)) })
 }
 
 func (d derived[Src, Dst]) Load() *Dst {

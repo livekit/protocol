@@ -14,13 +14,10 @@
 
 package datatrack
 
+import "github.com/livekit/protocol/livekit"
+
 const (
 	ExtensionE2EEIVLength = 12
-
-	// TODO: once the collision is fully resolved (see #1825), the source of truth for
-	// extension IDs will become the Protobuf enum, `DataTrackExtensionID`, at which point
-	// this const will be removed.
-	ExtensionE2EEID uint8 = 1
 )
 
 type ExtensionE2EE struct {
@@ -45,13 +42,13 @@ func (e *ExtensionE2EE) Marshal() (Extension, error) {
 	data[0] = e.keyIndex
 	copy(data[1:], e.iv[:])
 	return Extension{
-		id:   ExtensionE2EEID,
+		id:   uint8(livekit.DataTrackExtensionID_DTEI_E2EE),
 		data: data,
 	}, nil
 }
 
 func (e *ExtensionE2EE) Unmarshal(ext Extension) error {
-	if ext.id != ExtensionE2EEID {
+	if ext.id != uint8(livekit.DataTrackExtensionID_DTEI_E2EE) {
 		return ErrExtensionInvalidID
 	}
 

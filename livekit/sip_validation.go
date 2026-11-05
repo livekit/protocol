@@ -283,7 +283,10 @@ func findAngleBrackets(value string) (int, int, error) {
 	start := -1
 	end := -1
 
-	for i, r := range value {
+	// A leading quoted display name may contain angle brackets of its own.
+	offset := len(value) - len(skipQuotedDisplayName(value))
+	for i, r := range value[offset:] {
+		i += offset
 		switch r {
 		case '<':
 			if start != -1 {
@@ -313,6 +316,14 @@ func findAngleBrackets(value string) (int, int, error) {
 
 // validateNameAddrHeader validates headers that use name-addr format per RFC 3261 Section 20.10
 func validateNameAddrHeader(value string) error {
+	_, err := ParseSIPNameAddr(value)
+	return err
+}
+
+// ParseSIPNameAddr validates a value in name-addr or addr-spec format, as found
+// in From, To and Refer-To headers, and returns the user part of its URI. The
+// user is empty when the URI has none.
+func ParseSIPNameAddr(value string) (string, error) {
 	// RFC 3261 Section 20.10 - name-addr format
 	// name-addr = [display-name] <addr-spec>
 	// addr-spec = SIP-URI / SIPS-URI / absoluteURI
@@ -320,20 +331,37 @@ func validateNameAddrHeader(value string) error {
 	uri := value
 	start, end, err := findAngleBrackets(value)
 	if err != nil {
-		return err
+		return "", err
 	}
 	if start >= 0 || end >= 0 {
 		uri = value[start+1 : end]
 		if err := validateDisplayName(strings.TrimSpace(value[:start])); err != nil {
-			return err
+			return "", err
 		}
 	} else {
 		// This is a bare URI, and should comply with addr-spec, no special characters
 		if strings.ContainsAny(value, ",? ") {
-			return errors.New("bare URI with special characters")
+			return "", errors.New("bare URI with special characters")
 		}
 	}
-	return validateURI(uri)
+	return uriUser(uri)
+}
+
+// skipQuotedDisplayName returns the part of a name-addr after a leading quoted
+// display name. An unterminated quote returns the value unchanged.
+func skipQuotedDisplayName(s string) string {
+	if !strings.HasPrefix(s, "\"") {
+		return s
+	}
+	for i := 1; i < len(s); i++ {
+		switch s[i] {
+		case '\\':
+			i++
+		case '"':
+			return s[i+1:]
+		}
+	}
+	return s
 }
 
 // validateDisplayName validates a display name in name-addr format
@@ -360,20 +388,31 @@ func validateDisplayName(displayName string) error {
 	return nil
 }
 
-// validateURI validates URIs that can appear in name-addr format
-func validateURI(uri string) error {
+// uriUser validates a URI that can appear in name-addr format and returns its
+// user part: up to the "@" for sip and sips, the whole number for tel, without
+// parameters or headers.
+func uriUser(uri string) (string, error) {
 	// Just do the basics, full validation should be done by sip service
-	scheme := strings.SplitN(uri, ":", 2)[0]
-	if scheme != "sip" && scheme != "sips" && scheme != "tel" {
+	scheme, rest, _ := strings.Cut(uri, ":")
+	var user string
+	switch strings.ToLower(scheme) {
+	case "sip", "sips":
+		if u, _, found := strings.Cut(rest, "@"); found {
+			user = u
+		}
+	case "tel":
 		// Technically, it either needs to be sip/s: or scheme://...
 		// Thus, tel: uri should not be supported here... but we allow it because of de-facto usage.
-		return errors.New("uri: scheme not one of sip, sips, or tel")
+		user = rest
+	default:
+		return "", errors.New("uri: scheme not one of sip, sips, or tel")
 	}
 
 	// Just no spaces, proper validation should be done in sip service
 	if strings.Contains(uri, " ") {
-		return errors.New("uri: contains spaces")
+		return "", errors.New("uri: contains spaces")
 	}
 
-	return nil
+	user, _, _ = strings.Cut(user, ";")
+	return user, nil
 }

@@ -5384,19 +5384,19 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x15DeleteSIPTrunkRequest\x12/\n" +
 	"\fsip_trunk_id\x18\x01 \x01(\tB\r\xbaP\n" +
 	"sipTrunkIDR\n" +
-	"sipTrunkId\"F\n" +
+	"sipTrunkId\"K\n" +
 	"\x15SIPDispatchRuleDirect\x12\x1b\n" +
-	"\troom_name\x18\x01 \x01(\tR\broomName\x12\x10\n" +
-	"\x03pin\x18\x02 \x01(\tR\x03pin\"s\n" +
+	"\troom_name\x18\x01 \x01(\tR\broomName\x12\x15\n" +
+	"\x03pin\x18\x02 \x01(\tB\x03\xc0P\x02R\x03pin\"x\n" +
 	"\x19SIPDispatchRuleIndividual\x12\x1f\n" +
 	"\vroom_prefix\x18\x01 \x01(\tR\n" +
-	"roomPrefix\x12\x10\n" +
-	"\x03pin\x18\x02 \x01(\tR\x03pin\x12#\n" +
-	"\rno_randomness\x18\x03 \x01(\bR\fnoRandomness\"h\n" +
+	"roomPrefix\x12\x15\n" +
+	"\x03pin\x18\x02 \x01(\tB\x03\xc0P\x02R\x03pin\x12#\n" +
+	"\rno_randomness\x18\x03 \x01(\bR\fnoRandomness\"m\n" +
 	"\x15SIPDispatchRuleCallee\x12\x1f\n" +
 	"\vroom_prefix\x18\x01 \x01(\tR\n" +
-	"roomPrefix\x12\x10\n" +
-	"\x03pin\x18\x02 \x01(\tR\x03pin\x12\x1c\n" +
+	"roomPrefix\x12\x15\n" +
+	"\x03pin\x18\x02 \x01(\tB\x03\xc0P\x02R\x03pin\x12\x1c\n" +
 	"\trandomize\x18\x03 \x01(\bR\trandomize\"\xa1\x02\n" +
 	"\x0fSIPDispatchRule\x12R\n" +
 	"\x14dispatch_rule_direct\x18\x01 \x01(\v2\x1e.livekit.SIPDispatchRuleDirectH\x00R\x12dispatchRuleDirect\x12^\n" +

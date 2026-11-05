@@ -21,6 +21,7 @@
 package livekit
 
 import (
+	_ "github.com/livekit/protocol/livekit/logger"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -183,7 +184,7 @@ var File_livekit_token_source_proto protoreflect.FileDescriptor
 
 const file_livekit_token_source_proto_rawDesc = "" +
 	"\n" +
-	"\x1alivekit_token_source.proto\x12\alivekit\x1a\x12livekit_room.proto\"\xb6\x04\n" +
+	"\x1alivekit_token_source.proto\x12\alivekit\x1a\x12livekit_room.proto\x1a\x14logger/options.proto\"\xb6\x04\n" +
 	"\x12TokenSourceRequest\x12 \n" +
 	"\troom_name\x18\x01 \x01(\tH\x00R\broomName\x88\x01\x01\x12.\n" +
 	"\x10participant_name\x18\x02 \x01(\tH\x01R\x0fparticipantName\x88\x01\x01\x126\n" +
@@ -200,11 +201,11 @@ const file_livekit_token_source_proto_rawDesc = "" +
 	"\x11_participant_nameB\x17\n" +
 	"\x15_participant_identityB\x17\n" +
 	"\x15_participant_metadataB\x0e\n" +
-	"\f_room_config\"a\n" +
+	"\f_room_config\"f\n" +
 	"\x13TokenSourceResponse\x12\x1d\n" +
 	"\n" +
-	"server_url\x18\x01 \x01(\tR\tserverUrl\x12+\n" +
-	"\x11participant_token\x18\x02 \x01(\tR\x10participantTokenBFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
+	"server_url\x18\x01 \x01(\tR\tserverUrl\x120\n" +
+	"\x11participant_token\x18\x02 \x01(\tB\x03\xc0P\x02R\x10participantTokenBFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
 
 var (
 	file_livekit_token_source_proto_rawDescOnce sync.Once

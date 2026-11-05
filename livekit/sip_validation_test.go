@@ -165,7 +165,13 @@ var ValidNameAddrHeaders = []string{
 	`Alice Johnson <sip:u3@example.com>`,
 	`"Alice \"Ace\" Johnson's device\\" <sip:user@host>`, // quoted + escapes
 	`"Alice & Bob" <sip:user@host>`,                      // special char in quoted display
+	`"Smith <Jr>" <sip:user@host>`,                       // angle brackets in quoted display
 	`Alice <sip:user@host;transport=tcp?X-Custom=val>;tag=abc`,
+
+	// scheme is case-insensitive (RFC 3261 §19.1.4)
+	`SIP:user@host`,
+	`<SIPS:user@host>`,
+	`Alice <Tel:+15551234567>`,
 }
 
 // InvalidNameAddrHeaders contains invalid Name-addr format headers
@@ -300,6 +306,47 @@ func TestForbiddenSipHeaderNames(t *testing.T) {
 			err := ValidateHeaderName(name, true)
 			if err == nil {
 				t.Errorf("ValidateHeaderName(%q) = nil, want error", name)
+			}
+		})
+	}
+}
+
+func TestParseSIPNameAddr(t *testing.T) {
+	cases := []struct {
+		value string
+		user  string
+		ok    bool
+	}{
+		{`sip:911@example.com`, "911", true},
+		{`sips:911@example.com`, "911", true},
+		{`tel:911`, "911", true},
+		{`tel:+1-555-123-4567`, "+1-555-123-4567", true},
+		{`<sip:911@example.com>`, "911", true},
+		{`<sip:911@example.com;transport=tcp>`, "911", true},
+		{`<sip:911@example.com?X-Custom=val>`, "911", true},
+		{`<sip:911;phone-context=example.com@example.com>`, "911", true},
+		{`<tel:911;phone-context=example.com>`, "911", true},
+		{`<sip:911@example.com>;tag=abc`, "911", true},
+		{`Alice <sip:911@example.com>`, "911", true},
+		{`"Alice Johnson" <sip:911@example.com>`, "911", true},
+		{`"Smith <Jr>" <sip:911@example.com>`, "911", true},
+		{`SIP:911@example.com`, "911", true},
+		{`sip:example.com`, "", true},
+		{`<sip:u7@example.com`, "", false},
+		{`Alice sip:u13@example.com`, "", false},
+		{`"Alice <sip:911@example.com>`, "", false},
+		{`http://example.com`, "", false},
+		{`911`, "", false},
+		{``, "", false},
+	}
+	for _, c := range cases {
+		t.Run(c.value, func(t *testing.T) {
+			user, err := ParseSIPNameAddr(c.value)
+			if c.ok != (err == nil) {
+				t.Fatalf("ParseSIPNameAddr(%q) error = %v, want ok=%v", c.value, err, c.ok)
+			}
+			if user != c.user {
+				t.Errorf("ParseSIPNameAddr(%q) user = %q, want %q", c.value, user, c.user)
 			}
 		})
 	}
