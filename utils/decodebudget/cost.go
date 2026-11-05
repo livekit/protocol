@@ -25,20 +25,8 @@ import (
 )
 
 // The cost model overestimates on purpose: a budget that admits a payload must
-// not let its decode allocate more than the estimate.
-const (
-	// Map tables grow by doubling and are at most 7/8 full.
-	mapGrowthFactor  = 4
-	mapEntryOverhead = 16
-	extensionCost    = 64
-	// estimateMarginPercent covers allocations the model does not itemize; the
-	// calibration tests measured them at under 3%.
-	estimateMarginPercent = 5
-)
-
-func withMargin(n int) int {
-	return n + n*estimateMarginPercent/100
-}
+// not let its decode allocate more than the estimate. Its tunable constants
+// live in Profile.
 
 // Go runtime size classes; an allocation is rounded up to the next one.
 var goSizeClasses = []int{
@@ -132,8 +120,8 @@ func goValueSize(field protoreflect.FieldDescriptor) int {
 	}
 }
 
-func mapEntryCost(field protoreflect.FieldDescriptor) int {
-	return mapGrowthFactor*(goValueSize(field.MapKey())+goValueSize(field.MapValue())) + mapEntryOverhead
+func (p *Profile) mapEntryCost(field protoreflect.FieldDescriptor) int {
+	return p.MapGrowthFactor*(goValueSize(field.MapKey())+goValueSize(field.MapValue())) + p.MapEntryOverhead
 }
 
 func oneofWrapperCost(field protoreflect.FieldDescriptor) int {
@@ -158,7 +146,7 @@ func presenceCost(field protoreflect.FieldDescriptor) int {
 
 // fieldAllocCost is the allocation for one occurrence of field with a string or
 // bytes payload of payloadLen. Nested message contents are charged separately.
-func fieldAllocCost(field protoreflect.FieldDescriptor, payloadLen int) int {
+func (p *Profile) fieldAllocCost(field protoreflect.FieldDescriptor, payloadLen int) int {
 	cost := 0
 	if field.Message() != nil && !field.IsMap() {
 		cost += protoStructSize(field.Message())
@@ -168,11 +156,11 @@ func fieldAllocCost(field protoreflect.FieldDescriptor, payloadLen int) int {
 	}
 	switch {
 	case field.IsMap():
-		cost += mapEntryCost(field)
+		cost += p.mapEntryCost(field)
 	case field.IsList():
 		// Slice growth depends on earlier occurrences; the caller charges it.
 	case field.IsExtension():
-		cost += extensionCost
+		cost += p.ExtensionCost
 	case field.ContainingOneof() != nil && !field.ContainingOneof().IsSynthetic():
 		cost += oneofWrapperCost(field)
 	}

@@ -112,14 +112,14 @@ func (w *wireWalk) message(data []byte, desc protoreflect.MessageDescriptor, dep
 		var err error
 		switch {
 		case kind == protowire.BytesType && field.Message() != nil:
-			cost, child := state.messageOccurrence(field)
+			cost, child := state.messageOccurrence(w.profile, field)
 			if err = w.alloc(cost); err == nil {
 				err = w.message(value, field.Message(), depth+1, child)
 			}
 		case kind == protowire.BytesType && isPackable(field):
 			err = w.packed(value, field, state)
 		default:
-			err = w.alloc(state.occurrence(field, len(value)))
+			err = w.alloc(state.occurrence(w.profile, field, len(value)))
 		}
 		if err != nil {
 			return err
@@ -130,10 +130,10 @@ func (w *wireWalk) message(data []byte, desc protoreflect.MessageDescriptor, dep
 
 // messageOccurrence is the allocation for one occurrence of a message field,
 // and the state its contents decode into.
-func (m *messageState) messageOccurrence(field protoreflect.FieldDescriptor) (int, *messageState) {
+func (m *messageState) messageOccurrence(p *Profile, field protoreflect.FieldDescriptor) (int, *messageState) {
 	if field.IsList() || field.IsMap() {
 		// Every element or map value is a new message.
-		return m.occurrence(field, 0), &messageState{}
+		return m.occurrence(p, field, 0), &messageState{}
 	}
 	fs := m.get(field)
 	m.setOneof(field, fs)
@@ -141,7 +141,7 @@ func (m *messageState) messageOccurrence(field protoreflect.FieldDescriptor) (in
 		return 0, fs.child
 	}
 	fs.child = &messageState{}
-	return fieldAllocCost(field, 0), fs.child
+	return p.fieldAllocCost(field, 0), fs.child
 }
 
 // setOneof records field as its oneof's set member. Switching members discards
@@ -165,8 +165,8 @@ func (m *messageState) setOneof(field protoreflect.FieldDescriptor, fs *fieldSta
 
 // occurrence is the allocation for one occurrence of field with a string or
 // bytes payload of payloadLen. Nested message contents are charged separately.
-func (m *messageState) occurrence(field protoreflect.FieldDescriptor, payloadLen int) int {
-	cost := fieldAllocCost(field, payloadLen)
+func (m *messageState) occurrence(p *Profile, field protoreflect.FieldDescriptor, payloadLen int) int {
+	cost := p.fieldAllocCost(field, payloadLen)
 	switch {
 	case field.IsList():
 		fs := m.get(field)

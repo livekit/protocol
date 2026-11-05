@@ -23,16 +23,6 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
-// protojson allocates per token and per object on top of the decoded message
-// and the string copies charged separately, and its reflection-based list and
-// map setters box each scalar element and map entry.
-const (
-	jsonTokenCost       = 8
-	jsonListScalarCost  = 24
-	jsonMapEntryBoxCost = 32
-	jsonObjectCost      = 8
-)
-
 // ValidateProtoJSON checks protojson input against the budget in protobuf terms: an
 // object key or array element is a field, and nesting is message depth.
 func (b Proto) ValidateProtoJSON(data []byte, desc protoreflect.MessageDescriptor) error {
@@ -86,7 +76,7 @@ func (w *jsonWalk) next() (json.Token, error) {
 	if err != nil {
 		return nil, err
 	}
-	cost := jsonTokenCost
+	cost := w.profile.JSONTokenCost
 	if str, ok := tok.(string); ok {
 		// protojson's tokenizer copies every string, key or value.
 		cost += allocSize(len(str))
@@ -153,7 +143,7 @@ func (w *jsonWalk) field(field protoreflect.FieldDescriptor, tok json.Token, dep
 			if tok == json.Delim(']') {
 				cost := appendAllocBytes(n, goValueSize(field))
 				if field.Message() == nil {
-					cost += n * jsonListScalarCost
+					cost += n * w.profile.JSONListScalarCost
 				}
 				return w.alloc(cost)
 			}
@@ -184,7 +174,7 @@ func (w *jsonWalk) mapEntries(field protoreflect.FieldDescriptor, depth int) err
 		if err := w.count(); err != nil {
 			return err
 		}
-		if err := w.alloc(mapEntryCost(field) + jsonMapEntryBoxCost); err != nil {
+		if err := w.alloc(w.profile.mapEntryCost(field) + w.profile.JSONMapEntryBoxCost); err != nil {
 			return err
 		}
 		tok, err = w.next()
@@ -210,7 +200,7 @@ func (w *jsonWalk) value(field protoreflect.FieldDescriptor, tok json.Token, dep
 		}
 		return w.alloc(jsonScalarCost(field, tok))
 	}
-	cost := fieldAllocCost(field, 0) + jsonScalarCost(field, tok) + presenceCost(field)
+	cost := w.profile.fieldAllocCost(field, 0) + jsonScalarCost(field, tok) + presenceCost(field)
 	if field.Message() != nil {
 		cost -= protoStructSize(field.Message())
 	}
@@ -227,7 +217,7 @@ func (w *jsonWalk) value(field protoreflect.FieldDescriptor, tok json.Token, dep
 }
 
 func (w *jsonWalk) message(md protoreflect.MessageDescriptor, tok json.Token, depth int) error {
-	if err := w.alloc(protoStructSize(md) + jsonObjectCost); err != nil {
+	if err := w.alloc(protoStructSize(md) + w.profile.JSONObjectCost); err != nil {
 		return err
 	}
 	if tok != json.Delim('{') || md.FullName().Parent() == "google.protobuf" {

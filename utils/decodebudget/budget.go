@@ -42,6 +42,8 @@ type Proto struct {
 	// struct of each message, copied strings and bytes, oneof wrappers, and
 	// slice and map growth. Zero leaves it unchecked.
 	MaxDecodedBytes int
+	// Profile tunes the MaxDecodedBytes cost model; nil uses DefaultProfile.
+	Profile *Profile
 }
 
 // Validate checks data against the message descriptor without constructing the
@@ -73,15 +75,20 @@ func (b Proto) newTally(desc protoreflect.MessageDescriptor) (*tally, error) {
 	if desc == nil {
 		return nil, errors.New("protobuf descriptor must not be nil")
 	}
-	return &tally{budget: b}, nil
+	p := b.Profile
+	if p == nil {
+		p = &defaultProfile
+	}
+	return &tally{budget: b, profile: p}, nil
 }
 
 // tally is the running field count and allocation estimate shared by the wire
 // and protojson walks.
 type tally struct {
-	budget Proto
-	fields int
-	bytes  int
+	budget  Proto
+	profile *Profile
+	fields  int
+	bytes   int
 }
 
 func (t *tally) count() error {
@@ -93,7 +100,7 @@ func (t *tally) count() error {
 }
 
 func (t *tally) total() int {
-	return withMargin(t.bytes)
+	return t.profile.withMargin(t.bytes)
 }
 
 func (t *tally) alloc(n int) error {

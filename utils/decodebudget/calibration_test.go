@@ -210,7 +210,13 @@ func alternatingOneof(n int) []byte {
 	return inLogRecord(field(num(&logsv1.LogRecord{}, "body"), body))
 }
 
-func TestProtoEstimateCalibration(t *testing.T) {
+type calibrationCase struct {
+	name   string
+	data   []byte
+	newMsg func() proto.Message
+}
+
+func protoCalibrationCases() []calibrationCase {
 	// ScopeSpans{spans: n×{}} inside ResourceSpans inside TracesData.
 	emptySpans := func(n int) []byte {
 		scope := emptyChildren(2, n)
@@ -225,11 +231,7 @@ func TestProtoEstimateCalibration(t *testing.T) {
 		return protowire.AppendBytes(protowire.AppendTag(nil, 1, protowire.BytesType), rl)
 	}
 	participants := calibParticipants()
-	cases := []struct {
-		name   string
-		data   []byte
-		newMsg func() proto.Message
-	}{
+	return []calibrationCase{
 		{"traces 512", must(proto.Marshal(calibSpans(512))), func() proto.Message { return &tracev1.TracesData{} }},
 		{"logs 512", must(proto.Marshal(calibLogs(512))), func() proto.Message { return &logsv1.LogsData{} }},
 		{"histograms 512", must(proto.Marshal(calibHistograms(512))), func() proto.Message { return &metricsv1.MetricsData{} }},
@@ -245,8 +247,11 @@ func TestProtoEstimateCalibration(t *testing.T) {
 		{"merged resources 64k", mergedResources(1 << 16), func() proto.Message { return &logsv1.LogsData{} }},
 		{"alternating oneof 64k", alternatingOneof(1 << 16), func() proto.Message { return &logsv1.LogsData{} }},
 	}
+}
+
+func TestProtoEstimateCalibration(t *testing.T) {
 	budget := Proto{MaxFields: 1 << 30, MaxDepth: 100}
-	for _, tc := range cases {
+	for _, tc := range protoCalibrationCases() {
 		t.Run(tc.name, func(t *testing.T) {
 			est, err := budget.Estimate(tc.data, tc.newMsg().ProtoReflect().Descriptor())
 			require.NoError(t, err)
@@ -282,14 +287,10 @@ func measureJSONDecode(t *testing.T, data []byte, newMsg func() proto.Message) u
 	return best
 }
 
-func TestProtoEstimateProtoJSONCalibration(t *testing.T) {
+func protoJSONCalibrationCases() []calibrationCase {
 	emptySpans := `{"resourceSpans":[{"scopeSpans":[{"spans":[` + strings.TrimSuffix(strings.Repeat("{},", 1<<18), ",") + `]}]}]}`
 	emptyValues := `{"resourceLogs":[{"scopeLogs":[{"logRecords":[{"body":{"arrayValue":{"values":[` + strings.TrimSuffix(strings.Repeat("{},", 1<<18), ",") + `]}}}]}]}]}`
-	cases := []struct {
-		name   string
-		data   []byte
-		newMsg func() proto.Message
-	}{
+	return []calibrationCase{
 		{"traces 512", must(protojson.Marshal(calibSpans(512))), func() proto.Message { return &tracev1.TracesData{} }},
 		{"logs 512", must(protojson.Marshal(calibLogs(512))), func() proto.Message { return &logsv1.LogsData{} }},
 		{"histograms 512", must(protojson.Marshal(calibHistograms(512))), func() proto.Message { return &metricsv1.MetricsData{} }},
@@ -300,8 +301,11 @@ func TestProtoEstimateProtoJSONCalibration(t *testing.T) {
 		{"proto field names", must(protojson.MarshalOptions{UseProtoNames: true}.Marshal(calibLogs(512))), func() proto.Message { return &logsv1.LogsData{} }},
 		{"optional scalars", must(protojson.Marshal(calibOptionalPoints(16384))), func() proto.Message { return &metricsv1.MetricsData{} }},
 	}
+}
+
+func TestProtoEstimateProtoJSONCalibration(t *testing.T) {
 	budget := Proto{MaxFields: 1 << 30, MaxDepth: 100}
-	for _, tc := range cases {
+	for _, tc := range protoJSONCalibrationCases() {
 		t.Run(tc.name, func(t *testing.T) {
 			est, err := budget.EstimateProtoJSON(tc.data, tc.newMsg().ProtoReflect().Descriptor())
 			require.NoError(t, err)
@@ -310,5 +314,39 @@ func TestProtoEstimateProtoJSONCalibration(t *testing.T) {
 			require.GreaterOrEqual(t, uint64(est), got, "the estimate must not undercount")
 			require.LessOrEqual(t, float64(est), 1.15*float64(got), "the estimate should stay close enough to admit real payloads")
 		})
+	}
+}
+
+func TestProfile(t *testing.T) {
+	def := DefaultProfile()
+	pessimistic := DefaultProfile()
+	pessimistic.MarginPercent = 20
+	pessimistic.JSONTokenCost = 16
+	zero := Proto{MaxFields: 1 << 30, MaxDepth: 100}
+	withDefault := Proto{MaxFields: 1 << 30, MaxDepth: 100, Profile: &def}
+	withPessimistic := Proto{MaxFields: 1 << 30, MaxDepth: 100, Profile: &pessimistic}
+
+	estimators := []struct {
+		name     string
+		cases    []calibrationCase
+		estimate func(Proto, []byte, protoreflect.MessageDescriptor) (int, error)
+	}{
+		{"wire", protoCalibrationCases(), Proto.Estimate},
+		{"protojson", protoJSONCalibrationCases(), Proto.EstimateProtoJSON},
+	}
+	for _, e := range estimators {
+		for _, tc := range e.cases {
+			t.Run(e.name+" "+tc.name, func(t *testing.T) {
+				desc := tc.newMsg().ProtoReflect().Descriptor()
+				want, err := e.estimate(zero, tc.data, desc)
+				require.NoError(t, err)
+				got, err := e.estimate(withDefault, tc.data, desc)
+				require.NoError(t, err)
+				require.Equal(t, want, got)
+				got, err = e.estimate(withPessimistic, tc.data, desc)
+				require.NoError(t, err)
+				require.Greater(t, got, want)
+			})
+		}
 	}
 }
