@@ -28,10 +28,10 @@ jobs:
           version: "35.1"
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
 
       - name: Use Node.js 20
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
           cache: "pnpm"
@@ -41,18 +41,19 @@ jobs:
 
       - name: Create Release Pull Request or Publish packages
         id: changesets
-        uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
+        # v2 is the release line for @changesets/cli v3. v1 detects published packages by parsing
+        # `changeset publish` stdout for "New tag:", which CLI v3 no longer prints, so `published`
+        # stays false and the Go tag below is never created.
+        uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
         with:
           # This expects you to have a script called ci:publish which does a build for your packages and calls changeset publish
-          publish: pnpm ci:publish
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          publish-script: pnpm ci:publish
 
       - name: Create git tag for golang package
         if: steps.changesets.outputs.published == 'true'
         uses: rickstaa/action-create-tag@a1c7777fcb2fee4f19b0f283ba888afa11678b72 # v1.7.2
         id: tag_create
         with:
-          tag: ${{format('v{0}', fromJson(steps.changesets.outputs.publishedPackages)[0].version)}}
+          tag: ${{format('v{0}', fromJson(steps.changesets.outputs['published-packages'])[0].version)}}
           tag_exists_error: false
-          message: "github.com/livekit/protocol@${{fromJson(steps.changesets.outputs.publishedPackages)[0].version}}"
+          message: "github.com/livekit/protocol@${{fromJson(steps.changesets.outputs['published-packages'])[0].version}}"

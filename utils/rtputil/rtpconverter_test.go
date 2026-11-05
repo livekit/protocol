@@ -25,3 +25,11 @@ func TestRTPConverter(t *testing.T) {
 	require.Equal(t, uint64(8000), r.ToRTPExt(time.Second))
 	require.Equal(t, uint64(24*60*60*10*8000), r.ToRTPExt(240*time.Hour))
 }
+
+func TestRTPConverterZeroClockRate(t *testing.T) {
+	r := NewRTPConverter(0)
+	require.Zero(t, r.ToDuration(960))
+	require.Zero(t, r.ToDurationExt(960))
+	require.Zero(t, r.ToRTP(time.Second))
+	require.Zero(t, r.ToRTPExt(time.Second))
+}

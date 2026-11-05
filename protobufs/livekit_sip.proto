@@ -248,6 +248,9 @@ message SIPMediaConfig {
   optional SIPMediaEncryption encryption = 3;
   // Use specific media timeout. If zero or not specified, will use default timeout.
   optional google.protobuf.Duration media_timeout = 4;
+  // Stop sending audio RTP while outbound DTMF digits are sent.
+  // Always on when the telephone-event clock rate differs from the audio codec's.
+  bool drop_audio_during_dtmf = 5;
 }
 
 message ProviderInfo {

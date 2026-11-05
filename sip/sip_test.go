@@ -1163,27 +1163,37 @@ func TestEvaluateDispatchRule_RespectsRuleMediaTimeout(t *testing.T) {
 	require.Equal(t, 5*time.Minute, res.Media.MediaTimeout.AsDuration())
 }
 
-func TestMatchIP(t *testing.T) {
+func TestParseIPMask(t *testing.T) {
 	cases := []struct {
-		addr  string
-		mask  string
-		valid bool
-		exp   bool
+		mask string
+		exp  string // empty if not an IP mask
 	}{
-		{addr: "192.168.0.10", mask: "192.168.0.10", valid: true, exp: true},
-		{addr: "192.168.0.10", mask: "192.168.0.11", valid: true, exp: false},
-		{addr: "192.168.0.10", mask: "192.168.0.0/24", valid: true, exp: true},
-		{addr: "192.168.0.10", mask: "192.168.0.10/0", valid: true, exp: true},
-		{addr: "192.168.0.10", mask: "192.170.0.0/24", valid: true, exp: false},
+		{mask: "192.168.0.10", exp: "192.168.0.10/32"},
+		{mask: "192.168.0.0/24", exp: "192.168.0.0/24"},
+		{mask: "2001:db8::1", exp: "2001:db8::1/128"},
+		{mask: "[2001:db8::1]", exp: "2001:db8::1/128"},
+		{mask: "[2001:db8::]/32", exp: "2001:db8::/32"},
+		{mask: "[::]", exp: "::/128"},
+		{mask: "[::]/0", exp: "::/0"},
+
+		// Not IP masks: treated as hostnames.
+		{mask: "sip.example.com"},
+		{mask: "sip.example.com/24"},
+		{mask: "192.168.0.10/33"},
+		{mask: "192.168.0.10/"},
+		{mask: "[192.168.0.10"},
+		{mask: "[2001:db8::1]:5060"},
+		{mask: "[[2001:db8::1]]"},
 	}
 	for _, c := range cases {
 		t.Run(c.mask, func(t *testing.T) {
-			ip, err := netip.ParseAddr(c.addr)
-			require.NoError(t, err)
-			got := isValidMask(c.mask)
-			require.Equal(t, c.valid, got)
-			got = matchAddrMask(ip, c.mask)
-			require.Equal(t, c.exp, got)
+			pref, ok := parseIPMask(c.mask)
+			if c.exp == "" {
+				require.False(t, ok)
+				return
+			}
+			require.True(t, ok)
+			require.Equal(t, netip.MustParsePrefix(c.exp), pref)
 		})
 	}
 }
@@ -1278,6 +1288,59 @@ func TestMatchMasks(t *testing.T) {
 				"some.domain",
 				"192.168.1.0/24",
 				"sip.example.com",
+			},
+			exp: true,
+		},
+		{
+			name: "ip spoofed in from host",
+			addr: "203.0.113.5",
+			host: "192.168.0.10",
+			masks: []string{
+				"192.168.0.10",
+			},
+			exp: false,
+		},
+		{
+			name: "ip range spoofed in from host",
+			addr: "203.0.113.5",
+			host: "192.168.0.0/24",
+			masks: []string{
+				"192.168.0.0/24",
+			},
+			exp: false,
+		},
+		{
+			name: "ipv6 spoofed in from host",
+			addr: "203.0.113.5",
+			host: "[2001:db8::1]",
+			masks: []string{
+				"[2001:db8::1]",
+			},
+			exp: false,
+		},
+		{
+			name: "ipv6 bracketed",
+			addr: "2001:db8::1",
+			host: "sip.example.com",
+			masks: []string{
+				"[2001:db8::1]",
+			},
+			exp: true,
+		},
+		{
+			name: "ipv6 bracketed range",
+			addr: "2001:db8::1",
+			masks: []string{
+				"[2001:db8::]/32",
+			},
+			exp: true,
+		},
+		{
+			name: "ip matches source, from host differs",
+			addr: "192.168.0.10",
+			host: "sip.example.com",
+			masks: []string{
+				"192.168.0.10",
 			},
 			exp: true,
 		},

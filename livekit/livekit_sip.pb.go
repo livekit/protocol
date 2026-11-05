@@ -1129,9 +1129,12 @@ type SIPMediaConfig struct {
 	Codecs     []*SIPCodec         `protobuf:"bytes,2,rep,name=codecs,proto3" json:"codecs,omitempty"`
 	Encryption *SIPMediaEncryption `protobuf:"varint,3,opt,name=encryption,proto3,enum=livekit.SIPMediaEncryption,oneof" json:"encryption,omitempty"`
 	// Use specific media timeout. If zero or not specified, will use default timeout.
-	MediaTimeout  *durationpb.Duration `protobuf:"bytes,4,opt,name=media_timeout,json=mediaTimeout,proto3,oneof" json:"media_timeout,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	MediaTimeout *durationpb.Duration `protobuf:"bytes,4,opt,name=media_timeout,json=mediaTimeout,proto3,oneof" json:"media_timeout,omitempty"`
+	// Stop sending audio RTP while outbound DTMF digits are sent.
+	// Always on when the telephone-event clock rate differs from the audio codec's.
+	DropAudioDuringDtmf bool `protobuf:"varint,5,opt,name=drop_audio_during_dtmf,json=dropAudioDuringDtmf,proto3" json:"drop_audio_during_dtmf,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *SIPMediaConfig) Reset() {
@@ -1190,6 +1193,13 @@ func (x *SIPMediaConfig) GetMediaTimeout() *durationpb.Duration {
 		return x.MediaTimeout
 	}
 	return nil
+}
+
+func (x *SIPMediaConfig) GetDropAudioDuringDtmf() bool {
+	if x != nil {
+		return x.DropAudioDuringDtmf
+	}
+	return false
 }
 
 type ProviderInfo struct {
@@ -5270,14 +5280,15 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\bmetadata\x18\v \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\bmetadata:\x02\x18\x01\"2\n" +
 	"\bSIPCodec\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x12\n" +
-	"\x04rate\x18\x02 \x01(\rR\x04rate\"\x91\x02\n" +
+	"\x04rate\x18\x02 \x01(\rR\x04rate\"\xc6\x02\n" +
 	"\x0eSIPMediaConfig\x12,\n" +
 	"\x12only_listed_codecs\x18\x01 \x01(\bR\x10onlyListedCodecs\x12)\n" +
 	"\x06codecs\x18\x02 \x03(\v2\x11.livekit.SIPCodecR\x06codecs\x12@\n" +
 	"\n" +
 	"encryption\x18\x03 \x01(\x0e2\x1b.livekit.SIPMediaEncryptionH\x00R\n" +
 	"encryption\x88\x01\x01\x12C\n" +
-	"\rmedia_timeout\x18\x04 \x01(\v2\x19.google.protobuf.DurationH\x01R\fmediaTimeout\x88\x01\x01B\r\n" +
+	"\rmedia_timeout\x18\x04 \x01(\v2\x19.google.protobuf.DurationH\x01R\fmediaTimeout\x88\x01\x01\x123\n" +
+	"\x16drop_audio_during_dtmf\x18\x05 \x01(\bR\x13dropAudioDuringDtmfB\r\n" +
 	"\v_encryptionB\x10\n" +
 	"\x0e_media_timeout\"\x88\x01\n" +
 	"\fProviderInfo\x12\x0e\n" +

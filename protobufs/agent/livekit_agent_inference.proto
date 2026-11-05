@@ -89,6 +89,12 @@ message SessionClose {}
 
 message InferenceStart {
   string request_id = 1;
+  // Length of the current user turn, in samples at the session sample rate.
+  // Count from the start of the user turn, or from the last session_flush when
+  // the start is unknown, through the last input_audio sent before this
+  // message. The end-of-turn model reads it as the turn duration, which can be
+  // longer than the audio window it scores. 0 means unknown.
+  uint32 turn_samples = 2;
 }
 
 message InferenceStop {

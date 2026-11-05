@@ -230,7 +230,7 @@ func logFields(event *livekit.WebhookEvent, url string) []interface{} {
 		"event", event.Event,
 		"id", event.Id,
 		"webhookTime", event.CreatedAt,
-		"url", url,
+		"url", redactURL(url),
 	)
 
 	if event.Room != nil {
