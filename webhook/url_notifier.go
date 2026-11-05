@@ -20,7 +20,6 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
-	"net"
 	"net/http"
 	"sync"
 	"time"
@@ -83,37 +82,11 @@ func NewURLNotifier(params URLNotifierParams) *URLNotifier {
 		params.UserAgent = DefaultUserAgent
 	}
 
-	rhc := retryablehttp.NewClient()
-	if params.RetryWaitMin > 0 {
-		rhc.RetryWaitMin = params.RetryWaitMin
-	}
-	if params.RetryWaitMax > 0 {
-		rhc.RetryWaitMax = params.RetryWaitMax
-	}
-	if params.MaxRetries > 0 {
-		rhc.RetryMax = params.MaxRetries
-	}
-	if params.ClientTimeout > 0 {
-		rhc.HTTPClient.Timeout = params.ClientTimeout
-	}
-	if params.ForceIPv4 {
-		var tr *http.Transport
-		if existing, ok := rhc.HTTPClient.Transport.(*http.Transport); ok && existing != nil {
-			tr = existing.Clone()
-		} else {
-			tr = http.DefaultTransport.(*http.Transport).Clone()
-		}
-		tr.DialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
-			return (&net.Dialer{}).DialContext(ctx, "tcp4", addr)
-		}
-		rhc.HTTPClient.Transport = tr
-	}
 	n := &URLNotifier{
 		params: params,
-		client: rhc,
+		client: newHTTPClient(params.HTTPClientParams),
 		filter: newFilter(params.FilterParams),
 	}
-	n.client.Logger = &logAdapter{}
 
 	n.pool = core.NewQueuePool(params.Config.NumWorkers, core.QueueWorkerParams{
 		QueueSize:    params.Config.QueueSize,
@@ -203,7 +176,7 @@ func (n *URLNotifier) QueueNotify(ctx context.Context, event *livekit.WebhookEve
 		sendDuration := time.Since(sendStart)
 		fields = append(fields, "sendDuration", sendDuration)
 		if res != nil {
-			fields = append(fields, "status", res.Status, "statusCode", res.StatusCode)
+			fields = append(fields, "status", http.StatusText(res.StatusCode), "statusCode", res.StatusCode)
 		}
 		if err != nil {
 			params.Logger.Warnw("failed to send webhook", err, fields...)
@@ -285,7 +258,7 @@ func (n *URLNotifier) send(event *livekit.WebhookEvent, params *URLNotifierParam
 	r, err := retryablehttp.NewRequest("POST", params.URL, bytes.NewReader(encoded))
 	if err != nil {
 		// ignore and continue
-		return nil, err
+		return nil, redactURLError(err)
 	}
 	r.Header.Set(authHeader, token)
 	r.Header.Set(contentTypeHeader, ContentType)
