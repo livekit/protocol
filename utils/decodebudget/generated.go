@@ -90,18 +90,17 @@ func (g generatedModel) root(desc protoreflect.MessageDescriptor) int {
 	return protoStructSize(desc)
 }
 
-func (g generatedModel) message(m *messageState, field protoreflect.FieldDescriptor) (int, *messageState) {
+func (g generatedModel) message(m *messageState, field protoreflect.FieldDescriptor) (int, *fieldState) {
 	if field.IsList() || field.IsMap() {
 		// Every element or map value is a new message.
-		return g.occurrence(m, field, 0), &messageState{}
+		return g.occurrence(m, field, 0), nil
 	}
 	fs := m.get(field)
 	m.setOneof(field, fs)
 	if fs.child != nil {
-		return 0, fs.child
+		return 0, fs
 	}
-	fs.child = &messageState{}
-	return g.p.fieldAllocCost(field, 0), fs.child
+	return g.p.fieldAllocCost(field, 0), fs
 }
 
 func (g generatedModel) occurrence(m *messageState, field protoreflect.FieldDescriptor, payloadLen int) int {

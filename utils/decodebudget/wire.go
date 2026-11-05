@@ -26,7 +26,8 @@ import (
 // the model of the decoder that will write it.
 type wireWalk struct {
 	*tally
-	model decoderModel
+	model  decoderModel
+	states statePool
 }
 
 // decoderModel prices what one protobuf-go decoder allocates for each event of
@@ -34,8 +35,9 @@ type wireWalk struct {
 type decoderModel interface {
 	root(desc protoreflect.MessageDescriptor) int
 	// message is the allocation for one occurrence of a message field, and the
-	// state its contents decode into.
-	message(m *messageState, field protoreflect.FieldDescriptor) (int, *messageState)
+	// state of a singular field, whose child holds what its contents decode
+	// into once the walker creates it. Elements of lists and maps have none.
+	message(m *messageState, field protoreflect.FieldDescriptor) (int, *fieldState)
 	// occurrence is the allocation for one occurrence of field with a string or
 	// bytes payload of payloadLen.
 	occurrence(m *messageState, field protoreflect.FieldDescriptor, payloadLen int) int
@@ -121,6 +123,34 @@ func (m *messageState) isSet(oneof protoreflect.OneofDescriptor, field protorefl
 
 // unknown is the allocation for retaining an n-byte field in the message's
 // unknown-fields slice.
+// statePool recycles the states of list and map elements, which nothing
+// reads once the element is walked, to keep the walk's own allocation down.
+type statePool struct {
+	free []*messageState
+}
+
+func (p *statePool) get() *messageState {
+	n := len(p.free)
+	if n == 0 {
+		return &messageState{}
+	}
+	m := p.free[n-1]
+	p.free = p.free[:n-1]
+	return m
+}
+
+func (p *statePool) put(m *messageState) {
+	for i := range m.fields {
+		if child := m.fields[i].child; child != nil {
+			p.put(child)
+		}
+	}
+	clear(m.fields)
+	clear(m.oneofs)
+	*m = messageState{fields: m.fields[:0], oneofs: m.oneofs[:0]}
+	p.free = append(p.free, m)
+}
+
 func (m *messageState) unknown(n int) int {
 	mem, newCap := appendGrow(m.unknownLen, m.unknownCap, n, 1)
 	m.unknownLen += n
@@ -182,9 +212,9 @@ func (w *wireWalk) message(data []byte, desc protoreflect.MessageDescriptor, dep
 		var err error
 		switch {
 		case kind == protowire.BytesType && field.Message() != nil:
-			cost, child := w.model.message(state, field)
+			cost, fs := w.model.message(state, field)
 			if err = w.alloc(cost); err == nil {
-				err = w.message(value, field.Message(), depth+1, child)
+				err = w.child(value, field.Message(), depth+1, fs)
 			}
 		case kind == protowire.BytesType && isPackable(field):
 			err = w.packed(value, field, state)
@@ -200,6 +230,19 @@ func (w *wireWalk) message(data []byte, desc protoreflect.MessageDescriptor, dep
 
 // packed walks a packed scalar run; decoders accept one even when the schema
 // prefers unpacked.
+func (w *wireWalk) child(data []byte, desc protoreflect.MessageDescriptor, depth int, fs *fieldState) error {
+	if fs == nil {
+		state := w.states.get()
+		err := w.message(data, desc, depth, state)
+		w.states.put(state)
+		return err
+	}
+	if fs.child == nil {
+		fs.child = w.states.get()
+	}
+	return w.message(data, desc, depth, fs.child)
+}
+
 func (w *wireWalk) packed(value []byte, field protoreflect.FieldDescriptor, state *messageState) error {
 	count := 0
 	for len(value) > 0 {

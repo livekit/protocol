@@ -31,12 +31,24 @@ var goSizeClasses = []int{
 	19072, 20480, 21760, 24576, 27264, 28672, 32768,
 }
 
+// sizeClassByWord maps ceil(n/8) to n's size class, since every class is a
+// multiple of 8, to spare allocSize a search on the hot path.
+var sizeClassByWord = func() []uint16 {
+	maxSmall := goSizeClasses[len(goSizeClasses)-1]
+	table := make([]uint16, maxSmall/8+1)
+	for i := range table {
+		c, _ := slices.BinarySearch(goSizeClasses, i*8)
+		table[i] = uint16(goSizeClasses[c])
+	}
+	return table
+}()
+
 func allocSize(n int) int {
 	if n <= 0 {
 		return 0
 	}
-	if i, _ := slices.BinarySearch(goSizeClasses, n); i < len(goSizeClasses) {
-		return goSizeClasses[i]
+	if i := (n + 7) >> 3; i < len(sizeClassByWord) {
+		return int(sizeClassByWord[i])
 	}
 	const page = 8192
 	return (n + page - 1) / page * page

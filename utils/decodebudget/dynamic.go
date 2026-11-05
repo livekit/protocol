@@ -123,20 +123,17 @@ func (d dynamicModel) field(m *messageState, field protoreflect.FieldDescriptor)
 	return fs, cost
 }
 
-func (d dynamicModel) message(m *messageState, field protoreflect.FieldDescriptor) (int, *messageState) {
+func (d dynamicModel) message(m *messageState, field protoreflect.FieldDescriptor) (int, *fieldState) {
 	if field.IsList() || field.IsMap() {
-		return d.occurrence(m, field, 0), &messageState{}
+		return d.occurrence(m, field, 0), nil
 	}
 	fs, cost := d.field(m, field)
 	m.setOneof(field, fs)
-	if fs.child == nil {
-		fs.child = &messageState{}
-		// A map value message was charged with its entry.
-		if !field.IsExtension() && !field.ContainingMessage().IsMapEntry() {
-			cost += dynamicMessageCost
-		}
+	// A map value message was charged with its entry.
+	if fs.child == nil && !field.IsExtension() && !field.ContainingMessage().IsMapEntry() {
+		cost += dynamicMessageCost
 	}
-	return cost, fs.child
+	return cost, fs
 }
 
 func (d dynamicModel) occurrence(m *messageState, field protoreflect.FieldDescriptor, payloadLen int) int {
