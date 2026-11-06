@@ -61,6 +61,7 @@ const (
 	LatencyScopeUndefined LatencyScope = ""
 	LatencyScopeCounted   LatencyScope = "counted"
 	LatencyScopeExcluded  LatencyScope = "excluded"
+	LatencyScopeNoUser    LatencyScope = "no_user"
 )
 
 type Rollup string

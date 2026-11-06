@@ -63,6 +63,8 @@ message JobState {
   // joined, as an entrypoint that fails before it connects: from each such
   // attempt's start to the next attempt's start, in nanoseconds
   int64 agent_failed_attempts_ns = 14;
+  // workers asked to take this attempt, the one that took it included
+  uint32 workers_asked = 15;
 }
 
 // from Worker to Server
