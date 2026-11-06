@@ -37,6 +37,15 @@ deny contains data.livekit.lib.finding("livekit_shared_rename", msg) if {
 	msg := sprintf("%s: renamed to %s (renamed_from on %s); the old spelling may not be defined, deprecated or not", [a.key, new, new])
 }
 
+# The attribute rules skip deprecated keys, but a spelling the flat-identity rule forbids (a dotted
+# one, or an Agents `_sid` binding) may not be defined, deprecated or not. Either representation;
+# the per-file pass and the --v2 rule above already check every key that is not deprecated.
+deny contains f if {
+	some a in attributes
+	a.attr.deprecated
+	some f in data.livekit.lib.flat_identity({"id": a.key})
+}
+
 # A mapped value must be a member of the shared key's enum.
 deny contains data.livekit.lib.finding("livekit_rename_value", msg) if {
 	some a in attributes
@@ -74,6 +83,27 @@ deny contains data.livekit.lib.finding("livekit_metric_unit", msg) if {
 deny contains f if {
 	some m in metrics
 	some f in data.livekit.lib.cardinality(m.name, m.where, m.keys, m.exception)
+}
+
+deny contains f if {
+	some m in metrics
+	some f in data.livekit.lib.pii_metric(m.name, m.where, m.keys)
+}
+
+# Every resolved event, either representation, against its severity declaration.
+events contains {"name": g.name, "event": g, "where": object.get(g, ["lineage", "provenance", "path"], g.id)} if {
+	some g in object.get(input, "groups", [])
+	g.type == "event"
+}
+
+events contains {"name": e.name, "event": e, "where": object.get(e, ["provenance", "path"], e.name)} if {
+	some section in ["registry", "refinements"]
+	some e in object.get(input, [section, "events"], [])
+}
+
+deny contains f if {
+	some e in events
+	some f in data.livekit.lib.event_severity(e.name, e.where, e.event)
 }
 
 # A ref inherits the referenced key's classification. Overriding it would let one signal re-label

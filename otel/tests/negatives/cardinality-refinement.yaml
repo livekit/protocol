@@ -11,5 +11,5 @@ metric_refinements:
     ref: client.negative.count
     brief: A refinement that adds a high-cardinality dimension.
     attributes:
-      - ref: lk.room_sid
+      - ref: lk.room_id
         requirement_level: required

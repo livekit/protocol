@@ -8,7 +8,8 @@ upstream keys (`service.*`, `os.*`, `device.*`, `network.connection.type`, `erro
 
 Status: prototype, `development` stability. It registers the shared identity, PII and SDK keys,
 what the client cores (rust-sdks `livekit-telemetry` and the JS port) emit today, and what
-LiveKit Agents 2.0 (Python and the Rust core) emits today, all under their current names. The
+LiveKit Agents 2.0 (Python and the Rust core) emits. Room and track keys describe the canonical-only
+integration in livekit/agents#7973; explicitly labelled bindings retain the pre-#7973 names. The
 OTel GenAI conventions are a second dependency
 ([semantic-conventions-genai](https://github.com/open-telemetry/semantic-conventions-genai),
 pinned by commit: it has no tags), so Agents' `gen_ai.*` keys are referenced, not redefined.
@@ -20,7 +21,7 @@ policy, storage and the app API are not conventions and live with each SDK.
 | Path | What |
 |---|---|
 | `model/manifest.yaml` | The pinned OTel dependencies, and a `schema_url` that points at this registry (see [Versioning](#versioning)) |
-| `model/shared/registry.yaml` | Shared keys: identity (`lk.room_sid`, `lk.participant_id`, `lk.track_sid`, `lk.job_id`), PII (`lk.pii.*`), SDK identity (`lk.sdk.*`), and the concepts clients and Agents both send (`lk.track_source`, `lk.disconnect_reason`, `lk.agent_name`) |
+| `model/shared/registry.yaml` | Shared keys: identity (`lk.room_id`, `lk.participant_id`, `lk.track_id`, `lk.job_id`), PII (`lk.pii.*`), SDK identity (`lk.sdk.*`), and the concepts clients and Agents both send (`lk.track_source`, `lk.disconnect_reason`, `lk.agent_name`) |
 | `model/client/registry.yaml` | Client-owned attributes (`lk.device.*`, `lk.rtc.*`, `lk.track.*`, `lk.log.*`, `lk.telemetry.*`, …) |
 | `model/client/signals.yaml` | Client log events and spans |
 | `model/client/groups.yaml` | Attribute sets on every client resource / record (used by live-check) |
@@ -54,7 +55,11 @@ is the shared key, and the client is the side that changes: `lk.track_source` an
 `lk.disconnect_reason` take the enum names Agents sends as values (`SOURCE_MICROPHONE`,
 `CLIENT_INITIATED`), and `lk.agent_name` is the key a client uses for the agent. The track
 source names are the Agents RTC FFI `TrackSource` names, not the signal protocol's (`CAMERA`,
-`SCREEN_SHARE`), so clients map them explicitly.
+`SCREEN_SHARE`), so clients map them explicitly. The room and track IDs are the exception:
+`lk.room_id` and `lk.track_id` match `lk.participant_id` and the collector's `room_id` column,
+and clients and Agents must emit those canonical keys only. Agents adopts them in
+livekit/agents#7973, without aliases. Native SDK/protobuf SID fields and `RM_`/`TR_` values stay
+unchanged. Agents' pre-#7973 names are explicitly labelled historical bindings.
 
 All eight client renames (the six identity/PII keys, `lk.track.source` and
 `lk.disconnect.reason`) are recorded the same way: `renamed_from` on the shared key names the old
@@ -62,6 +67,8 @@ spelling and, for an enum, maps each old value to a member. The old spellings ar
 registered, deprecated or not. A policy rejects defining one, and live-check reads the map to
 name the key and value to send.
 - `cloud` is a valid owner for when that team registers its keys, in its own directory.
+- `telephony` is the telephony-devs team, which owns SIP. It is a valid owner for when that team
+  registers its keys, in its own directory.
 
 The Notion conventions put client-owned attributes under `lk.client.*`. The client core does not do
 that yet, so that rule is advice: `check.sh` lists every client key it would move, `browser.*`
@@ -69,7 +76,18 @@ included, and never fails on it.
 
 How a concept is named in other producers or stores (Agents' `room_id`, the collector's `room_id`
 column, roomobs) is recorded in `annotations.livekit.bindings`. Weaver carries it into the docs;
-nothing validates it.
+nothing validates it. `event_logs` is the Go project logger store that cloud services such as
+cloud-sip and cloud realtime write to, not OTLP. `agents_otlp` describes the integrated producer:
+`lk.room_id` on every signal and `lk.track_id` on spans, without aliases. Its job binding remains
+`[lk.job_id, job_id]` (spans, then resource and metric points); job renaming is outside this change.
+`agents_otlp_before_7973` records the old room/track names for historical captures only. They are
+not registered keys: `livekit_flat_identity` rejects defining one, deprecated or not, and
+live-check rejects them as unregistered attributes (see [Live-check](#live-check)).
+
+Clients keep session IDs off the process-wide Resource because one process can join several
+rooms. Agents may attach room and job IDs to a job-scoped Resource. The collector must recognize
+`lk.room_id` before a canonical-only producer deploys; the legacy collector bindings do not imply
+that this backend migration has happened.
 
 Agents' session report sends plain log records whose keys predate this registry. They are
 registered as emitted, owner `agents`: `session.options`, `session.report_timestamp` and
@@ -88,11 +106,11 @@ map, and its fields (such as `reason` in `outcome`) are payload, not attribute k
 
    | Annotation | Values | Rule |
    |---|---|---|
-   | `owner` | `shared`, `client`, `agents`, `cloud` | required |
+   | `owner` | `shared`, `client`, `agents`, `cloud`, `telephony` | required |
    | `sensitivity` | `none`, `pii`, `secret` (protocol `logger.Sensitivity`) | required; `pii` iff the key has a `pii` segment, or is `chat.item`, which the collector drops by name; `secret` is never emitted |
    | `unit` | UCUM, e.g. `s`, `By`, `{packet}` | durations are seconds |
    | `unit_exception` | a reason | allows a `*_ms` key with `unit: ms` (the RTC stats keys: `lk.rtc.window_ms` as measured, the others converted from the W3C stats' seconds) |
-   | `bindings` | map of producer/store → name | informational |
+   | `bindings` | map of producer/store → name | informational; live-check reads the Agents span name from `agents_otlp` |
    | `cardinality_exception` | `true`, on a metric | allows a high-cardinality ID as a metric dimension |
    | `renamed_from` | `{key, values}`, on a shared key | the spelling it replaces, and for an enum a map of old value → member; the old key stays unregistered |
    | `pii_heuristic_exception` | a reason | documents a shipped key the PII heuristic would flag; it only takes effect for a key listed in `pii_heuristic_allowlist` in `policies/lib.rego` (today `lk.rpc.caller_identity`, `lk.rpc.destination_identity`), so a new key cannot opt out by annotating itself. The collector still does not redact them |
@@ -102,7 +120,7 @@ map, and its fields (such as `reason` in `outcome`) are payload, not attribute k
 
    | Annotation | On | Meaning |
    |---|---|---|
-   | `severity` | event | OTLP severity texts the event is sent with, e.g. `[INFO]` |
+   | `severity` | event | OTLP severity texts the event is sent with, from `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `FATAL`, e.g. `[INFO]`; `[]` for an event that is never a log record (a span event) |
    | `body` | event | What the log body carries |
    | `reserved`, `limits` | `custom` event | Keys and prefixes apps may not use; size caps on app events and attributes |
    | `checkpoints` | span | Span events in order, each `{name, requirement: required\|best_effort, brief}` |
@@ -112,7 +130,7 @@ map, and its fields (such as `reason` in `outcome`) are payload, not attribute k
    Give every key, event and span a `brief` and a `note`, and every non-enum key `examples`; a
    `ref` to an OTel key gets a short `note` saying how LiveKit uses it.
 
-   Naming: shared identity keys are flat (`lk.room_sid`, never `lk.room.sid`). Customer-supplied
+   Naming: shared identity keys are flat (`lk.room_id`, never `lk.room.sid`). Customer-supplied
    values go under `lk.pii.*`: the collector deletes keys with a `pii` segment when redaction is
    on, and keeps everything else.
 4. Reference it from the events or spans that carry it, with a `requirement_level`.
@@ -192,14 +210,16 @@ add to it:
 | `livekit_secret` | yes | `secret` is never emitted |
 | `livekit_pii_marker` | yes | `sensitivity: pii` iff a `pii` key segment, except `chat.item`, which the collector drops by name (`pii_by_name` in `lib.rego`) |
 | `livekit_pii_heuristic` | yes | identity, email, phone, room/participant name outside `lk.pii.*`, unless the key is on the policy's `pii_heuristic_allowlist` and carries a `pii_heuristic_exception` reason |
-| `livekit_flat_identity` | yes | no `lk.room.sid`, `lk.participant.sid`, `lk.track.sid`, `lk.job.id` |
+| `livekit_flat_identity` | yes | no `lk.room.sid`, `lk.participant.sid`, `lk.track.sid`, `lk.job.id`, and no `_sid` spelling (`lk.room_sid`, `lk.participant_sid`, `lk.track_sid`), deprecated or not (deprecated keys: resolved, both modes); pre-#7973 Agents names are historical bindings only |
 | `livekit_shared_rename` | yes | no old spelling named in a `renamed_from` is defined, deprecated or not (resolved, both modes) |
 | `livekit_rename_value` | yes | every value a `renamed_from` maps to is a member of the shared key's enum |
 | `livekit_seconds`, `livekit_unit` | yes | seconds, unless `unit_exception` |
 | `livekit_metric_unit` | yes | metric units are not `ms` (resolved, so `definition/2` metrics and refinements count) |
+| `livekit_event_severity` | yes | an event's `severity`, when present (an explicit null too), is a list of `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `FATAL`; `[]` marks an event that is never a log record (resolved, both modes) |
+| `livekit_pii_metric` | yes | no metric dimension is a key the collector redacts (`lk.pii.*`, `chat.item`) or one the PII heuristic matches, allowlisted keys included: the collector does not redact metrics (resolved, so inline definitions, refs, `extends` and refinements count) |
 | `livekit_cardinality` | yes | high-cardinality IDs are not metric dimensions (resolved, so `extends` and refinements count) |
 | `livekit_ref_override` | yes | a `ref` to a key defined in `otel/model` may not override its `annotations` (owner, sensitivity, unit) |
-| `livekit_shipped_value` | yes | a `shipped_values` list is on a non-`lk.*` key of type string, string[] or an enum whose values are all strings; every entry has a lowercase snake_case id, a value and a brief; no value repeats an upstream value; no id repeats another entry or an upstream member id (lowercased, non-alphanumerics as `_`); and each key has at most one distinct list in the whole registry. Refs and definitions, resolved, both modes |
+| `livekit_shipped_value` | yes | `shipped_values` is a list, on a non-`lk.*` key of type string, string[] or an enum whose values are all strings; every entry has a lowercase snake_case id, a value and a brief; no value repeats an upstream value; no id repeats another entry or an upstream member id (lowercased, non-alphanumerics as `_`); and each key has at most one distinct list in the whole registry. Refs and definitions, resolved, both modes |
 | `livekit_client_namespace` | no (advice) | client-owned keys under `lk.client.*` |
 
 The attribute rules cover every key defined in `otel/model`, `lk.*` or not.
@@ -216,15 +236,31 @@ otel/live-check.sh session.jsonl [out-dir] [--fail-on none]
 ```
 
 It takes OTLP/JSON lines from an otelcol `file` exporter (the SDK e2e setup), or a weaver samples
-JSON file. `live-check/weaver.toml` matches spans by name and checks the resource and every
-record against `model/client/groups.yaml`. It drops two kinds of finding: `not_stable` (every key
-is `development`) and absent `conditionally_required` attributes (their conditions are prose).
+JSON file. `live-check/otlp2samples.py` converts the OTLP lines and stops the run before weaver,
+whatever `--fail-on` says, when it cannot: exit 1 for an attribute value it does not support
+(`bytesValue`, `kvlistValue`), 2 for a capture with metrics but no span or log record, 3 for one
+with no record at all. An envelope without spans or log records is no record.
+`live-check/weaver.toml` matches spans by name and checks the resource and every
+record against `model/client/groups.yaml`. It drops `not_stable` (every key is `development`)
+and absent `conditionally_required` attributes (their conditions are prose). Historical Agents
+room/track names have no exemption: `lk.room_sid`, `lk.track_sid` and bare `room_id` fail as
+unregistered attributes. The integrated producer must send only `lk.room_id` and `lk.track_id`.
+`live-check/renames.jq` still reads the first active `bindings.agents_otlp` entry for span advice;
+it ignores the explicitly historical `agents_otlp_before_7973` entries. This is not a structured,
+producer- or signal-aware binding validator: resource and metric bindings, including bare
+`job_id`, are not normalized by it. That broader bindings design remains open.
 `live-check/livekit.rego` adds `livekit_shared_rename` for an old spelling. `live-check/renames.jq`
 builds its map from the model's `renamed_from`, so each finding names the key to send and, for an
-enum, the value. It also adds `livekit_pii_unmarked` for any other PII-looking key, and
+enum, the value. It also adds `livekit_pii_unmarked` for any other PII-looking key, except the
+keys the registry check exempts: `live-check/lib.rego` is a symlink to `policies/lib.rego`, so
+both apply the same `pii_heuristic_allowlist` and annotation rule, with or without a prior
+`check.sh`. It also adds
 `livekit_unknown_span` for an `lk.*` span no matcher places (weaver
 alone reports nothing for an unmatched span that has no attributes). From the event and span
-annotations it adds `livekit_severity` (an event at a severity it is not declared with),
+annotations it adds `livekit_severity` (an event at a severity it is not declared with, by number
+or by text, or a log record for an event declared `severity: []`), `livekit_event_severity` (a
+record of an event whose declaration breaks the registry rule of that name; no record is compared
+against it),
 `livekit_checkpoint` (a span event the span does not list) and `livekit_span_outcome` (span status
 disagreeing with `lk.outcome`, or `error.type` without `lk.outcome = error`).
 
@@ -232,11 +268,11 @@ On the reference session (Swift 2.17.0 with the core at rust-sdks `a9ec8d52`: 6 
 349 attributes), every finding is one of the eight expected renames to shared keys (136
 violations, 62 improvements):
 
-| Emitted today | Registered key | Findings |
+| Emitted in this historical capture | Registered key | Findings |
 |---|---|---|
-| `lk.room.sid` | `lk.room_sid` | `missing_attribute`, `unexpected_attribute`, `livekit_shared_rename` ×10 each |
+| `lk.room.sid` | `lk.room_id` | `missing_attribute`, `unexpected_attribute`, `livekit_shared_rename` ×10 each |
 | `lk.participant.sid` | `lk.participant_id` | same, ×10 each |
-| `lk.track.sid` | `lk.track_sid` | same, ×12 each, plus `required_attribute_not_present: lk.track_sid` ×10 |
+| `lk.track.sid` | `lk.track_id` | same, ×12 each, plus `required_attribute_not_present: lk.track_id` ×10 |
 | `lk.room.name` | `lk.pii.room_name` | `missing_attribute`, `unexpected_attribute`, `livekit_shared_rename` ×10 each |
 | `lk.participant.identity` | `lk.pii.participant_identity` | same, ×10 each |
 | `lk.participant.remote_identity` | `lk.pii.remote_participant_identity` | same, ×2 each, plus `recommended_attribute_not_present` ×2 |
@@ -244,8 +280,11 @@ violations, 62 improvements):
 | `lk.disconnect.reason` = `client_initiated` | `lk.disconnect_reason` = `CLIENT_INITIATED` | same, ×2 each |
 
 With those eight keys renamed (and the two values mapped) in the same capture, live-check reports
-nothing and exits 0. `tests/live-sample.json` is part of that capture, anonymized, and
-`tests/live-agents.json` holds the shared keys as Agents sends them; both must pass.
+nothing and exits 0. `tests/live-sample.json` is part of that capture, anonymized, and must pass.
+`tests/live-agents.json` holds the integrated canonical Agents shared keys and must pass without
+findings. `tests/live-agents-before-7973.json` is an explicitly historical input: its two `_sid`
+keys must fail as unregistered attributes. The test also rejects the historical bare `room_id`
+room alias; these inputs do not authorize new producers to emit any legacy alias.
 
 Known limits:
 
@@ -257,6 +296,8 @@ Known limits:
 - App-defined attributes (custom events, `Scope::set_attribute`) are reported as unknown keys.
 - `lk.sdk.*` is not reported when missing: resource attributes are only compared, not required.
 - Units are annotations; live-check checks names, types and enum values, never magnitudes.
+- Metrics are not converted from OTLP: a capture with spans or logs as well passes without its
+  metrics checked.
 
 ### In SDK integration tests
 

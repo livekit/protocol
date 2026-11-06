@@ -9,8 +9,8 @@ attribute_groups:
     stability: development
     brief: Resource attributes of the client pipeline, one Resource per process.
     note: >
-      Set once per pipeline. Session-specific keys (`lk.room_sid`, `lk.participant_id`,
-      `lk.track_sid`) never go here; they stay on records and spans.
+      Set once per pipeline. Session-specific keys (`lk.room_id`, `lk.participant_id`,
+      `lk.track_id`) never go here; they stay on records and spans.
     attributes:
       - ref: service.name
         requirement_level: required
@@ -74,7 +74,7 @@ attribute_groups:
         requirement_level: {conditionally_required: On event records; duplicates the record's `event_name`.}
         note: For backends that do not surface the OTLP `event_name` field yet.
         examples: ["lk.rtc.stats.sample"]
-      - ref: lk.room_sid
+      - ref: lk.room_id
         requirement_level: {conditionally_required: Once the client has joined the room.}
       - ref: lk.pii.room_name
         requirement_level: {conditionally_required: Once the client has joined the room.}

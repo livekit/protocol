@@ -14,17 +14,20 @@ pii_segment := `(^|\.)pii(\.|$)`
 # ponytail: keyword heuristic, misses PII with innocent names; reviewers still own it.
 pii_looking := `(identity|email|phone|ip_address|user_agent|(room|participant)[._]name)`
 
+# The `_sid` spellings are Agents' span bindings of the room and track keys, never keys.
 canonical_identity := {
-	"lk.room.sid": "lk.room_sid",
+	"lk.room.sid": "lk.room_id",
+	"lk.room_sid": "lk.room_id",
 	"lk.participant.sid": "lk.participant_id",
 	"lk.participant_sid": "lk.participant_id",
-	"lk.track.sid": "lk.track_sid",
+	"lk.track.sid": "lk.track_id",
+	"lk.track_sid": "lk.track_id",
 	"lk.job.id": "lk.job_id",
 }
 
-high_cardinality := {"lk.room_sid", "lk.participant_id", "lk.track_sid", "lk.job_id", "lk.client.connect_id"}
+high_cardinality := {"lk.room_id", "lk.participant_id", "lk.track_id", "lk.job_id", "lk.client.connect_id"}
 
-owners := {"shared", "client", "agents", "cloud"}
+owners := {"shared", "client", "agents", "cloud", "telephony"}
 
 # Mirrors protocol protobufs/logger/options.proto Sensitivity (UNSPECIFIED/PII/SECRET).
 sensitivities := {"none", "pii", "secret"}
@@ -118,11 +121,48 @@ cardinality(name, where, keys, exception) := {finding("livekit_cardinality", spr
 	high_cardinality[key]
 }
 
+# The collector redacts traces and logs by key, never metric points: no metric dimension may be a
+# key it redacts (`lk.pii.*`, chat.item) or one the PII heuristic matches. The heuristic's allowlist
+# does not apply here: it documents span and log keys Agents ships, not metric dimensions.
+pii_metric(name, where, keys) := {finding("livekit_pii_metric", sprintf("%s (%s): %s is PII, and the collector does not redact metric dimensions", [name, where, key])) |
+	some key in keys
+	pii_dimension(key)
+}
+
+pii_dimension(key) if redacted(key)
+
+pii_dimension(key) if regex.match(pii_looking, key)
+
+# The six OTLP severity texts (logs data model); live-check/livekit.rego maps each to its numbers
+# and applies the same declaration rule.
+severity_texts := {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"}
+
+# An event's `severity`, when present (an explicit null too): OTLP severity texts, or [] for an
+# event that is never a log record (a span event). Absent means no constraint.
+event_severity(name, where, event) := {finding("livekit_event_severity", sprintf("%s (%s): severity must be a list of %v, or [] for an event that is never a log record, not %v", [name, where, severity_texts, s])) |
+	livekit := lk_all(event)
+	is_object(livekit)
+	some field, s in livekit
+	field == "severity"
+	not severity_texts_only(s)
+}
+
+severity_texts_only(s) if {
+	is_array(s)
+	every t in s {
+		severity_texts[t]
+	}
+}
+
 lk_all(obj) := object.get(obj, ["annotations", "livekit"], null)
 
 # `annotations.livekit.shipped_values` on a ref: values a producer sends for an upstream key that
 # the upstream definition does not list. Every problem with one ref's list, as messages.
-shipped_value_problems(key, attr) := ((((lk_key_shipped(key) | unshippable(key, attr)) | malformed_shipped(key, attr)) | upstream_shipped(key, attr)) | upstream_id_shipped(key, attr)) | repeated_id_shipped(key, attr)
+# Anything but a list gets only this message: the rules below iterate the list, and iterating a
+# string or a boolean is a policy evaluation error, not a finding.
+shipped_value_problems(key, attr) := {sprintf("%s: shipped_values must be a list, not %v", [key, lk(attr, "shipped_values")])} if {
+	not is_array(lk(attr, "shipped_values"))
+} else := ((((lk_key_shipped(key) | unshippable(key, attr)) | malformed_shipped(key, attr)) | upstream_shipped(key, attr)) | upstream_id_shipped(key, attr)) | repeated_id_shipped(key, attr)
 
 lk_key_shipped(key) := {sprintf("%s: shipped_values are for upstream keys; list a LiveKit key's values as enum members", [key]) |
 	startswith(key, "lk.")

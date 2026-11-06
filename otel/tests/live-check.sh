@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 # The smoke sample (a real client capture, anonymized, canonical names) must pass with no
-# findings, and so must a sparse RTC window, a JS network event without its flags, the shared keys
-# as Agents sends them, and a record without severity text. The same smoke sample with the
-# client's current identity/PII keys and spellings of shared keys, an unregistered lk.* span,
-# unlisted checkpoints (one empty), outcomes that disagree with the span status (Error for ok, Ok
-# for ok) and events at the wrong severity (by text, and by number) must be flagged. Last, a stub
-# weaver checks the wrapper: it keeps weaver's status, shows weaver's log when there is no report,
-# and never summarizes a report left over from an earlier run.
+# findings, and so must a sparse RTC window, a JS network event without its flags and a record
+# without severity text; the integrated Agents shared keys must also pass without findings.
+# Historical Agents room/track aliases must fail as unregistered attributes. The same smoke sample with the client's current identity/PII keys and
+# spellings of shared keys, an unregistered lk.* span, unlisted checkpoints (one empty), outcomes
+# that disagree with the span status (Error for ok, Ok for ok) and events at the wrong severity
+# (by text, and by number) must be flagged. Last, a stub weaver checks the wrapper: it keeps
+# weaver's status, shows weaver's log when there is no report, never summarizes a report left over
+# from an earlier run, and stops before weaver on a capture the converter cannot use.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 tmp=$(mktemp -d) && trap 'rm -rf "$tmp"' EXIT
@@ -25,10 +26,30 @@ js=$(./live-check.sh tests/live-js-network.json "$tmp/js")
 echo "$js"
 [[ $js == *'"advice_level_counts": {}'* ]] || { echo "FAIL  JS network sample has findings" >&2; exit 1; }
 
-# What Agents sends for the shared keys, as bare attributes (Agents spans have no matchers).
+# Integrated Agents shared keys, as bare attributes (Agents spans have no matchers). Its RPC
+# identity keys are the registry's PII heuristic exceptions, so they are no finding either.
 agents=$(./live-check.sh tests/live-agents.json "$tmp/agents" --search-all-attributes)
 echo "$agents"
-[[ $agents == *'"advice_level_counts": {}'* ]] || { echo "FAIL  Agents shared-key sample has findings" >&2; exit 1; }
+[[ $agents == *'"advice_level_counts": {}'* ]] || { echo "FAIL  canonical Agents shared-key sample has findings" >&2; exit 1; }
+
+# Explicitly historical input is retained to prevent legacy aliases becoming accepted again.
+# Include bare room_id, which pre-#7973 resources and metric points used; no metrics are converted.
+jq '. + [{"attribute": {"name": "room_id", "value": "RM_5Fq8xQ2ZbXwN"}}]' \
+  tests/live-agents-before-7973.json > "$tmp/agents-before-7973.json"
+status=0
+./live-check.sh "$tmp/agents-before-7973.json" "$tmp/agents-before-7973" --search-all-attributes > "$tmp/historical.log" || status=$?
+[[ $status == 1 ]] || { echo "FAIL  historical Agents aliases must fail live-check" >&2; exit 1; }
+python3 -I - "$tmp/agents-before-7973/live_check.json" <<'PYTHON'
+import json, sys
+report = json.load(open(sys.argv[1]))
+text = json.dumps(report)
+for key in ("lk.room_sid", "lk.track_sid", "room_id"):
+    assert any(f["id"] == "missing_attribute" for sample in report["samples"]
+               if sample.get("attribute", {}).get("name") == key
+               for f in sample["attribute"]["live_check_result"]["all_advice"]), key
+assert "livekit_agents_binding" not in text
+print("PASS  historical Agents lk.room_sid, lk.track_sid and room_id are unregistered")
+PYTHON
 
 # severity_text is optional in OTLP: a record with only a valid severity number passes, whether
 # it comes as weaver samples or as OTLP/JSON lines.
@@ -38,7 +59,7 @@ for sample in tests/live-no-severity-text.json tests/live-no-severity-text.jsonl
   [[ $out == *'"advice_level_counts": {}'* ]] || { echo "FAIL  $sample has findings" >&2; exit 1; }
 done
 
-sed -e 's/"lk\.room_sid"/"lk.room.sid"/g' -e 's/"lk\.pii\.room_name"/"lk.room.name"/g' \
+sed -e 's/"lk\.room_id"/"lk.room.sid"/g' -e 's/"lk\.pii\.room_name"/"lk.room.name"/g' \
   -e 's/"name": "lk\.publish"/"name": "lk.bogus"/' \
   -e '/"name": "lk\.connect"/s/"name": "ws_open"/"name": "ws_opened"/' \
   -e '/"name": "lk\.connect"/s/"name": "lk\.outcome", "value": "ok"/"name": "lk.outcome", "value": "error"/' \
@@ -50,6 +71,41 @@ sed -e 's/"lk\.room_sid"/"lk.room.sid"/g' -e 's/"lk\.pii\.room_name"/"lk.room.na
   -e 's/"name": "lk\.disconnect_reason", "value": "CLIENT_INITIATED"/"name": "lk.disconnect.reason", "value": "client_initiated"/' \
   -e '/"name": "lk\.connect"/s/"name": "lk\.pii\.participant_identity"/"name": "lk.caller_identity"/' \
   tests/live-sample.json > "$tmp/legacy.json"
+# live-check applies the event and PII declaration rules itself, on a copy of the registry with
+# fixtures that otel/check.sh would reject. Every OTLP severity range is known: an event declared
+# [DEBUG, FATAL] passes at 5/DEBUG and 21/FATAL, and fails at 9/INFO by number and by text. A
+# GenAI span event (`severity: []`) sent as a log record gets one finding that says so. A scalar,
+# an explicit null and an unknown text each get one livekit_event_severity finding per record and
+# no comparison. lk.caller_identity carries a pii_heuristic_exception but is not on the
+# allowlist in policies/lib.rego, so it is still flagged; lk.rpc.caller_identity is exempt.
+mkdir -p "$tmp/reg" && cp -R live-check.sh live-check model policies "$tmp/reg/"
+cat > "$tmp/reg/model/live-test.yaml" <<'YAML'
+groups:
+  - {id: event.lk.test.verbose, type: event, name: lk.test.verbose, stability: development, brief: Fixture., annotations: {livekit: {severity: [DEBUG, FATAL]}}}
+  - {id: event.lk.test.scalar, type: event, name: lk.test.scalar, stability: development, brief: Fixture., annotations: {livekit: {severity: INFO}}}
+  - {id: event.lk.test.null, type: event, name: lk.test.null, stability: development, brief: Fixture., annotations: {livekit: {severity: null}}}
+  - {id: event.lk.test.unknown, type: event, name: lk.test.unknown, stability: development, brief: Fixture., annotations: {livekit: {severity: [INFO, VERBOSE]}}}
+  - id: registry.lk.test.pii
+    type: attribute_group
+    brief: Fixture.
+    attributes:
+      - {id: lk.caller_identity, type: string, stability: development, brief: Fixture., examples: [x], annotations: {livekit: {owner: agents, sensitivity: none, pii_heuristic_exception: "Not on the allowlist."}}}
+YAML
+rec() { printf '{"log": {"event_name": "%s", "severity_number": %s, "severity_text": "%s", "body": "x", "attributes": [{"name": "session.id", "value": "4bf92f3577b34da6a3ce929d0e0e4736"}, {"name": "otel.event.name", "value": "%s"}]}}' "$1" "$2" "$3" "$1"; }
+attr() { printf '{"attribute": {"name": "%s", "value": "x"}}' "$1"; }
+echo "[$(rec lk.test.verbose 5 DEBUG), $(rec lk.test.verbose 21 FATAL), $(rec lk.test.verbose 9 INFO), $(rec gen_ai.user.message 9 INFO),
+  $(rec lk.test.scalar 9 INFO), $(rec lk.test.null 9 INFO), $(rec lk.test.unknown 9 INFO),
+  $(attr lk.caller_identity), $(attr lk.rpc.caller_identity)]" > "$tmp/reg.json"
+reg=$("$tmp/reg/live-check.sh" "$tmp/reg.json" "$tmp/reg-out" --search-all-attributes --fail-on none)
+echo "$reg"
+[[ $reg == *'"advice_level_counts": {"violation": 7}'* ]] || { echo "FAIL  registry-copy sample: want exactly 7 violations" >&2; exit 1; }
+for want in "event 'lk.test.verbose' is sent at severity number 9" "event 'lk.test.verbose' is sent at INFO" \
+  "event 'gen_ai.user.message' is declared as not a log record (severity: []), but was sent as one" \
+  "event 'lk.test.scalar': otel/model declares severity" "event 'lk.test.null': otel/model declares severity null" \
+  "event 'lk.test.unknown': otel/model declares severity" "'lk.caller_identity' looks like PII"; do
+  grep -q -F -- "$want" "$tmp/reg-out/live_check.json" || { echo "FAIL  no finding says: $want" >&2; exit 1; }
+done
+
 legacy=$(./live-check.sh "$tmp/legacy.json" "$tmp/legacy" --fail-on none)
 echo "$legacy"
 for want in "livekit_shared_rename lk.room.sid" "livekit_shared_rename lk.room.name" "livekit_unknown_span lk.bogus" \
@@ -61,7 +117,7 @@ for want in "livekit_shared_rename lk.room.sid" "livekit_shared_rename lk.room.n
   grep -q -E -- "${id}: .*${key//./\\.}" <<<"$legacy" || { echo "FAIL  not flagged: $id on $key" >&2; exit 1; }
 done
 # The key and value to send come from renamed_from in the model.
-for want in "send 'lk.room_sid'" "send 'lk.track_source' = 'SOURCE_CAMERA'" "send 'lk.disconnect_reason' = 'CLIENT_INITIATED'"; do
+for want in "send 'lk.room_id'" "send 'lk.track_source' = 'SOURCE_CAMERA'" "send 'lk.disconnect_reason' = 'CLIENT_INITIATED'"; do
   grep -q -F -- "$want" "$tmp/legacy/live_check.json" || { echo "FAIL  no finding says: $want" >&2; exit 1; }
 done
 
@@ -92,4 +148,27 @@ mkdir -p "$tmp/reused" && cp "$report" "$tmp/reused/live_check.json" && echo kee
 stub 7 "" "$tmp/reused"
 [[ $st == 7 && $res != *"totals:"* && $res != *"report:"* && -f $tmp/reused/unrelated.txt && ! -e $tmp/reused/live_check.json ]] ||
   fail "stale report in a reused directory: must not be summarized, and an unrelated file must stay"
-echo "PASS  live-check: smoke, sparse, JS, Agents and no-severity-text samples clean, every planted violation flagged, wrapper status and stale-report cases"
+# A capture the converter cannot use stops before weaver (the stub would write a report), in both
+# fail-on modes, with a status and message per case, and leaves samples.json empty. Envelopes
+# without spans or log records are no records. An unsupported AnyValue fails the whole capture,
+# also when the same record has supported attributes: nothing is skipped silently.
+convert() { st=0; res=$(STUB_REPORT=$report WEAVER=$tmp/weaver ./live-check.sh "$@" 2>&1) || st=$?; }
+metrics='{"resourceMetrics":[{"scopeMetrics":[{"metrics":[{"name":"lk.test.count"}]}]}]}'
+logs='{"resourceLogs":[{"scopeLogs":[{"logRecords":[]}]}]}'
+echo '{"resourceLogs":[{"scopeLogs":[{"logRecords":[{"eventName":"lk.ping","severityNumber":9,"attributes":[{"key":"lk.kept","value":{"stringValue":"ok"}},{"key":"lk.blob","value":{"bytesValue":"YQ=="}}]}]}]}]}' > "$tmp/mixed.jsonl"
+echo "$metrics" > "$tmp/metrics.jsonl"
+printf '%s\n' "$metrics" "$logs" > "$tmp/metrics-empty-logs.jsonl"
+: > "$tmp/empty.jsonl"
+echo "$logs" > "$tmp/empty-logs.jsonl"
+echo '{"resourceSpans":[{"scopeSpans":[{"spans":[]}]}]}' > "$tmp/empty-traces.jsonl"
+for case in "mixed 1 unsupported AnyValue {'bytesValue': 'YQ=='}" "metrics 2 unsupported signal type" \
+  "metrics-empty-logs 2 unsupported signal type" "empty 3 empty capture" "empty-logs 3 empty capture" "empty-traces 3 empty capture"; do
+  read -r file want msg <<<"$case"
+  for mode in default report-only; do
+    dir=$tmp/conv-$file-$mode flags=() && [[ $mode == report-only ]] && flags=(--fail-on none)
+    convert "$tmp/$file.jsonl" "$dir" ${flags[@]+"${flags[@]}"}
+    [[ $st == "$want" && $res == *"$msg"* && $res != *"stub weaver"* && ! -e $dir/live_check.json && ! -s $dir/samples.json ]] ||
+      fail "$file.jsonl ($mode): must exit $want before weaver, with empty samples.json, saying: $msg"
+  done
+done
+echo "PASS  live-check: smoke, sparse, JS and no-severity-text samples clean, canonical Agents clean, historical aliases rejected, every planted violation flagged, wrapper status, stale-report and converter cases"

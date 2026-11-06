@@ -4,7 +4,7 @@ groups:
     type: attribute_group
     brief: Negative fixture.
     attributes:
-      - id: lk.room_sid
+      - id: lk.room_id
         type: int
         stability: development
         brief: Defined twice.
