@@ -83,6 +83,9 @@ message SimulationRun {
     int32 sample = 16;
     // Set on a failed job whose cause is known; error stays the detail.
     FailureReason failure_reason = 19;
+    // The SimulationRun.compare option this job ran; empty when the run
+    // compares nothing.
+    string compare_option = 20;
 
     message Usage {
       int32 text_turns_count = 1;
@@ -338,6 +341,9 @@ message SimulationRun {
 
       // Named deployment of agent_name to dispatch to; empty is production.
       string deployment = 18;
+      // Runs every scenario once per option, so the run holds
+      // scenarios × samples × options jobs, subject to the usual job cap.
+      optional SimulationCompare compare = 19;
     }
     message Response {
       string simulation_run_id = 1;
@@ -461,6 +467,10 @@ message SimulationRun {
   optional CI ci = 22;
   // Absent when the run ran each scenario once and required it to pass.
   optional SamplingOptions sampling = 23;
+  // Absent when the run compares nothing.
+  optional SimulationCompare compare = 24;
+  // metrics over each compare option's jobs, keyed by option.
+  map<string, RunMetrics> compare_metrics = 25;
 
   message Usage {
     int32 text_turns_count = 1;
@@ -520,6 +530,15 @@ message SimulationImpairments {
   bool packet_loss = 3;
 }
 
+// One knob of the agent under test, varied across a run. The agent declares the
+// knob and its options in code (simulation.choose in the agents SDKs) and runs
+// the option its SimulationDispatch.choices names.
+message SimulationCompare {
+  string knob = 1;
+  // At least two distinct option names; the first is the baseline.
+  repeated string options = 2;
+}
+
 // Carried (protojson-encoded) in the Job's lk.simulator.dispatch attribute, set
 // on the agent dispatch, so the agent under test can read the scenario + run
 // identity synchronously at job start.
@@ -528,6 +547,8 @@ message SimulationDispatch {
   string job_id = 2;
   Scenario scenario = 3;
   SimulationMode mode = 4;
+  // knob → option this job runs; empty when the run compares nothing.
+  map<string, string> choices = 5;
 }
 
 service AgentSimulation {
