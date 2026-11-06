@@ -539,8 +539,10 @@ type JobState struct {
 	// joined, as an entrypoint that fails before it connects: from each such
 	// attempt's start to the next attempt's start, in nanoseconds
 	AgentFailedAttemptsNs int64 `protobuf:"varint,14,opt,name=agent_failed_attempts_ns,json=agentFailedAttemptsNs,proto3" json:"agent_failed_attempts_ns,omitempty"`
-	unknownFields         protoimpl.UnknownFields
-	sizeCache             protoimpl.SizeCache
+	// workers asked to take this attempt, the one that took it included
+	WorkersAsked  uint32 `protobuf:"varint,15,opt,name=workers_asked,json=workersAsked,proto3" json:"workers_asked,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *JobState) Reset() {
@@ -667,6 +669,13 @@ func (x *JobState) GetFirstStartedAt() int64 {
 func (x *JobState) GetAgentFailedAttemptsNs() int64 {
 	if x != nil {
 		return x.AgentFailedAttemptsNs
+	}
+	return 0
+}
+
+func (x *JobState) GetWorkersAsked() uint32 {
+	if x != nil {
+		return x.WorkersAsked
 	}
 	return 0
 }
@@ -2276,7 +2285,7 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x0e\n" +
-	"\f_participant\"\x9b\x04\n" +
+	"\f_participant\"\xc0\x04\n" +
 	"\bJobState\x12*\n" +
 	"\x06status\x18\x01 \x01(\x0e2\x12.livekit.JobStatusR\x06status\x12\x14\n" +
 	"\x05error\x18\x02 \x01(\tR\x05error\x12\x1d\n" +
@@ -2297,7 +2306,8 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"assignedAt\x12\x1a\n" +
 	"\battempts\x18\f \x01(\rR\battempts\x12(\n" +
 	"\x10first_started_at\x18\r \x01(\x03R\x0efirstStartedAt\x127\n" +
-	"\x18agent_failed_attempts_ns\x18\x0e \x01(\x03R\x15agentFailedAttemptsNs\"\xc8\x03\n" +
+	"\x18agent_failed_attempts_ns\x18\x0e \x01(\x03R\x15agentFailedAttemptsNs\x12#\n" +
+	"\rworkers_asked\x18\x0f \x01(\rR\fworkersAsked\"\xc8\x03\n" +
 	"\rWorkerMessage\x12<\n" +
 	"\bregister\x18\x01 \x01(\v2\x1e.livekit.RegisterWorkerRequestH\x00R\bregister\x12C\n" +
 	"\favailability\x18\x02 \x01(\v2\x1d.livekit.AvailabilityResponseH\x00R\favailability\x12B\n" +
