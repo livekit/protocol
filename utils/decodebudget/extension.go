@@ -57,9 +57,9 @@ func extensionMapHeader(m *messageState) int {
 // extensionCost is what a generated message allocates for an occurrence of
 // extension field beyond its value: the field info of a type it cannot cache,
 // and map growth when the field is new.
-func extensionCost(m *messageState, field protoreflect.FieldDescriptor, isNew bool) int {
+func extensionCost(m *messageState, f *fieldInfo, isNew bool) int {
 	cost := extensionMapHeader(m)
-	if !isGeneratedExtension(field) {
+	if !f.generatedExt {
 		cost += uncachedExtensionCost
 	}
 	switch {
@@ -74,33 +74,33 @@ func extensionCost(m *messageState, field protoreflect.FieldDescriptor, isNew bo
 
 // extensionValueCost is the value a decoder creates for an extension that is
 // not yet set before it reads the wire: a message or a list.
-func extensionValueCost(field protoreflect.FieldDescriptor) int {
+func extensionValueCost(field protoreflect.FieldDescriptor, msgCost int) int {
 	switch {
 	case field.IsList():
 		return extensionListSize
 	case field.Message() == nil:
 		return 0
 	}
-	return messageCost(field)
+	return msgCost
 }
 
 // messageCost is one new message of field's type, which for an extension
 // follows the extension type: dynamicpb's makes dynamicpb messages.
-func messageCost(field protoreflect.FieldDescriptor) int {
+func messageCost(field protoreflect.FieldDescriptor, child messageLayout) int {
 	if field.IsExtension() && !isGeneratedExtension(field) {
 		return dynamicMessageCost
 	}
-	return protoStructSize(field.Message())
+	return child.size
 }
 
 // valueModel is the model for the messages field holds, which an extension's
 // type decides: a generated type's messages take the fast path, and
 // dynamicpb's the reflective decoder.
-func valueModel(model decoderModel, field protoreflect.FieldDescriptor) decoderModel {
-	if !field.IsExtension() {
+func valueModel(model decoderModel, f *fieldInfo) decoderModel {
+	if !f.extension {
 		return model
 	}
-	return newDecoderModel(!isGeneratedExtension(field))
+	return newDecoderModel(!f.generatedExt)
 }
 
 // extensionCheckCost is a dynamicpb message type-checking a value of a
@@ -118,22 +118,22 @@ func extensionCheckCost(field protoreflect.FieldDescriptor) int {
 // extensionListCost is appending count elements one at a time to a repeated
 // extension, whose list layout follows its extension type, not the message.
 // isNew charges the list itself.
-func extensionListCost(fs *fieldState, field protoreflect.FieldDescriptor, count, payloadLen int, isNew bool) int {
+func extensionListCost(fs *fieldState, f *fieldInfo, count, payloadLen int, isNew bool) int {
 	cost := 0
 	if isNew {
 		cost = extensionListSize
 	}
-	if !isGeneratedExtension(field) {
+	if !f.generatedExt {
 		mem, newCap := appendValues(fs.len, fs.cap, count)
 		fs.len += count
 		fs.cap = newCap
-		return cost + mem + count*dynamicBoxCost(field, payloadLen)
+		return cost + mem + count*kindBoxCost(f.kind, payloadLen)
 	}
-	size := goValueSize(field)
+	size := f.elemSize
 	for fs.len += count; fs.cap < fs.len; {
 		mem := allocSize(nextSliceCap(fs.cap+1, fs.cap) * size)
 		cost += mem
 		fs.cap = mem / size
 	}
-	return cost + count*reflectAppendCost(field)
+	return cost + count*f.appendCost
 }

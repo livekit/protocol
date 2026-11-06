@@ -21,9 +21,13 @@ import (
 // mapInsertCost is the allocation for inserting a new key into a generated
 // map field holding n entries, excluding the map header.
 func mapInsertCost(field protoreflect.FieldDescriptor, n int) int {
+	slot, pointers := mapSlot(field)
+	return mapGrowth(n, slot, pointers)
+}
+
+func mapSlot(field protoreflect.FieldDescriptor) (size int, pointers bool) {
 	key, value := field.MapKey(), field.MapValue()
-	slot := (goValueSize(key) + goValueSize(value) + 7) &^ 7
-	return mapGrowth(n, slot, hasPointers(key) || hasPointers(value))
+	return (goValueSize(key) + goValueSize(value) + 7) &^ 7, hasPointers(key) || hasPointers(value)
 }
 
 // mapBoxCost is the allocation for passing one map key or value of field's
@@ -61,36 +65,29 @@ func presenceCost(field protoreflect.FieldDescriptor) int {
 	return allocSize(goValueSize(field))
 }
 
-// fieldAllocCost is the allocation for one occurrence of field with a string or
-// bytes payload of payloadLen. Nested message contents are charged separately.
-func fieldAllocCost(field protoreflect.FieldDescriptor, payloadLen int) int {
-	return fieldCost(field, payloadLen, true)
-}
-
-// fieldExtraCost is fieldAllocCost without the field's own message, which the
-// protojson walk charges as it walks it.
+// fieldExtraCost is the allocation for one occurrence of field with a string or
+// bytes payload of payloadLen, without the field's own message, which the
+// walks charge themselves.
 func fieldExtraCost(field protoreflect.FieldDescriptor, payloadLen int) int {
-	return fieldCost(field, payloadLen, false)
+	return fieldCost(field, payloadLen, 0)
 }
 
-func fieldCost(field protoreflect.FieldDescriptor, payloadLen int, withMessage bool) int {
+// fieldCost is fieldExtraCost plus msgCost for the field's own message, or
+// for a map field, the value message the decoder allocates before reading
+// each entry, whether or not the entry has one.
+func fieldCost(field protoreflect.FieldDescriptor, payloadLen, msgCost int) int {
 	cost := 0
 	// A map value message is charged with its entry.
-	if withMessage && field.Message() != nil && !field.IsMap() && !field.ContainingMessage().IsMapEntry() {
-		cost += messageCost(field)
+	if !field.ContainingMessage().IsMapEntry() {
+		cost += msgCost
 	}
 	if k := field.Kind(); k == protoreflect.StringKind || k == protoreflect.BytesKind {
 		cost += allocSize(payloadLen)
 	}
 	switch {
 	case field.IsMap():
-		// The decoder allocates a message value before reading the entry,
-		// whether or not the entry has one. Map growth depends on earlier
-		// entries; the caller charges it.
+		// Map growth depends on earlier entries; the caller charges it.
 		cost += mapBoxCost(field.MapKey()) + mapBoxCost(field.MapValue())
-		if value := field.MapValue().Message(); value != nil {
-			cost += protoStructSize(value)
-		}
 	case field.IsList():
 		// Slice growth depends on earlier occurrences; the caller charges it.
 	case field.ContainingOneof() != nil && !field.ContainingOneof().IsSynthetic():
@@ -103,109 +100,111 @@ func fieldCost(field protoreflect.FieldDescriptor, payloadLen int, withMessage b
 // generated Go structs.
 type generatedModel struct{}
 
-func (g generatedModel) root(desc protoreflect.MessageDescriptor) int {
-	return protoStructSize(desc)
+func (g generatedModel) root(info *messageInfo) int {
+	return info.layout.size
 }
 
-func (g generatedModel) message(m *messageState, field protoreflect.FieldDescriptor) (int, *fieldState) {
-	if field.IsList() || field.IsMap() {
+func (g generatedModel) message(m *messageState, f *fieldInfo) (int, *fieldState) {
+	if f.list || f.isMap {
 		// Every element or map value is a new message.
-		return g.occurrence(m, field, 0), nil
+		return g.occurrence(m, f, 0), nil
 	}
-	fs, isNew := m.add(field)
+	fs, isNew := m.add(f)
 	cost := 0
-	if field.IsExtension() {
-		cost = extensionCost(m, field, isNew)
+	if f.extension {
+		cost = extensionCost(m, f, isNew)
 	}
-	m.setOneof(field, fs)
+	m.setOneof(f, fs)
 	if fs.child != nil {
 		return cost, fs
 	}
-	return cost + fieldAllocCost(field, 0), fs
+	return cost + f.allocCost, fs
 }
 
-func (g generatedModel) occurrence(m *messageState, field protoreflect.FieldDescriptor, payloadLen int) int {
-	cost := fieldAllocCost(field, payloadLen)
-	if field.IsExtension() {
-		fs, isNew := m.add(field)
-		cost += extensionCost(m, field, isNew)
-		if field.IsList() {
-			cost += extensionListCost(fs, field, 1, payloadLen, isNew)
+func (g generatedModel) occurrence(m *messageState, f *fieldInfo, payloadLen int) int {
+	cost := f.allocCost
+	if f.payload {
+		cost += allocSize(payloadLen)
+	}
+	if f.extension {
+		fs, isNew := m.add(f)
+		cost += extensionCost(m, f, isNew)
+		if f.list {
+			cost += extensionListCost(fs, f, 1, payloadLen, isNew)
 		}
 		return cost
 	}
 	switch {
-	case field.IsList():
-		fs := m.get(field)
+	case f.list:
+		fs := m.get(f)
 		grow := appendGrow
-		if hasPointers(field) {
+		if f.pointers {
 			grow = appendGrowPointers
 		}
 		var mem int
-		mem, fs.cap = grow(fs.len, fs.cap, 1, goValueSize(field))
+		mem, fs.cap = grow(fs.len, fs.cap, 1, f.elemSize)
 		fs.len++
 		cost += mem
-	case field.IsMap():
+	case f.isMap:
 		// Every entry is taken as a new key; duplicates are over-charged.
-		fs := m.get(field)
+		fs := m.get(f)
 		cost += g.allocateMap(fs)
-		cost += mapInsertCost(field, fs.entries)
+		cost += mapGrowth(fs.entries, f.mapSlot, f.mapPointers)
 		fs.entries++
-	case presenceCost(field) > 0:
-		if fs := m.get(field); !fs.present {
+	case f.presence > 0:
+		if fs := m.get(f); !fs.present {
 			fs.present = true
-			cost += presenceCost(field)
+			cost += f.presence
 		}
-	case field.ContainingOneof() != nil:
-		m.setOneof(field, m.get(field))
+	case f.oneof != nil:
+		m.setOneof(f, m.get(f))
 	}
 	return cost
 }
 
 // packed reallocates the field's slice at exactly its new length: each run is
 // a fresh allocation, so many small runs cost quadratically.
-func (g generatedModel) packed(m *messageState, field protoreflect.FieldDescriptor, count int) int {
-	if field.IsExtension() {
+func (g generatedModel) packed(m *messageState, f *fieldInfo, count int) int {
+	if f.extension {
 		// Even an empty run resolves the extension and sets its list.
-		fs, isNew := m.add(field)
-		return extensionCost(m, field, isNew) + extensionListCost(fs, field, count, 0, isNew)
+		fs, isNew := m.add(f)
+		return extensionCost(m, f, isNew) + extensionListCost(fs, f, count, 0, isNew)
 	}
 	if count == 0 {
 		return 0
 	}
-	fs := m.get(field)
+	fs := m.get(f)
 	fs.len += count
 	fs.cap = fs.len
-	return allocSize(fs.len * goValueSize(field))
+	return allocSize(fs.len * f.elemSize)
 }
 
 // mismatch is what the decoder allocates for a known field before it rejects
 // the wire type: a nil map field's map, the wrapper of a oneof member other
 // than the set one, which it then drops without changing the oneof, and an
 // unset extension's value, each time.
-func (g generatedModel) mismatch(m *messageState, field protoreflect.FieldDescriptor) int {
-	if field.IsExtension() {
+func (g generatedModel) mismatch(m *messageState, f *fieldInfo) int {
+	if f.extension {
 		cost := extensionMapHeader(m)
-		if !isGeneratedExtension(field) {
+		if !f.generatedExt {
 			cost += uncachedExtensionCost
 		}
-		if m.find(field) == nil {
-			cost += extensionValueCost(field)
+		if m.find(f) == nil {
+			cost += f.valueCost
 		}
 		return cost
 	}
-	if field.IsMap() {
-		return g.allocateMap(m.get(field))
+	if f.isMap {
+		return g.allocateMap(m.get(f))
 	}
-	oneof := field.ContainingOneof()
-	if oneof == nil || oneof.IsSynthetic() || m.isSet(oneof, field) {
+	if f.oneof == nil || m.isSet(f) {
 		return 0
 	}
-	return oneofWrapperCost(field)
+	return allocSize(f.elemSize)
 }
 
-func (g generatedModel) unknown(m *messageState, desc protoreflect.MessageDescriptor) int {
-	if desc.ExtensionRanges().Len() == 0 {
+func (g generatedModel) unknown(m *messageState, info *messageInfo) int {
+	if !info.extendable {
 		return 0
 	}
 	return extensionMapHeader(m)

@@ -27,26 +27,29 @@ import (
 type wireWalk struct {
 	*tally
 	states statePool
+	// extensions holds the infos of extension types seen in this walk, so
+	// their states compare by pointer like other fields'.
+	extensions []*fieldInfo
 }
 
 // decoderModel prices what one protobuf-go decoder allocates for each event of
 // the wire walk, reading and updating the mirrored decoder state.
 type decoderModel interface {
-	root(desc protoreflect.MessageDescriptor) int
+	root(info *messageInfo) int
 	// message is the allocation for one occurrence of a message field, and the
 	// state of a singular field, whose child holds what its contents decode
 	// into once the walker creates it. Elements of lists and maps have none.
-	message(m *messageState, field protoreflect.FieldDescriptor) (int, *fieldState)
+	message(m *messageState, f *fieldInfo) (int, *fieldState)
 	// occurrence is the allocation for one occurrence of field with a string or
 	// bytes payload of payloadLen.
-	occurrence(m *messageState, field protoreflect.FieldDescriptor, payloadLen int) int
-	packed(m *messageState, field protoreflect.FieldDescriptor, count int) int
+	occurrence(m *messageState, f *fieldInfo, payloadLen int) int
+	packed(m *messageState, f *fieldInfo, count int) int
 	// mismatch is what the decoder allocates for a known field before it
 	// rejects an unexpected wire type.
-	mismatch(m *messageState, field protoreflect.FieldDescriptor) int
-	// unknown is what the decoder allocates for a field number desc does not
-	// know before it keeps the field as unknown.
-	unknown(m *messageState, desc protoreflect.MessageDescriptor) int
+	mismatch(m *messageState, f *fieldInfo) int
+	// unknown is what the decoder allocates for a field number the message
+	// does not know before it keeps the field as unknown.
+	unknown(m *messageState, info *messageInfo) int
 }
 
 func newDecoderModel(dynamic bool) decoderModel {
@@ -70,7 +73,7 @@ type messageState struct {
 }
 
 type fieldState struct {
-	field protoreflect.FieldDescriptor
+	field *fieldInfo
 	// len and cap mirror a repeated field's slice.
 	len, cap int
 	// entries counts a map field's insertions, and allocated records that the
@@ -86,12 +89,12 @@ type fieldState struct {
 
 type oneofState struct {
 	oneof protoreflect.OneofDescriptor
-	field protoreflect.FieldDescriptor
+	field *fieldInfo
 }
 
-func (m *messageState) find(field protoreflect.FieldDescriptor) *fieldState {
+func (m *messageState) find(f *fieldInfo) *fieldState {
 	for i := range m.fields {
-		if m.fields[i].field == field {
+		if m.fields[i].field == f {
 			return &m.fields[i]
 		}
 	}
@@ -99,44 +102,44 @@ func (m *messageState) find(field protoreflect.FieldDescriptor) *fieldState {
 }
 
 // add returns field's state, reporting whether it was just created.
-func (m *messageState) add(field protoreflect.FieldDescriptor) (*fieldState, bool) {
-	if fs := m.find(field); fs != nil {
+func (m *messageState) add(f *fieldInfo) (*fieldState, bool) {
+	if fs := m.find(f); fs != nil {
 		return fs, false
 	}
-	m.fields = append(m.fields, fieldState{field: field})
-	if field.IsExtension() {
+	m.fields = append(m.fields, fieldState{field: f})
+	if f.extension {
 		m.extensions++
 	}
 	return &m.fields[len(m.fields)-1], true
 }
 
-func (m *messageState) get(field protoreflect.FieldDescriptor) *fieldState {
-	fs, _ := m.add(field)
+func (m *messageState) get(f *fieldInfo) *fieldState {
+	fs, _ := m.add(f)
 	return fs
 }
 
 // setOneof records field as its oneof's set member. Switching members discards
 // the previous member's value, so a later return to field starts over.
-func (m *messageState) setOneof(field protoreflect.FieldDescriptor, fs *fieldState) {
-	oneof := field.ContainingOneof()
-	if oneof == nil || oneof.IsSynthetic() {
+func (m *messageState) setOneof(f *fieldInfo, fs *fieldState) {
+	oneof := f.oneof
+	if oneof == nil {
 		return
 	}
 	for i := range m.oneofs {
 		if m.oneofs[i].oneof == oneof {
-			if m.oneofs[i].field != field {
-				*fs = fieldState{field: field}
-				m.oneofs[i].field = field
+			if m.oneofs[i].field != f {
+				*fs = fieldState{field: f}
+				m.oneofs[i].field = f
 			}
 			return
 		}
 	}
-	m.oneofs = append(m.oneofs, oneofState{oneof: oneof, field: field})
+	m.oneofs = append(m.oneofs, oneofState{oneof: oneof, field: f})
 }
 
-func (m *messageState) isSet(oneof protoreflect.OneofDescriptor, field protoreflect.FieldDescriptor) bool {
+func (m *messageState) isSet(f *fieldInfo) bool {
 	for _, o := range m.oneofs {
-		if o.oneof == oneof && o.field == field {
+		if o.oneof == f.oneof && o.field == f {
 			return true
 		}
 	}
@@ -182,7 +185,7 @@ func (m *messageState) unknown(n int) int {
 
 // message walks the fields of one message into state, which persists across
 // occurrences that the decoder merges into the same message.
-func (w *wireWalk) message(data []byte, desc protoreflect.MessageDescriptor, depth int, state *messageState, model decoderModel) error {
+func (w *wireWalk) message(data []byte, info *messageInfo, depth int, state *messageState, model decoderModel) error {
 	if depth > w.budget.MaxDepth {
 		return ErrMessageComplexity
 	}
@@ -198,11 +201,11 @@ func (w *wireWalk) message(data []byte, desc protoreflect.MessageDescriptor, dep
 		if kind == protowire.StartGroupType || kind == protowire.EndGroupType {
 			return ErrMessageComplexity
 		}
-		field := desc.Fields().ByNumber(number)
-		if field == nil && desc.ExtensionRanges().Has(number) {
-			extension, err := protoregistry.GlobalTypes.FindExtensionByNumber(desc.FullName(), number)
+		f := info.field(number)
+		if f == nil && info.extendable && info.desc.ExtensionRanges().Has(number) {
+			extension, err := protoregistry.GlobalTypes.FindExtensionByNumber(info.desc.FullName(), number)
 			if err == nil {
-				field = extension.TypeDescriptor()
+				f = w.extension(extension.TypeDescriptor())
 			} else if !errors.Is(err, protoregistry.NotFound) {
 				return err
 			}
@@ -221,12 +224,12 @@ func (w *wireWalk) message(data []byte, desc protoreflect.MessageDescriptor, dep
 		data = data[size:]
 
 		// The decoder keeps a field with an unexpected wire type as unknown.
-		if field == nil || !wireTypeMatches(field, kind) {
+		if f == nil || !f.matches(kind) {
 			cost := state.unknown(n + size)
-			if field != nil {
-				cost += model.mismatch(state, field)
+			if f != nil {
+				cost += model.mismatch(state, f)
 			} else {
-				cost += model.unknown(state, desc)
+				cost += model.unknown(state, info)
 			}
 			if err := w.alloc(cost); err != nil {
 				return err
@@ -235,15 +238,15 @@ func (w *wireWalk) message(data []byte, desc protoreflect.MessageDescriptor, dep
 		}
 		var err error
 		switch {
-		case kind == protowire.BytesType && field.Message() != nil:
-			cost, fs := model.message(state, field)
+		case kind == protowire.BytesType && f.child != nil:
+			cost, fs := model.message(state, f)
 			if err = w.alloc(cost); err == nil {
-				err = w.child(value, field.Message(), depth+1, fs, valueModel(model, field))
+				err = w.child(value, f.child, depth+1, fs, valueModel(model, f))
 			}
-		case kind == protowire.BytesType && isPackable(field):
-			err = w.packed(value, field, state, model)
+		case kind == protowire.BytesType && f.packable:
+			err = w.packed(value, f, state, model)
 		default:
-			err = w.alloc(model.occurrence(state, field, len(value)))
+			err = w.alloc(model.occurrence(state, f, len(value)))
 		}
 		if err != nil {
 			return err
@@ -252,29 +255,44 @@ func (w *wireWalk) message(data []byte, desc protoreflect.MessageDescriptor, dep
 	return nil
 }
 
-func (w *wireWalk) child(data []byte, desc protoreflect.MessageDescriptor, depth int, fs *fieldState, model decoderModel) error {
+func (w *wireWalk) extension(xd protoreflect.ExtensionTypeDescriptor) *fieldInfo {
+	for _, f := range w.extensions {
+		if f.FieldDescriptor == protoreflect.FieldDescriptor(xd) {
+			return f
+		}
+	}
+	var child *messageInfo
+	if md := xd.Message(); md != nil {
+		child = infoOf(md)
+	}
+	f := newFieldInfo(xd, child)
+	w.extensions = append(w.extensions, &f)
+	return &f
+}
+
+func (w *wireWalk) child(data []byte, info *messageInfo, depth int, fs *fieldState, model decoderModel) error {
 	if fs == nil {
 		state := w.states.get()
-		err := w.message(data, desc, depth, state, model)
+		err := w.message(data, info, depth, state, model)
 		w.states.put(state)
 		return err
 	}
 	if fs.child == nil {
 		fs.child = w.states.get()
 	}
-	return w.message(data, desc, depth, fs.child, model)
+	return w.message(data, info, depth, fs.child, model)
 }
 
 // packed walks a packed scalar run; decoders accept one even when the schema
 // prefers unpacked.
-func (w *wireWalk) packed(value []byte, field protoreflect.FieldDescriptor, state *messageState, model decoderModel) error {
+func (w *wireWalk) packed(value []byte, f *fieldInfo, state *messageState, model decoderModel) error {
 	count := 0
 	for len(value) > 0 {
 		var consumed int
-		switch field.Kind() {
-		case protoreflect.DoubleKind, protoreflect.Fixed64Kind, protoreflect.Sfixed64Kind:
+		switch f.wire {
+		case protowire.Fixed64Type:
 			_, consumed = protowire.ConsumeFixed64(value)
-		case protoreflect.FloatKind, protoreflect.Fixed32Kind, protoreflect.Sfixed32Kind:
+		case protowire.Fixed32Type:
 			_, consumed = protowire.ConsumeFixed32(value)
 		default:
 			_, consumed = protowire.ConsumeVarint(value)
@@ -288,25 +306,7 @@ func (w *wireWalk) packed(value []byte, field protoreflect.FieldDescriptor, stat
 		count++
 		value = value[consumed:]
 	}
-	return w.alloc(model.packed(state, field, count))
-}
-
-func wireTypeMatches(field protoreflect.FieldDescriptor, kind protowire.Type) bool {
-	if kind == protowire.BytesType && isPackable(field) {
-		return true
-	}
-	switch field.Kind() {
-	case protoreflect.MessageKind, protoreflect.StringKind, protoreflect.BytesKind:
-		return kind == protowire.BytesType
-	case protoreflect.GroupKind:
-		return kind == protowire.StartGroupType
-	case protoreflect.FloatKind, protoreflect.Fixed32Kind, protoreflect.Sfixed32Kind:
-		return kind == protowire.Fixed32Type
-	case protoreflect.DoubleKind, protoreflect.Fixed64Kind, protoreflect.Sfixed64Kind:
-		return kind == protowire.Fixed64Type
-	default:
-		return kind == protowire.VarintType
-	}
+	return w.alloc(model.packed(state, f, count))
 }
 
 func isPackable(field protoreflect.FieldDescriptor) bool {

@@ -16,7 +16,6 @@ package decodebudget
 
 import (
 	"reflect"
-	"sync"
 
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/reflect/protoregistry"
@@ -34,12 +33,15 @@ type messageLayout struct {
 	size      int
 }
 
-var messageLayouts sync.Map // protoreflect.FullName -> messageLayout
-
+// layoutOf is the layout cached under desc's name.
 func layoutOf(desc protoreflect.MessageDescriptor) messageLayout {
-	if v, ok := messageLayouts.Load(desc.FullName()); ok {
-		return v.(messageLayout)
+	if v, ok := messageInfos.Load(desc.FullName()); ok {
+		return v.(*messageInfo).layout
 	}
+	return infoOf(desc).layout
+}
+
+func newLayout(desc protoreflect.MessageDescriptor) messageLayout {
 	// A dynamicpb message keeps its fields in a map.
 	l := messageLayout{size: 64 + 32*desc.Fields().Len()}
 	if mt, err := protoregistry.GlobalTypes.FindMessageByName(desc.FullName()); err == nil {
@@ -49,7 +51,6 @@ func layoutOf(desc protoreflect.MessageDescriptor) messageLayout {
 		}
 	}
 	l.size = allocSize(l.size)
-	messageLayouts.Store(desc.FullName(), l)
 	return l
 }
 

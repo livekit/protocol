@@ -66,12 +66,13 @@ func (b Proto) estimate(data []byte, desc protoreflect.MessageDescriptor, dynami
 	if err != nil {
 		return 0, err
 	}
-	model := newDecoderModel(dynamic || !layoutOf(desc).generated)
+	info := infoOf(desc)
+	model := newDecoderModel(dynamic || !info.layout.generated)
 	w := &wireWalk{tally: t}
-	if err := w.alloc(model.root(desc)); err != nil {
+	if err := w.alloc(model.root(info)); err != nil {
 		return t.total(), err
 	}
-	err = w.message(data, desc, 1, &messageState{}, model)
+	err = w.message(data, info, 1, &messageState{}, model)
 	return t.total(), err
 }
 

@@ -48,7 +48,11 @@ func isDynamicDestination(msg protoreflect.Message) bool {
 // dynamicBoxCost is the allocation for boxing one value of field into an
 // interface, which dynamicpb does to type-check every value it stores.
 func dynamicBoxCost(field protoreflect.FieldDescriptor, payloadLen int) int {
-	switch field.Kind() {
+	return kindBoxCost(field.Kind(), payloadLen)
+}
+
+func kindBoxCost(kind protoreflect.Kind, payloadLen int) int {
+	switch kind {
 	case protoreflect.BoolKind, protoreflect.MessageKind, protoreflect.GroupKind:
 		return 0
 	case protoreflect.StringKind:
@@ -78,111 +82,111 @@ func appendValues(l, c, add int) (mem, newCap int) {
 // messages.
 type dynamicModel struct{}
 
-func (d dynamicModel) root(protoreflect.MessageDescriptor) int {
+func (d dynamicModel) root(*messageInfo) int {
 	return dynamicMessageCost + dynamicResetCost
 }
 
 // field is the known-map growth for the first occurrence of field in a
 // dynamic message, plus the list, map or extension value Mutable creates then.
-func (d dynamicModel) field(m *messageState, field protoreflect.FieldDescriptor) (fs *fieldState, isNew bool, cost int) {
-	fs, isNew = m.add(field)
-	if !isNew || field.ContainingMessage().IsMapEntry() {
+func (d dynamicModel) field(m *messageState, f *fieldInfo) (fs *fieldState, isNew bool, cost int) {
+	fs, isNew = m.add(f)
+	if !isNew || f.mapEntry {
 		return fs, isNew, 0
 	}
 	cost = mapGrowth(len(m.fields)-1, knownSlotSize, true)
 	switch {
-	case field.IsExtension():
+	case f.extension:
 		cost += mapGrowth(m.extensions-1, extSlotSize, true)
-		if field.Message() != nil && !field.IsList() {
-			cost += messageCost(field)
+		if f.child != nil && !f.list {
+			cost += f.msgCost
 		}
-	case field.IsList():
+	case f.list:
 		cost += dynamicListCost
-	case field.IsMap():
+	case f.isMap:
 		cost += dynamicMapCost
 	}
 	return fs, isNew, cost
 }
 
-func (d dynamicModel) message(m *messageState, field protoreflect.FieldDescriptor) (int, *fieldState) {
-	if field.IsList() || field.IsMap() {
-		return d.occurrence(m, field, 0), nil
+func (d dynamicModel) message(m *messageState, f *fieldInfo) (int, *fieldState) {
+	if f.list || f.isMap {
+		return d.occurrence(m, f, 0), nil
 	}
-	fs, _, cost := d.field(m, field)
-	cost += extensionCheckCost(field)
-	m.setOneof(field, fs)
+	fs, _, cost := d.field(m, f)
+	cost += f.checkCost
+	m.setOneof(f, fs)
 	// A map value message was charged with its entry.
-	if fs.child == nil && !field.IsExtension() && !field.ContainingMessage().IsMapEntry() {
+	if fs.child == nil && !f.extension && !f.mapEntry {
 		cost += dynamicMessageCost
 	}
 	return cost, fs
 }
 
-func (d dynamicModel) occurrence(m *messageState, field protoreflect.FieldDescriptor, payloadLen int) int {
-	fs, isNew, cost := d.field(m, field)
-	if k := field.Kind(); k == protoreflect.StringKind || k == protoreflect.BytesKind {
+func (d dynamicModel) occurrence(m *messageState, f *fieldInfo, payloadLen int) int {
+	fs, isNew, cost := d.field(m, f)
+	if f.payload {
 		cost += allocSize(payloadLen)
 	}
 	switch {
-	case field.IsMap():
+	case f.isMap:
 		cost += mapGrowth(fs.entries, mapEntrySlotSize, true)
 		fs.entries++
-		if field.MapValue().Message() != nil {
+		if f.mapValueMessage {
 			cost += dynamicMessageCost
 		}
-	case field.IsList() && field.IsExtension():
-		cost += extensionListCost(fs, field, 1, payloadLen, isNew) + extensionCheckCost(field)
-		if field.Message() != nil {
-			cost += messageCost(field)
+	case f.list && f.extension:
+		cost += extensionListCost(fs, f, 1, payloadLen, isNew) + f.checkCost
+		if f.child != nil {
+			cost += f.msgCost
 		}
-	case field.IsList():
+	case f.list:
 		var mem int
 		mem, fs.cap = appendValues(fs.len, fs.cap, 1)
 		fs.len++
-		cost += mem + dynamicBoxCost(field, payloadLen)
-		if field.Message() != nil {
+		cost += mem + kindBoxCost(f.kind, payloadLen)
+		if f.child != nil {
 			cost += dynamicMessageCost
 		}
 	default:
-		cost += dynamicBoxCost(field, payloadLen) + extensionCheckCost(field)
-		if field.ContainingMessage().IsMapEntry() && field.Number() == 1 {
+		cost += kindBoxCost(f.kind, payloadLen) + f.checkCost
+		if f.mapKey {
 			// The map boxes its key again to store it.
-			cost += dynamicBoxCost(field, payloadLen)
+			cost += kindBoxCost(f.kind, payloadLen)
 		}
-		m.setOneof(field, fs)
+		m.setOneof(f, fs)
 	}
 	return cost
 }
 
-func (d dynamicModel) packed(m *messageState, field protoreflect.FieldDescriptor, count int) int {
-	fs, isNew, cost := d.field(m, field)
-	if field.IsExtension() {
-		return cost + extensionListCost(fs, field, count, 0, isNew) + extensionCheckCost(field)
+func (d dynamicModel) packed(m *messageState, f *fieldInfo, count int) int {
+	fs, isNew, cost := d.field(m, f)
+	if f.extension {
+		return cost + extensionListCost(fs, f, count, 0, isNew) + f.checkCost
 	}
 	mem, newCap := appendValues(fs.len, fs.cap, count)
 	fs.len += count
 	fs.cap = newCap
-	return cost + mem + count*dynamicBoxCost(field, 0)
+	return cost + mem + count*kindBoxCost(f.kind, 0)
 }
 
 // mismatch is what a field with an unexpected wire type allocates: the
 // reflective decoder resolves an extension and creates a list or map before
 // checking the wire type.
-func (d dynamicModel) mismatch(m *messageState, field protoreflect.FieldDescriptor) int {
+func (d dynamicModel) mismatch(m *messageState, f *fieldInfo) int {
 	cost := 0
-	if field.IsExtension() && !isGeneratedExtension(field) {
+	if f.extension && !f.generatedExt {
 		cost = dynamicExtensionResolveCost
 	}
-	if !field.IsList() && !field.IsMap() {
+	if !f.list && !f.isMap {
 		return cost
 	}
-	_, isNew, fieldCost := d.field(m, field)
-	if isNew && field.IsExtension() {
+	_, isNew, fieldCost := d.field(m, f)
+	if isNew && f.extension {
 		cost += extensionListSize
 	}
 	return cost + fieldCost
 }
 
-func (d dynamicModel) unknown(*messageState, protoreflect.MessageDescriptor) int {
+func (d dynamicModel) unknown(*messageState, *messageInfo) int {
 	return 0
 }
