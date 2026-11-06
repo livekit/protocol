@@ -374,10 +374,12 @@ func (w *jsonWalk) boxCost(field protoreflect.FieldDescriptor, tok json.Token) i
 		return 0
 	}
 	if n, ok := tok.(json.Number); ok {
-		if u, err := strconv.ParseUint(string(n), 10, 64); err == nil && u < 256 {
-			return 0
-		}
-		if f, err := n.Float64(); err == nil && math.Float64bits(f) == 0 {
+		if kind := field.Kind(); kind == protoreflect.FloatKind || kind == protoreflect.DoubleKind {
+			// A float is boxed by its bits, so only zero is free.
+			if f, err := n.Float64(); err == nil && math.Float64bits(f) == 0 {
+				return 0
+			}
+		} else if u, err := strconv.ParseUint(string(n), 10, 64); err == nil && u < 256 {
 			return 0
 		}
 	}

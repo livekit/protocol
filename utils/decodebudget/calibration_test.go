@@ -732,6 +732,43 @@ func TestProtoEstimateRuntimeMessage(t *testing.T) {
 	require.LessOrEqual(t, float64(est), 1.25*float64(got), "the estimate should stay close enough to admit real payloads")
 }
 
+// dynamicpb boxes a float's bits, so a small whole number is not free to box
+// the way a small integer is.
+func TestProtoJSONRuntimeFloats(t *testing.T) {
+	file := must(protodesc.NewFile(&descriptorpb.FileDescriptorProto{
+		Name:    proto.String("decodebudget_runtime_floats_test.proto"),
+		Package: proto.String("decodebudget.runtime"),
+		MessageType: []*descriptorpb.DescriptorProto{{
+			Name: proto.String("Floats"),
+			Field: []*descriptorpb.FieldDescriptorProto{{
+				Name:   proto.String("d"),
+				Number: proto.Int32(1),
+				Label:  descriptorpb.FieldDescriptorProto_LABEL_REPEATED.Enum(),
+				Type:   descriptorpb.FieldDescriptorProto_TYPE_DOUBLE.Enum(),
+			}, {
+				Name:   proto.String("f"),
+				Number: proto.Int32(2),
+				Label:  descriptorpb.FieldDescriptorProto_LABEL_REPEATED.Enum(),
+				Type:   descriptorpb.FieldDescriptorProto_TYPE_FLOAT.Enum(),
+			}},
+		}},
+	}, protoregistry.GlobalFiles))
+	desc := file.Messages().Get(0)
+	for _, field := range []string{"d", "f"} {
+		estimates := map[string]int{}
+		for _, value := range []string{"1", "1.5"} {
+			data := []byte(`{"` + field + `":[` + strings.TrimSuffix(strings.Repeat(value+",", 1<<16), ",") + `]}`)
+			est, err := Proto{MaxFields: 1 << 30, MaxDepth: 100}.EstimateProtoJSON(data, desc)
+			require.NoError(t, err)
+			got := measureJSONDecode(t, data, func() proto.Message { return dynamicpb.NewMessage(desc) })
+			t.Logf("%s=%s measured=%d estimate=%d ratio=%.2f", field, value, got, est, float64(est)/float64(got))
+			require.GreaterOrEqual(t, uint64(est), got, "the estimate must not undercount")
+			estimates[value] = est
+		}
+		require.Equal(t, estimates["1.5"], estimates["1"], "%s: boxing 1 costs the same as 1.5", field)
+	}
+}
+
 // A mismatched occurrence charges the map header but must not count as an entry.
 func mismatchedThenEntry(n int) []byte {
 	attrs := num(&livekit.ParticipantInfo{}, "attributes")
