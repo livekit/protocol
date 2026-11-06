@@ -33,11 +33,7 @@ type messageLayout struct {
 	size      int
 }
 
-// layoutOf is the layout cached under desc's name.
 func layoutOf(desc protoreflect.MessageDescriptor) messageLayout {
-	if v, ok := messageInfos.Load(desc.FullName()); ok {
-		return v.(*messageInfo).layout
-	}
 	return infoOf(desc).layout
 }
 

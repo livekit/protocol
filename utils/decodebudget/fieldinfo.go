@@ -55,6 +55,8 @@ type fieldInfo struct {
 	mapPointers, mapValueMessage              bool
 }
 
+// messageInfos assumes one descriptor per name. A schema rebuilt at runtime
+// under the same names is still estimated correctly, just not cached.
 var messageInfos sync.Map // protoreflect.FullName -> *messageInfo
 
 // infoOf returns desc's cached info. A descriptor that is not the one cached
