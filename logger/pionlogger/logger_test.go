@@ -30,3 +30,10 @@ func TestPrefixFilter(t *testing.T) {
 	require.True(t, f["tcp_mux"].Match("error closing connection"))
 	require.True(t, f["tcp_mux"].Match("test"))
 }
+
+func TestIgnoredPrefixes(t *testing.T) {
+	f := NewPrefixFilter(nil)
+
+	require.True(t, f["ice"].Match("Failed to ping without candidate pairs. Connection is not possible yet."))
+	require.False(t, f["ice"].Match("Failed to handle message"))
+}
