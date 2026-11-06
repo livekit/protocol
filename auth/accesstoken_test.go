@@ -277,3 +277,25 @@ func decodeClaims(t *testing.T, raw string) string {
 	require.NoError(t, err)
 	return string(body)
 }
+
+func TestObservabilityGrantRoundTrip(t *testing.T) {
+	t.Parallel()
+
+	apiKey, secret := apiKeypair()
+	grant := &ObservabilityGrant{ClientWrite: true}
+	raw, err := NewAccessToken(apiKey, secret).
+		SetObservabilityGrant(grant).
+		SetValidFor(time.Minute).
+		ToJWT()
+	require.NoError(t, err)
+
+	// the claim key is camelCase, and an unset write is omitted
+	claims := decodeClaims(t, raw)
+	require.Contains(t, claims, `"observability":{"clientWrite":true}`)
+
+	v, err := ParseAPIToken(raw)
+	require.NoError(t, err)
+	_, decoded, err := v.Verify(secret)
+	require.NoError(t, err)
+	require.Equal(t, grant, decoded.Observability)
+}
