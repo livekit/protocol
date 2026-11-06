@@ -1,7 +1,7 @@
 # Live-check advice preprocessor, for live-check/livekit.rego: the renames recorded in otel/model as
-# `renamed_from`, keyed by the old spelling (`data.renames`), and the span keys Agents sends for a
-# shared key under another name (`bindings.agents_otlp`, its first entry), keyed by that name
-# (`data.bindings`).
+# `renamed_from`, keyed by the old spelling (`data.renames`), and active Agents span bindings
+# (`bindings.agents_otlp`, its first entry), keyed by that name (`data.bindings`). Historical
+# `agents_otlp_before_7973` metadata is not accepted as an active binding.
 [.registry.registry.attributes[]] as $attrs
 | {renames: ([$attrs[]
     | .annotations.livekit.renamed_from as $from

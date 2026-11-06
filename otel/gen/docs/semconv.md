@@ -31,16 +31,19 @@ owner is in the [attribute reference](#attribute-reference).
 **Flat shared identity.** Shared identity keys are flat, `lk.<entity>_<field>`, never
 `lk.<entity>.sid`:
 `lk.job_id`, `lk.participant_id`, `lk.room_id`, `lk.track_id`.
-They are record and span attributes, never Resource attributes, omitted until the server has
-assigned them, and never default metric dimensions (high cardinality).
+On clients they belong to records and spans, not the process-wide Resource, since a client can
+join several rooms. Agents may put room and job IDs on a job-scoped Resource. Omit IDs until the
+server has assigned them. They are high cardinality, never default metric dimensions; Agents'
+job-scoped metrics carry an explicit cardinality exception.
 
 **One name per concept.** Where a client and Agents named the same concept differently, the
 Agents spelling and value set is the shared key: a flat key, and the enum names Agents sends as
 values (`lk.track_source = SOURCE_MICROPHONE`, `lk.disconnect_reason = CLIENT_INITIATED`). The
 other spelling is never registered, deprecated or not. The shared key records it in
 `renamed_from`, listed under [Old spellings](#old-spellings). The room and track IDs are the
-exception: `lk.room_id` and `lk.track_id` match `lk.participant_id`, and Agents spans keep their
-own names for them, listed under [Bindings](#bindings).
+exception: `lk.room_id` and `lk.track_id` match `lk.participant_id`. Clients and Agents must emit
+these canonical keys without legacy aliases. Agents adopts them in livekit/agents#7973; native
+SDK/protobuf SID fields and the `RM_`/`TR_` values do not change.
 
 **Upstream metrics.** Agents creates three GenAI metrics that the GenAI registry defines. The
 registry imports `gen_ai.invoke_agent.duration` and `gen_ai.execute_tool.duration`, and the
@@ -601,7 +604,7 @@ Kind `internal`. The job's entrypoint, root of a job's trace.
 | `lk.job.launch_latency` | double, `s` | Recommended | Seconds from assignment to the job process launch. |
 | `lk.job.worker_id` | string | Recommended | Worker id the job runs on. |
 | `lk.pii.room_name` | string | Recommended | Customer-supplied room name. On every record and span of a session once the client has joined. |
-| `lk.room_id` | string | Recommended | Server-assigned room session SID (`RM_...`). Agents sends it as `lk.room_sid` (`bindings.agents_otlp`). |
+| `lk.room_id` | string | Recommended | Server-assigned room session SID (`RM_...`). Agents sends the canonical key after livekit/agents#7973; the value remains an `RM_` SID. |
 | `lk.cloud_agent_id` | string | Opt-in | LiveKit Cloud agent id. |
 | `lk.deployment_id` | string | Opt-in | LiveKit Cloud deployment id. |
 | `lk.dispatch_id` | string | Opt-in | Agent dispatch id. |
@@ -931,7 +934,7 @@ Kind `internal`. Publishing the agent's audio track.
 
 | Attribute | Type | Requirement | Description |
 | --- | --- | --- | --- |
-| `lk.track_id` | string | Recommended | Server-assigned track SID (`TR_...`). Agents sends it as `lk.track_sid` (`bindings.agents_otlp`). |
+| `lk.track_id` | string | Recommended | Server-assigned track SID (`TR_...`). Agents sends the canonical key after livekit/agents#7973; the value remains a `TR_` SID. |
 | `lk.pre_connect_audio.duration` | double, `s` | Opt-in | Seconds of pre-connect audio replayed. |
 
 No checkpoints.
@@ -1273,12 +1276,12 @@ Kind `internal`. Waiting for the participant's audio track.
 | Attribute | Type | Requirement | Description |
 | --- | --- | --- | --- |
 | `lk.first_frame_delay` | double, `s` | Recommended | Seconds from waiting for a track to its first frame. |
-| `lk.track_id` | string | Recommended | Server-assigned track SID (`TR_...`). Agents sends it as `lk.track_sid` (`bindings.agents_otlp`). |
+| `lk.track_id` | string | Recommended | Server-assigned track SID (`TR_...`). Agents sends the canonical key after livekit/agents#7973; the value remains a `TR_` SID. |
 | `lk.track_source` | enum | Recommended | Source of the track, as the Agents RTC FFI `TrackSource` enum name. Sent on the `track_subscribed` checkpoint, not on the span. |
 
 | Checkpoint | Requirement | Meaning |
 | --- | --- | --- |
-| `track_subscribed` | Best effort | The track was subscribed, with `lk.track_id` (sent as `lk.track_sid`) and `lk.track_source`. |
+| `track_subscribed` | Best effort | The track was subscribed, with `lk.track_id` and `lk.track_source`. |
 | `first_frame` | Best effort | The first frame arrived. |
 | `pre_connect_audio` | Best effort | Pre-connect audio was replayed, with `lk.pre_connect_audio.duration`. |
 
@@ -1303,12 +1306,12 @@ Kind `internal`. Waiting for the participant's video track.
 | Attribute | Type | Requirement | Description |
 | --- | --- | --- | --- |
 | `lk.first_frame_delay` | double, `s` | Recommended | Seconds from waiting for a track to its first frame. |
-| `lk.track_id` | string | Recommended | Server-assigned track SID (`TR_...`). Agents sends it as `lk.track_sid` (`bindings.agents_otlp`). |
+| `lk.track_id` | string | Recommended | Server-assigned track SID (`TR_...`). Agents sends the canonical key after livekit/agents#7973; the value remains a `TR_` SID. |
 | `lk.track_source` | enum | Recommended | Source of the track, as the Agents RTC FFI `TrackSource` enum name. Sent on the `track_subscribed` checkpoint, not on the span. |
 
 | Checkpoint | Requirement | Meaning |
 | --- | --- | --- |
-| `track_subscribed` | Best effort | The track was subscribed, with `lk.track_id` (sent as `lk.track_sid`) and `lk.track_source`. |
+| `track_subscribed` | Best effort | The track was subscribed, with `lk.track_id` and `lk.track_source`. |
 | `first_frame` | Best effort | The first frame arrived. |
 
 No limits declared.
@@ -1752,15 +1755,19 @@ validates it.
 | `lk.job_id` | agents_otlp | `lk.job_id`, `job_id` |
 | `lk.job_id` | collector_column | `none` |
 | `lk.participant_id` | event_logs | `participantID` |
-| `lk.room_id` | agents_otlp | `lk.room_sid`, `room_id` |
+| `lk.room_id` | agents_otlp | `lk.room_id` |
+| `lk.room_id` | agents_otlp_before_7973 | `lk.room_sid`, `room_id` |
 | `lk.room_id` | collector_column | `room_id` |
 | `lk.room_id` | event_logs | `roomID` |
 | `lk.room_id` | roomobs | `room_session.id` |
-| `lk.track_id` | agents_otlp | `lk.track_sid` |
+| `lk.track_id` | agents_otlp | `lk.track_id` |
+| `lk.track_id` | agents_otlp_before_7973 | `lk.track_sid` |
 
 `agents_otlp` is Agents' span key, then its Resource and metric-point key when there is one. A
 span key that differs from the registered key is a binding, never a key: live-check reports it as
-`livekit_agents_binding`, an improvement that names the key.
+`livekit_agents_binding`, an improvement that names the key. The room and track keys are canonical
+on all signals after livekit/agents#7973, with no dual emission. `agents_otlp_before_7973` records
+historical names only: live-check does not exempt them from unregistered-attribute violations.
 `agents_participant_attribute` is the room participant attribute, which is not an OTLP key.
 `collector_column: room_id` is materialized from the attributes `room_id` and `roomID`.
 

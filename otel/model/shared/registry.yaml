@@ -7,8 +7,9 @@ groups:
     display_name: LiveKit shared identity
     brief: Cross-producer identity keys. Flat `lk.<entity>_<field>`, never `lk.<entity>.sid`.
     note: >
-      Record and span attributes, never Resource attributes: a Resource lives for the process,
-      these for one session. Omitted until the server has assigned them, never sent empty.
+      On client records and spans, not the process-wide Resource: a client can join several rooms.
+      Agents may put room and job IDs on a job-scoped Resource. Omitted until the server has
+      assigned them, never sent empty.
     attributes:
       - id: lk.room_id
         type: string
@@ -26,7 +27,8 @@ groups:
             renamed_from: {key: lk.room.sid}
             # Physical name per producer/store. Weaver carries these; nothing validates them.
             bindings:
-              agents_otlp: [lk.room_sid, room_id] # spans | resource + metric points
+              agents_otlp: lk.room_id # canonical-only after livekit/agents#7973, all signals
+              agents_otlp_before_7973: [lk.room_sid, room_id] # historical spans | resource + metric points
               collector_column: room_id # materialized from attribute room_id|roomID only
               event_logs: roomID # Go project logger (cloud-sip, cloud realtime), not OTLP
               roomobs: room_session.id
@@ -55,7 +57,8 @@ groups:
             authority: cloud
             renamed_from: {key: lk.track.sid}
             bindings:
-              agents_otlp: lk.track_sid # spans
+              agents_otlp: lk.track_id # canonical-only after livekit/agents#7973
+              agents_otlp_before_7973: lk.track_sid # historical spans
       - id: lk.job_id
         type: string
         stability: development

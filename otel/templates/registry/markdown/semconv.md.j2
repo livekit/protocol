@@ -57,16 +57,19 @@ owner is in the [attribute reference](#attribute-reference).
 **Flat shared identity.** Shared identity keys are flat, `lk.<entity>_<field>`, never
 `lk.<entity>.sid`:
 {% for a in ctx.attributes | selectattr("annotations.livekit.authority", "eq", "cloud") %}`{{ a.key }}`{% if not loop.last %}, {% endif %}{% endfor %}.
-They are record and span attributes, never Resource attributes, omitted until the server has
-assigned them, and never default metric dimensions (high cardinality).
+On clients they belong to records and spans, not the process-wide Resource, since a client can
+join several rooms. Agents may put room and job IDs on a job-scoped Resource. Omit IDs until the
+server has assigned them. They are high cardinality, never default metric dimensions; Agents'
+job-scoped metrics carry an explicit cardinality exception.
 
 **One name per concept.** Where a client and Agents named the same concept differently, the
 Agents spelling and value set is the shared key: a flat key, and the enum names Agents sends as
 values (`lk.track_source = SOURCE_MICROPHONE`, `lk.disconnect_reason = CLIENT_INITIATED`). The
 other spelling is never registered, deprecated or not. The shared key records it in
 `renamed_from`, listed under [Old spellings](#old-spellings). The room and track IDs are the
-exception: `lk.room_id` and `lk.track_id` match `lk.participant_id`, and Agents spans keep their
-own names for them, listed under [Bindings](#bindings).
+exception: `lk.room_id` and `lk.track_id` match `lk.participant_id`. Clients and Agents must emit
+these canonical keys without legacy aliases. Agents adopts them in livekit/agents#7973; native
+SDK/protobuf SID fields and the `RM_`/`TR_` values do not change.
 
 **Upstream metrics.** Agents creates three GenAI metrics that the GenAI registry defines. The
 registry imports `gen_ai.invoke_agent.duration` and `gen_ai.execute_tool.duration`, and the
@@ -193,7 +196,9 @@ validates it.
 {% endfor %}{% endif %}{% endfor %}
 `agents_otlp` is Agents' span key, then its Resource and metric-point key when there is one. A
 span key that differs from the registered key is a binding, never a key: live-check reports it as
-`livekit_agents_binding`, an improvement that names the key.
+`livekit_agents_binding`, an improvement that names the key. The room and track keys are canonical
+on all signals after livekit/agents#7973, with no dual emission. `agents_otlp_before_7973` records
+historical names only: live-check does not exempt them from unregistered-attribute violations.
 `agents_participant_attribute` is the room participant attribute, which is not an OTLP key.
 `collector_column: room_id` is materialized from the attributes `room_id` and `roomID`.
 

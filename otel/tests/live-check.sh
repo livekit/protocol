@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # The smoke sample (a real client capture, anonymized, canonical names) must pass with no
 # findings, and so must a sparse RTC window, a JS network event without its flags and a record
-# without severity text; the shared keys as Agents sends them report only its two span bindings,
-# as improvements. The same smoke sample with the client's current identity/PII keys and
+# without severity text; the integrated Agents shared keys must also pass without findings.
+# Historical Agents room/track aliases must fail as unregistered attributes. The same smoke sample with the client's current identity/PII keys and
 # spellings of shared keys, an unregistered lk.* span, unlisted checkpoints (one empty), outcomes
 # that disagree with the span status (Error for ok, Ok for ok) and events at the wrong severity
 # (by text, and by number) must be flagged. Last, a stub weaver checks the wrapper: it keeps
@@ -26,15 +26,30 @@ js=$(./live-check.sh tests/live-js-network.json "$tmp/js")
 echo "$js"
 [[ $js == *'"advice_level_counts": {}'* ]] || { echo "FAIL  JS network sample has findings" >&2; exit 1; }
 
-# What Agents sends for the shared keys, as bare attributes (Agents spans have no matchers). Its
-# span names for the room and track keys are bindings: improvements that name the key, nothing else.
-# Its RPC identity keys are the registry's PII heuristic exceptions, so they are no finding either.
+# Integrated Agents shared keys, as bare attributes (Agents spans have no matchers). Its RPC
+# identity keys are the registry's PII heuristic exceptions, so they are no finding either.
 agents=$(./live-check.sh tests/live-agents.json "$tmp/agents" --search-all-attributes)
 echo "$agents"
-[[ $agents == *'"advice_level_counts": {"improvement": 2}'* ]] || { echo "FAIL  Agents shared-key sample has findings beyond its two bindings" >&2; exit 1; }
-for want in "'lk.room_sid' is how Agents spans send 'lk.room_id'" "'lk.track_sid' is how Agents spans send 'lk.track_id'"; do
-  grep -q -F -- "$want" "$tmp/agents/live_check.json" || { echo "FAIL  no finding says: $want" >&2; exit 1; }
-done
+[[ $agents == *'"advice_level_counts": {}'* ]] || { echo "FAIL  canonical Agents shared-key sample has findings" >&2; exit 1; }
+
+# Explicitly historical input is retained to prevent legacy aliases becoming accepted again.
+# Include bare room_id, which pre-#7973 resources and metric points used; no metrics are converted.
+jq '. + [{"attribute": {"name": "room_id", "value": "RM_5Fq8xQ2ZbXwN"}}]' \
+  tests/live-agents-before-7973.json > "$tmp/agents-before-7973.json"
+status=0
+./live-check.sh "$tmp/agents-before-7973.json" "$tmp/agents-before-7973" --search-all-attributes > "$tmp/historical.log" || status=$?
+[[ $status == 1 ]] || { echo "FAIL  historical Agents aliases must fail live-check" >&2; exit 1; }
+python3 -I - "$tmp/agents-before-7973/live_check.json" <<'PYTHON'
+import json, sys
+report = json.load(open(sys.argv[1]))
+text = json.dumps(report)
+for key in ("lk.room_sid", "lk.track_sid", "room_id"):
+    assert any(f["id"] == "missing_attribute" for sample in report["samples"]
+               if sample.get("attribute", {}).get("name") == key
+               for f in sample["attribute"]["live_check_result"]["all_advice"]), key
+assert "livekit_agents_binding" not in text
+print("PASS  historical Agents lk.room_sid, lk.track_sid and room_id are unregistered")
+PYTHON
 
 # severity_text is optional in OTLP: a record with only a valid severity number passes, whether
 # it comes as weaver samples or as OTLP/JSON lines.
@@ -156,4 +171,4 @@ for case in "mixed 1 unsupported AnyValue {'bytesValue': 'YQ=='}" "metrics 2 uns
       fail "$file.jsonl ($mode): must exit $want before weaver, with empty samples.json, saying: $msg"
   done
 done
-echo "PASS  live-check: smoke, sparse, JS and no-severity-text samples clean, Agents sample only its two bindings, every planted violation flagged, wrapper status, stale-report and converter cases"
+echo "PASS  live-check: smoke, sparse, JS and no-severity-text samples clean, canonical Agents clean, historical aliases rejected, every planted violation flagged, wrapper status, stale-report and converter cases"

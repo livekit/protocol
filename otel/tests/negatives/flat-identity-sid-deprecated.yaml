@@ -7,6 +7,6 @@ groups:
       - id: lk.room_sid
         type: string
         stability: development
-        brief: Agents' span binding of lk.room_id, defined as a deprecated key.
+        brief: Agents' pre-#7973 span spelling of lk.room_id, defined as a deprecated key.
         deprecated: {reason: uncategorized, note: Legacy key still accepted.}
         annotations: {livekit: {owner: shared, sensitivity: none}}

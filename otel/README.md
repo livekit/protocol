@@ -8,7 +8,8 @@ upstream keys (`service.*`, `os.*`, `device.*`, `network.connection.type`, `erro
 
 Status: prototype, `development` stability. It registers the shared identity, PII and SDK keys,
 what the client cores (rust-sdks `livekit-telemetry` and the JS port) emit today, and what
-LiveKit Agents 2.0 (Python and the Rust core) emits today, all under their current names. The
+LiveKit Agents 2.0 (Python and the Rust core) emits. Room and track keys describe the canonical-only
+integration in livekit/agents#7973; explicitly labelled bindings retain the pre-#7973 names. The
 OTel GenAI conventions are a second dependency
 ([semantic-conventions-genai](https://github.com/open-telemetry/semantic-conventions-genai),
 pinned by commit: it has no tags), so Agents' `gen_ai.*` keys are referenced, not redefined.
@@ -56,7 +57,9 @@ is the shared key, and the client is the side that changes: `lk.track_source` an
 source names are the Agents RTC FFI `TrackSource` names, not the signal protocol's (`CAMERA`,
 `SCREEN_SHARE`), so clients map them explicitly. The room and track IDs are the exception:
 `lk.room_id` and `lk.track_id` match `lk.participant_id` and the collector's `room_id` column,
-and Agents spans keep sending `lk.room_sid` and `lk.track_sid`, recorded as bindings.
+and clients and Agents must emit those canonical keys only. Agents adopts them in
+livekit/agents#7973, without aliases. Native SDK/protobuf SID fields and `RM_`/`TR_` values stay
+unchanged. Agents' pre-#7973 names are explicitly labelled historical bindings.
 
 All eight client renames (the six identity/PII keys, `lk.track.source` and
 `lk.disconnect.reason`) are recorded the same way: `renamed_from` on the shared key names the old
@@ -74,10 +77,17 @@ included, and never fails on it.
 How a concept is named in other producers or stores (Agents' `room_id`, the collector's `room_id`
 column, roomobs) is recorded in `annotations.livekit.bindings`. Weaver carries it into the docs;
 nothing validates it. `event_logs` is the Go project logger store that cloud services such as
-cloud-sip and cloud realtime write to, not OTLP. Agents spans send `lk.room_id` and `lk.track_id`
-as `lk.room_sid` and `lk.track_sid` (the first `agents_otlp` entry). Those names are bindings, not
-keys: `livekit_flat_identity` rejects defining one, deprecated or not, and live-check reports one
-as an improvement that names the key (see [Live-check](#live-check)).
+cloud-sip and cloud realtime write to, not OTLP. `agents_otlp` describes the integrated producer:
+`lk.room_id` on every signal and `lk.track_id` on spans, without aliases. Its job binding remains
+`[lk.job_id, job_id]` (spans, then resource and metric points); job renaming is outside this change.
+`agents_otlp_before_7973` records the old room/track names for historical captures only. They are
+not registered keys: `livekit_flat_identity` rejects defining one, deprecated or not, and
+live-check rejects them as unregistered attributes (see [Live-check](#live-check)).
+
+Clients keep session IDs off the process-wide Resource because one process can join several
+rooms. Agents may attach room and job IDs to a job-scoped Resource. The collector must recognize
+`lk.room_id` before a canonical-only producer deploys; the legacy collector bindings do not imply
+that this backend migration has happened.
 
 Agents' session report sends plain log records whose keys predate this registry. They are
 registered as emitted, owner `agents`: `session.options`, `session.report_timestamp` and
@@ -200,7 +210,7 @@ add to it:
 | `livekit_secret` | yes | `secret` is never emitted |
 | `livekit_pii_marker` | yes | `sensitivity: pii` iff a `pii` key segment, except `chat.item`, which the collector drops by name (`pii_by_name` in `lib.rego`) |
 | `livekit_pii_heuristic` | yes | identity, email, phone, room/participant name outside `lk.pii.*`, unless the key is on the policy's `pii_heuristic_allowlist` and carries a `pii_heuristic_exception` reason |
-| `livekit_flat_identity` | yes | no `lk.room.sid`, `lk.participant.sid`, `lk.track.sid`, `lk.job.id`, and no `_sid` spelling (`lk.room_sid`, `lk.participant_sid`, `lk.track_sid`), deprecated or not (deprecated keys: resolved, both modes); `lk.room_sid` and `lk.track_sid` are Agents' span bindings |
+| `livekit_flat_identity` | yes | no `lk.room.sid`, `lk.participant.sid`, `lk.track.sid`, `lk.job.id`, and no `_sid` spelling (`lk.room_sid`, `lk.participant_sid`, `lk.track_sid`), deprecated or not (deprecated keys: resolved, both modes); pre-#7973 Agents names are historical bindings only |
 | `livekit_shared_rename` | yes | no old spelling named in a `renamed_from` is defined, deprecated or not (resolved, both modes) |
 | `livekit_rename_value` | yes | every value a `renamed_from` maps to is a member of the shared key's enum |
 | `livekit_seconds`, `livekit_unit` | yes | seconds, unless `unit_exception` |
@@ -231,16 +241,14 @@ whatever `--fail-on` says, when it cannot: exit 1 for an attribute value it does
 (`bytesValue`, `kvlistValue`), 2 for a capture with metrics but no span or log record, 3 for one
 with no record at all. An envelope without spans or log records is no record.
 `live-check/weaver.toml` matches spans by name and checks the resource and every
-record against `model/client/groups.yaml`. It drops three kinds of finding: `not_stable` (every
-key is `development`), absent `conditionally_required` attributes (their conditions are prose), and
-`missing_attribute` for `lk.room_sid` and `lk.track_sid`, the names Agents spans send for
-`lk.room_id` and `lk.track_id`. For those two, `live-check/livekit.rego` reports
-`livekit_agents_binding` instead, an improvement that names the key; `live-check/renames.jq` reads
-them from the model's `bindings.agents_otlp`, and the `weaver.toml` filter lists the same two.
-Both go by the attribute name alone, not by producer or span: a client record that sends
-`lk.room_sid` in place of `lk.room_id` gets only improvements (`livekit_agents_binding` and
-`unexpected_attribute`), since an absent `lk.room_id` is conditionally required;
-`lk.track_sid` in place of a required `lk.track_id` still fails as `required_attribute_not_present`.
+record against `model/client/groups.yaml`. It drops `not_stable` (every key is `development`)
+and absent `conditionally_required` attributes (their conditions are prose). Historical Agents
+room/track names have no exemption: `lk.room_sid`, `lk.track_sid` and bare `room_id` fail as
+unregistered attributes. The integrated producer must send only `lk.room_id` and `lk.track_id`.
+`live-check/renames.jq` still reads the first active `bindings.agents_otlp` entry for span advice;
+it ignores the explicitly historical `agents_otlp_before_7973` entries. This is not a structured,
+producer- or signal-aware binding validator: resource and metric bindings, including bare
+`job_id`, are not normalized by it. That broader bindings design remains open.
 `live-check/livekit.rego` adds `livekit_shared_rename` for an old spelling. `live-check/renames.jq`
 builds its map from the model's `renamed_from`, so each finding names the key to send and, for an
 enum, the value. It also adds `livekit_pii_unmarked` for any other PII-looking key, except the
@@ -260,7 +268,7 @@ On the reference session (Swift 2.17.0 with the core at rust-sdks `a9ec8d52`: 6 
 349 attributes), every finding is one of the eight expected renames to shared keys (136
 violations, 62 improvements):
 
-| Emitted today | Registered key | Findings |
+| Emitted in this historical capture | Registered key | Findings |
 |---|---|---|
 | `lk.room.sid` | `lk.room_id` | `missing_attribute`, `unexpected_attribute`, `livekit_shared_rename` ×10 each |
 | `lk.participant.sid` | `lk.participant_id` | same, ×10 each |
@@ -273,8 +281,10 @@ violations, 62 improvements):
 
 With those eight keys renamed (and the two values mapped) in the same capture, live-check reports
 nothing and exits 0. `tests/live-sample.json` is part of that capture, anonymized, and must pass.
-`tests/live-agents.json` holds the shared keys as Agents sends them and must report nothing but
-its two `livekit_agents_binding` improvements.
+`tests/live-agents.json` holds the integrated canonical Agents shared keys and must pass without
+findings. `tests/live-agents-before-7973.json` is an explicitly historical input: its two `_sid`
+keys must fail as unregistered attributes. The test also rejects the historical bare `room_id`
+room alias; these inputs do not authorize new producers to emit any legacy alias.
 
 Known limits:
 

@@ -54,8 +54,8 @@ deny contains lk_advice("livekit_shared_rename", {"attribute_key": key, "expecte
 	hint := rename_value_hint(to, value)
 }
 
-# An Agents span binding is not a registered key. weaver.toml drops weaver's missing_attribute for
-# it; this names the key instead, as an improvement, since Agents sends it by design.
+# An active Agents span binding names the registered key as an improvement. Historical bindings
+# are not in data.bindings, so they still fail as unregistered attributes.
 deny contains lk_finding("improvement", "livekit_agents_binding", {"attribute_key": key, "expected": to}, sprintf("'%s' is how Agents spans send '%s' (bindings.agents_otlp)", [key, to])) if {
 	key := input.sample.attribute.name
 	to := bindings[key]

@@ -5,8 +5,8 @@
 # registry documents the vocabulary rather than fixing it. Shared identity keys (`lk.room_id`,
 # `lk.participant_id`, `lk.job_id`, `lk.track_id`, `lk.pii.room_name`,
 # `lk.pii.participant_identity`) live in otel/model/shared and are referenced, never redefined;
-# Agents spans send the room and track keys as `lk.room_sid` and `lk.track_sid`, recorded as
-# their `bindings`.
+# Agents adopts canonical `lk.room_id` and `lk.track_id` in livekit/agents#7973, without aliases.
+# Pre-#7973 spellings are historical `bindings.agents_otlp_before_7973` metadata.
 # Upstream keys (`gen_ai.*`, `error.type`, `exception.*`, `rpc.method`) are referenced from the
 # spans in signals.yaml. Types follow the Python producer; the Node binding's deviations are
 # noted on the key.

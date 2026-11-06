@@ -1131,7 +1131,7 @@ export const CHECKPOINT_STOP_RESPONSE = "stop_response" as const;
 export const CHECKPOINT_SUBSCRIBED = "subscribed" as const;
 /** Checkpoint (span event): A newer detection superseded this one. */
 export const CHECKPOINT_SUPERSEDED = "superseded" as const;
-/** Checkpoint (span event): The track was subscribed, with `lk.track_id` (sent as `lk.track_sid`) and `lk.track_source`. */
+/** Checkpoint (span event): The track was subscribed, with `lk.track_id` and `lk.track_source`. */
 export const CHECKPOINT_TRACK_SUBSCRIBED = "track_subscribed" as const;
 /** Checkpoint (span event): The user spoke again during the wait. */
 export const CHECKPOINT_USER_RESUMED = "user_resumed" as const;
