@@ -6,6 +6,6 @@ groups:
     stability: development
     brief: A ref that overrides the referenced key's classification.
     attributes:
-      - ref: lk.room_sid
+      - ref: lk.room_id
         requirement_level: required
         annotations: {livekit: {owner: bogus, sensitivity: pii}}

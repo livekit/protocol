@@ -13,21 +13,37 @@ pii_looking := `(identity|email|phone|ip_address|user_agent|(room|participant)[.
 # spelling: `data.renames[old] = {key, values}`. Built by live-check/renames.jq.
 renames := object.get(data, "renames", {})
 
-lk_advice(type, ctx, msg) := {
+# The span keys Agents sends for a shared key under another name (`bindings.agents_otlp` in
+# otel/model), keyed by that name: `data.bindings[name] = key`. Also built by renames.jq.
+bindings := object.get(data, "bindings", {})
+
+lk_advice(type, ctx, msg) := lk_finding("violation", type, ctx, msg)
+
+lk_finding(level, type, ctx, msg) := {
 	"type": "advice",
 	"advice_type": type,
-	"advice_level": "violation",
+	"advice_level": level,
 	"advice_context": ctx,
 	"message": msg,
 }
 
-# A PII-looking key that is not an old spelling (those get livekit_shared_rename).
+# A key the registry check exempts from its PII heuristic: the same rule, allowlist and annotation,
+# from policies/lib.rego (loaded here through the live-check/lib.rego symlink), applied to the
+# key's registered definition. An unregistered key has none and is never exempt.
+pii_exempt(key) if {
+	attr := object.get(input, "registry_attribute", null)
+	is_object(attr)
+	data.livekit.lib.heuristic_exception(object.union(attr, {"id": key}))
+}
+
+# A PII-looking key that is not an old spelling (those get livekit_shared_rename) or exempt.
 deny contains lk_advice("livekit_pii_unmarked", {"attribute_key": key}, sprintf("'%s' looks like PII but has no `pii` key segment, so the collector will not redact it", [key])) if {
 	key := input.sample.attribute.name
 	startswith(key, "lk.")
 	regex.match(pii_looking, key)
 	not regex.match(pii_segment, key)
 	not renames[key]
+	not pii_exempt(key)
 }
 
 # An old spelling: the model names the key to send and, for an enum, the value.
@@ -36,6 +52,13 @@ deny contains lk_advice("livekit_shared_rename", {"attribute_key": key, "expecte
 	to := renames[key]
 	value := object.get(to.values, input.sample.attribute.value, null)
 	hint := rename_value_hint(to, value)
+}
+
+# An active Agents span binding names the registered key as an improvement. Historical bindings
+# are not in data.bindings, so they still fail as unregistered attributes.
+deny contains lk_finding("improvement", "livekit_agents_binding", {"attribute_key": key, "expected": to}, sprintf("'%s' is how Agents spans send '%s' (bindings.agents_otlp)", [key, to])) if {
+	key := input.sample.attribute.name
+	to := bindings[key]
 }
 
 rename_value_hint(to, value) := "" if count(to.values) == 0
@@ -79,8 +102,47 @@ deny contains lk_advice("livekit_checkpoint", {"span_name": span.name, "checkpoi
 	not matches_declared_pattern(name)
 }
 
-# OTLP severity numbers per severity text (logs data model: INFO 9-12, WARN 13-16, ERROR 17-20).
-severity_range := {"INFO": [9, 12], "WARN": [13, 16], "ERROR": [17, 20]}
+# OTLP severity numbers per severity text, all six ranges of the logs data model.
+severity_range := {"TRACE": [1, 4], "DEBUG": [5, 8], "INFO": [9, 12], "WARN": [13, 16], "ERROR": [17, 20], "FATAL": [21, 24]}
+
+# The matched event's annotations.livekit, {} when the sample matched no event.
+event_livekit := object.get(input, ["registry_group", "annotations", "livekit"], {})
+
+# `severity` is declared, also as an explicit null: absent means no constraint.
+severity_declared if {
+	is_object(event_livekit)
+	some field, _ in event_livekit
+	field == "severity"
+}
+
+# The same declaration rule as livekit_event_severity in policies/lib.rego, so live-check does not
+# depend on otel/check.sh having run on the model.
+severity_valid if {
+	severity_declared
+	data.livekit.lib.severity_texts_only(event_livekit.severity)
+}
+
+# A declaration no record can be compared against: reported once per record, and no record is
+# compared against it.
+deny contains lk_advice("livekit_event_severity", {"event_name": log.event_name}, sprintf("event '%s': otel/model declares severity %v, which is not a list of %v; records are not compared against it", [log.event_name, event_livekit.severity, data.livekit.lib.severity_texts])) if {
+	log := input.sample.log
+	severity_declared
+	not severity_valid
+}
+
+# `severity: []` declares an event that is never a log record (the GenAI span events): a log record
+# under its name is one finding that says so, not a severity mismatch.
+deny contains lk_advice("livekit_severity", {"event_name": log.event_name}, sprintf("event '%s' is declared as not a log record (severity: []), but was sent as one", [log.event_name])) if {
+	log := input.sample.log
+	severity_valid
+	event_livekit.severity == []
+}
+
+# A valid declaration with one or more severities.
+declared_levels if {
+	severity_valid
+	count(event_livekit.severity) > 0
+}
 
 number_declared(n) if {
 	some text in declared("severity")
@@ -91,13 +153,13 @@ number_declared(n) if {
 # The number decides; a text, when present, must agree with the declaration too.
 deny contains lk_advice("livekit_severity", {"event_name": log.event_name, "severity_number": log.severity_number}, sprintf("event '%s' is sent at severity number %v; otel/model allows %v", [log.event_name, log.severity_number, declared("severity")])) if {
 	log := input.sample.log
-	declared("severity") != null
+	declared_levels
 	not number_declared(object.get(log, "severity_number", 0))
 }
 
 deny contains lk_advice("livekit_severity", {"event_name": log.event_name, "severity_text": log.severity_text}, sprintf("event '%s' is sent at %v; otel/model allows %v", [log.event_name, log.severity_text, declared("severity")])) if {
 	log := input.sample.log
-	declared("severity") != null
+	declared_levels
 	text := object.get(log, "severity_text", null) # optional in OTLP; omitted arrives as null
 	is_string(text)
 	text != ""

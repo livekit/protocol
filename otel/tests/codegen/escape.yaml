@@ -14,5 +14,10 @@ groups:
               value: "a \"quoted\" back\\slash, 'single', </tag> & */ tab\tnew\nline"
               brief: "Member docs with */ and a\nsecond line."
               stability: development
+            # No brief: the Rust and Python comments fall back to the value, which must stay one line.
+            - id: no_brief
+              value: "fallback\nwith a\rbreak"
+              brief: ""
+              stability: development
         annotations:
           livekit: {owner: client, sensitivity: none}

@@ -5,7 +5,8 @@ package before_resolution
 
 import rego.v1
 
-# Attribute definitions in this file, lk.* or not (refs and deprecated keys are exempt).
+# Attribute definitions in this file, lk.* or not. Refs and deprecated keys are exempt, but
+# resolved.rego still applies the flat-identity rule to deprecated keys.
 lk_attrs contains attr if {
 	some group in input.groups
 	some attr in group.attributes
@@ -26,9 +27,15 @@ deny contains f if {
 
 # A definition/2 metric refinement is absent from the default mode's resolved registry, so its
 # dimensions are checked here (resolved.rego sees them with --v2).
+refinement_keys(r) := [a.ref | some a in object.get(r, "attributes", []); a.ref]
+
 deny contains f if {
 	some r in object.get(input, "metric_refinements", [])
-	keys := [a.ref | some a in object.get(r, "attributes", []); a.ref]
 	exception := data.livekit.lib.lk(r, "cardinality_exception")
-	some f in data.livekit.lib.cardinality(r.id, "metric refinement", keys, exception)
+	some f in data.livekit.lib.cardinality(r.id, "metric refinement", refinement_keys(r), exception)
+}
+
+deny contains f if {
+	some r in object.get(input, "metric_refinements", [])
+	some f in data.livekit.lib.pii_metric(r.id, "metric refinement", refinement_keys(r))
 }

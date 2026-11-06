@@ -4,6 +4,9 @@
 usage: otel/live-check/otlp2samples.py session.jsonl > samples.json
 Lets `weaver registry live-check --input-source <file> --input-format json` check a
 capture without a gRPC replay. Stdlib only.
+Exits 1 on an AnyValue it cannot convert (nothing is written), 2 when the capture has no span or
+log record but has metrics, which live-check does not check, and 3 when it has no record at all.
+Empty envelopes (a resourceLogs without log records) do not count as records.
 """
 import json, sys
 
@@ -49,6 +52,14 @@ def samples(row):
 
 
 if __name__ == "__main__":
-    out = [s for line in open(sys.argv[1]) if line.strip() for s in samples(json.loads(line))]
-    assert out, "no OTLP records found"
+    rows = [json.loads(line) for line in open(sys.argv[1]) if line.strip()]
+    out = [s for row in rows for s in samples(row)]
+    # Every envelope yields a resource sample, so count the spans and log records themselves.
+    records = any("span" in s or "log" in s for s in out)
+    if not records and any(row.get("resourceMetrics") for row in rows):
+        sys.stderr.write("otlp2samples: unsupported signal type: the capture holds only metrics; live-check converts traces and logs\n")
+        sys.exit(2)
+    if not records:
+        sys.stderr.write("otlp2samples: empty capture: no span or log record found\n")
+        sys.exit(3)
     json.dump(out, sys.stdout, indent=1)

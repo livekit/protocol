@@ -1,0 +1,20 @@
+# expect: lk.track_sid: shared identity keys are flat, use lk.track_id
+groups:
+  - id: registry.lk.negative
+    type: attribute_group
+    brief: Negative fixture.
+    attributes:
+      - id: lk.track_sid
+        type: string
+        stability: development
+        brief: Agents' span binding of lk.track_id, defined as a deprecated key.
+        deprecated: {reason: uncategorized, note: Legacy key still accepted.}
+        annotations: {livekit: {owner: shared, sensitivity: none}}
+  - id: span.lk.negative
+    type: span
+    span_kind: internal
+    stability: development
+    brief: Requires the deprecated binding key.
+    attributes:
+      - ref: lk.track_sid
+        requirement_level: required

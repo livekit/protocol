@@ -5,6 +5,8 @@
 #   out-dir: where live_check.json lands (default: a new temporary directory)
 # Exits like weaver: 1 when there is a violation (pass `--fail-on none` to only report). When weaver
 # writes no report, prints the weaver log and exits with weaver's status, or 1 if that was 0.
+# A *.jsonl capture stops before weaver when live-check/otlp2samples.py cannot convert it: 1 for an
+# AnyValue it does not support, 2 for a metrics-only capture, 3 for an empty one.
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
 W=${WEAVER:-weaver}

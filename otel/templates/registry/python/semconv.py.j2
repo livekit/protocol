@@ -21,7 +21,7 @@
 class {{ a.key | pascal_case }}:
     """Values of {{ a.key | screaming_snake_case }}."""
 
-{% for m in (a.type.members if a.type is mapping else []) %}    #: {{ line(m.brief) or "`" ~ m.value ~ "`." }}
+{% for m in (a.type.members if a.type is mapping else []) %}    #: {{ line(m.brief) or line("`" ~ m.value ~ "`.") }}
     {{ m.id | screaming_snake_case }} = {{ lit(m.value) }}
 {% endfor %}{% for v in a.shipped_values or [] %}    #: {{ line(v.brief) }} Sent by LiveKit, not an upstream value.
     {{ v.id | screaming_snake_case }} = {{ lit(v.value) }}
