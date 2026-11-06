@@ -1,0 +1,11 @@
+# expect: livekit_ref_override
+groups:
+  - id: span.lk.negative
+    type: span
+    span_kind: internal
+    stability: development
+    brief: A ref that overrides the referenced key's classification.
+    attributes:
+      - ref: lk.room_id
+        requirement_level: required
+        annotations: {livekit: {owner: bogus, sensitivity: pii}}

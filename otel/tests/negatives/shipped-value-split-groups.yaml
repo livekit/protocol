@@ -1,0 +1,22 @@
+# expect: livekit_shipped_value
+# Codex r2 duplicate-split-groups: two refs to one upstream key with different lists; codegen merges them into one module.
+file_format: definition/2
+attribute_groups:
+  - id: livekit.review
+    visibility: public
+    stability: development
+    brief: review
+    attributes:
+      - ref: gen_ai.operation.name
+        annotations:
+          livekit:
+            shipped_values: [{id: other, value: custom1, brief: fake}]
+  - id: livekit.review.second
+    visibility: public
+    stability: development
+    brief: review
+    attributes:
+      - ref: gen_ai.operation.name
+        annotations:
+          livekit:
+            shipped_values: [{id: other, value: custom2, brief: fake}]

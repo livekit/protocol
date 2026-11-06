@@ -1,0 +1,8 @@
+# expect: livekit_flat_identity
+file_format: definition/2
+attributes:
+  - key: lk.room.sid
+    type: string
+    stability: development
+    brief: A definition/2 file gets the same rules.
+    annotations: {livekit: {owner: shared, sensitivity: none}}

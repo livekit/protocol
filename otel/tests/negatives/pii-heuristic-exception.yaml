@@ -1,0 +1,14 @@
+# expect: livekit_pii_heuristic
+# A key outside the policy's pii_heuristic_allowlist cannot opt out by annotating itself.
+groups:
+  - id: registry.negative.pii_heuristic_exception
+    type: attribute_group
+    brief: negative
+    attributes:
+      - id: lk.rpc.other_identity
+        type: string
+        stability: development
+        brief: Looks like PII, outside lk.pii.*, with the annotation but not on the allowlist.
+        examples: ["identity-0"]
+        annotations:
+          livekit: {owner: agents, sensitivity: none, pii_heuristic_exception: "not good enough on its own"}

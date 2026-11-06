@@ -1,0 +1,13 @@
+# expect: livekit_pii_marker
+# A bare PII key: the collector redacts by a `pii` key segment, so an unprefixed key with
+# sensitivity pii and no such segment is never redacted (chat.item is the one named exception).
+groups:
+  - id: registry.negative.unprefixed
+    type: attribute_group
+    brief: Negative fixture.
+    attributes:
+      - id: caller_number
+        type: string
+        stability: development
+        brief: A customer-supplied phone number under a bare key.
+        annotations: {livekit: {owner: client, sensitivity: pii}}
