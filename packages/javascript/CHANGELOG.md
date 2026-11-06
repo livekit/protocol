@@ -1,5 +1,26 @@
 # @livekit/protocol
 
+## 1.53.5
+
+### Patch Changes
+
+- Add `lk.connector.requestTime` and `lk.connector.answerTime` connector participant attributes, with helpers to set and parse them - [#1956](https://github.com/livekit/protocol/pull/1956) ([@boks1971](https://github.com/boks1971))
+
+- Add `attempts`, `first_started_at` and `agent_failed_attempts_ns` to `JobState`, so every node that syncs a job sees how many attempts it took, when the first one started, and how long the attempts the agent's own code failed took - [#1949](https://github.com/livekit/protocol/pull/1949) ([@boks1971](https://github.com/boks1971))
+
+- Add `workers_asked` to `JobState`: how many workers were asked to take the current attempt, the one that took it included - [#1953](https://github.com/livekit/protocol/pull/1953) ([@boks1971](https://github.com/boks1971))
+
+- Add the `no_user` latency scope to the agents observability schema, for an agent join that no user waited for - [#1953](https://github.com/livekit/protocol/pull/1953) ([@boks1971](https://github.com/boks1971))
+
+- `SimulationRun.JobMetrics.Turn.entities`: each key-entity saying in the turn, with what the listener heard and whether it was recognized. - [#1894](https://github.com/livekit/protocol/pull/1894) ([@u9g](https://github.com/u9g))
+  `SimulationRun.JobMetrics.Turn.item_id`: the agent's chat item id for the turn's first message, so a turn can link to its place in the stored transcript.
+
+- Add the telemetry semantic-conventions registry under `otel/` - [#1866](https://github.com/livekit/protocol/pull/1866) ([@pblazej](https://github.com/pblazej))
+
+- Group generated Python telemetry attribute values in plain classes while preserving string values. - [#1881](https://github.com/livekit/protocol/pull/1881) ([@pblazej](https://github.com/pblazej))
+
+- Group generated TypeScript telemetry attribute values in const objects with matching union types. - [#1872](https://github.com/livekit/protocol/pull/1872) ([@lukasIO](https://github.com/lukasIO))
+
 ## 1.53.4
 
 ### Patch Changes

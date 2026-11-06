@@ -1,5 +1,41 @@
 # github.com/livekit/protocol
 
+## 1.53.5
+
+### Patch Changes
+
+- utils: CloneProtoRedacted no longer panics on unannotated scalar-valued maps - [#1951](https://github.com/livekit/protocol/pull/1951) ([@paulwe](https://github.com/paulwe))
+
+- Add `lk.connector.requestTime` and `lk.connector.answerTime` connector participant attributes, with helpers to set and parse them - [#1956](https://github.com/livekit/protocol/pull/1956) ([@boks1971](https://github.com/boks1971))
+
+- datatrack: size marshalled extensions from the extension list so a stale `ExtensionsSize` cannot corrupt the marshalled header. - [#1944](https://github.com/livekit/protocol/pull/1944) ([@boks1971](https://github.com/boks1971))
+  datatrack: reset extensions on each `Unmarshal` and reject packets that repeat an extension ID.
+
+- decodebudget: price protojson well-known types, extensions, numbers, escapes and maps, wire-type mismatches and dynamicpb destinations; cut Estimate's own allocation - [#1950](https://github.com/livekit/protocol/pull/1950) ([@paulwe](https://github.com/paulwe))
+
+- guid: invalid IDs marshal to a sentinel and malformed input unmarshals to the zero ID instead of panicking - [#1952](https://github.com/livekit/protocol/pull/1952) ([@paulwe](https://github.com/paulwe))
+
+- `utils.MetricsBatchBuilder.Merge` rejects out-of-range `str_data` indexes on 32-bit builds. - [#1946](https://github.com/livekit/protocol/pull/1946) ([@boks1971](https://github.com/boks1971))
+
+- `rtputil.RTPConverter` returns a zero duration when the clock rate is 0. - [#1942](https://github.com/livekit/protocol/pull/1942) ([@boks1971](https://github.com/boks1971))
+
+- `sdp.CodecsFromMediaDescription` builds the codec map once and returns each payload type once, even when the m= line repeats it. - [#1941](https://github.com/livekit/protocol/pull/1941) ([@boks1971](https://github.com/boks1971))
+  `SDPFragment.PatchICECredentialAndCandidatesIntoSDP` adds the fragment's candidates only to the media section with the fragment's mid.
+
+- `signalling.FromProtoSessionDescription` returns an empty description for a nil input, the same zero value that `ToProtoSessionDescription` maps to nil. - [#1943](https://github.com/livekit/protocol/pull/1943) ([@boks1971](https://github.com/boks1971))
+
+- `SimulationRun.JobMetrics.Turn.entities`: each key-entity saying in the turn, with what the listener heard and whether it was recognized. - [#1894](https://github.com/livekit/protocol/pull/1894) ([@u9g](https://github.com/u9g))
+  `SimulationRun.JobMetrics.Turn.item_id`: the agent's chat item id for the turn's first message, so a turn can link to its place in the stored transcript.
+
+- Add the telemetry semantic-conventions registry under `otel/` - [#1866](https://github.com/livekit/protocol/pull/1866) ([@pblazej](https://github.com/pblazej))
+
+- Group generated Python telemetry attribute values in plain classes while preserving string values. - [#1881](https://github.com/livekit/protocol/pull/1881) ([@pblazej](https://github.com/pblazej))
+
+- Group generated TypeScript telemetry attribute values in const objects with matching union types. - [#1872](https://github.com/livekit/protocol/pull/1872) ([@lukasIO](https://github.com/lukasIO))
+
+- webhook: bound each delivery attempt by default (10 s client timeout when none is set) and cap a `Retry-After` wait at `RetryWaitMax`. - [#1945](https://github.com/livekit/protocol/pull/1945) ([@boks1971](https://github.com/boks1971))
+  webhook: mask userinfo and query values of the delivery URL in logs and send errors, log `http.StatusText` instead of the endpoint's status text, and cap the response head at 64 KiB.
+
 ## 1.53.4
 
 ### Patch Changes
