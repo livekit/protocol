@@ -2612,8 +2612,17 @@ type SimulationRun_JobMetrics_Turn struct {
 	EotMisprediction  *bool    `protobuf:"varint,15,opt,name=eot_misprediction,json=eotMisprediction,proto3,oneof" json:"eot_misprediction,omitempty"`
 	AwkwardSilence    *bool    `protobuf:"varint,16,opt,name=awkward_silence,json=awkwardSilence,proto3,oneof" json:"awkward_silence,omitempty"`
 	Unanswered        *bool    `protobuf:"varint,17,opt,name=unanswered,proto3,oneof" json:"unanswered,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	// Audio only; needs the text judge. One per saying of a key entity in
+	// this turn, in order, as the other side heard it. Matched over the whole
+	// call's transcript, so a saying spanning turns sits on its first, and
+	// which of an entity's repeated sayings was heard is the alignment's
+	// best guess.
+	Entities []*SimulationRun_JobMetrics_Turn_Entity `protobuf:"bytes,19,rep,name=entities,proto3" json:"entities,omitempty"`
+	// the agent's chat item id for the first message this turn holds, as its
+	// stored transcript carries it; "" without a RemoteSession
+	ItemId        string `protobuf:"bytes,20,opt,name=item_id,json=itemId,proto3" json:"item_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *SimulationRun_JobMetrics_Turn) Reset() {
@@ -2772,6 +2781,80 @@ func (x *SimulationRun_JobMetrics_Turn) GetUnanswered() bool {
 	return false
 }
 
+func (x *SimulationRun_JobMetrics_Turn) GetEntities() []*SimulationRun_JobMetrics_Turn_Entity {
+	if x != nil {
+		return x.Entities
+	}
+	return nil
+}
+
+func (x *SimulationRun_JobMetrics_Turn) GetItemId() string {
+	if x != nil {
+		return x.ItemId
+	}
+	return ""
+}
+
+type SimulationRun_JobMetrics_Turn_Entity struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Said          string                 `protobuf:"bytes,1,opt,name=said,proto3" json:"said,omitempty"`              // the entity as the speaker said it
+	Heard         string                 `protobuf:"bytes,2,opt,name=heard,proto3" json:"heard,omitempty"`            // the listener's normalized words where it landed; "" if dropped
+	Recognized    bool                   `protobuf:"varint,3,opt,name=recognized,proto3" json:"recognized,omitempty"` // heard with no word errors
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SimulationRun_JobMetrics_Turn_Entity) Reset() {
+	*x = SimulationRun_JobMetrics_Turn_Entity{}
+	mi := &file_livekit_agent_simulation_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SimulationRun_JobMetrics_Turn_Entity) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SimulationRun_JobMetrics_Turn_Entity) ProtoMessage() {}
+
+func (x *SimulationRun_JobMetrics_Turn_Entity) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_agent_simulation_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SimulationRun_JobMetrics_Turn_Entity.ProtoReflect.Descriptor instead.
+func (*SimulationRun_JobMetrics_Turn_Entity) Descriptor() ([]byte, []int) {
+	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{1, 1, 4, 0}
+}
+
+func (x *SimulationRun_JobMetrics_Turn_Entity) GetSaid() string {
+	if x != nil {
+		return x.Said
+	}
+	return ""
+}
+
+func (x *SimulationRun_JobMetrics_Turn_Entity) GetHeard() string {
+	if x != nil {
+		return x.Heard
+	}
+	return ""
+}
+
+func (x *SimulationRun_JobMetrics_Turn_Entity) GetRecognized() bool {
+	if x != nil {
+		return x.Recognized
+	}
+	return false
+}
+
 type SimulationRun_Create_Request struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	ProjectId      string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
@@ -2801,15 +2884,17 @@ type SimulationRun_Create_Request struct {
 	SipCallTo string `protobuf:"bytes,15,opt,name=sip_call_to,json=sipCallTo,proto3" json:"sip_call_to,omitempty"`
 	// Outbound trunk to dial through. Empty dials from sip_number, which must
 	// then be a LiveKit phone number the project owns.
-	SipTrunkId    string `protobuf:"bytes,16,opt,name=sip_trunk_id,json=sipTrunkId,proto3" json:"sip_trunk_id,omitempty"`
-	SipNumber     string `protobuf:"bytes,17,opt,name=sip_number,json=sipNumber,proto3" json:"sip_number,omitempty"`
+	SipTrunkId string `protobuf:"bytes,16,opt,name=sip_trunk_id,json=sipTrunkId,proto3" json:"sip_trunk_id,omitempty"`
+	SipNumber  string `protobuf:"bytes,17,opt,name=sip_number,json=sipNumber,proto3" json:"sip_number,omitempty"`
+	// Named deployment of agent_name to dispatch to; empty is production.
+	Deployment    string `protobuf:"bytes,18,opt,name=deployment,proto3" json:"deployment,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *SimulationRun_Create_Request) Reset() {
 	*x = SimulationRun_Create_Request{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[27]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2821,7 +2906,7 @@ func (x *SimulationRun_Create_Request) String() string {
 func (*SimulationRun_Create_Request) ProtoMessage() {}
 
 func (x *SimulationRun_Create_Request) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[27]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2942,6 +3027,13 @@ func (x *SimulationRun_Create_Request) GetSipNumber() string {
 	return ""
 }
 
+func (x *SimulationRun_Create_Request) GetDeployment() string {
+	if x != nil {
+		return x.Deployment
+	}
+	return ""
+}
+
 type SimulationRun_Create_Response struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
 	SimulationRunId      string                 `protobuf:"bytes,1,opt,name=simulation_run_id,json=simulationRunId,proto3" json:"simulation_run_id,omitempty"`
@@ -2952,7 +3044,7 @@ type SimulationRun_Create_Response struct {
 
 func (x *SimulationRun_Create_Response) Reset() {
 	*x = SimulationRun_Create_Response{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[28]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2964,7 +3056,7 @@ func (x *SimulationRun_Create_Response) String() string {
 func (*SimulationRun_Create_Response) ProtoMessage() {}
 
 func (x *SimulationRun_Create_Response) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[28]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3005,7 +3097,7 @@ type SimulationRun_ConfirmSourceUpload_Request struct {
 
 func (x *SimulationRun_ConfirmSourceUpload_Request) Reset() {
 	*x = SimulationRun_ConfirmSourceUpload_Request{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[29]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3017,7 +3109,7 @@ func (x *SimulationRun_ConfirmSourceUpload_Request) String() string {
 func (*SimulationRun_ConfirmSourceUpload_Request) ProtoMessage() {}
 
 func (x *SimulationRun_ConfirmSourceUpload_Request) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[29]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3062,7 +3154,7 @@ type SimulationRun_ConfirmSourceUpload_Response struct {
 
 func (x *SimulationRun_ConfirmSourceUpload_Response) Reset() {
 	*x = SimulationRun_ConfirmSourceUpload_Response{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[30]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3074,7 +3166,7 @@ func (x *SimulationRun_ConfirmSourceUpload_Response) String() string {
 func (*SimulationRun_ConfirmSourceUpload_Response) ProtoMessage() {}
 
 func (x *SimulationRun_ConfirmSourceUpload_Response) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[30]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3100,7 +3192,7 @@ type SimulationRun_Get_Request struct {
 
 func (x *SimulationRun_Get_Request) Reset() {
 	*x = SimulationRun_Get_Request{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[31]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3112,7 +3204,7 @@ func (x *SimulationRun_Get_Request) String() string {
 func (*SimulationRun_Get_Request) ProtoMessage() {}
 
 func (x *SimulationRun_Get_Request) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[31]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3151,7 +3243,7 @@ type SimulationRun_Get_Response struct {
 
 func (x *SimulationRun_Get_Response) Reset() {
 	*x = SimulationRun_Get_Response{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[32]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3163,7 +3255,7 @@ func (x *SimulationRun_Get_Response) String() string {
 func (*SimulationRun_Get_Response) ProtoMessage() {}
 
 func (x *SimulationRun_Get_Response) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[32]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3208,7 +3300,7 @@ type SimulationRun_List_Request struct {
 
 func (x *SimulationRun_List_Request) Reset() {
 	*x = SimulationRun_List_Request{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[33]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3220,7 +3312,7 @@ func (x *SimulationRun_List_Request) String() string {
 func (*SimulationRun_List_Request) ProtoMessage() {}
 
 func (x *SimulationRun_List_Request) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[33]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3295,7 +3387,7 @@ type SimulationRun_List_Response struct {
 
 func (x *SimulationRun_List_Response) Reset() {
 	*x = SimulationRun_List_Response{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[34]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3307,7 +3399,7 @@ func (x *SimulationRun_List_Response) String() string {
 func (*SimulationRun_List_Response) ProtoMessage() {}
 
 func (x *SimulationRun_List_Response) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[34]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3355,7 +3447,7 @@ type SimulationRun_Counts_Request struct {
 
 func (x *SimulationRun_Counts_Request) Reset() {
 	*x = SimulationRun_Counts_Request{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[35]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3367,7 +3459,7 @@ func (x *SimulationRun_Counts_Request) String() string {
 func (*SimulationRun_Counts_Request) ProtoMessage() {}
 
 func (x *SimulationRun_Counts_Request) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[35]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3440,7 +3532,7 @@ type SimulationRun_Counts_Response struct {
 
 func (x *SimulationRun_Counts_Response) Reset() {
 	*x = SimulationRun_Counts_Response{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[36]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3452,7 +3544,7 @@ func (x *SimulationRun_Counts_Response) String() string {
 func (*SimulationRun_Counts_Response) ProtoMessage() {}
 
 func (x *SimulationRun_Counts_Response) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[36]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3492,7 +3584,7 @@ type SimulationRun_Counts_Bucket struct {
 
 func (x *SimulationRun_Counts_Bucket) Reset() {
 	*x = SimulationRun_Counts_Bucket{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[37]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3504,7 +3596,7 @@ func (x *SimulationRun_Counts_Bucket) String() string {
 func (*SimulationRun_Counts_Bucket) ProtoMessage() {}
 
 func (x *SimulationRun_Counts_Bucket) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[37]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3544,7 +3636,7 @@ type SimulationRun_Cancel_Request struct {
 
 func (x *SimulationRun_Cancel_Request) Reset() {
 	*x = SimulationRun_Cancel_Request{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[38]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3556,7 +3648,7 @@ func (x *SimulationRun_Cancel_Request) String() string {
 func (*SimulationRun_Cancel_Request) ProtoMessage() {}
 
 func (x *SimulationRun_Cancel_Request) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[38]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3594,7 +3686,7 @@ type SimulationRun_Cancel_Response struct {
 
 func (x *SimulationRun_Cancel_Response) Reset() {
 	*x = SimulationRun_Cancel_Response{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[39]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3606,7 +3698,7 @@ func (x *SimulationRun_Cancel_Response) String() string {
 func (*SimulationRun_Cancel_Response) ProtoMessage() {}
 
 func (x *SimulationRun_Cancel_Response) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[39]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3630,7 +3722,7 @@ type Scenario_CreateFromSession struct {
 
 func (x *Scenario_CreateFromSession) Reset() {
 	*x = Scenario_CreateFromSession{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[40]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3642,7 +3734,7 @@ func (x *Scenario_CreateFromSession) String() string {
 func (*Scenario_CreateFromSession) ProtoMessage() {}
 
 func (x *Scenario_CreateFromSession) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[40]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3669,7 +3761,7 @@ type Scenario_CreateFromSession_Request struct {
 
 func (x *Scenario_CreateFromSession_Request) Reset() {
 	*x = Scenario_CreateFromSession_Request{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[42]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3681,7 +3773,7 @@ func (x *Scenario_CreateFromSession_Request) String() string {
 func (*Scenario_CreateFromSession_Request) ProtoMessage() {}
 
 func (x *Scenario_CreateFromSession_Request) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[42]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3727,7 +3819,7 @@ type Scenario_CreateFromSession_Response struct {
 
 func (x *Scenario_CreateFromSession_Response) Reset() {
 	*x = Scenario_CreateFromSession_Response{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[43]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3739,7 +3831,7 @@ func (x *Scenario_CreateFromSession_Response) String() string {
 func (*Scenario_CreateFromSession_Response) ProtoMessage() {}
 
 func (x *Scenario_CreateFromSession_Response) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[43]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3774,7 +3866,7 @@ type SimulatorNode_Route struct {
 
 func (x *SimulatorNode_Route) Reset() {
 	*x = SimulatorNode_Route{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[45]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3786,7 +3878,7 @@ func (x *SimulatorNode_Route) String() string {
 func (*SimulatorNode_Route) ProtoMessage() {}
 
 func (x *SimulatorNode_Route) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[45]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3827,7 +3919,7 @@ type SimulatorNode_Timeout struct {
 
 func (x *SimulatorNode_Timeout) Reset() {
 	*x = SimulatorNode_Timeout{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[46]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[47]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3839,7 +3931,7 @@ func (x *SimulatorNode_Timeout) String() string {
 func (*SimulatorNode_Timeout) ProtoMessage() {}
 
 func (x *SimulatorNode_Timeout) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[46]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[47]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3891,7 +3983,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\x83U\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\xdbV\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -3952,7 +4044,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\rFailureReason\x12\x1e\n" +
 	"\x1aFAILURE_REASON_UNSPECIFIED\x10\x00\x12%\n" +
 	"!FAILURE_REASON_AGENT_JOIN_TIMEOUT\x10\x01J\x04\b\t\x10\n" +
-	"\x1a\xec)\n" +
+	"\x1a\xa4+\n" +
 	"\n" +
 	"JobMetrics\x12,\n" +
 	"\x0ftask_completion\x18\x03 \x01(\x02H\x00R\x0etaskCompletion\x88\x01\x01\x12(\n" +
@@ -4080,7 +4172,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x11_unanswered_turnsB\x1b\n" +
 	"\x19_false_interruption_countB\x11\n" +
 	"\x0f_e2e_latency_msB\x14\n" +
-	"\x12_backchannel_count\x1a\xbe\a\n" +
+	"\x12_backchannel_count\x1a\xf6\b\n" +
 	"\x04Turn\x12\x14\n" +
 	"\x05index\x18\x01 \x01(\rR\x05index\x12+\n" +
 	"\x04role\x18\x02 \x01(\x0e2\x17.livekit.agent.ChatRoleR\x04role\x12\x12\n" +
@@ -4104,7 +4196,15 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x0fawkward_silence\x18\x10 \x01(\bH\rR\x0eawkwardSilence\x88\x01\x01\x12#\n" +
 	"\n" +
 	"unanswered\x18\x11 \x01(\bH\x0eR\n" +
-	"unanswered\x88\x01\x01B\v\n" +
+	"unanswered\x88\x01\x01\x12I\n" +
+	"\bentities\x18\x13 \x03(\v2-.livekit.SimulationRun.JobMetrics.Turn.EntityR\bentities\x12\x17\n" +
+	"\aitem_id\x18\x14 \x01(\tR\x06itemId\x1aR\n" +
+	"\x06Entity\x12\x12\n" +
+	"\x04said\x18\x01 \x01(\tR\x04said\x12\x14\n" +
+	"\x05heard\x18\x02 \x01(\tR\x05heard\x12\x1e\n" +
+	"\n" +
+	"recognized\x18\x03 \x01(\bR\n" +
+	"recognizedB\v\n" +
 	"\t_start_msB\t\n" +
 	"\a_end_msB\x0f\n" +
 	"\r_stt_delay_msB\x0e\n" +
@@ -4163,8 +4263,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x05actor\x18\x06 \x01(\tR\x05actor\x1aH\n" +
 	"\x0fSamplingOptions\x12\x18\n" +
 	"\asamples\x18\x01 \x01(\x05R\asamples\x12\x1b\n" +
-	"\tpass_rate\x18\x02 \x01(\x01R\bpassRate\x1a\xe5\x06\n" +
-	"\x06Create\x1a\xcc\x05\n" +
+	"\tpass_rate\x18\x02 \x01(\x01R\bpassRate\x1a\x85\a\n" +
+	"\x06Create\x1a\xec\x05\n" +
 	"\aRequest\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1d\n" +
@@ -4186,7 +4286,10 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\fsip_trunk_id\x18\x10 \x01(\tR\n" +
 	"sipTrunkId\x12\x1d\n" +
 	"\n" +
-	"sip_number\x18\x11 \x01(\tR\tsipNumberB\x11\n" +
+	"sip_number\x18\x11 \x01(\tR\tsipNumber\x12\x1e\n" +
+	"\n" +
+	"deployment\x18\x12 \x01(\tR\n" +
+	"deploymentB\x11\n" +
 	"\x0f_scenario_groupB\x0e\n" +
 	"\f_concurrencyB\x05\n" +
 	"\x03_ciB\v\n" +
@@ -4353,7 +4456,7 @@ func file_livekit_agent_simulation_proto_rawDescGZIP() []byte {
 }
 
 var file_livekit_agent_simulation_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
-var file_livekit_agent_simulation_proto_msgTypes = make([]protoimpl.MessageInfo, 47)
+var file_livekit_agent_simulation_proto_msgTypes = make([]protoimpl.MessageInfo, 48)
 var file_livekit_agent_simulation_proto_goTypes = []any{
 	(SimulationMode)(0),                                // 0: livekit.SimulationMode
 	(SimulationRun_Status)(0),                          // 1: livekit.SimulationRun.Status
@@ -4388,58 +4491,59 @@ var file_livekit_agent_simulation_proto_goTypes = []any{
 	(*SimulationRun_JobMetrics_TTS)(nil),               // 30: livekit.SimulationRun.JobMetrics.TTS
 	(*SimulationRun_JobMetrics_Conversation)(nil),      // 31: livekit.SimulationRun.JobMetrics.Conversation
 	(*SimulationRun_JobMetrics_Turn)(nil),              // 32: livekit.SimulationRun.JobMetrics.Turn
-	(*SimulationRun_Create_Request)(nil),               // 33: livekit.SimulationRun.Create.Request
-	(*SimulationRun_Create_Response)(nil),              // 34: livekit.SimulationRun.Create.Response
-	(*SimulationRun_ConfirmSourceUpload_Request)(nil),  // 35: livekit.SimulationRun.ConfirmSourceUpload.Request
-	(*SimulationRun_ConfirmSourceUpload_Response)(nil), // 36: livekit.SimulationRun.ConfirmSourceUpload.Response
-	(*SimulationRun_Get_Request)(nil),                  // 37: livekit.SimulationRun.Get.Request
-	(*SimulationRun_Get_Response)(nil),                 // 38: livekit.SimulationRun.Get.Response
-	(*SimulationRun_List_Request)(nil),                 // 39: livekit.SimulationRun.List.Request
-	(*SimulationRun_List_Response)(nil),                // 40: livekit.SimulationRun.List.Response
-	(*SimulationRun_Counts_Request)(nil),               // 41: livekit.SimulationRun.Counts.Request
-	(*SimulationRun_Counts_Response)(nil),              // 42: livekit.SimulationRun.Counts.Response
-	(*SimulationRun_Counts_Bucket)(nil),                // 43: livekit.SimulationRun.Counts.Bucket
-	(*SimulationRun_Cancel_Request)(nil),               // 44: livekit.SimulationRun.Cancel.Request
-	(*SimulationRun_Cancel_Response)(nil),              // 45: livekit.SimulationRun.Cancel.Response
-	(*Scenario_CreateFromSession)(nil),                 // 46: livekit.Scenario.CreateFromSession
-	nil,                                                // 47: livekit.Scenario.TagsEntry
-	(*Scenario_CreateFromSession_Request)(nil),         // 48: livekit.Scenario.CreateFromSession.Request
-	(*Scenario_CreateFromSession_Response)(nil),        // 49: livekit.Scenario.CreateFromSession.Response
-	nil,                           // 50: livekit.ScenarioGroup.NodesEntry
-	(*SimulatorNode_Route)(nil),   // 51: livekit.SimulatorNode.Route
-	(*SimulatorNode_Timeout)(nil), // 52: livekit.SimulatorNode.Timeout
-	(*timestamppb.Timestamp)(nil), // 53: google.protobuf.Timestamp
-	(*agent.ChatContext)(nil),     // 54: livekit.agent.ChatContext
-	(agent.ChatRole)(0),           // 55: livekit.agent.ChatRole
-	(*PresignedPostRequest)(nil),  // 56: livekit.PresignedPostRequest
-	(*TokenPagination)(nil),       // 57: livekit.TokenPagination
-	(*durationpb.Duration)(nil),   // 58: google.protobuf.Duration
+	(*SimulationRun_JobMetrics_Turn_Entity)(nil),       // 33: livekit.SimulationRun.JobMetrics.Turn.Entity
+	(*SimulationRun_Create_Request)(nil),               // 34: livekit.SimulationRun.Create.Request
+	(*SimulationRun_Create_Response)(nil),              // 35: livekit.SimulationRun.Create.Response
+	(*SimulationRun_ConfirmSourceUpload_Request)(nil),  // 36: livekit.SimulationRun.ConfirmSourceUpload.Request
+	(*SimulationRun_ConfirmSourceUpload_Response)(nil), // 37: livekit.SimulationRun.ConfirmSourceUpload.Response
+	(*SimulationRun_Get_Request)(nil),                  // 38: livekit.SimulationRun.Get.Request
+	(*SimulationRun_Get_Response)(nil),                 // 39: livekit.SimulationRun.Get.Response
+	(*SimulationRun_List_Request)(nil),                 // 40: livekit.SimulationRun.List.Request
+	(*SimulationRun_List_Response)(nil),                // 41: livekit.SimulationRun.List.Response
+	(*SimulationRun_Counts_Request)(nil),               // 42: livekit.SimulationRun.Counts.Request
+	(*SimulationRun_Counts_Response)(nil),              // 43: livekit.SimulationRun.Counts.Response
+	(*SimulationRun_Counts_Bucket)(nil),                // 44: livekit.SimulationRun.Counts.Bucket
+	(*SimulationRun_Cancel_Request)(nil),               // 45: livekit.SimulationRun.Cancel.Request
+	(*SimulationRun_Cancel_Response)(nil),              // 46: livekit.SimulationRun.Cancel.Response
+	(*Scenario_CreateFromSession)(nil),                 // 47: livekit.Scenario.CreateFromSession
+	nil,                                                // 48: livekit.Scenario.TagsEntry
+	(*Scenario_CreateFromSession_Request)(nil),         // 49: livekit.Scenario.CreateFromSession.Request
+	(*Scenario_CreateFromSession_Response)(nil),        // 50: livekit.Scenario.CreateFromSession.Response
+	nil,                           // 51: livekit.ScenarioGroup.NodesEntry
+	(*SimulatorNode_Route)(nil),   // 52: livekit.SimulatorNode.Route
+	(*SimulatorNode_Timeout)(nil), // 53: livekit.SimulatorNode.Timeout
+	(*timestamppb.Timestamp)(nil), // 54: google.protobuf.Timestamp
+	(*agent.ChatContext)(nil),     // 55: livekit.agent.ChatContext
+	(agent.ChatRole)(0),           // 56: livekit.agent.ChatRole
+	(*PresignedPostRequest)(nil),  // 57: livekit.PresignedPostRequest
+	(*TokenPagination)(nil),       // 58: livekit.TokenPagination
+	(*durationpb.Duration)(nil),   // 59: google.protobuf.Duration
 }
 var file_livekit_agent_simulation_proto_depIdxs = []int32{
 	14, // 0: livekit.SimulationRunSummary.issues:type_name -> livekit.SimulationRunSummary.Issue
 	13, // 1: livekit.SimulationRunSummary.chat_history:type_name -> livekit.SimulationRunSummary.ChatHistoryEntry
 	1,  // 2: livekit.SimulationRun.status:type_name -> livekit.SimulationRun.Status
-	53, // 3: livekit.SimulationRun.created_at:type_name -> google.protobuf.Timestamp
+	54, // 3: livekit.SimulationRun.created_at:type_name -> google.protobuf.Timestamp
 	15, // 4: livekit.SimulationRun.jobs:type_name -> livekit.SimulationRun.Job
 	9,  // 5: livekit.SimulationRun.scenario_group:type_name -> livekit.ScenarioGroup
-	53, // 6: livekit.SimulationRun.ended_at:type_name -> google.protobuf.Timestamp
+	54, // 6: livekit.SimulationRun.ended_at:type_name -> google.protobuf.Timestamp
 	26, // 7: livekit.SimulationRun.usage:type_name -> livekit.SimulationRun.Usage
 	0,  // 8: livekit.SimulationRun.mode:type_name -> livekit.SimulationMode
 	17, // 9: livekit.SimulationRun.metrics:type_name -> livekit.SimulationRun.RunMetrics
 	18, // 10: livekit.SimulationRun.ci:type_name -> livekit.SimulationRun.CI
 	19, // 11: livekit.SimulationRun.sampling:type_name -> livekit.SimulationRun.SamplingOptions
-	47, // 12: livekit.Scenario.tags:type_name -> livekit.Scenario.TagsEntry
+	48, // 12: livekit.Scenario.tags:type_name -> livekit.Scenario.TagsEntry
 	8,  // 13: livekit.ScenarioGroup.scenarios:type_name -> livekit.Scenario
-	50, // 14: livekit.ScenarioGroup.nodes:type_name -> livekit.ScenarioGroup.NodesEntry
-	51, // 15: livekit.SimulatorNode.routes:type_name -> livekit.SimulatorNode.Route
-	52, // 16: livekit.SimulatorNode.timeout:type_name -> livekit.SimulatorNode.Timeout
+	51, // 14: livekit.ScenarioGroup.nodes:type_name -> livekit.ScenarioGroup.NodesEntry
+	52, // 15: livekit.SimulatorNode.routes:type_name -> livekit.SimulatorNode.Route
+	53, // 16: livekit.SimulatorNode.timeout:type_name -> livekit.SimulatorNode.Timeout
 	5,  // 17: livekit.SimulatorNode.speaker:type_name -> livekit.SimulatorNode.Speaker
 	8,  // 18: livekit.SimulationDispatch.scenario:type_name -> livekit.Scenario
 	0,  // 19: livekit.SimulationDispatch.mode:type_name -> livekit.SimulationMode
-	54, // 20: livekit.SimulationRunSummary.ChatHistoryEntry.value:type_name -> livekit.agent.ChatContext
+	55, // 20: livekit.SimulationRunSummary.ChatHistoryEntry.value:type_name -> livekit.agent.ChatContext
 	2,  // 21: livekit.SimulationRun.Job.status:type_name -> livekit.SimulationRun.Job.Status
-	53, // 22: livekit.SimulationRun.Job.started_at:type_name -> google.protobuf.Timestamp
-	53, // 23: livekit.SimulationRun.Job.ended_at:type_name -> google.protobuf.Timestamp
+	54, // 22: livekit.SimulationRun.Job.started_at:type_name -> google.protobuf.Timestamp
+	54, // 23: livekit.SimulationRun.Job.ended_at:type_name -> google.protobuf.Timestamp
 	27, // 24: livekit.SimulationRun.Job.usage:type_name -> livekit.SimulationRun.Job.Usage
 	16, // 25: livekit.SimulationRun.Job.metrics:type_name -> livekit.SimulationRun.JobMetrics
 	3,  // 26: livekit.SimulationRun.Job.failure_reason:type_name -> livekit.SimulationRun.Job.FailureReason
@@ -4448,56 +4552,57 @@ var file_livekit_agent_simulation_proto_depIdxs = []int32{
 	30, // 29: livekit.SimulationRun.JobMetrics.tts:type_name -> livekit.SimulationRun.JobMetrics.TTS
 	31, // 30: livekit.SimulationRun.JobMetrics.conversation:type_name -> livekit.SimulationRun.JobMetrics.Conversation
 	32, // 31: livekit.SimulationRun.JobMetrics.turns:type_name -> livekit.SimulationRun.JobMetrics.Turn
-	53, // 32: livekit.SimulationRun.JobMetrics.t0:type_name -> google.protobuf.Timestamp
+	54, // 32: livekit.SimulationRun.JobMetrics.t0:type_name -> google.protobuf.Timestamp
 	4,  // 33: livekit.SimulationRun.JobMetrics.end_reason:type_name -> livekit.SimulationRun.JobMetrics.EndReason
 	11, // 34: livekit.SimulationRun.JobMetrics.impairments:type_name -> livekit.SimulationImpairments
 	28, // 35: livekit.SimulationRun.RunMetrics.stt:type_name -> livekit.SimulationRun.JobMetrics.STT
 	29, // 36: livekit.SimulationRun.RunMetrics.llm:type_name -> livekit.SimulationRun.JobMetrics.LLM
 	30, // 37: livekit.SimulationRun.RunMetrics.tts:type_name -> livekit.SimulationRun.JobMetrics.TTS
 	31, // 38: livekit.SimulationRun.RunMetrics.conversation:type_name -> livekit.SimulationRun.JobMetrics.Conversation
-	55, // 39: livekit.SimulationRun.JobMetrics.Turn.role:type_name -> livekit.agent.ChatRole
-	9,  // 40: livekit.SimulationRun.Create.Request.scenario_group:type_name -> livekit.ScenarioGroup
-	0,  // 41: livekit.SimulationRun.Create.Request.mode:type_name -> livekit.SimulationMode
-	18, // 42: livekit.SimulationRun.Create.Request.ci:type_name -> livekit.SimulationRun.CI
-	19, // 43: livekit.SimulationRun.Create.Request.sampling:type_name -> livekit.SimulationRun.SamplingOptions
-	56, // 44: livekit.SimulationRun.Create.Response.presigned_post_request:type_name -> livekit.PresignedPostRequest
-	7,  // 45: livekit.SimulationRun.Get.Response.run:type_name -> livekit.SimulationRun
-	1,  // 46: livekit.SimulationRun.List.Request.status:type_name -> livekit.SimulationRun.Status
-	57, // 47: livekit.SimulationRun.List.Request.page_token:type_name -> livekit.TokenPagination
-	53, // 48: livekit.SimulationRun.List.Request.start_time:type_name -> google.protobuf.Timestamp
-	53, // 49: livekit.SimulationRun.List.Request.end_time:type_name -> google.protobuf.Timestamp
-	0,  // 50: livekit.SimulationRun.List.Request.mode:type_name -> livekit.SimulationMode
-	7,  // 51: livekit.SimulationRun.List.Response.runs:type_name -> livekit.SimulationRun
-	57, // 52: livekit.SimulationRun.List.Response.next_page_token:type_name -> livekit.TokenPagination
-	53, // 53: livekit.SimulationRun.Counts.Request.start_time:type_name -> google.protobuf.Timestamp
-	53, // 54: livekit.SimulationRun.Counts.Request.end_time:type_name -> google.protobuf.Timestamp
-	1,  // 55: livekit.SimulationRun.Counts.Request.status:type_name -> livekit.SimulationRun.Status
-	0,  // 56: livekit.SimulationRun.Counts.Request.mode:type_name -> livekit.SimulationMode
-	43, // 57: livekit.SimulationRun.Counts.Response.buckets:type_name -> livekit.SimulationRun.Counts.Bucket
-	58, // 58: livekit.SimulationRun.Counts.Response.interval:type_name -> google.protobuf.Duration
-	53, // 59: livekit.SimulationRun.Counts.Bucket.bucket_start:type_name -> google.protobuf.Timestamp
-	8,  // 60: livekit.Scenario.CreateFromSession.Response.scenario:type_name -> livekit.Scenario
-	10, // 61: livekit.ScenarioGroup.NodesEntry.value:type_name -> livekit.SimulatorNode
-	58, // 62: livekit.SimulatorNode.Timeout.after:type_name -> google.protobuf.Duration
-	33, // 63: livekit.AgentSimulation.CreateSimulationRun:input_type -> livekit.SimulationRun.Create.Request
-	35, // 64: livekit.AgentSimulation.ConfirmSimulationSourceUpload:input_type -> livekit.SimulationRun.ConfirmSourceUpload.Request
-	37, // 65: livekit.AgentSimulation.GetSimulationRun:input_type -> livekit.SimulationRun.Get.Request
-	39, // 66: livekit.AgentSimulation.ListSimulationRuns:input_type -> livekit.SimulationRun.List.Request
-	41, // 67: livekit.AgentSimulation.CountSimulationRuns:input_type -> livekit.SimulationRun.Counts.Request
-	44, // 68: livekit.AgentSimulation.CancelSimulationRun:input_type -> livekit.SimulationRun.Cancel.Request
-	48, // 69: livekit.AgentSimulation.CreateScenarioFromSession:input_type -> livekit.Scenario.CreateFromSession.Request
-	34, // 70: livekit.AgentSimulation.CreateSimulationRun:output_type -> livekit.SimulationRun.Create.Response
-	36, // 71: livekit.AgentSimulation.ConfirmSimulationSourceUpload:output_type -> livekit.SimulationRun.ConfirmSourceUpload.Response
-	38, // 72: livekit.AgentSimulation.GetSimulationRun:output_type -> livekit.SimulationRun.Get.Response
-	40, // 73: livekit.AgentSimulation.ListSimulationRuns:output_type -> livekit.SimulationRun.List.Response
-	42, // 74: livekit.AgentSimulation.CountSimulationRuns:output_type -> livekit.SimulationRun.Counts.Response
-	45, // 75: livekit.AgentSimulation.CancelSimulationRun:output_type -> livekit.SimulationRun.Cancel.Response
-	49, // 76: livekit.AgentSimulation.CreateScenarioFromSession:output_type -> livekit.Scenario.CreateFromSession.Response
-	70, // [70:77] is the sub-list for method output_type
-	63, // [63:70] is the sub-list for method input_type
-	63, // [63:63] is the sub-list for extension type_name
-	63, // [63:63] is the sub-list for extension extendee
-	0,  // [0:63] is the sub-list for field type_name
+	56, // 39: livekit.SimulationRun.JobMetrics.Turn.role:type_name -> livekit.agent.ChatRole
+	33, // 40: livekit.SimulationRun.JobMetrics.Turn.entities:type_name -> livekit.SimulationRun.JobMetrics.Turn.Entity
+	9,  // 41: livekit.SimulationRun.Create.Request.scenario_group:type_name -> livekit.ScenarioGroup
+	0,  // 42: livekit.SimulationRun.Create.Request.mode:type_name -> livekit.SimulationMode
+	18, // 43: livekit.SimulationRun.Create.Request.ci:type_name -> livekit.SimulationRun.CI
+	19, // 44: livekit.SimulationRun.Create.Request.sampling:type_name -> livekit.SimulationRun.SamplingOptions
+	57, // 45: livekit.SimulationRun.Create.Response.presigned_post_request:type_name -> livekit.PresignedPostRequest
+	7,  // 46: livekit.SimulationRun.Get.Response.run:type_name -> livekit.SimulationRun
+	1,  // 47: livekit.SimulationRun.List.Request.status:type_name -> livekit.SimulationRun.Status
+	58, // 48: livekit.SimulationRun.List.Request.page_token:type_name -> livekit.TokenPagination
+	54, // 49: livekit.SimulationRun.List.Request.start_time:type_name -> google.protobuf.Timestamp
+	54, // 50: livekit.SimulationRun.List.Request.end_time:type_name -> google.protobuf.Timestamp
+	0,  // 51: livekit.SimulationRun.List.Request.mode:type_name -> livekit.SimulationMode
+	7,  // 52: livekit.SimulationRun.List.Response.runs:type_name -> livekit.SimulationRun
+	58, // 53: livekit.SimulationRun.List.Response.next_page_token:type_name -> livekit.TokenPagination
+	54, // 54: livekit.SimulationRun.Counts.Request.start_time:type_name -> google.protobuf.Timestamp
+	54, // 55: livekit.SimulationRun.Counts.Request.end_time:type_name -> google.protobuf.Timestamp
+	1,  // 56: livekit.SimulationRun.Counts.Request.status:type_name -> livekit.SimulationRun.Status
+	0,  // 57: livekit.SimulationRun.Counts.Request.mode:type_name -> livekit.SimulationMode
+	44, // 58: livekit.SimulationRun.Counts.Response.buckets:type_name -> livekit.SimulationRun.Counts.Bucket
+	59, // 59: livekit.SimulationRun.Counts.Response.interval:type_name -> google.protobuf.Duration
+	54, // 60: livekit.SimulationRun.Counts.Bucket.bucket_start:type_name -> google.protobuf.Timestamp
+	8,  // 61: livekit.Scenario.CreateFromSession.Response.scenario:type_name -> livekit.Scenario
+	10, // 62: livekit.ScenarioGroup.NodesEntry.value:type_name -> livekit.SimulatorNode
+	59, // 63: livekit.SimulatorNode.Timeout.after:type_name -> google.protobuf.Duration
+	34, // 64: livekit.AgentSimulation.CreateSimulationRun:input_type -> livekit.SimulationRun.Create.Request
+	36, // 65: livekit.AgentSimulation.ConfirmSimulationSourceUpload:input_type -> livekit.SimulationRun.ConfirmSourceUpload.Request
+	38, // 66: livekit.AgentSimulation.GetSimulationRun:input_type -> livekit.SimulationRun.Get.Request
+	40, // 67: livekit.AgentSimulation.ListSimulationRuns:input_type -> livekit.SimulationRun.List.Request
+	42, // 68: livekit.AgentSimulation.CountSimulationRuns:input_type -> livekit.SimulationRun.Counts.Request
+	45, // 69: livekit.AgentSimulation.CancelSimulationRun:input_type -> livekit.SimulationRun.Cancel.Request
+	49, // 70: livekit.AgentSimulation.CreateScenarioFromSession:input_type -> livekit.Scenario.CreateFromSession.Request
+	35, // 71: livekit.AgentSimulation.CreateSimulationRun:output_type -> livekit.SimulationRun.Create.Response
+	37, // 72: livekit.AgentSimulation.ConfirmSimulationSourceUpload:output_type -> livekit.SimulationRun.ConfirmSourceUpload.Response
+	39, // 73: livekit.AgentSimulation.GetSimulationRun:output_type -> livekit.SimulationRun.Get.Response
+	41, // 74: livekit.AgentSimulation.ListSimulationRuns:output_type -> livekit.SimulationRun.List.Response
+	43, // 75: livekit.AgentSimulation.CountSimulationRuns:output_type -> livekit.SimulationRun.Counts.Response
+	46, // 76: livekit.AgentSimulation.CancelSimulationRun:output_type -> livekit.SimulationRun.Cancel.Response
+	50, // 77: livekit.AgentSimulation.CreateScenarioFromSession:output_type -> livekit.Scenario.CreateFromSession.Response
+	71, // [71:78] is the sub-list for method output_type
+	64, // [64:71] is the sub-list for method input_type
+	64, // [64:64] is the sub-list for extension type_name
+	64, // [64:64] is the sub-list for extension extendee
+	0,  // [0:64] is the sub-list for field type_name
 }
 
 func init() { file_livekit_agent_simulation_proto_init() }
@@ -4515,16 +4620,16 @@ func file_livekit_agent_simulation_proto_init() {
 	file_livekit_agent_simulation_proto_msgTypes[24].OneofWrappers = []any{}
 	file_livekit_agent_simulation_proto_msgTypes[25].OneofWrappers = []any{}
 	file_livekit_agent_simulation_proto_msgTypes[26].OneofWrappers = []any{}
-	file_livekit_agent_simulation_proto_msgTypes[27].OneofWrappers = []any{}
-	file_livekit_agent_simulation_proto_msgTypes[33].OneofWrappers = []any{}
-	file_livekit_agent_simulation_proto_msgTypes[35].OneofWrappers = []any{}
+	file_livekit_agent_simulation_proto_msgTypes[28].OneofWrappers = []any{}
+	file_livekit_agent_simulation_proto_msgTypes[34].OneofWrappers = []any{}
+	file_livekit_agent_simulation_proto_msgTypes[36].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_agent_simulation_proto_rawDesc), len(file_livekit_agent_simulation_proto_rawDesc)),
 			NumEnums:      6,
-			NumMessages:   47,
+			NumMessages:   48,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

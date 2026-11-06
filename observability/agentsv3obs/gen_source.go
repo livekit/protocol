@@ -44,6 +44,26 @@ const (
 	JobStatusFailed    JobStatus = "failed"
 )
 
+type JoinOutcome string
+
+const (
+	JoinOutcomeUndefined     JoinOutcome = ""
+	JoinOutcomeConnected     JoinOutcome = "connected"
+	JoinOutcomeAbandoned     JoinOutcome = "abandoned"
+	JoinOutcomeCancelled     JoinOutcome = "cancelled"
+	JoinOutcomeCustomerError JoinOutcome = "customer_error"
+	JoinOutcomeFailed        JoinOutcome = "failed"
+)
+
+type LatencyScope string
+
+const (
+	LatencyScopeUndefined LatencyScope = ""
+	LatencyScopeCounted   LatencyScope = "counted"
+	LatencyScopeExcluded  LatencyScope = "excluded"
+	LatencyScopeNoUser    LatencyScope = "no_user"
+)
+
 type Rollup string
 
 const (

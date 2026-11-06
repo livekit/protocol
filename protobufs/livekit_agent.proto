@@ -36,6 +36,8 @@ message Job {
   string deployment = 11;
   map<string, string> attributes = 12 [(logger.sensitivity) = SENSITIVITY_PII];
   bool enable_redaction = 13;
+  // when the server created the job, in Unix nanoseconds
+  int64 created_at = 14;
 }
 
 message JobState {
@@ -49,6 +51,20 @@ message JobState {
   string agent_id = 8 [(logger.name) = "agentID"];
   // why the job has no agent, for JS_PENDING and JS_CANCELLED jobs
   JobStateReason reason = 9;
+  // when the server received the worker's accept for this attempt, in Unix nanoseconds
+  int64 accepted_at = 10;
+  // when the server sent the assignment for this attempt, in Unix nanoseconds
+  int64 assigned_at = 11;
+  // attempts assigned to a worker so far, the current one included
+  uint32 attempts = 12;
+  // started_at of the first attempt assigned to a worker, in Unix nanoseconds
+  int64 first_started_at = 13;
+  // time spent in attempts the agent's own code failed before the agent
+  // joined, as an entrypoint that fails before it connects: from each such
+  // attempt's start to the next attempt's start, in nanoseconds
+  int64 agent_failed_attempts_ns = 14;
+  // workers asked to take this attempt, the one that took it included
+  uint32 workers_asked = 15;
 }
 
 // from Worker to Server
@@ -199,6 +215,23 @@ message UpdateJobStatus {
 
   // metadata shown on the dashboard, useful for debugging
   string error = 3;
+
+  // set once the agent has connected to the room
+  JobJoinTiming join_timing = 4;
+}
+
+// Instants of one agent join on the worker host's monotonic clock, in microseconds. The
+// clock origin is arbitrary, so only differences between these values carry meaning on
+// their own. The worker and its job processes share this clock.
+message JobJoinTiming {
+  int64 offer_received_us = 1;       // availability request received
+  int64 accepted_us = 2;             // request handler accepted the job
+  int64 assignment_received_us = 3;  // job assignment received
+  int64 launched_us = 4;             // a job process was handed the job
+  bool launch_warm = 5;              // an idle process took the job; false means one was spawned
+  int64 entrypoint_started_us = 6;   // the agent's entrypoint started
+  int64 connect_called_us = 7;       // the agent called room connect
+  int64 connected_us = 8;            // the agent's primary transport connected
 }
 
 message UpdateWorkerStatus {

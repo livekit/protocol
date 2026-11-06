@@ -52,11 +52,13 @@ type resourceQueue struct {
 
 	closed bool
 	drain  bool
+	done   chan struct{}
 }
 
 func newResourceQueue(params resourceQueueParams) *resourceQueue {
 	r := &resourceQueue{
 		params: params,
+		done:   make(chan struct{}),
 	}
 	r.items.SetBaseCap(int(min(params.MaxDepth, 16)))
 	r.cond = sync.NewCond(&r.mu)
@@ -75,6 +77,11 @@ func (r *resourceQueue) Stop(force bool) {
 
 		r.cond.Broadcast()
 	}
+}
+
+// Done is closed when the worker exits, i.e. after Stop once the queue is drained (or immediately when forced)
+func (r *resourceQueue) Done() <-chan struct{} {
+	return r.done
 }
 
 func (r *resourceQueue) Enqueue(ctx context.Context, whEvent *livekit.WebhookEvent, params *ResourceURLNotifierParams) (int, error) {
@@ -99,6 +106,8 @@ func (r *resourceQueue) EnqueueAt(ctx context.Context, at time.Time, whEvent *li
 }
 
 func (r *resourceQueue) worker() {
+	defer close(r.done)
+
 	for {
 		r.mu.Lock()
 		for {
