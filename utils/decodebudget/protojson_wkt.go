@@ -292,8 +292,6 @@ func (s *jsonScanner) skip() bool {
 	}
 }
 
-// jsonUnquote decodes a quoted string from jsonScanner.str, or returns "" if
-// it is malformed. Only strings with escapes allocate.
 // jsonStringsCost is what tokenizing the strings in raw copies.
 func jsonStringsCost(raw []byte) int {
 	cost := 0
@@ -311,6 +309,8 @@ func jsonStringsCost(raw []byte) int {
 	return cost
 }
 
+// jsonUnquote decodes a quoted string from jsonScanner.str, or returns "" if
+// it is malformed. Only strings with escapes allocate.
 func jsonUnquote(quoted []byte) string {
 	if len(quoted) < 2 {
 		return ""
