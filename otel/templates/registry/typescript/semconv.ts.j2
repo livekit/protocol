@@ -10,9 +10,14 @@
 {% for a in ctx.attributes %}
 /** {{ doc(a) }} */
 export const ATTR_{{ a.key | screaming_snake_case }} = {{ a.key | tojson }} as const;
-{% if a.type is mapping %}{% for m in a.type.members %}/** {{ line(m.brief) }} */
-export const {{ a.key | screaming_snake_case }}_VALUE_{{ m.id | screaming_snake_case }} = {{ m.value | tojson }} as const;
-{% endfor %}{% endif %}{% endfor %}
+{% if a.type is mapping %}{% set t = a.key | pascal_case %}/** Values of {@link ATTR_{{ a.key | screaming_snake_case }}}. */
+export const {{ t }} = {
+{% for m in a.type.members %}  /** {{ line(m.brief) }} */
+  {{ m.id | screaming_snake_case }}: {{ m.value | tojson }},
+{% endfor %}} as const;
+/** A value of {@link ATTR_{{ a.key | screaming_snake_case }}}. */
+export type {{ t }} = (typeof {{ t }})[keyof typeof {{ t }}];
+{% endif %}{% endfor %}
 {% for e in ctx.events %}/** {{ line(e.brief) }} */
 export const EVENT_{{ e.name | screaming_snake_case }} = {{ e.name | tojson }} as const;
 {% endfor %}

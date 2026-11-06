@@ -119,39 +119,54 @@ export const ATTR_LK_DEPLOYMENT_ID = "lk.deployment_id" as const;
 
 /** Whether the app is in front of the user. */
 export const ATTR_LK_DEVICE_APP_STATE = "lk.device.app_state" as const;
-/** In front of the user. */
-export const LK_DEVICE_APP_STATE_VALUE_FOREGROUND = "foreground" as const;
-/** In the background. */
-export const LK_DEVICE_APP_STATE_VALUE_BACKGROUND = "background" as const;
+/** Values of {@link ATTR_LK_DEVICE_APP_STATE}. */
+export const LkDeviceAppState = {
+  /** In front of the user. */
+  FOREGROUND: "foreground",
+  /** In the background. */
+  BACKGROUND: "background",
+} as const;
+/** A value of {@link ATTR_LK_DEVICE_APP_STATE}. */
+export type LkDeviceAppState = (typeof LkDeviceAppState)[keyof typeof LkDeviceAppState];
 
 /** Phase of an audio session interruption. */
 export const ATTR_LK_DEVICE_AUDIO_INTERRUPTION = "lk.device.audio.interruption" as const;
-/** Interruption began (another app or a call took the audio session). */
-export const LK_DEVICE_AUDIO_INTERRUPTION_VALUE_BEGAN = "began" as const;
-/** Interruption ended. */
-export const LK_DEVICE_AUDIO_INTERRUPTION_VALUE_ENDED = "ended" as const;
+/** Values of {@link ATTR_LK_DEVICE_AUDIO_INTERRUPTION}. */
+export const LkDeviceAudioInterruption = {
+  /** Interruption began (another app or a call took the audio session). */
+  BEGAN: "began",
+  /** Interruption ended. */
+  ENDED: "ended",
+} as const;
+/** A value of {@link ATTR_LK_DEVICE_AUDIO_INTERRUPTION}. */
+export type LkDeviceAudioInterruption = (typeof LkDeviceAudioInterruption)[keyof typeof LkDeviceAudioInterruption];
 
 /** The active outputs, comma-separated. */
 export const ATTR_LK_DEVICE_AUDIO_ROUTE_OUTPUTS = "lk.device.audio_route.outputs" as const;
 
 /** Why the audio route changed. */
 export const ATTR_LK_DEVICE_AUDIO_ROUTE_REASON = "lk.device.audio_route.reason" as const;
-/** A new output became available. */
-export const LK_DEVICE_AUDIO_ROUTE_REASON_VALUE_NEW_DEVICE = "new_device" as const;
-/** The previous output went away. */
-export const LK_DEVICE_AUDIO_ROUTE_REASON_VALUE_OLD_DEVICE_UNAVAILABLE = "old_device_unavailable" as const;
-/** The audio session category changed. */
-export const LK_DEVICE_AUDIO_ROUTE_REASON_VALUE_CATEGORY_CHANGE = "category_change" as const;
-/** The route was overridden. */
-export const LK_DEVICE_AUDIO_ROUTE_REASON_VALUE_OVERRIDE = "override" as const;
-/** The device woke from sleep. */
-export const LK_DEVICE_AUDIO_ROUTE_REASON_VALUE_WAKE_FROM_SLEEP = "wake_from_sleep" as const;
-/** No route fits the category. */
-export const LK_DEVICE_AUDIO_ROUTE_REASON_VALUE_NO_SUITABLE_ROUTE = "no_suitable_route" as const;
-/** The route's configuration changed. */
-export const LK_DEVICE_AUDIO_ROUTE_REASON_VALUE_ROUTE_CONFIGURATION_CHANGE = "route_configuration_change" as const;
-/** The platform gave no reason. */
-export const LK_DEVICE_AUDIO_ROUTE_REASON_VALUE_UNKNOWN = "unknown" as const;
+/** Values of {@link ATTR_LK_DEVICE_AUDIO_ROUTE_REASON}. */
+export const LkDeviceAudioRouteReason = {
+  /** A new output became available. */
+  NEW_DEVICE: "new_device",
+  /** The previous output went away. */
+  OLD_DEVICE_UNAVAILABLE: "old_device_unavailable",
+  /** The audio session category changed. */
+  CATEGORY_CHANGE: "category_change",
+  /** The route was overridden. */
+  OVERRIDE: "override",
+  /** The device woke from sleep. */
+  WAKE_FROM_SLEEP: "wake_from_sleep",
+  /** No route fits the category. */
+  NO_SUITABLE_ROUTE: "no_suitable_route",
+  /** The route's configuration changed. */
+  ROUTE_CONFIGURATION_CHANGE: "route_configuration_change",
+  /** The platform gave no reason. */
+  UNKNOWN: "unknown",
+} as const;
+/** A value of {@link ATTR_LK_DEVICE_AUDIO_ROUTE_REASON}. */
+export type LkDeviceAudioRouteReason = (typeof LkDeviceAudioRouteReason)[keyof typeof LkDeviceAudioRouteReason];
 
 /** The device is charging. */
 export const ATTR_LK_DEVICE_BATTERY_CHARGING = "lk.device.battery.charging" as const;
@@ -161,37 +176,52 @@ export const ATTR_LK_DEVICE_BATTERY_LEVEL = "lk.device.battery.level" as const;
 
 /** Capture device that failed. */
 export const ATTR_LK_DEVICE_CAPTURE_DEVICE = "lk.device.capture.device" as const;
-/** Camera. */
-export const LK_DEVICE_CAPTURE_DEVICE_VALUE_CAMERA = "camera" as const;
-/** Microphone. */
-export const LK_DEVICE_CAPTURE_DEVICE_VALUE_MICROPHONE = "microphone" as const;
-/** Screen capture. */
-export const LK_DEVICE_CAPTURE_DEVICE_VALUE_SCREEN_SHARE = "screen_share" as const;
+/** Values of {@link ATTR_LK_DEVICE_CAPTURE_DEVICE}. */
+export const LkDeviceCaptureDevice = {
+  /** Camera. */
+  CAMERA: "camera",
+  /** Microphone. */
+  MICROPHONE: "microphone",
+  /** Screen capture. */
+  SCREEN_SHARE: "screen_share",
+} as const;
+/** A value of {@link ATTR_LK_DEVICE_CAPTURE_DEVICE}. */
+export type LkDeviceCaptureDevice = (typeof LkDeviceCaptureDevice)[keyof typeof LkDeviceCaptureDevice];
 
 /** Why capture failed, in the getUserMedia failure taxonomy. */
 export const ATTR_LK_DEVICE_CAPTURE_REASON = "lk.device.capture.reason" as const;
-/** The user or OS denied access. */
-export const LK_DEVICE_CAPTURE_REASON_VALUE_PERMISSION_DENIED = "permission_denied" as const;
-/** No such device. */
-export const LK_DEVICE_CAPTURE_REASON_VALUE_NOT_FOUND = "not_found" as const;
-/** Another app holds the device. */
-export const LK_DEVICE_CAPTURE_REASON_VALUE_IN_USE = "in_use" as const;
-/** The device went away. */
-export const LK_DEVICE_CAPTURE_REASON_VALUE_DISCONNECTED = "disconnected" as const;
-/** Anything else. */
-export const LK_DEVICE_CAPTURE_REASON_VALUE_OTHER = "other" as const;
+/** Values of {@link ATTR_LK_DEVICE_CAPTURE_REASON}. */
+export const LkDeviceCaptureReason = {
+  /** The user or OS denied access. */
+  PERMISSION_DENIED: "permission_denied",
+  /** No such device. */
+  NOT_FOUND: "not_found",
+  /** Another app holds the device. */
+  IN_USE: "in_use",
+  /** The device went away. */
+  DISCONNECTED: "disconnected",
+  /** Anything else. */
+  OTHER: "other",
+} as const;
+/** A value of {@link ATTR_LK_DEVICE_CAPTURE_REASON}. */
+export type LkDeviceCaptureReason = (typeof LkDeviceCaptureReason)[keyof typeof LkDeviceCaptureReason];
 
 /** Low Power Mode / Battery Saver is on. */
 export const ATTR_LK_DEVICE_LOW_POWER_ENABLED = "lk.device.low_power.enabled" as const;
 
 /** Memory pressure as the OS reports it. */
 export const ATTR_LK_DEVICE_MEMORY_PRESSURE = "lk.device.memory.pressure" as const;
-/** No pressure. */
-export const LK_DEVICE_MEMORY_PRESSURE_VALUE_NORMAL = "normal" as const;
-/** Low memory. */
-export const LK_DEVICE_MEMORY_PRESSURE_VALUE_WARNING = "warning" as const;
-/** Critically low memory. */
-export const LK_DEVICE_MEMORY_PRESSURE_VALUE_CRITICAL = "critical" as const;
+/** Values of {@link ATTR_LK_DEVICE_MEMORY_PRESSURE}. */
+export const LkDeviceMemoryPressure = {
+  /** No pressure. */
+  NORMAL: "normal",
+  /** Low memory. */
+  WARNING: "warning",
+  /** Critically low memory. */
+  CRITICAL: "critical",
+} as const;
+/** A value of {@link ATTR_LK_DEVICE_MEMORY_PRESSURE}. */
+export type LkDeviceMemoryPressure = (typeof LkDeviceMemoryPressure)[keyof typeof LkDeviceMemoryPressure];
 
 /** The user asked for less traffic (Low Data Mode, Data Saver). */
 export const ATTR_LK_DEVICE_NETWORK_CONSTRAINED = "lk.device.network.constrained" as const;
@@ -201,53 +231,63 @@ export const ATTR_LK_DEVICE_NETWORK_EXPENSIVE = "lk.device.network.expensive" as
 
 /** Thermal pressure as the OS reports it. */
 export const ATTR_LK_DEVICE_THERMAL_STATE = "lk.device.thermal.state" as const;
-/** Within normal limits. */
-export const LK_DEVICE_THERMAL_STATE_VALUE_NOMINAL = "nominal" as const;
-/** Slightly elevated. */
-export const LK_DEVICE_THERMAL_STATE_VALUE_FAIR = "fair" as const;
-/** High; the system reduces performance. */
-export const LK_DEVICE_THERMAL_STATE_VALUE_SERIOUS = "serious" as const;
-/** Critical; the device needs to cool down. */
-export const LK_DEVICE_THERMAL_STATE_VALUE_CRITICAL = "critical" as const;
+/** Values of {@link ATTR_LK_DEVICE_THERMAL_STATE}. */
+export const LkDeviceThermalState = {
+  /** Within normal limits. */
+  NOMINAL: "nominal",
+  /** Slightly elevated. */
+  FAIR: "fair",
+  /** High; the system reduces performance. */
+  SERIOUS: "serious",
+  /** Critical; the device needs to cool down. */
+  CRITICAL: "critical",
+} as const;
+/** A value of {@link ATTR_LK_DEVICE_THERMAL_STATE}. */
+export type LkDeviceThermalState = (typeof LkDeviceThermalState)[keyof typeof LkDeviceThermalState];
 
 /** Why a participant left the room, as the protobuf `DisconnectReason` enum name. */
 export const ATTR_LK_DISCONNECT_REASON = "lk.disconnect_reason" as const;
-/** No reason given, or a number the producer does not know. */
-export const LK_DISCONNECT_REASON_VALUE_UNKNOWN_REASON = "UNKNOWN_REASON" as const;
-/** The participant hung up. */
-export const LK_DISCONNECT_REASON_VALUE_CLIENT_INITIATED = "CLIENT_INITIATED" as const;
-/** Another participant joined with the same identity. */
-export const LK_DISCONNECT_REASON_VALUE_DUPLICATE_IDENTITY = "DUPLICATE_IDENTITY" as const;
-/** The server instance shut down. */
-export const LK_DISCONNECT_REASON_VALUE_SERVER_SHUTDOWN = "SERVER_SHUTDOWN" as const;
-/** RoomService.RemoveParticipant was called. */
-export const LK_DISCONNECT_REASON_VALUE_PARTICIPANT_REMOVED = "PARTICIPANT_REMOVED" as const;
-/** RoomService.DeleteRoom was called. */
-export const LK_DISCONNECT_REASON_VALUE_ROOM_DELETED = "ROOM_DELETED" as const;
-/** The server did not know the session the client tried to resume. */
-export const LK_DISCONNECT_REASON_VALUE_STATE_MISMATCH = "STATE_MISMATCH" as const;
-/** The client could not connect fully. */
-export const LK_DISCONNECT_REASON_VALUE_JOIN_FAILURE = "JOIN_FAILURE" as const;
-/** The server asked the participant to migrate (Cloud only). */
-export const LK_DISCONNECT_REASON_VALUE_MIGRATION = "MIGRATION" as const;
-/** The signal WebSocket closed unexpectedly. */
-export const LK_DISCONNECT_REASON_VALUE_SIGNAL_CLOSE = "SIGNAL_CLOSE" as const;
-/** The room closed after its participants left. */
-export const LK_DISCONNECT_REASON_VALUE_ROOM_CLOSED = "ROOM_CLOSED" as const;
-/** The SIP callee did not answer in time. */
-export const LK_DISCONNECT_REASON_VALUE_USER_UNAVAILABLE = "USER_UNAVAILABLE" as const;
-/** The SIP callee rejected the call. */
-export const LK_DISCONNECT_REASON_VALUE_USER_REJECTED = "USER_REJECTED" as const;
-/** SIP protocol failure. */
-export const LK_DISCONNECT_REASON_VALUE_SIP_TRUNK_FAILURE = "SIP_TRUNK_FAILURE" as const;
-/** The server timed out the session. */
-export const LK_DISCONNECT_REASON_VALUE_CONNECTION_TIMEOUT = "CONNECTION_TIMEOUT" as const;
-/** Media failed or timed out. */
-export const LK_DISCONNECT_REASON_VALUE_MEDIA_FAILURE = "MEDIA_FAILURE" as const;
-/** The agent failed. */
-export const LK_DISCONNECT_REASON_VALUE_AGENT_ERROR = "AGENT_ERROR" as const;
-/** The client ran out of reconnect attempts (client only, not a protobuf value). */
-export const LK_DISCONNECT_REASON_VALUE_RECONNECT_FAILED = "RECONNECT_FAILED" as const;
+/** Values of {@link ATTR_LK_DISCONNECT_REASON}. */
+export const LkDisconnectReason = {
+  /** No reason given, or a number the producer does not know. */
+  UNKNOWN_REASON: "UNKNOWN_REASON",
+  /** The participant hung up. */
+  CLIENT_INITIATED: "CLIENT_INITIATED",
+  /** Another participant joined with the same identity. */
+  DUPLICATE_IDENTITY: "DUPLICATE_IDENTITY",
+  /** The server instance shut down. */
+  SERVER_SHUTDOWN: "SERVER_SHUTDOWN",
+  /** RoomService.RemoveParticipant was called. */
+  PARTICIPANT_REMOVED: "PARTICIPANT_REMOVED",
+  /** RoomService.DeleteRoom was called. */
+  ROOM_DELETED: "ROOM_DELETED",
+  /** The server did not know the session the client tried to resume. */
+  STATE_MISMATCH: "STATE_MISMATCH",
+  /** The client could not connect fully. */
+  JOIN_FAILURE: "JOIN_FAILURE",
+  /** The server asked the participant to migrate (Cloud only). */
+  MIGRATION: "MIGRATION",
+  /** The signal WebSocket closed unexpectedly. */
+  SIGNAL_CLOSE: "SIGNAL_CLOSE",
+  /** The room closed after its participants left. */
+  ROOM_CLOSED: "ROOM_CLOSED",
+  /** The SIP callee did not answer in time. */
+  USER_UNAVAILABLE: "USER_UNAVAILABLE",
+  /** The SIP callee rejected the call. */
+  USER_REJECTED: "USER_REJECTED",
+  /** SIP protocol failure. */
+  SIP_TRUNK_FAILURE: "SIP_TRUNK_FAILURE",
+  /** The server timed out the session. */
+  CONNECTION_TIMEOUT: "CONNECTION_TIMEOUT",
+  /** Media failed or timed out. */
+  MEDIA_FAILURE: "MEDIA_FAILURE",
+  /** The agent failed. */
+  AGENT_ERROR: "AGENT_ERROR",
+  /** The client ran out of reconnect attempts (client only, not a protobuf value). */
+  RECONNECT_FAILED: "RECONNECT_FAILED",
+} as const;
+/** A value of {@link ATTR_LK_DISCONNECT_REASON}. */
+export type LkDisconnectReason = (typeof LkDisconnectReason)[keyof typeof LkDisconnectReason];
 
 /** Agent dispatch id. */
 export const ATTR_LK_DISPATCH_ID = "lk.dispatch_id" as const;
@@ -275,12 +315,17 @@ export const ATTR_LK_EOU_NOT_COMMITTED_COUNT = "lk.eou.not_committed_count" as c
 
 /** How the endpointing wait ended. */
 export const ATTR_LK_EOU_OUTCOME = "lk.eou.outcome" as const;
-/** The turn was committed. */
-export const LK_EOU_OUTCOME_VALUE_COMMITTED = "committed" as const;
-/** The user spoke again. */
-export const LK_EOU_OUTCOME_VALUE_USER_RESUMED = "user_resumed" as const;
-/** The turn was dropped. */
-export const LK_EOU_OUTCOME_VALUE_DROPPED = "dropped" as const;
+/** Values of {@link ATTR_LK_EOU_OUTCOME}. */
+export const LkEouOutcome = {
+  /** The turn was committed. */
+  COMMITTED: "committed",
+  /** The user spoke again. */
+  USER_RESUMED: "user_resumed",
+  /** The turn was dropped. */
+  DROPPED: "dropped",
+} as const;
+/** A value of {@link ATTR_LK_EOU_OUTCOME}. */
+export type LkEouOutcome = (typeof LkEouOutcome)[keyof typeof LkEouOutcome];
 
 /** End-of-utterance probability. */
 export const ATTR_LK_EOU_PROBABILITY = "lk.eou.probability" as const;
@@ -320,14 +365,19 @@ export const ATTR_LK_FIRST_FRAME_DELAY = "lk.first_frame_delay" as const;
 
 /** How the inbound frame of a plugin-task metric was resolved (Node binding). */
 export const ATTR_LK_FRAME_RESOLUTION = "lk.frame.resolution" as const;
-/** The root frame. */
-export const LK_FRAME_RESOLUTION_VALUE_ROOT = "root" as const;
-/** A live speech frame. */
-export const LK_FRAME_RESOLUTION_VALUE_LIVE = "live" as const;
-/** A frame whose speech already ended. */
-export const LK_FRAME_RESOLUTION_VALUE_STALE = "stale" as const;
-/** Not a frame the slab knows. */
-export const LK_FRAME_RESOLUTION_VALUE_UNKNOWN = "unknown" as const;
+/** Values of {@link ATTR_LK_FRAME_RESOLUTION}. */
+export const LkFrameResolution = {
+  /** The root frame. */
+  ROOT: "root",
+  /** A live speech frame. */
+  LIVE: "live",
+  /** A frame whose speech already ended. */
+  STALE: "stale",
+  /** Not a frame the slab knows. */
+  UNKNOWN: "unknown",
+} as const;
+/** A value of {@link ATTR_LK_FRAME_RESOLUTION}. */
+export type LkFrameResolution = (typeof LkFrameResolution)[keyof typeof LkFrameResolution];
 
 /** Tool call id. */
 export const ATTR_LK_FUNCTION_TOOL_ID = "lk.function_tool.id" as const;
@@ -418,12 +468,17 @@ export const ATTR_LK_LOG_LOGGER = "lk.log.logger" as const;
 
 /** Which layer wrote the log line. */
 export const ATTR_LK_LOG_SOURCE = "lk.log.source" as const;
-/** The platform SDK. */
-export const LK_LOG_SOURCE_VALUE_SDK = "sdk" as const;
-/** The Rust core, copied by the log forwarder with JWT-shaped substrings masked as `<jwt>`. */
-export const LK_LOG_SOURCE_VALUE_FFI = "ffi" as const;
-/** WebRTC. */
-export const LK_LOG_SOURCE_VALUE_WEBRTC = "webrtc" as const;
+/** Values of {@link ATTR_LK_LOG_SOURCE}. */
+export const LkLogSource = {
+  /** The platform SDK. */
+  SDK: "sdk",
+  /** The Rust core, copied by the log forwarder with JWT-shaped substrings masked as `<jwt>`. */
+  FFI: "ffi",
+  /** WebRTC. */
+  WEBRTC: "webrtc",
+} as const;
+/** A value of {@link ATTR_LK_LOG_SOURCE}. */
+export type LkLogSource = (typeof LkLogSource)[keyof typeof LkLogSource];
 
 /** Metric type noted from a plugin task (Node binding `metrics` span). */
 export const ATTR_LK_METRIC = "lk.metric" as const;
@@ -439,12 +494,17 @@ export const ATTR_LK_ON_USER_TURN_COMPLETED_DELAY = "lk.on_user_turn_completed_d
 
 /** How the attempt ended. Rollups read this, never the span status. */
 export const ATTR_LK_OUTCOME = "lk.outcome" as const;
-/** Succeeded; span status Unset. */
-export const LK_OUTCOME_VALUE_OK = "ok" as const;
-/** Failed; span status Error, with `error.type` when the failure has a type. */
-export const LK_OUTCOME_VALUE_ERROR = "error" as const;
-/** Cancelled by the caller or superseded; span status Unset. */
-export const LK_OUTCOME_VALUE_CANCELLED = "cancelled" as const;
+/** Values of {@link ATTR_LK_OUTCOME}. */
+export const LkOutcome = {
+  /** Succeeded; span status Unset. */
+  OK: "ok",
+  /** Failed; span status Error, with `error.type` when the failure has a type. */
+  ERROR: "error",
+  /** Cancelled by the caller or superseded; span status Unset. */
+  CANCELLED: "cancelled",
+} as const;
+/** A value of {@link ATTR_LK_OUTCOME}. */
+export type LkOutcome = (typeof LkOutcome)[keyof typeof LkOutcome];
 
 /** Generation this one continues (a tool-call follow-up). */
 export const ATTR_LK_PARENT_GENERATION_ID = "lk.parent_generation_id" as const;
@@ -565,29 +625,39 @@ export const ATTR_LK_RECONNECT_ATTEMPTS = "lk.reconnect.attempts" as const;
 
 /** Mode of the last reconnect attempt. */
 export const ATTR_LK_RECONNECT_MODE = "lk.reconnect.mode" as const;
-/** Resume the session (ICE restart). */
-export const LK_RECONNECT_MODE_VALUE_QUICK = "quick" as const;
-/** Reconnect from scratch. */
-export const LK_RECONNECT_MODE_VALUE_FULL = "full" as const;
+/** Values of {@link ATTR_LK_RECONNECT_MODE}. */
+export const LkReconnectMode = {
+  /** Resume the session (ICE restart). */
+  QUICK: "quick",
+  /** Reconnect from scratch. */
+  FULL: "full",
+} as const;
+/** A value of {@link ATTR_LK_RECONNECT_MODE}. */
+export type LkReconnectMode = (typeof LkReconnectMode)[keyof typeof LkReconnectMode];
 
 /** What triggered the reconnect cycle. */
 export const ATTR_LK_RECONNECT_REASON = "lk.reconnect.reason" as const;
-/** The signaling socket closed (RR_SIGNAL_DISCONNECTED). */
-export const LK_RECONNECT_REASON_VALUE_SIGNAL_DISCONNECTED = "signal_disconnected" as const;
-/** The publisher peer connection failed (RR_PUBLISHER_FAILED). */
-export const LK_RECONNECT_REASON_VALUE_PUBLISHER_FAILED = "publisher_failed" as const;
-/** The subscriber peer connection failed (RR_SUBSCRIBER_FAILED). */
-export const LK_RECONNECT_REASON_VALUE_SUBSCRIBER_FAILED = "subscriber_failed" as const;
-/** A peer connection failed and the platform did not say which (client only). */
-export const LK_RECONNECT_REASON_VALUE_TRANSPORT_FAILED = "transport_failed" as const;
-/** The server asked for a candidate switch (RR_SWITCH_CANDIDATE). */
-export const LK_RECONNECT_REASON_VALUE_SWITCH_CANDIDATE = "switch_candidate" as const;
-/** The device moved to another network (client only). */
-export const LK_RECONNECT_REASON_VALUE_NETWORK_CHANGED = "network_changed" as const;
-/** A test or a debug menu asked for it (client only). */
-export const LK_RECONNECT_REASON_VALUE_DEBUG = "debug" as const;
-/** RR_UNKNOWN or a number the client does not know. */
-export const LK_RECONNECT_REASON_VALUE_UNKNOWN = "unknown" as const;
+/** Values of {@link ATTR_LK_RECONNECT_REASON}. */
+export const LkReconnectReason = {
+  /** The signaling socket closed (RR_SIGNAL_DISCONNECTED). */
+  SIGNAL_DISCONNECTED: "signal_disconnected",
+  /** The publisher peer connection failed (RR_PUBLISHER_FAILED). */
+  PUBLISHER_FAILED: "publisher_failed",
+  /** The subscriber peer connection failed (RR_SUBSCRIBER_FAILED). */
+  SUBSCRIBER_FAILED: "subscriber_failed",
+  /** A peer connection failed and the platform did not say which (client only). */
+  TRANSPORT_FAILED: "transport_failed",
+  /** The server asked for a candidate switch (RR_SWITCH_CANDIDATE). */
+  SWITCH_CANDIDATE: "switch_candidate",
+  /** The device moved to another network (client only). */
+  NETWORK_CHANGED: "network_changed",
+  /** A test or a debug menu asked for it (client only). */
+  DEBUG: "debug",
+  /** RR_UNKNOWN or a number the client does not know. */
+  UNKNOWN: "unknown",
+} as const;
+/** A value of {@link ATTR_LK_RECONNECT_REASON}. */
+export type LkReconnectReason = (typeof LkReconnectReason)[keyof typeof LkReconnectReason];
 
 /** PII redaction was requested for the session. */
 export const ATTR_LK_REDACTION_ENABLED = "lk.redaction.enabled" as const;
@@ -840,33 +910,48 @@ export const ATTR_LK_TOOL_SETS = "lk.tool_sets" as const;
 
 /** Whether the stats describe sent or received media. */
 export const ATTR_LK_TRACK_DIRECTION = "lk.track.direction" as const;
-/** Received media (inbound-rtp). */
-export const LK_TRACK_DIRECTION_VALUE_INBOUND = "inbound" as const;
-/** Sent media (outbound-rtp). */
-export const LK_TRACK_DIRECTION_VALUE_OUTBOUND = "outbound" as const;
+/** Values of {@link ATTR_LK_TRACK_DIRECTION}. */
+export const LkTrackDirection = {
+  /** Received media (inbound-rtp). */
+  INBOUND: "inbound",
+  /** Sent media (outbound-rtp). */
+  OUTBOUND: "outbound",
+} as const;
+/** A value of {@link ATTR_LK_TRACK_DIRECTION}. */
+export type LkTrackDirection = (typeof LkTrackDirection)[keyof typeof LkTrackDirection];
 
 /** Media kind of the track. */
 export const ATTR_LK_TRACK_KIND = "lk.track.kind" as const;
-/** Audio. */
-export const LK_TRACK_KIND_VALUE_AUDIO = "audio" as const;
-/** Video. */
-export const LK_TRACK_KIND_VALUE_VIDEO = "video" as const;
+/** Values of {@link ATTR_LK_TRACK_KIND}. */
+export const LkTrackKind = {
+  /** Audio. */
+  AUDIO: "audio",
+  /** Video. */
+  VIDEO: "video",
+} as const;
+/** A value of {@link ATTR_LK_TRACK_KIND}. */
+export type LkTrackKind = (typeof LkTrackKind)[keyof typeof LkTrackKind];
 
 /** Server-assigned track SID (`TR_...`). */
 export const ATTR_LK_TRACK_ID = "lk.track_id" as const;
 
 /** Source of the track, as the Agents RTC FFI `TrackSource` enum name. */
 export const ATTR_LK_TRACK_SOURCE = "lk.track_source" as const;
-/** Unknown source. */
-export const LK_TRACK_SOURCE_VALUE_SOURCE_UNKNOWN = "SOURCE_UNKNOWN" as const;
-/** Camera. */
-export const LK_TRACK_SOURCE_VALUE_SOURCE_CAMERA = "SOURCE_CAMERA" as const;
-/** Microphone. */
-export const LK_TRACK_SOURCE_VALUE_SOURCE_MICROPHONE = "SOURCE_MICROPHONE" as const;
-/** Screen share video. */
-export const LK_TRACK_SOURCE_VALUE_SOURCE_SCREENSHARE = "SOURCE_SCREENSHARE" as const;
-/** Screen share audio. */
-export const LK_TRACK_SOURCE_VALUE_SOURCE_SCREENSHARE_AUDIO = "SOURCE_SCREENSHARE_AUDIO" as const;
+/** Values of {@link ATTR_LK_TRACK_SOURCE}. */
+export const LkTrackSource = {
+  /** Unknown source. */
+  SOURCE_UNKNOWN: "SOURCE_UNKNOWN",
+  /** Camera. */
+  SOURCE_CAMERA: "SOURCE_CAMERA",
+  /** Microphone. */
+  SOURCE_MICROPHONE: "SOURCE_MICROPHONE",
+  /** Screen share video. */
+  SOURCE_SCREENSHARE: "SOURCE_SCREENSHARE",
+  /** Screen share audio. */
+  SOURCE_SCREENSHARE_AUDIO: "SOURCE_SCREENSHARE_AUDIO",
+} as const;
+/** A value of {@link ATTR_LK_TRACK_SOURCE}. */
+export type LkTrackSource = (typeof LkTrackSource)[keyof typeof LkTrackSource];
 
 /** Confidence of the final transcript. */
 export const ATTR_LK_TRANSCRIPT_CONFIDENCE = "lk.transcript_confidence" as const;
