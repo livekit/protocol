@@ -252,3 +252,18 @@ var validIDPattern = regexp.MustCompile(`^([a-zA-Z0-9]{1,16}_){1,2}[a-zA-Z0-9]{0
 func IsValidID[T ~string](id T) bool {
 	return validIDPattern.MatchString(string(id))
 }
+
+// IsValidWithPrefix reports whether id is prefix followed by exactly Size characters of IDAlphabet,
+// the form New(prefix) produces.
+func IsValidWithPrefix(prefix, id string) bool {
+	if len(id) != len(prefix)+Size || id[:len(prefix)] != prefix {
+		return false
+	}
+	for i := len(prefix); i < len(id); i++ {
+		c := id[i]
+		if b57Chars[b57Index[c]] != c {
+			return false
+		}
+	}
+	return true
+}
