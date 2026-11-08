@@ -1,6 +1,10 @@
 package agent
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/livekit/protocol/utils/guid"
+)
 
 const MaxDeploymentLength = 64
 
@@ -19,6 +23,15 @@ func ValidateDeployment(deployment string) error {
 		case c <= ' ' || c == 0x7f:
 			return fmt.Errorf("deployment contains whitespace or control byte at position %d", i)
 		}
+	}
+	return nil
+}
+
+// ValidateThreadID accepts an empty thread id (the call keeps no durable thread) or an agent
+// thread id as guid.New(guid.AgentThreadPrefix) mints it.
+func ValidateThreadID(threadID string) error {
+	if threadID != "" && !guid.IsValidWithPrefix(guid.AgentThreadPrefix, threadID) {
+		return fmt.Errorf("thread id must be an %s agent thread id", guid.AgentThreadPrefix)
 	}
 	return nil
 }
