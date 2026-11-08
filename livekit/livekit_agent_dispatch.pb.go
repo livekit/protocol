@@ -146,6 +146,9 @@ type CreateAgentDispatchRequest struct {
 	RestartPolicy JobRestartPolicy       `protobuf:"varint,4,opt,name=restart_policy,json=restartPolicy,proto3,enum=livekit.JobRestartPolicy" json:"restart_policy,omitempty"` // cloud only
 	Deployment    string                 `protobuf:"bytes,5,opt,name=deployment,proto3" json:"deployment,omitempty"`
 	Attributes    map[string]string      `protobuf:"bytes,6,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	// The agent thread (an AT_ id, see agent/livekit_agent_thread.proto) the dispatched job's
+	// call reads and writes. Empty means the call keeps no durable thread.
+	ThreadId      string `protobuf:"bytes,7,opt,name=thread_id,json=threadId,proto3" json:"thread_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -222,6 +225,13 @@ func (x *CreateAgentDispatchRequest) GetAttributes() map[string]string {
 	return nil
 }
 
+func (x *CreateAgentDispatchRequest) GetThreadId() string {
+	if x != nil {
+		return x.ThreadId
+	}
+	return ""
+}
+
 type RoomAgentDispatch struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	AgentName     string                 `protobuf:"bytes,1,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
@@ -229,6 +239,9 @@ type RoomAgentDispatch struct {
 	RestartPolicy JobRestartPolicy       `protobuf:"varint,3,opt,name=restart_policy,json=restartPolicy,proto3,enum=livekit.JobRestartPolicy" json:"restart_policy,omitempty"` // cloud only
 	Deployment    string                 `protobuf:"bytes,4,opt,name=deployment,proto3" json:"deployment,omitempty"`
 	Attributes    map[string]string      `protobuf:"bytes,5,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	// The agent thread (an AT_ id, see agent/livekit_agent_thread.proto) the dispatched job's
+	// call reads and writes. Empty means the call keeps no durable thread.
+	ThreadId      string `protobuf:"bytes,6,opt,name=thread_id,json=threadId,proto3" json:"thread_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -296,6 +309,13 @@ func (x *RoomAgentDispatch) GetAttributes() map[string]string {
 		return x.Attributes
 	}
 	return nil
+}
+
+func (x *RoomAgentDispatch) GetThreadId() string {
+	if x != nil {
+		return x.ThreadId
+	}
+	return ""
 }
 
 type DeleteAgentDispatchRequest struct {
@@ -456,6 +476,9 @@ type AgentDispatch struct {
 	RestartPolicy JobRestartPolicy       `protobuf:"varint,6,opt,name=restart_policy,json=restartPolicy,proto3,enum=livekit.JobRestartPolicy" json:"restart_policy,omitempty"` // cloud only
 	Deployment    string                 `protobuf:"bytes,7,opt,name=deployment,proto3" json:"deployment,omitempty"`
 	Attributes    map[string]string      `protobuf:"bytes,8,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	// The agent thread (an AT_ id, see agent/livekit_agent_thread.proto) the dispatched job's
+	// call reads and writes. Empty means the call keeps no durable thread.
+	ThreadId      string `protobuf:"bytes,9,opt,name=thread_id,json=threadId,proto3" json:"thread_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -546,6 +569,13 @@ func (x *AgentDispatch) GetAttributes() map[string]string {
 	return nil
 }
 
+func (x *AgentDispatch) GetThreadId() string {
+	if x != nil {
+		return x.ThreadId
+	}
+	return ""
+}
+
 type AgentDispatchState struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// For dispatches of tyoe JT_ROOM, there will be at most 1 job.
@@ -620,7 +650,7 @@ var File_livekit_agent_dispatch_proto protoreflect.FileDescriptor
 
 const file_livekit_agent_dispatch_proto_rawDesc = "" +
 	"\n" +
-	"\x1clivekit_agent_dispatch.proto\x12\alivekit\x1a\x13livekit_agent.proto\x1a\x14logger/options.proto\"\xad\x03\n" +
+	"\x1clivekit_agent_dispatch.proto\x12\alivekit\x1a\x13livekit_agent.proto\x1a\x14logger/options.proto\"\xca\x03\n" +
 	"\x1aCreateAgentDispatchRequest\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x01 \x01(\tR\tagentName\x12\x12\n" +
@@ -632,10 +662,11 @@ const file_livekit_agent_dispatch_proto_rawDesc = "" +
 	"deployment\x12y\n" +
 	"\n" +
 	"attributes\x18\x06 \x03(\v23.livekit.CreateAgentDispatchRequest.AttributesEntryB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\n" +
-	"attributes\x1a=\n" +
+	"attributes\x12\x1b\n" +
+	"\tthread_id\x18\a \x01(\tR\bthreadId\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x87\x03\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xa4\x03\n" +
 	"\x11RoomAgentDispatch\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x01 \x01(\tR\tagentName\x12@\n" +
@@ -646,7 +677,8 @@ const file_livekit_agent_dispatch_proto_rawDesc = "" +
 	"deployment\x12p\n" +
 	"\n" +
 	"attributes\x18\x05 \x03(\v2*.livekit.RoomAgentDispatch.AttributesEntryB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\n" +
-	"attributes\x1a=\n" +
+	"attributes\x12\x1b\n" +
+	"\tthread_id\x18\x06 \x01(\tR\bthreadId\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"`\n" +
@@ -661,7 +693,7 @@ const file_livekit_agent_dispatch_proto_rawDesc = "" +
 	"dispatchId\x12\x12\n" +
 	"\x04room\x18\x02 \x01(\tR\x04room\"^\n" +
 	"\x19ListAgentDispatchResponse\x12A\n" +
-	"\x10agent_dispatches\x18\x01 \x03(\v2\x16.livekit.AgentDispatchR\x0fagentDispatches\"\xd6\x03\n" +
+	"\x10agent_dispatches\x18\x01 \x03(\v2\x16.livekit.AgentDispatchR\x0fagentDispatches\"\xf3\x03\n" +
 	"\rAgentDispatch\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -675,7 +707,8 @@ const file_livekit_agent_dispatch_proto_rawDesc = "" +
 	"deployment\x12l\n" +
 	"\n" +
 	"attributes\x18\b \x03(\v2&.livekit.AgentDispatch.AttributesEntryB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\n" +
-	"attributes\x1a=\n" +
+	"attributes\x12\x1b\n" +
+	"\tthread_id\x18\t \x01(\tR\bthreadId\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xad\x01\n" +
