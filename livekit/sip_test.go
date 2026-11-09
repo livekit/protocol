@@ -1629,3 +1629,55 @@ func TestSIPTransferErrorAsError(t *testing.T) {
 	require.Equal(t, codes.Unknown, st2.Code())
 	require.True(t, proto.Equal(timedOut, SIPTransferErrorFrom(st2.Err())))
 }
+
+func TestValidateAllowedAddressEntry(t *testing.T) {
+	cases := []struct {
+		name  string
+		entry string
+		valid bool
+	}{
+		{"ipv4", "192.0.2.10", true},
+		{"ipv4 cidr", "192.0.2.0/24", true},
+		{"ipv4 cidr host bits set", "192.0.2.10/24", true},
+		{"ipv4 single host cidr", "192.0.2.10/32", true},
+		{"ipv4 allow all", "0.0.0.0/0", true},
+		{"ipv6", "2001:db8::1", true},
+		{"ipv6 cidr", "2001:db8::/32", true},
+		{"ipv6 allow all", "::/0", true},
+		{"ipv6 loopback", "::1", true},
+
+		{"empty", "", false},
+		{"hostname", "sip.twilio.com", false},
+		{"hostname with port", "sip.twilio.com:5060", false},
+		{"ipv4 with port", "192.0.2.10:5060", false},
+		{"quoted", `"0.0.0.0/0"`, false},
+		{"leading space", " 192.0.2.10", false},
+		{"trailing space", "192.0.2.10 ", false},
+		{"comma separated", "192.0.2.10,192.0.2.11", false},
+		{"ipv4 leading zeros", "192.000.002.010", false},
+		{"ipv4 out of range", "192.0.2.256", false},
+		{"ipv4 short", "192.0.2", false},
+		{"ipv4 range", "192.0.2.10-192.0.2.20", false},
+		{"ipv4 prefix too long", "192.0.2.0/33", false},
+		{"ipv4 prefix missing", "192.0.2.0/", false},
+		{"ipv4 wildcard", "192.0.2.*", false},
+		{"ipv6 bracketed", "[2001:db8::1]", false},
+		{"ipv6 bracketed cidr", "[2001:db8::]/32", false},
+		{"ipv6 zone", "fe80::1%eth0", false},
+		{"ipv6 cidr zone", "fe80::%eth0/64", false},
+		{"ipv6 prefix too long", "2001:db8::/129", false},
+		{"ipv4-mapped ipv6", "::ffff:192.0.2.10", false},
+		{"ipv4-mapped ipv6 cidr", "::ffff:192.0.2.0/120", false},
+		{"url", "sip://192.0.2.10", false},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			err := ValidateAllowedAddressEntry(c.entry)
+			if c.valid {
+				require.NoError(t, err)
+			} else {
+				require.Error(t, err)
+			}
+		})
+	}
+}

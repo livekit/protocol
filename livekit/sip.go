@@ -3,6 +3,7 @@ package livekit
 import (
 	"errors"
 	"fmt"
+	"net/netip"
 	"regexp"
 	"slices"
 	"strconv"
@@ -598,6 +599,33 @@ func (p *UpdateSIPInboundTrunkRequest) ValidateResult() ValidationResult {
 		}
 		return ValidationResult{diff.Validate(), nil}
 	}
+}
+
+// ValidateAllowedAddressEntry checks a single allowed_addresses entry of an inbound trunk.
+//
+// An entry must be an IPv4 or IPv6 address or CIDR block.
+func ValidateAllowedAddressEntry(entry string) error {
+	var addr netip.Addr
+	if strings.Contains(entry, "/") {
+		prefix, err := netip.ParsePrefix(entry)
+		if err != nil {
+			return fmt.Errorf("invalid allowed address %q: must be an IP address or CIDR block", entry)
+		}
+		addr = prefix.Addr()
+	} else {
+		a, err := netip.ParseAddr(entry)
+		if err != nil {
+			return fmt.Errorf("invalid allowed address %q: must be an IP address or CIDR block", entry)
+		}
+		if a.Zone() != "" {
+			return fmt.Errorf("invalid allowed address %q: IPv6 zones are not allowed", entry)
+		}
+		addr = a
+	}
+	if addr.Is4In6() {
+		return fmt.Errorf("invalid allowed address %q: use the IPv4 form instead of an IPv4-mapped IPv6 address", entry)
+	}
+	return nil
 }
 
 func (p *SIPInboundTrunkInfo) Validate() error {
