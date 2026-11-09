@@ -629,27 +629,36 @@ func validateAllowedAddresses(addresses []string) error {
 //
 // An entry must be an IPv4 or IPv6 address or CIDR block.
 func validateAllowedAddressEntry(address string) error {
-	var addr netip.Addr
+	_, err := ParseSIPAllowedAddress(address)
+	return err
+}
+
+// ParseSIPAllowedAddress parses a single allowed_addresses entry of an inbound trunk.
+//
+// An entry must be an IPv4 or IPv6 address or CIDR block. A single address is returned as a full-length prefix.
+// This is the same check used by strict inbound trunk validation, so callers matching addresses stay in sync with it.
+func ParseSIPAllowedAddress(address string) (netip.Prefix, error) {
+	var prefix netip.Prefix
 	if strings.Contains(address, "/") {
-		prefix, err := netip.ParsePrefix(address)
+		p, err := netip.ParsePrefix(address)
 		if err != nil {
-			return fmt.Errorf("invalid allowed address %q: must be an IP address or CIDR block", address)
+			return netip.Prefix{}, fmt.Errorf("invalid allowed address %q: must be an IP address or CIDR block", address)
 		}
-		addr = prefix.Addr()
+		prefix = p
 	} else {
 		a, err := netip.ParseAddr(address)
 		if err != nil {
-			return fmt.Errorf("invalid allowed address %q: must be an IP address or CIDR block", address)
+			return netip.Prefix{}, fmt.Errorf("invalid allowed address %q: must be an IP address or CIDR block", address)
 		}
 		if a.Zone() != "" {
-			return fmt.Errorf("invalid allowed address %q: IPv6 zones are not allowed", address)
+			return netip.Prefix{}, fmt.Errorf("invalid allowed address %q: IPv6 zones are not allowed", address)
 		}
-		addr = a
+		prefix = netip.PrefixFrom(a, a.BitLen())
 	}
-	if addr.Is4In6() {
-		return fmt.Errorf("invalid allowed address %q: use the IPv4 form instead of an IPv4-mapped IPv6 address", address)
+	if prefix.Addr().Is4In6() {
+		return netip.Prefix{}, fmt.Errorf("invalid allowed address %q: use the IPv4 form instead of an IPv4-mapped IPv6 address", address)
 	}
-	return nil
+	return prefix, nil
 }
 
 func (p *SIPInboundTrunkInfo) Validate() error {

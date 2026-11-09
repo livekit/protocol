@@ -469,6 +469,32 @@ func matchAddrMasks(addr string, host string, masks []string) bool {
 	return false
 }
 
+// matchAddrMasksStrict is like matchAddrMasks, but only matches the source IP against entries that pass
+// inbound trunk address validation.
+func matchAddrMasksStrict(addr string, masks []string) bool {
+	if len(masks) == 0 {
+		return true
+	}
+	ip, err := netip.ParseAddr(addr)
+	if err != nil {
+		return false
+	}
+	ip = ip.Unmap()
+	for _, mask := range masks {
+		if pref, err := livekit.ParseSIPAllowedAddress(mask); err == nil && pref.Contains(ip) {
+			return true
+		}
+	}
+	return false
+}
+
+func (opt *matchTrunkOpts) matchAddresses(call *rpc.SIPCall, masks []string) bool {
+	if opt.StrictAddresses {
+		return matchAddrMasksStrict(call.SourceIp, masks)
+	}
+	return matchAddrMasks(call.SourceIp, call.From.Host, masks)
+}
+
 func matchNumbers(num string, allowed []string) bool {
 	if len(allowed) == 0 {
 		return true
@@ -552,7 +578,7 @@ func MatchTrunkDetailed(it iters.Iter[*livekit.SIPInboundTrunkInfo], call *rpc.S
 				continue
 			}
 		}
-		if !matchAddrMasks(call.SourceIp, call.From.Host, tr.AllowedAddresses) {
+		if !opt.matchAddresses(call, tr.AllowedAddresses) {
 			if !opt.Filtered(tr, TrunkFilteredSourceAddressDisallowed) {
 				continue
 			}
@@ -609,10 +635,11 @@ func MatchTrunkDetailed(it iters.Iter[*livekit.SIPInboundTrunkInfo], call *rpc.S
 }
 
 type matchTrunkOpts struct {
-	AllowConflicts bool
-	Filtered       TrunkFilteredFunc
-	Conflict       TrunkConflictFunc
-	Replace        TrunkReplaceFunc
+	AllowConflicts  bool
+	StrictAddresses bool
+	Filtered        TrunkFilteredFunc
+	Conflict        TrunkConflictFunc
+	Replace         TrunkReplaceFunc
 }
 
 func (opt *matchTrunkOpts) defaults() {
@@ -649,6 +676,19 @@ type TrunkFilteredFunc func(tr *livekit.SIPInboundTrunkInfo, reason TrunkFiltere
 func WithTrunkFiltered(fnc TrunkFilteredFunc) MatchTrunkOpt {
 	return func(opt *matchTrunkOpts) {
 		opt.Filtered = fnc
+	}
+}
+
+// WithStrictAddressMatching only matches the call's source IP against allowed_addresses entries
+// that are valid IP addresses or CIDR blocks.
+//
+// By default, entries with invalid characters are ignored (a trunk whose entries are all invalid allows any address),
+// other non-IP entries are matched against the (spoofable) From host, and calls with an invalid source IP are allowed.
+// With this option, invalid entries never match, the From host is never used, and calls with an invalid source IP
+// do not match any trunk with a non-empty allowed_addresses list.
+func WithStrictAddressMatching() MatchTrunkOpt {
+	return func(opt *matchTrunkOpts) {
+		opt.StrictAddresses = true
 	}
 }
 
