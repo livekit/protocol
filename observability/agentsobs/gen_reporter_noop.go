@@ -178,6 +178,7 @@ func (r *noopJobReporter) ReportLatencyScope(v LatencyScope)                {}
 func (r *noopJobReporter) ReportAttempts(v uint8)                           {}
 func (r *noopJobReporter) ReportTotalLatencyMs(v uint32)                    {}
 func (r *noopJobReporter) ReportAttributableLatencyMs(v uint32)             {}
+func (r *noopJobReporter) ReportOriginGroup(v JoinOriginGroup)              {}
 
 type noopJobTx struct{}
 
@@ -202,3 +203,4 @@ func (t *noopJobTx) ReportLatencyScope(v LatencyScope)    {}
 func (t *noopJobTx) ReportAttempts(v uint8)               {}
 func (t *noopJobTx) ReportTotalLatencyMs(v uint32)        {}
 func (t *noopJobTx) ReportAttributableLatencyMs(v uint32) {}
+func (t *noopJobTx) ReportOriginGroup(v JoinOriginGroup)  {}

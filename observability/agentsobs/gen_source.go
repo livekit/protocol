@@ -64,6 +64,15 @@ const (
 	LatencyScopeNoUser    LatencyScope = "no_user"
 )
 
+type JoinOriginGroup string
+
+const (
+	JoinOriginGroupUndefined JoinOriginGroup = ""
+	JoinOriginGroupWebrtc    JoinOriginGroup = "webrtc"
+	JoinOriginGroupInbound   JoinOriginGroup = "inbound"
+	JoinOriginGroupOutbound  JoinOriginGroup = "outbound"
+)
+
 type Rollup string
 
 const (

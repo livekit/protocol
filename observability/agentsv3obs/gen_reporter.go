@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_V938U8O = true
+const Version_QE4DF5O = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -134,6 +134,7 @@ type jobReporter interface {
 	ReportAttempts(v uint8)
 	ReportTotalLatencyMs(v uint32)
 	ReportAttributableLatencyMs(v uint32)
+	ReportOriginGroup(v JoinOriginGroup)
 }
 
 type JobTx interface {
