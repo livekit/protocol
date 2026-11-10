@@ -4042,8 +4042,8 @@ type CreateSIPParticipantRequest struct {
 	DisplayName *string      `protobuf:"bytes,21,opt,name=display_name,json=displayName,proto3,oneof" json:"display_name,omitempty"`
 	Destination *Destination `protobuf:"bytes,22,opt,name=destination,proto3,oneof" json:"destination,omitempty"`
 	// cloud only
-	// LiveKit SIP call ID of a live inbound call in the same project, for example
-	// SCL_[...]. This is the ID that LiveKit assigns to the call (sip_call_id on
+	// LiveKit SIP call ID (SCL_[...]) of a live inbound call in the same project.
+	// This is the ID that LiveKit assigns to the call (sip_call_id on
 	// SIPParticipantInfo), not the SIP Call-ID header from the provider. It is
 	// used for forwarding an inbound call, while keeping the original caller's ID
 	// as the caller ID of this new call.
