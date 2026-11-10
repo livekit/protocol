@@ -134,6 +134,17 @@ enum ToolReplyStatus {
   TR_SKIPPED = 3;
 }
 
+// Why an agent session closed. Agent evals read it from the recording upload's session
+// summary (MetricsRecordingHeader.session_summary), as the value name.
+enum CloseReason {
+  CR_UNKNOWN = 0; // not reported, or an SDK-specific reason
+  CR_ERROR = 1;
+  CR_JOB_SHUTDOWN = 2;
+  CR_PARTICIPANT_DISCONNECTED = 3;
+  CR_USER_INITIATED = 4;
+  CR_COMPLETED = 5;
+}
+
 enum AmdCategory {
   AMD_UNKNOWN = 0;
   AMD_HUMAN = 1;
@@ -141,6 +152,9 @@ enum AmdCategory {
   AMD_MACHINE_VM = 3;
   AMD_MACHINE_UNAVAILABLE = 4;
   AMD_UNCERTAIN = 5;
+  AMD_MACHINE_SCREENING = 6;
+  // A prediction only: the turn's reply is held, and the stage does not change.
+  AMD_WAIT = 7;
 }
 
 message LLMModelUsage {
@@ -256,6 +270,20 @@ message AgentSessionEvent {
     string reason = 3;
     string transcript = 4;
     google.protobuf.Duration delay = 5;
+    uint32 turn_id = 6;
+    // The stage after this prediction. Never AMD_WAIT.
+    AmdCategory stage = 7;
+    // Unset when the turn ran no inference.
+    google.protobuf.Duration inference_duration = 8;
+  }
+
+  // Once per AMD run.
+  message AmdCompleted {
+    AmdCategory category = 1;
+    string reason = 2;
+    bool voicemail_message_played = 3;
+    // Unset when the run ended before any prediction.
+    AmdPrediction prediction = 4;
   }
 
   message EotPrediction {
@@ -309,6 +337,14 @@ message AgentSessionEvent {
     }
   }
 
+  // The agent session closed: the call is over even if the agent is still in the room.
+  // No further session events follow, and session requests are no longer answered;
+  // finalize_simulation may still be.
+  message SessionClosed {
+    CloseReason reason = 1;
+    optional string error = 2;
+  }
+
   message AgentFalseInterruption {
     // Agent paused its own speech for what turned out not to be a real interruption (a backchannel, brief noise, etc.).
     bool resumed = 1;
@@ -330,6 +366,8 @@ message AgentSessionEvent {
     DebugMessage debug_message = 21;
     ToolExecutionUpdated tool_execution_updated = 22;
     AgentFalseInterruption agent_false_interruption = 23;
+    AmdCompleted amd_completed = 24;
+    SessionClosed session_closed = 25;
   }
 }
 

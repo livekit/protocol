@@ -223,6 +223,18 @@ enum SIPMediaEncryption {
   SIP_MEDIA_ENCRYPT_REQUIRE = 2; // require encryption
 }
 
+// Dial tone (ringback) played while a call is being placed or transferred.
+// Receivers treat unknown values as SIP_DIALTONE_ETSI.
+enum SIPDialtone {
+  SIP_DIALTONE_DISABLED = 0; // no tone
+  SIP_DIALTONE_ETSI = 1; // 425 Hz, 1s on / 4s off; the tone play_dialtone used
+  SIP_DIALTONE_AUTO = 2; // pick by the country of the called number, ETSI if unknown
+  SIP_DIALTONE_US = 3; // North America (NANP)
+  SIP_DIALTONE_UK = 4;
+  SIP_DIALTONE_JP = 5;
+  SIP_DIALTONE_AU = 6;
+}
+
 message SIPCodec {
   string name = 1;
   uint32 rate = 2;
@@ -236,6 +248,9 @@ message SIPMediaConfig {
   optional SIPMediaEncryption encryption = 3;
   // Use specific media timeout. If zero or not specified, will use default timeout.
   optional google.protobuf.Duration media_timeout = 4;
+  // Stop sending audio RTP while outbound DTMF digits are sent.
+  // Always on when the telephone-event clock rate differs from the audio codec's.
+  bool drop_audio_during_dtmf = 5;
 }
 
 message ProviderInfo {
@@ -802,9 +817,11 @@ message CreateSIPParticipantRequest {
   // Character 'w' can be used to add a 0.5 sec delay.
   string dtmf = 5;
 
-  // Optionally play dialtone in the room as an audible indicator for existing participants. The `play_ringtone` option is deprectated but has the same effect.
+  // Deprecated: use dialtone. Setting play_dialtone (or play_ringtone) is equivalent to SIP_DIALTONE_ETSI when dialtone is unset.
   bool play_ringtone = 6 [deprecated = true];
-  bool play_dialtone = 13;
+  bool play_dialtone = 13 [deprecated = true];
+  // Optionally play dialtone in the room as an audible indicator for existing participants.
+  SIPDialtone dialtone = 28;
 
   // By default the From value (Phone number) is used for participant name/identity (if not set) and added to attributes.
   // If true, a random value for identity will be used and numbers will be omitted from attributes.
@@ -848,7 +865,7 @@ message CreateSIPParticipantRequest {
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   optional Destination destination = 22;
-  // NEXT ID: 28
+  // NEXT ID: 29
 }
 
 message SIPParticipantInfo {
@@ -863,8 +880,10 @@ message TransferSIPParticipantRequest {
   string room_name = 2;
   string transfer_to = 3;
 
-  // Optionally play dialtone to the SIP participant as an audible indicator of being transferred
-  bool play_dialtone = 4;
+  // Deprecated: use dialtone. Setting play_dialtone is equivalent to SIP_DIALTONE_ETSI when dialtone is unset.
+  bool play_dialtone = 4 [deprecated = true];
+  // Optionally play dialtone to the SIP participant as an audible indicator of being transferred.
+  SIPDialtone dialtone = 7;
 
   // Add the following headers to the REFER SIP request.
   map<string, string> headers = 5 [

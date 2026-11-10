@@ -21,8 +21,11 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
+	"net/url"
+	"strings"
 	"sync"
 	"time"
 
@@ -38,6 +41,11 @@ import (
 
 const (
 	defaultTimeout = 5 * time.Minute
+
+	// an endpoint that accepts and never answers must not hold a queue worker forever
+	defaultClientTimeout = 10 * time.Second
+	// only the status code of a response is used
+	maxResponseHeaderBytes = 64 << 10
 )
 
 var (
@@ -121,6 +129,18 @@ func NewResourceURLNotifier(params ResourceURLNotifierParams) *ResourceURLNotifi
 		params.UserAgent = DefaultUserAgent
 	}
 
+	r := &ResourceURLNotifier{
+		params:         params,
+		client:         newHTTPClient(params.HTTPClientParams),
+		resourceQueues: make(map[string]*resourceQueueInfo),
+		filter:         newFilter(params.FilterParams),
+	}
+
+	go r.sweeper()
+	return r
+}
+
+func newHTTPClient(params HTTPClientParams) *retryablehttp.Client {
 	rhc := retryablehttp.NewClient()
 	if params.RetryWaitMin > 0 {
 		rhc.RetryWaitMin = params.RetryWaitMin
@@ -131,31 +151,64 @@ func NewResourceURLNotifier(params ResourceURLNotifierParams) *ResourceURLNotifi
 	if params.MaxRetries > 0 {
 		rhc.RetryMax = params.MaxRetries
 	}
+	rhc.HTTPClient.Timeout = defaultClientTimeout
 	if params.ClientTimeout > 0 {
 		rhc.HTTPClient.Timeout = params.ClientTimeout
 	}
+	rhc.Backoff = cappedBackoff
+	rhc.ErrorHandler = redactedErrorHandler
 	rhc.Logger = &logAdapter{}
+
+	tr, ok := rhc.HTTPClient.Transport.(*http.Transport)
+	if !ok || tr == nil {
+		tr = http.DefaultTransport.(*http.Transport).Clone()
+	}
 	if params.ForceIPv4 {
-		var tr *http.Transport
-		if existing, ok := rhc.HTTPClient.Transport.(*http.Transport); ok && existing != nil {
-			tr = existing.Clone()
-		} else {
-			tr = http.DefaultTransport.(*http.Transport).Clone()
-		}
 		tr.DialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
 			return (&net.Dialer{}).DialContext(ctx, "tcp4", addr)
 		}
-		rhc.HTTPClient.Transport = tr
 	}
-	r := &ResourceURLNotifier{
-		params:         params,
-		client:         rhc,
-		resourceQueues: make(map[string]*resourceQueueInfo),
-		filter:         newFilter(params.FilterParams),
-	}
+	tr.MaxResponseHeaderBytes = maxResponseHeaderBytes
+	rhc.HTTPClient.Transport = tr
+	return rhc
+}
 
-	go r.sweeper()
-	return r
+// the webhook receiver sets Retry-After, so cap the wait at RetryWaitMax
+func cappedBackoff(waitMin, waitMax time.Duration, attemptNum int, resp *http.Response) time.Duration {
+	return min(retryablehttp.DefaultBackoff(waitMin, waitMax, attemptNum, resp), waitMax)
+}
+
+// the default handler repeats the request URL, which may carry the receiver's credentials
+func redactedErrorHandler(resp *http.Response, err error, attempts int) (*http.Response, error) {
+	if resp != nil {
+		_, _ = io.Copy(io.Discard, io.LimitReader(resp.Body, 4096))
+		_ = resp.Body.Close()
+	}
+	if err == nil {
+		return nil, fmt.Errorf("giving up after %d attempt(s)", attempts)
+	}
+	return nil, fmt.Errorf("giving up after %d attempt(s): %w", attempts, redactURLError(err))
+}
+
+func redactURLError(err error) error {
+	if ue, ok := err.(*url.Error); ok {
+		return &url.Error{Op: ue.Op, URL: redactURL(ue.URL), Err: ue.Err}
+	}
+	return err
+}
+
+// masks userinfo and query values; works on the raw string so an unparsable URL is masked too
+func redactURL(rawURL string) string {
+	if scheme, rest, ok := strings.Cut(rawURL, "://"); ok {
+		authority := rest
+		if end := strings.IndexAny(rest, "/?#"); end >= 0 {
+			authority = rest[:end]
+		}
+		if at := strings.LastIndexByte(authority, '@'); at >= 0 {
+			rawURL = scheme + "://{...}" + rest[at:]
+		}
+	}
+	return utils.RedactUrlQueryValues(rawURL)
 }
 
 func (r *ResourceURLNotifier) SetKeys(apiKey, apiSecret string) {
@@ -287,6 +340,12 @@ func (r *ResourceURLNotifier) Stop(force bool) {
 	for _, rq := range resourceQueues {
 		rq.Stop(force)
 	}
+	if !force {
+		// wait for the queued events to be sent, as URLNotifier does when draining
+		for _, rq := range resourceQueues {
+			<-rq.Done()
+		}
+	}
 }
 
 // poster interface
@@ -331,7 +390,7 @@ func (r *ResourceURLNotifier) Process(
 	sendDuration := time.Since(sendStart)
 	fields = append(fields, "sendDuration", sendDuration)
 	if res != nil {
-		fields = append(fields, "status", res.Status, "statusCode", res.StatusCode)
+		fields = append(fields, "status", http.StatusText(res.StatusCode), "statusCode", res.StatusCode)
 	}
 	if err != nil {
 		params.Logger.Warnw("failed to send webhook", err, fields...)
@@ -380,7 +439,7 @@ func (r *ResourceURLNotifier) send(event *livekit.WebhookEvent, params *Resource
 	req, err := retryablehttp.NewRequest("POST", params.URL, bytes.NewReader(encoded))
 	if err != nil {
 		// ignore and continue
-		return nil, err
+		return nil, redactURLError(err)
 	}
 	req.Header.Set(authHeader, token)
 	req.Header.Set(contentTypeHeader, ContentType)

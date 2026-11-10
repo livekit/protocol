@@ -207,7 +207,8 @@ func NewCreateSIPParticipantRequestResult(
 		ParticipantMetadata:   req.ParticipantMetadata,
 		ParticipantAttributes: attrs,
 		Dtmf:                  req.Dtmf,
-		PlayDialtone:          req.PlayRingtone || req.PlayDialtone,
+		Dialtone:              req.Dialtone,
+		PlayDialtone:          req.Dialtone != livekit.SIPDialtone_SIP_DIALTONE_DISABLED,
 		Headers:               headers,
 		HeadersToAttributes:   hdrToAttr,
 		AttributesToHeaders:   attrToHdr,
@@ -229,10 +230,12 @@ func NewTransferSIPParticipantRequest(
 	callID string,
 	req *livekit.TransferSIPParticipantRequest,
 ) (*InternalTransferSIPParticipantRequest, error) {
+	req.Upgrade()
 	return &InternalTransferSIPParticipantRequest{
 		SipCallId:      callID,
 		TransferTo:     req.TransferTo,
-		PlayDialtone:   req.PlayDialtone,
+		Dialtone:       req.Dialtone,
+		PlayDialtone:   req.Dialtone != livekit.SIPDialtone_SIP_DIALTONE_DISABLED,
 		Headers:        req.Headers,
 		RingingTimeout: req.RingingTimeout,
 	}, nil
@@ -240,6 +243,14 @@ func NewTransferSIPParticipantRequest(
 
 func (p *InternalCreateSIPParticipantRequest) Upgrade() {
 	p.Media = p.Media.UpgradeWith(p.MediaEncryption)
+	p.Dialtone = livekit.UpgradeSIPDialtone(p.Dialtone, p.PlayDialtone)
+}
+
+func (p *InternalTransferSIPParticipantRequest) Upgrade() {
+	if p == nil {
+		return
+	}
+	p.Dialtone = livekit.UpgradeSIPDialtone(p.Dialtone, p.PlayDialtone)
 }
 
 func (p *EvaluateSIPDispatchRulesResponse) Upgrade() {

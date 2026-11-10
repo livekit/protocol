@@ -206,24 +206,59 @@ func CodecsFromMediaDescription(m *sdp.MediaDescription) (out []sdp.Codec, err e
 		MediaDescriptions: []*sdp.MediaDescription{m},
 	}
 
+	// each build walks every attribute of the section, so build once instead of per format
+	codecMap := s.GetCodecMap()
+	// a format repeated on the m= line resolves to the same codec
+	var seen [256]bool
 	for _, payloadStr := range m.MediaName.Formats {
 		payloadType, err := strconv.ParseUint(payloadStr, 10, 8)
 		if err != nil {
 			return nil, err
 		}
+		if seen[payloadType] {
+			continue
+		}
+		seen[payloadType] = true
 
-		codec, err := s.GetCodecForPayloadType(uint8(payloadType))
-		if err != nil {
+		codec, ok := codecMap[uint8(payloadType)]
+		if !ok {
 			if payloadType == 0 {
 				continue
 			}
-			return nil, err
+			return nil, fmt.Errorf("payload type %d not found", payloadType)
 		}
 
 		out = append(out, codec)
 	}
 
 	return out, nil
+}
+
+func CodecsFromSessionDescription(parsed *sdp.SessionDescription, mediaType string) ([]sdp.Codec, error) {
+	var out []sdp.Codec
+	for _, m := range parsed.MediaDescriptions {
+		if m.MediaName.Media != mediaType {
+			continue
+		}
+		codecs, err := CodecsFromMediaDescription(m)
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, codecs...)
+	}
+	return out, nil
+}
+
+// Keys are lowercased (RFC 6838 §4.3). Params without a value, like "0-16", map to "".
+func ParseFmtp(fmtp string) map[string]string {
+	params := make(map[string]string)
+	for _, param := range strings.Split(fmtp, ";") {
+		key, value, _ := strings.Cut(param, "=")
+		if key = strings.ToLower(strings.TrimSpace(key)); key != "" {
+			params[key] = strings.TrimSpace(value)
+		}
+	}
+	return params
 }
 
 func GetBundleMid(parsed *sdp.SessionDescription) (string, bool) {
@@ -673,6 +708,7 @@ func (s *SDPFragment) PatchICECredentialAndCandidatesIntoSDP(parsed *sdp.Session
 	}
 
 	if s.media != nil {
+		candidatesPatched := false
 		for _, md := range parsed.MediaDescriptions {
 			if s.media.ice != nil {
 				for idx, a := range md.Attributes {
@@ -705,6 +741,12 @@ func (s *SDPFragment) PatchICECredentialAndCandidatesIntoSDP(parsed *sdp.Session
 				retained = append(retained, a)
 			}
 			md.Attributes = retained
+
+			// candidates go only to the first section with the fragment's mid, copying to every section multiplies them
+			if mid, found := md.Attribute(sdp.AttrKeyMID); candidatesPatched || !found || mid != s.media.mid {
+				continue
+			}
+			candidatesPatched = true
 
 			for _, ic := range s.media.candidates {
 				md.Attributes = append(

@@ -1,0 +1,13 @@
+# expect: livekit_shipped_value
+# A shipped value that the upstream definition already lists (chat).
+file_format: definition/2
+attribute_groups:
+  - id: livekit.review
+    visibility: public
+    stability: development
+    brief: review
+    attributes:
+      - ref: gen_ai.operation.name
+        annotations:
+          livekit:
+            shipped_values: [{id: chat_again, value: chat, brief: fake}]

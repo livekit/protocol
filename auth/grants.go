@@ -260,8 +260,10 @@ type VideoGrant struct {
 	RoomJoin  bool   `json:"roomJoin,omitempty"`
 	Room      string `json:"room,omitempty"`
 
-	// permissions within a room, if none of the permissions are set explicitly
-	// it will be granted with all publish and subscribe permissions
+	// permissions within a room. each is optional and evaluated on its own: an
+	// unset (nil) field defaults to granted, so setting only one of these still
+	// leaves the others granted. set a field to false to deny it. CanPublishData,
+	// when unset, defaults to the effective CanPublish value.
 	CanPublish     *bool `json:"canPublish,omitempty"`
 	CanSubscribe   *bool `json:"canSubscribe,omitempty"`
 	CanPublishData *bool `json:"canPublishData,omitempty"`
@@ -416,9 +418,7 @@ func (v *VideoGrant) MatchesPermission(permission *livekit.ParticipantPermission
 	if v.Recorder != permission.Recorder {
 		return false
 	}
-	if v.Agent != permission.Agent {
-		return false
-	}
+	// Agent is skipped, it comes only from a signed token
 	if !slices.Equal(v.GetCanPublishSources(), permission.CanPublishSources) {
 		return false
 	}
@@ -444,7 +444,7 @@ func (v *VideoGrant) UpdateFromPermission(permission *livekit.ParticipantPermiss
 	v.SetCanUpdateOwnMetadata(permission.CanUpdateMetadata)
 	v.Hidden = permission.Hidden
 	v.Recorder = permission.Recorder
-	v.Agent = permission.Agent
+	// Agent is skipped, it comes only from a signed token
 	v.SetCanSubscribeMetrics(permission.CanSubscribeMetrics)
 	v.SetCanManageAgentSession(permission.CanManageAgentSession)
 }

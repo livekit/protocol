@@ -50,10 +50,10 @@ jobs:
       - name: Generate Protobuf
         run: go tool mage proto
 
-      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
 
       - name: Use Node.js 20
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
           cache: "pnpm"
@@ -65,9 +65,23 @@ jobs:
         run: |
           pnpm --filter @livekit/protocol run generate:proto
 
-      - name: Add changes
-        uses: EndBug/add-and-commit@645ecc0dd0a57f4d86d26c0aa5fc42c0a856fbca # v11.0.0
+      # Only the telemetry conventions in otel/ need weaver; the protobuf and JS generation
+      # above do not. Pinned like otel.yaml, which checks the registry. A failure in this step
+      # or the next leaves otel/gen as it was and never blocks the protobuf and JS commit
+      # below; otel.yaml's freshness check fails while otel/gen is stale.
+      - name: Set up weaver
+        continue-on-error: true
+        uses: open-telemetry/weaver/.github/actions/setup-weaver@51a5bf95bdbb2e20fb6e16638e6bbe7dde911e93 # v0.28.0
         with:
-          add: '["livekit", "replay", "rpc", "infra", "packages/javascript/src/gen"]'
+          version: "0.28.0"
+
+      - name: Generate the telemetry conventions
+        continue-on-error: true
+        run: go tool mage otel
+
+      - name: Add changes
+        uses: EndBug/add-and-commit@cc9c08ba6c8df3b93a8f2db63e89b98368ae2ae8 # v11.1.1
+        with:
+          add: '["livekit", "replay", "rpc", "infra", "packages/javascript/src/gen", "otel/gen"]'
           default_author: github_actions
           message: generated protobuf

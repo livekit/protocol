@@ -59,6 +59,7 @@ type subprocessResult struct {
 	EffectiveCPU float64 `json:"effective_cpu"`
 	NumCPU       float64 `json:"num_cpu"`
 	PlatformCPU  float64 `json:"platform_cpu"`
+	HostNumCPU   float64 `json:"host_num_cpu"`
 }
 
 func TestEffectiveCPURequest(t *testing.T) {
@@ -84,6 +85,12 @@ func TestEffectiveCPURequest(t *testing.T) {
 			assert.InDelta(t, tt.expectedCPU, result.EffectiveCPU, 0.001)
 		})
 	}
+}
+
+func TestNumCPU_HostIgnoresCPURequest(t *testing.T) {
+	result := runSubprocess(t, "2")
+	assert.Equal(t, 2.0, result.NumCPU)
+	assert.Equal(t, result.PlatformCPU, result.HostNumCPU)
 }
 
 func runSubprocess(t *testing.T, cpuRequestEnv string) subprocessResult {
@@ -134,10 +141,14 @@ func TestSubprocessWorker(t *testing.T) {
 	plat := &mockPlatform{nCPU: float64(runtime.NumCPU())}
 	c := newTestCPUStats(plat)
 
+	host := newTestCPUStats(plat)
+	host.hostCPU = true
+
 	result := subprocessResult{
 		EffectiveCPU: EffectiveCPURequest(),
 		NumCPU:       c.NumCPU(),
 		PlatformCPU:  plat.numCPU(),
+		HostNumCPU:   host.NumCPU(),
 	}
 
 	b, _ := json.Marshal(result)

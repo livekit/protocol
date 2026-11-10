@@ -58,6 +58,23 @@
     {
       "matchManagers": ["npm"],
       "groupName": "npm deps"
+    },
+    {
+      "description": "protobuf-es majors change the generated code and the published @livekit/protocol API, so they get their own PR instead of riding along with routine npm bumps. The runtime and the generator must move together.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": [
+        "@bufbuild/protobuf",
+        "@bufbuild/protoc-gen-es"
+      ],
+      "matchUpdateTypes": ["major"],
+      "groupName": "protobuf-es major"
+    },
+    {
+      "description": "TypeScript majors get their own PR: TypeScript 7 no longer exposes the JS compiler API that unbuild's declaration bundling depends on, so a major can block every other npm bump until the build tooling catches up.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["typescript"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "typescript major"
     }
   ],
   "postUpdateOptions": [

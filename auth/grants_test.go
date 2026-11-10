@@ -595,3 +595,19 @@ func TestObservabilityGrantCloneAndLog(t *testing.T) {
 	require.NoError(t, grants.Observability.MarshalLogObject(enc))
 	require.Equal(t, map[string]any{"Write": false, "ClientWrite": true}, enc.Fields)
 }
+
+func TestUpdateFromPermissionKeepsAgent(t *testing.T) {
+	v := &VideoGrant{}
+	v.UpdateFromPermission(&livekit.ParticipantPermission{CanSubscribe: true})
+	escalate := &livekit.ParticipantPermission{CanSubscribe: true, Agent: true}
+	require.True(t, v.MatchesPermission(escalate))
+
+	v.UpdateFromPermission(escalate)
+	require.False(t, v.Agent)
+
+	v = &VideoGrant{Agent: true}
+	v.UpdateFromPermission(&livekit.ParticipantPermission{CanPublish: true, Hidden: true})
+	require.True(t, v.Agent)
+	require.True(t, v.Hidden)
+	require.True(t, v.GetCanPublish())
+}

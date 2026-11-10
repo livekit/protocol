@@ -466,8 +466,12 @@ type MetricsRecordingHeader struct {
 	JobId            string                 `protobuf:"bytes,8,opt,name=job_id,json=jobId,proto3" json:"job_id,omitempty"`
 	Simulated        bool                   `protobuf:"varint,9,opt,name=simulated,proto3" json:"simulated,omitempty"`                                        // session is a simulation; the collector skips PII redaction for it unless redaction_enabled is set
 	RedactionEnabled bool                   `protobuf:"varint,10,opt,name=redaction_enabled,json=redactionEnabled,proto3" json:"redaction_enabled,omitempty"` // force PII redaction on for this session (only ever enables, never disables)
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	// JSON object of session facts for agent evals, at most 16 KiB. Its schema is
+	// evalschema/session-summary.schema.json in livekit/cloud-protocol. The collector
+	// stores it without reading individual keys.
+	SessionSummary string `protobuf:"bytes,11,opt,name=session_summary,json=sessionSummary,proto3" json:"session_summary,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *MetricsRecordingHeader) Reset() {
@@ -563,6 +567,13 @@ func (x *MetricsRecordingHeader) GetRedactionEnabled() bool {
 	return false
 }
 
+func (x *MetricsRecordingHeader) GetSessionSummary() string {
+	if x != nil {
+		return x.SessionSummary
+	}
+	return ""
+}
+
 var File_livekit_metrics_proto protoreflect.FileDescriptor
 
 const file_livekit_metrics_proto_rawDesc = "" +
@@ -596,7 +607,7 @@ const file_livekit_metrics_proto_rawDesc = "" +
 	"\bmetadata\x18\b \x01(\tR\bmetadata\x12\x10\n" +
 	"\x03rid\x18\t \x01(\rR\x03ridB\x13\n" +
 	"\x11_end_timestamp_msB\x1b\n" +
-	"\x19_normalized_end_timestamp\"\xe5\x03\n" +
+	"\x19_normalized_end_timestamp\"\x8e\x04\n" +
 	"\x16MetricsRecordingHeader\x12\"\n" +
 	"\aroom_id\x18\x01 \x01(\tB\t\xbaP\x06roomIDR\x06roomId\x12\x1a\n" +
 	"\bduration\x18\x03 \x01(\x04R\bduration\x129\n" +
@@ -608,7 +619,8 @@ const file_livekit_metrics_proto_rawDesc = "" +
 	"\x06job_id\x18\b \x01(\tR\x05jobId\x12\x1c\n" +
 	"\tsimulated\x18\t \x01(\bR\tsimulated\x12+\n" +
 	"\x11redaction_enabled\x18\n" +
-	" \x01(\bR\x10redactionEnabled\x1a;\n" +
+	" \x01(\bR\x10redactionEnabled\x12'\n" +
+	"\x0fsession_summary\x18\v \x01(\tR\x0esessionSummary\x1a;\n" +
 	"\rRoomTagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01J\x04\b\x02\x10\x03*\x81\a\n" +

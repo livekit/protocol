@@ -1,5 +1,71 @@
 # @livekit/protocol
 
+## 1.53.4
+
+### Patch Changes
+
+- Add `AgentSessionEvent.SessionClosed`, sent when an agent session ends while its host keeps serving requests - [#1888](https://github.com/livekit/protocol/pull/1888) ([@u9g](https://github.com/u9g))
+
+## 1.53.3
+
+### Patch Changes
+
+- AMD v2 in agent session events (`livekit_agent_session.proto`): `AmdCategory` adds `AMD_MACHINE_SCREENING` and `AMD_WAIT`, `AmdPrediction` adds the turn ID, the stage, and the inference time, and a new `AmdCompleted` event reports the final result and the last prediction once per AMD run. - [#1880](https://github.com/livekit/protocol/pull/1880) ([@chenghao-mou](https://github.com/chenghao-mou))
+
+- add the user turn length in samples to the eot inference start - [#1937](https://github.com/livekit/protocol/pull/1937) ([@chenghao-mou](https://github.com/chenghao-mou))
+
+- `MediaSource.videos` and `MediaSource.data` with `track_name` and `exclude` selector matching, and `EncodedFileType.MCAP`, for multi-track MCAP egress - [#1882](https://github.com/livekit/protocol/pull/1882) ([@frostbyte73](https://github.com/frostbyte73))
+
+- agent_simulation: dispatch a simulation run to a named agent deployment - [#1932](https://github.com/livekit/protocol/pull/1932) ([@u9g](https://github.com/u9g))
+
+## 1.53.2
+
+### Patch Changes
+
+- Add `Job.created_at`, `JobState.accepted_at`, `JobState.assigned_at` and `AgentDispatchState.trigger`, and the `lk.rtc.joinRequestTime` participant attribute - [#1929](https://github.com/livekit/protocol/pull/1929) ([@boks1971](https://github.com/boks1971))
+
+- Add `UpdateJobStatus.join_timing`, the instants of an agent join on the worker's monotonic clock - [#1900](https://github.com/livekit/protocol/pull/1900) ([@boks1971](https://github.com/boks1971))
+
+- `agentsobs` and `agentsv3obs` report agent join latency per job: the user arrival time, the join outcome, whether the join counts toward the latency figures, the attempts, and the total and attributable latency - [#1927](https://github.com/livekit/protocol/pull/1927) ([@boks1971](https://github.com/boks1971))
+
+- Replace `NodeStats.forward_scheduling_delay` with `NodeStats.forward_processing_per_write`, the mean forwarding work per write to a subscriber - [#1895](https://github.com/livekit/protocol/pull/1895) ([@boks1971](https://github.com/boks1971))
+
+- webhook: `ResourceURLNotifier.Stop(false)` waits for queued events to be sent, as `URLNotifier.Stop(false)` does - [#1901](https://github.com/livekit/protocol/pull/1901) ([@mnjalale](https://github.com/mnjalale))
+
+- sdp: add CodecsFromSessionDescription and ParseFmtp helpers - [#1899](https://github.com/livekit/protocol/pull/1899) ([@anunaym14](https://github.com/anunaym14))
+
+- agent_simulation: dial a phone number over SIP instead of dispatching an agent - [#1858](https://github.com/livekit/protocol/pull/1858) ([@u9g](https://github.com/u9g))
+
+- Add `SIPDialtone` to select a regional dial tone on CreateSIPParticipant and TransferSIPParticipant; deprecate `play_dialtone` - [#1892](https://github.com/livekit/protocol/pull/1892) ([@dennwc](https://github.com/dennwc))
+
+- sip: add `SIPMediaConfig.drop_audio_during_dtmf` to stop sending audio RTP while DTMF is sent - [#1907](https://github.com/livekit/protocol/pull/1907) ([@alexlivekit](https://github.com/alexlivekit))
+
+- Add `lk.sip.pinEnteredTime` and `lk.sip.answerTime` SIP participant attributes, with helpers to set and parse them - [#1928](https://github.com/livekit/protocol/pull/1928) ([@boks1971](https://github.com/boks1971))
+
+- SIP authentication: compare IP masks against remote address rather than From header. - [#1889](https://github.com/livekit/protocol/pull/1889) ([@alexfish8](https://github.com/alexfish8))
+
+## 1.53.1
+
+### Patch Changes
+
+- Add `agent_job_pending` webhook event, `JS_CANCELLED` job status, and `JobState.reason` (including `JSR_RETRYING`) - [#1860](https://github.com/livekit/protocol/pull/1860) ([@erikhortsch](https://github.com/erikhortsch))
+
+- Add `MigrateJobRequest.jobs`, the jobs a reconnecting agent worker still runs, as they were assigned - [#1893](https://github.com/livekit/protocol/pull/1893) ([@davidzhao](https://github.com/davidzhao))
+
+- Add `livekit.agent.CloseReason`, the agent session close reasons, for agent evals. - [#1887](https://github.com/livekit/protocol/pull/1887) ([@jmcclanahan](https://github.com/jmcclanahan))
+
+- Add `NodeStats.forward_scheduling_delay`, the p90 time from arrival to dequeue for packets that found their forwarder idle - [#1891](https://github.com/livekit/protocol/pull/1891) ([@boks1971](https://github.com/boks1971))
+
+- Add session_summary to MetricsRecordingHeader, for agent evals. - [#1884](https://github.com/livekit/protocol/pull/1884) ([@jmcclanahan](https://github.com/jmcclanahan))
+
+- `SimulationRun.JobMetrics`: how the call ended (`end_reason`), the simulated caller's languages (`caller_language`, `caller_listen_language`), the audio impairments applied to it (`impairments`), and `conversation.backchannel_count`. - [#1867](https://github.com/livekit/protocol/pull/1867) ([@u9g](https://github.com/u9g))
+
+- `SimulationRun.Job.failure_reason`: a machine-readable cause for a failed simulation job, such as the agent never joining the room. - [#1867](https://github.com/livekit/protocol/pull/1867) ([@u9g](https://github.com/u9g))
+
+- `SimulationRun.JobMetrics.Turn.text`: the words of each turn as the simulation's judges read them. - [#1867](https://github.com/livekit/protocol/pull/1867) ([@u9g](https://github.com/u9g))
+
+- `StreamDestination` (`id`, `url`) on `StreamOutput.destinations` and `UpdateStreamRequest.add_destinations`, echoed as `StreamInfo.id`, so a client can tell its streams apart; `RedactStreamKeys` redacts destination URLs - [#1873](https://github.com/livekit/protocol/pull/1873) ([@frostbyte73](https://github.com/frostbyte73))
+
 ## 1.53.0
 
 ### Minor Changes

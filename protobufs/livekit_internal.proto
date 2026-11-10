@@ -126,10 +126,12 @@ message NodeStats {
   // forward metrics
   uint32 forward_latency = 48;
   uint32 forward_jitter = 49 [deprecated = true];
+  // mean forwarding work per write to a subscriber, in ns: (end of fan-out - dequeue) / writes
+  uint32 forward_processing_per_write = 57;
 
   repeated NodeStatsRate rates = 50;
 
-  // NEXT ID: 57
+  // NEXT ID: 58
 }
 
 // rates of different node stats (per second)
@@ -200,8 +202,10 @@ message StartSession {
   SyncState sync_state = 23;
   bool use_single_peer_connection = 24;
   int64 token_expires_at = 26;
+  // API key that issued the join token, for correlating sessions with the key
+  string api_key = 27;
 
-  // NEXT ID: 27
+  // NEXT ID: 28
 }
 
 // room info that should not be returned to clients
