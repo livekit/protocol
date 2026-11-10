@@ -11,3 +11,5 @@ update listings and terminal run receipts. Keep the v1 schema filename, exports 
 Define DefaultPartitionKey for framework default resolution and require every SQL write to supply an explicit partition key.
 
 Standardize stored timestamps and lease arithmetic on Unix milliseconds, using explicit _ms field names.
+
+Remove the cross-worker interruption marker from partition lease rows. New requests wait for ownership without signaling the active turn to stop.

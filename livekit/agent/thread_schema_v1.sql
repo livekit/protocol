@@ -65,6 +65,7 @@ CREATE UNIQUE INDEX tasks_partition_message
   ON tasks (partition_key, message_id) WHERE message_id IS NOT NULL;
 
 -- One row per partition. Local session routing lives in the typed state snapshot.
+-- A new request waits for the active turn to finish. Lease rows carry no interrupt signals.
 CREATE TABLE partitions (
   partition_key       TEXT PRIMARY KEY NOT NULL  -- [framework]
                       CHECK(length(partition_key)>0),
@@ -73,7 +74,6 @@ CREATE TABLE partitions (
   lease_holder        TEXT,                      -- [framework] owning worker
   lease_token         TEXT,                      -- [framework] identity of this lease acquisition
   lease_expires_at_ms INTEGER NOT NULL DEFAULT 0, -- [framework] lease expiry, Unix milliseconds
-  waiter              TEXT,                      -- [framework] worker requesting interruption
   drained_id          INTEGER NOT NULL DEFAULT 0 -- [framework] last consumed inbox id
 );
 
