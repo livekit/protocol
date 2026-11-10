@@ -10,13 +10,15 @@
 -- The endpoint selects which handler runs, independently of the partition.
 -- Application context fields retain their explicitly selected storage scopes.
 --
+-- All stored timestamps are Unix milliseconds. Durations used in SQL are milliseconds.
+--
 -- Column readers:
 --   [platform]  agent-db's AgentThreads.GetThreadItems and GetThreadTasks
 --   [a2a]       framework A2A methods, which reconstruct wire objects
 --   [framework] framework run loop, leases and persistence
 
 CREATE TABLE schema_version (
-  version INTEGER NOT NULL  -- [framework] checked when opening the database
+  version INTEGER NOT NULL                       -- [framework] checked when opening the database
 );
 
 -- One typed model-context item: message, tool call, tool result or handoff.
@@ -24,12 +26,12 @@ CREATE TABLE schema_version (
 -- Upsert by id with DO UPDATE, preserving pos. REPLACE would move the cursor.
 CREATE TABLE items (
   pos           INTEGER PRIMARY KEY AUTOINCREMENT, -- [platform] stable insertion cursor
-  id            TEXT NOT NULL UNIQUE,              -- [framework] item's upsert identity
-  partition_key TEXT NOT NULL -- [platform, framework]
+  id            TEXT NOT NULL UNIQUE,            -- [framework] item's upsert identity
+  partition_key TEXT NOT NULL                    -- [platform, framework]
                 CHECK(length(partition_key)>0),
-  seq           INTEGER NOT NULL,                  -- [platform, framework] model-context order
-  message_id    TEXT DEFAULT NULL,                 -- [platform, framework] optional messageId
-  payload       JSONB NOT NULL                      -- [platform, framework] typed ChatItem
+  seq           INTEGER NOT NULL,                -- [platform, framework] model-context order
+  message_id    TEXT DEFAULT NULL,               -- [platform, framework] optional messageId
+  payload       JSONB NOT NULL                   -- [platform, framework] typed ChatItem
 );
 -- History order and insertion pagination are separate access paths.
 CREATE INDEX items_partition_seq ON items (partition_key, seq);
@@ -38,54 +40,54 @@ CREATE UNIQUE INDEX items_partition_message
   ON items (partition_key, message_id) WHERE message_id IS NOT NULL;
 
 -- One A2A task. Its contextId is the enclosing thread id.
--- status combines status, data.status_message and updated_at.
+-- status combines status, data.status_message and updated_at_ms.
 -- Optional message_id deduplicates the initiating message on retry. Tasks created
 -- without an incoming message leave it NULL. Later messages use inbox/history.
 -- endpoint stores the stable agent/deployment/endpoint destination when applicable.
 CREATE TABLE tasks (
-  pos           INTEGER PRIMARY KEY AUTOINCREMENT, -- [platform, framework] cursor and FIFO order
-  task_id       TEXT NOT NULL UNIQUE,              -- [platform, a2a, framework] task identity
-  partition_key TEXT NOT NULL -- [framework] owner
+  pos           INTEGER PRIMARY KEY AUTOINCREMENT, -- [platform, framework] FIFO/cursor
+  task_id       TEXT NOT NULL UNIQUE,            -- [platform, a2a, framework] task identity
+  partition_key TEXT NOT NULL                    -- [framework] owner
                 CHECK(length(partition_key)>0),
   endpoint      TEXT CHECK(endpoint IS NULL OR length(endpoint)>0), -- [framework] optional route
-  name          TEXT,                              -- [platform, framework] optional label
-  message_id    TEXT DEFAULT NULL,                 -- [framework] optional initiating A2A messageId
-  status        TEXT NOT NULL,                     -- [platform, a2a, framework] A2A task state
-  updated_at    INTEGER NOT NULL,                  -- [platform, a2a, framework] Unix milliseconds
-  data          JSONB NOT NULL,                    -- [a2a] task fields and status_message
-  internal      JSONB                              -- [framework] transport state and question
+  name          TEXT,                            -- [platform, framework] optional label
+  message_id    TEXT DEFAULT NULL,               -- [framework] optional initiating A2A messageId
+  status        TEXT NOT NULL,                   -- [platform, a2a, framework] A2A task state
+  updated_at_ms INTEGER NOT NULL,                -- [platform, a2a, framework] Unix milliseconds
+  data          JSONB NOT NULL,                  -- [a2a] task fields and status_message
+  internal      JSONB                            -- [framework] transport state and question
 );
 CREATE INDEX tasks_partition_pos ON tasks (partition_key, pos);
 CREATE INDEX tasks_partition_status ON tasks (partition_key, status, pos);
 -- A2A task listings use update time, independently of acceptance order.
-CREATE INDEX tasks_updated ON tasks (updated_at DESC, task_id DESC);
+CREATE INDEX tasks_updated ON tasks (updated_at_ms DESC, task_id DESC);
 CREATE UNIQUE INDEX tasks_partition_message
   ON tasks (partition_key, message_id) WHERE message_id IS NOT NULL;
 
 -- One row per partition. Local session routing lives in the typed state snapshot.
 CREATE TABLE partitions (
-  partition_key TEXT PRIMARY KEY NOT NULL -- [framework]
-                CHECK(length(partition_key)>0),
-  version       INTEGER NOT NULL,           -- [framework] fencing version, incremented per commit
-  state         JSONB,                      -- [framework] typed session-state snapshot
-  lease_holder  TEXT,                       -- [framework] owning worker
-  lease_token   TEXT,                       -- [framework] identity of this lease acquisition
-  lease_until   INTEGER NOT NULL DEFAULT 0, -- [framework] lease expiry, Unix seconds
-  waiter        TEXT,                       -- [framework] worker requesting interruption
-  drained_id    INTEGER NOT NULL DEFAULT 0  -- [framework] last consumed inbox id
+  partition_key       TEXT PRIMARY KEY NOT NULL  -- [framework]
+                      CHECK(length(partition_key)>0),
+  version             INTEGER NOT NULL,          -- [framework] commit fencing version
+  state               JSONB,                     -- [framework] typed session-state snapshot
+  lease_holder        TEXT,                      -- [framework] owning worker
+  lease_token         TEXT,                      -- [framework] identity of this lease acquisition
+  lease_expires_at_ms INTEGER NOT NULL DEFAULT 0, -- [framework] lease expiry, Unix milliseconds
+  waiter              TEXT,                      -- [framework] worker requesting interruption
+  drained_id          INTEGER NOT NULL DEFAULT 0 -- [framework] last consumed inbox id
 );
 
 -- Append-only journal: session events, run_started and run_ended.
 -- Incremental writers reuse event_key on retry. Managed commits use run-id guards.
 CREATE TABLE events (
-  id            INTEGER PRIMARY KEY,       -- [framework] insertion order
-  ts_ms         INTEGER NOT NULL,          -- [framework] Unix milliseconds
-  partition_key TEXT NOT NULL -- [framework]
-                CHECK(length(partition_key)>0),
-  run_id        TEXT NOT NULL,             -- [framework] producing run
-  event_key     TEXT CHECK(event_key IS NULL OR length(event_key)>0), -- [framework] retry id
-  type          TEXT NOT NULL,             -- [framework] event kind
-  payload       JSONB NOT NULL              -- [framework] event data
+  id             INTEGER PRIMARY KEY,            -- [framework] insertion order
+  occurred_at_ms INTEGER NOT NULL,               -- [framework] Unix milliseconds
+  partition_key  TEXT NOT NULL                   -- [framework]
+                 CHECK(length(partition_key)>0),
+  run_id         TEXT NOT NULL,                  -- [framework] producing run
+  event_key      TEXT CHECK(event_key IS NULL OR length(event_key)>0), -- [framework] retry id
+  type           TEXT NOT NULL,                  -- [framework] event kind
+  payload        JSONB NOT NULL                  -- [framework] event data
 );
 CREATE INDEX events_partition_id ON events (partition_key, id);
 -- Only terminal run receipts participate in commit/retry checks.
@@ -98,13 +100,13 @@ CREATE UNIQUE INDEX events_partition_key
 -- requests for one endpoint. Keep the newest row when pruning, preventing id reuse
 -- behind partitions.drained_id.
 CREATE TABLE inbox (
-  id            INTEGER PRIMARY KEY,       -- [framework] arrival order
-  partition_key TEXT NOT NULL -- [framework]
-                CHECK(length(partition_key)>0),
-  task_id       TEXT NOT NULL,             -- [framework] destination task
-  message_id    TEXT NOT NULL,             -- [framework] A2A messageId, deduplicated per partition
-  message       JSONB NOT NULL,            -- [framework] A2A Message
-  received_at   INTEGER NOT NULL            -- [framework] Unix seconds
+  id             INTEGER PRIMARY KEY,            -- [framework] arrival order
+  partition_key  TEXT NOT NULL                   -- [framework]
+                 CHECK(length(partition_key)>0),
+  task_id        TEXT NOT NULL,                  -- [framework] destination task
+  message_id     TEXT NOT NULL,                  -- [framework] A2A messageId, retry identity
+  message        JSONB NOT NULL,                 -- [framework] A2A Message
+  received_at_ms INTEGER NOT NULL                -- [framework] Unix milliseconds
 );
 CREATE INDEX inbox_partition_id ON inbox (partition_key, id);
 CREATE INDEX inbox_partition_task ON inbox (partition_key, task_id);

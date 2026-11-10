@@ -9,3 +9,5 @@ insertion positions for FIFO acceptance, store task status messages in data, and
 update listings and terminal run receipts. Keep the v1 schema filename, exports and version.
 
 Define DefaultPartitionKey for framework default resolution and require every SQL write to supply an explicit partition key.
+
+Standardize stored timestamps and lease arithmetic on Unix milliseconds, using explicit _ms field names.
