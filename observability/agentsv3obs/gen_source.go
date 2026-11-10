@@ -64,6 +64,28 @@ const (
 	LatencyScopeNoUser    LatencyScope = "no_user"
 )
 
+type JoinOrigin string
+
+const (
+	JoinOriginUndefined        JoinOrigin = ""
+	JoinOriginWebrtc           JoinOrigin = "webrtc"
+	JoinOriginSIPInbound       JoinOrigin = "sip_inbound"
+	JoinOriginSIPOutbound      JoinOrigin = "sip_outbound"
+	JoinOriginWhatsappInbound  JoinOrigin = "whatsapp_inbound"
+	JoinOriginWhatsappOutbound JoinOrigin = "whatsapp_outbound"
+	JoinOriginTwilioInbound    JoinOrigin = "twilio_inbound"
+	JoinOriginTwilioOutbound   JoinOrigin = "twilio_outbound"
+)
+
+type DispatchTrigger string
+
+const (
+	DispatchTriggerUndefined   DispatchTrigger = ""
+	DispatchTriggerJoin        DispatchTrigger = "join"
+	DispatchTriggerRoomAPI     DispatchTrigger = "room_api"
+	DispatchTriggerDispatchAPI DispatchTrigger = "dispatch_api"
+)
+
 type Rollup string
 
 const (
