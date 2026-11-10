@@ -524,17 +524,31 @@ func (p *CreateSIPOutboundTrunkRequest) ValidateResult() ValidationResult {
 }
 
 func (p *CreateSIPInboundTrunkRequest) Validate() error {
-	return p.ValidateResult().Error()
+	return p.validateResult(false).Error()
 }
 
 func (p *CreateSIPInboundTrunkRequest) ValidateResult() ValidationResult {
+	return p.validateResult(false)
+}
+
+// ValidateAddresses is like Validate, but also rejects invalid allowed_addresses entries.
+func (p *CreateSIPInboundTrunkRequest) ValidateAddresses() error {
+	return p.validateResult(true).Error()
+}
+
+// ValidateResultAddresses is like ValidateResult, but also rejects invalid allowed_addresses entries.
+func (p *CreateSIPInboundTrunkRequest) ValidateResultAddresses() ValidationResult {
+	return p.validateResult(true)
+}
+
+func (p *CreateSIPInboundTrunkRequest) validateResult(enforceAddressValidation bool) ValidationResult {
 	if p.Trunk == nil {
 		return ValidationFailure(errors.New("missing trunk"))
 	}
 	if p.Trunk.SipTrunkId != "" {
 		return ValidationFailure(errors.New("trunk id must not be set"))
 	}
-	return p.Trunk.ValidateResult()
+	return p.Trunk.validateResult(enforceAddressValidation)
 }
 
 func (p *UpdateSIPOutboundTrunkRequest) Validate() error {
@@ -668,16 +682,6 @@ func (p *SIPInboundTrunkInfo) Validate() error {
 // ValidateResult is like Validate, but also returns soft errors, including invalid allowed_addresses entries.
 func (p *SIPInboundTrunkInfo) ValidateResult() ValidationResult {
 	return p.validateResult(false)
-}
-
-// ValidateAddresses is like Validate, but also rejects invalid allowed_addresses entries.
-func (p *SIPInboundTrunkInfo) ValidateAddresses() error {
-	return p.validateResult(true).Error()
-}
-
-// ValidateResultAddresses is like ValidateResult, but also rejects invalid allowed_addresses entries.
-func (p *SIPInboundTrunkInfo) ValidateResultAddresses() ValidationResult {
-	return p.validateResult(true)
 }
 
 func (p *SIPInboundTrunkInfo) validateResult(enforceAddressValidation bool) ValidationResult {
