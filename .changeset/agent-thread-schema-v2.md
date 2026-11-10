@@ -3,4 +3,7 @@
 "@livekit/protocol": patch
 ---
 
-Agent thread schema version 2: `tasks.data` holds the task's A2A v1 fields as protobuf JSON, its status message included (`tasks.status_message` is gone), `tasks.updated_at` is in milliseconds, and `tasks.internal` is `tasks.ask`, the question a waiting task asked. `thread_schema_v1.sql` is `thread_schema.sql`, and `ThreadSchemaV1` is `ThreadSchema`.
+Update the existing v1 agent thread schema in place: partition-keyed history and ownership,
+optional task message links, endpoint destinations and journal retry identities. Use task
+insertion positions for FIFO acceptance, store task status messages in data, and index task
+update listings and terminal run receipts. Keep the v1 schema filename, exports and version.

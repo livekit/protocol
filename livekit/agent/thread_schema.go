@@ -16,20 +16,18 @@ package agent
 
 import _ "embed"
 
-// ThreadSchemaVersion is the conversation schema a thread's database holds.
-// Version 2 stores A2A messages and task fields as v1 protobuf JSON in
-// tasks.data, and tasks.updated_at in milliseconds.
-const ThreadSchemaVersion = 2
+// ThreadSchemaVersion is the newest conversation schema a thread's database
+// can hold.
+const ThreadSchemaVersion = 1
 
-// ThreadSchema creates the conversation schema, one statement per ";"
-// (comments hold none).
+// ThreadSchemaV1 creates version 1 of the conversation schema, one statement
+// per ";" (comments hold none).
 //
-//go:embed thread_schema.sql
-var ThreadSchema string
+//go:embed thread_schema_v1.sql
+var ThreadSchemaV1 string
 
-// taskStatuses maps the values of tasks.status (the framework's task states)
-// to AgentTask.Status: a task not yet finished is running, a rejected one
-// failed.
+// taskStatuses maps the values of tasks.status (A2A task states) to
+// AgentTask.Status: a task not yet finished is running, a rejected one failed.
 var taskStatuses = map[string]AgentTask_Status{
 	"submitted":      AgentTask_RUNNING,
 	"working":        AgentTask_RUNNING,
