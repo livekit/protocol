@@ -7,3 +7,5 @@ Update the existing v1 agent thread schema in place: partition-keyed history and
 optional task message links, endpoint destinations and journal retry identities. Use task
 insertion positions for FIFO acceptance, store task status messages in data, and index task
 update listings and terminal run receipts. Keep the v1 schema filename, exports and version.
+
+Define DefaultPartitionKey for framework default resolution and require every SQL write to supply an explicit partition key.

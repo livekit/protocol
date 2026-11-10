@@ -5,7 +5,8 @@
 -- that thread. Text and voice endpoints with the same partition_key share that
 -- history, state and inbox. Mutable turns serialize under the partition's lease.
 -- Different keys keep those records and ownership separate, for example a fast
--- brain in "default" and a slow brain in "backend". Omitted keys use "default".
+-- brain in "default" and a slow brain in "backend". The framework resolves an
+-- omitted key to DefaultPartitionKey before writing. SQL requires an explicit key.
 -- The endpoint selects which handler runs, independently of the partition.
 -- Application context fields retain their explicitly selected storage scopes.
 --
@@ -24,7 +25,7 @@ CREATE TABLE schema_version (
 CREATE TABLE items (
   pos           INTEGER PRIMARY KEY AUTOINCREMENT, -- [platform] stable insertion cursor
   id            TEXT NOT NULL UNIQUE,              -- [framework] item's upsert identity
-  partition_key TEXT NOT NULL DEFAULT 'default' -- [platform, framework]
+  partition_key TEXT NOT NULL -- [platform, framework]
                 CHECK(length(partition_key)>0),
   seq           INTEGER NOT NULL,                  -- [platform, framework] model-context order
   message_id    TEXT DEFAULT NULL,                 -- [platform, framework] optional messageId
@@ -44,7 +45,7 @@ CREATE UNIQUE INDEX items_partition_message
 CREATE TABLE tasks (
   pos           INTEGER PRIMARY KEY AUTOINCREMENT, -- [platform, framework] cursor and FIFO order
   task_id       TEXT NOT NULL UNIQUE,              -- [platform, a2a, framework] task identity
-  partition_key TEXT NOT NULL DEFAULT 'default' -- [framework] owner
+  partition_key TEXT NOT NULL -- [framework] owner
                 CHECK(length(partition_key)>0),
   endpoint      TEXT CHECK(endpoint IS NULL OR length(endpoint)>0), -- [framework] optional route
   name          TEXT,                              -- [platform, framework] optional label
@@ -63,7 +64,7 @@ CREATE UNIQUE INDEX tasks_partition_message
 
 -- One row per partition. Local session routing lives in the typed state snapshot.
 CREATE TABLE partitions (
-  partition_key TEXT PRIMARY KEY NOT NULL DEFAULT 'default' -- [framework]
+  partition_key TEXT PRIMARY KEY NOT NULL -- [framework]
                 CHECK(length(partition_key)>0),
   version       INTEGER NOT NULL,           -- [framework] fencing version, incremented per commit
   state         JSONB,                      -- [framework] typed session-state snapshot
@@ -79,7 +80,7 @@ CREATE TABLE partitions (
 CREATE TABLE events (
   id            INTEGER PRIMARY KEY,       -- [framework] insertion order
   ts_ms         INTEGER NOT NULL,          -- [framework] Unix milliseconds
-  partition_key TEXT NOT NULL DEFAULT 'default' -- [framework]
+  partition_key TEXT NOT NULL -- [framework]
                 CHECK(length(partition_key)>0),
   run_id        TEXT NOT NULL,             -- [framework] producing run
   event_key     TEXT CHECK(event_key IS NULL OR length(event_key)>0), -- [framework] retry id
@@ -98,7 +99,7 @@ CREATE UNIQUE INDEX events_partition_key
 -- behind partitions.drained_id.
 CREATE TABLE inbox (
   id            INTEGER PRIMARY KEY,       -- [framework] arrival order
-  partition_key TEXT NOT NULL DEFAULT 'default' -- [framework]
+  partition_key TEXT NOT NULL -- [framework]
                 CHECK(length(partition_key)>0),
   task_id       TEXT NOT NULL,             -- [framework] destination task
   message_id    TEXT NOT NULL,             -- [framework] A2A messageId, deduplicated per partition
