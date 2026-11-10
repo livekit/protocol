@@ -4041,10 +4041,14 @@ type CreateSIPParticipantRequest struct {
 	// 3) Non-empty: Use the specified value as the display name.
 	DisplayName *string      `protobuf:"bytes,21,opt,name=display_name,json=displayName,proto3,oneof" json:"display_name,omitempty"`
 	Destination *Destination `protobuf:"bytes,22,opt,name=destination,proto3,oneof" json:"destination,omitempty"`
-	// Cloud only.
-	// SIP call ID of a live inbound call in the same project that this call forwards.
-	// The new call keeps the caller's number as the caller ID.
-	// If sip_from_header is set, its user must match the caller's number. If not, the caller's number is used.
+	// cloud only
+	// LiveKit SIP call ID of a live inbound call in the same project, for example
+	// SCL_[...]. This is the ID that LiveKit assigns to the call (sip_call_id on
+	// SIPParticipantInfo), not the SIP Call-ID header from the provider. It is
+	// used for forwarding an inbound call, while keeping the original caller's ID
+	// as the caller ID of this new call.
+	// If sip_from_header is set, its user must match the caller's number. If not,
+	// the caller's number is used.
 	SipSourceCallId string `protobuf:"bytes,29,opt,name=sip_source_call_id,json=sipSourceCallId,proto3" json:"sip_source_call_id,omitempty"` // NEXT ID: 30
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache

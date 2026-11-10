@@ -867,9 +867,11 @@ message CreateSIPParticipantRequest {
   optional Destination destination = 22;
 
   // cloud only
-  // SIP call ID of a live inbound call in the same project. This is used for 
-  // forwarding an inbound call, while keeping the original caller's ID as the
-  // caller ID of this new call.
+  // LiveKit SIP call ID (SCL_[...]) of a live inbound call in the same project.
+  // This is the ID that LiveKit assigns to the call (sip_call_id on
+  // SIPParticipantInfo), not the SIP Call-ID header from the provider. It is
+  // used for forwarding an inbound call, while keeping the original caller's ID
+  // as the caller ID of this new call.
   // If sip_from_header is set, its user must match the caller's number. If not,
   // the caller's number is used.
   string sip_source_call_id = 29 [(logger.name) = "sipSourceCallID"];
