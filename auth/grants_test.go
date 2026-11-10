@@ -580,3 +580,19 @@ func TestAgentThreadGrantCloneIndependent(t *testing.T) {
 	require.True(t, grants.AgentThread.Write)
 	require.Equal(t, []string{"AT_1"}, grants.AgentThread.ThreadIDs)
 }
+
+func TestUpdateFromPermissionKeepsAgent(t *testing.T) {
+	v := &VideoGrant{}
+	v.UpdateFromPermission(&livekit.ParticipantPermission{CanSubscribe: true})
+	escalate := &livekit.ParticipantPermission{CanSubscribe: true, Agent: true}
+	require.True(t, v.MatchesPermission(escalate))
+
+	v.UpdateFromPermission(escalate)
+	require.False(t, v.Agent)
+
+	v = &VideoGrant{Agent: true}
+	v.UpdateFromPermission(&livekit.ParticipantPermission{CanPublish: true, Hidden: true})
+	require.True(t, v.Agent)
+	require.True(t, v.Hidden)
+	require.True(t, v.GetCanPublish())
+}

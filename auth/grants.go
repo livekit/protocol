@@ -395,6 +395,7 @@ func (v *VideoGrant) GetCanManageAgentSession() bool {
 	return *v.CanManageAgentSession
 }
 
+// MatchesPermission and UpdateFromPermission skip Agent: it grants project-wide worker access, so it comes only from a signed token.
 func (v *VideoGrant) MatchesPermission(permission *livekit.ParticipantPermission) bool {
 	if permission == nil {
 		return false
@@ -416,9 +417,6 @@ func (v *VideoGrant) MatchesPermission(permission *livekit.ParticipantPermission
 		return false
 	}
 	if v.Recorder != permission.Recorder {
-		return false
-	}
-	if v.Agent != permission.Agent {
 		return false
 	}
 	if !slices.Equal(v.GetCanPublishSources(), permission.CanPublishSources) {
@@ -446,7 +444,6 @@ func (v *VideoGrant) UpdateFromPermission(permission *livekit.ParticipantPermiss
 	v.SetCanUpdateOwnMetadata(permission.CanUpdateMetadata)
 	v.Hidden = permission.Hidden
 	v.Recorder = permission.Recorder
-	v.Agent = permission.Agent
 	v.SetCanSubscribeMetrics(permission.CanSubscribeMetrics)
 	v.SetCanManageAgentSession(permission.CanManageAgentSession)
 }
