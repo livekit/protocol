@@ -163,9 +163,23 @@ func newHTTPClient(params HTTPClientParams) *retryablehttp.Client {
 	if !ok || tr == nil {
 		tr = http.DefaultTransport.(*http.Transport).Clone()
 	}
-	if params.ForceIPv4 {
+	if params.ForceIPv4 || params.BlockPrivateAddresses {
+		dialer := &net.Dialer{}
+		if params.BlockPrivateAddresses {
+			dialer.Control = GuardWebhookDial
+		}
 		tr.DialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
-			return (&net.Dialer{}).DialContext(ctx, "tcp4", addr)
+			if params.ForceIPv4 {
+				network = "tcp4"
+			}
+			return dialer.DialContext(ctx, network, addr)
+		}
+	}
+	if params.BlockPrivateAddresses {
+		tr.Proxy = nil
+		// A redirect is reported as the receiver's answer, not followed.
+		rhc.HTTPClient.CheckRedirect = func(*http.Request, []*http.Request) error {
+			return http.ErrUseLastResponse
 		}
 	}
 	tr.MaxResponseHeaderBytes = maxResponseHeaderBytes

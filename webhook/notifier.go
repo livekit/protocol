@@ -181,11 +181,12 @@ func (n *DefaultNotifier) SetFilter(params FilterParams) {
 // ---------------------------------
 
 type HTTPClientParams struct {
-	RetryWaitMin  time.Duration
-	RetryWaitMax  time.Duration
-	MaxRetries    int
-	ClientTimeout time.Duration
-	ForceIPv4     bool
+	RetryWaitMin          time.Duration
+	RetryWaitMax          time.Duration
+	MaxRetries            int
+	ClientTimeout         time.Duration
+	ForceIPv4             bool
+	BlockPrivateAddresses bool
 	// receivers pin WAF rules to this, so it must stay stable across releases
 	// defaults to DefaultUserAgent
 	UserAgent string
