@@ -418,9 +418,7 @@ func (v *VideoGrant) MatchesPermission(permission *livekit.ParticipantPermission
 	if v.Recorder != permission.Recorder {
 		return false
 	}
-	if v.Agent != permission.Agent {
-		return false
-	}
+	// Agent is skipped, it comes only from a signed token
 	if !slices.Equal(v.GetCanPublishSources(), permission.CanPublishSources) {
 		return false
 	}
@@ -446,7 +444,7 @@ func (v *VideoGrant) UpdateFromPermission(permission *livekit.ParticipantPermiss
 	v.SetCanUpdateOwnMetadata(permission.CanUpdateMetadata)
 	v.Hidden = permission.Hidden
 	v.Recorder = permission.Recorder
-	v.Agent = permission.Agent
+	// Agent is skipped, it comes only from a signed token
 	v.SetCanSubscribeMetrics(permission.CanSubscribeMetrics)
 	v.SetCanManageAgentSession(permission.CanManageAgentSession)
 }

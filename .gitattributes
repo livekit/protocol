@@ -1,2 +1,3 @@
 packages/js/src/gen/* linguist-generated
 gen_*.* linguist-generated
+otel/gen/** linguist-generated

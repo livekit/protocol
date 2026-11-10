@@ -45,6 +45,7 @@ require (
 	golang.org/x/mod v0.42.0
 	golang.org/x/sys v0.49.0
 	golang.org/x/text v0.43.0
+	google.golang.org/genproto/googleapis/api v0.0.0-20260803160001-6ac0973c030d
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20261005182115-fad411399dd8
 	google.golang.org/grpc v1.84.0
 	google.golang.org/protobuf v1.36.12
@@ -94,7 +95,6 @@ require (
 	golang.org/x/sync v0.24.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
 	golang.org/x/tools v0.52.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20260803160001-6ac0973c030d // indirect
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.6.2 // indirect
 )
 

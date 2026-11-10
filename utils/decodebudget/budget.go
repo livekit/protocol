@@ -53,16 +53,26 @@ func (b Proto) Validate(data []byte, desc protoreflect.MessageDescriptor) error 
 }
 
 // Estimate validates data like Validate and returns the estimated bytes the
-// binary decoder allocates for it, including the root message.
+// binary decoder allocates for it, including the root message, decoding into
+// desc's generated type, or into a dynamicpb message when desc has none.
 func (b Proto) Estimate(data []byte, desc protoreflect.MessageDescriptor) (int, error) {
+	return b.estimate(data, desc, false)
+}
+
+// estimate is Estimate decoding into a dynamicpb message when dynamic is set,
+// as it must when desc has no generated type.
+func (b Proto) estimate(data []byte, desc protoreflect.MessageDescriptor, dynamic bool) (int, error) {
 	t, err := b.newTally(desc)
 	if err != nil {
 		return 0, err
 	}
-	if err := t.alloc(protoStructSize(desc)); err != nil {
+	info := infoOf(desc)
+	model := newDecoderModel(dynamic || !info.layout.generated)
+	w := &wireWalk{tally: t}
+	if err := w.alloc(model.root(info)); err != nil {
 		return t.total(), err
 	}
-	err = (&wireWalk{t}).message(data, desc, 1, &messageState{})
+	err = w.message(data, info, 1, &messageState{}, model)
 	return t.total(), err
 }
 
@@ -92,8 +102,12 @@ func (t *tally) count() error {
 	return nil
 }
 
+// marginPercent covers allocations the model does not itemize; the calibration
+// tests measured them at under 3%.
+const marginPercent = 5
+
 func (t *tally) total() int {
-	return withMargin(t.bytes)
+	return t.bytes + t.bytes*marginPercent/100
 }
 
 func (t *tally) alloc(n int) error {
@@ -108,6 +122,8 @@ func (t *tally) alloc(n int) error {
 // It discards unknown fields, uses MaxDepth as the decoder recursion limit, and
 // retains the binary decoder's required-field checks. Preflight rejection leaves
 // the destination unchanged; other decode errors follow normal protobuf semantics.
+// A destination without a generated fast path, such as a dynamicpb message, is
+// estimated as one.
 func (b Proto) Unmarshal(data []byte, msg proto.Message) error {
 	if msg == nil || (reflect.ValueOf(msg).Kind() == reflect.Pointer && reflect.ValueOf(msg).IsNil()) {
 		return errors.New("protobuf message must be non-nil and mutable")
@@ -116,7 +132,7 @@ func (b Proto) Unmarshal(data []byte, msg proto.Message) error {
 	if !reflected.IsValid() {
 		return errors.New("protobuf message must be non-nil and mutable")
 	}
-	if err := b.Validate(data, reflected.Descriptor()); err != nil {
+	if _, err := b.estimate(data, reflected.Descriptor(), isDynamicDestination(reflected)); err != nil {
 		return err
 	}
 	return (proto.UnmarshalOptions{DiscardUnknown: true, RecursionLimit: b.MaxDepth}).Unmarshal(data, msg)

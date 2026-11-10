@@ -37,6 +37,11 @@ const (
 	// AttrSIPAnswerTime attribute contains the time the callee answered an outbound call, in Unix milliseconds.
 	AttrSIPAnswerTime = "lk.sip.answerTime"
 
+	// AttrConnectorRequestTime attribute contains the time the API request for an inbound connector call arrived, in Unix milliseconds.
+	AttrConnectorRequestTime = "lk.connector.requestTime"
+	// AttrConnectorAnswerTime attribute contains the time the callee answered an outbound connector call, in Unix milliseconds.
+	AttrConnectorAnswerTime = "lk.connector.answerTime"
+
 	// AttrIngressPrefix is shared for all Ingress attributes
 	AttrIngressPrefix = "ingress."
 	// AttrIngressID contains the ingressID associated with the participant

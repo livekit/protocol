@@ -1,0 +1,9 @@
+# expect: livekit_metric_unit
+groups:
+  - id: metric.client.connection.duration
+    type: metric
+    metric_name: client.connection.duration
+    instrument: histogram
+    unit: ms
+    stability: development
+    brief: A metric in milliseconds.

@@ -15,30 +15,12 @@
 package decodebudget
 
 import (
-	"reflect"
 	"slices"
-	"sync"
-
-	"google.golang.org/protobuf/reflect/protoreflect"
-	"google.golang.org/protobuf/reflect/protoregistry"
-	"google.golang.org/protobuf/types/dynamicpb"
 )
 
 // The cost model overestimates on purpose: a budget that admits a payload must
-// not let its decode allocate more than the estimate.
-const (
-	// Map tables grow by doubling and are at most 7/8 full.
-	mapGrowthFactor  = 4
-	mapEntryOverhead = 16
-	extensionCost    = 64
-	// estimateMarginPercent covers allocations the model does not itemize; the
-	// calibration tests measured them at under 3%.
-	estimateMarginPercent = 5
-)
-
-func withMargin(n int) int {
-	return n + n*estimateMarginPercent/100
-}
+// not let its decode allocate more than the estimate. This file models the Go
+// allocator; generated.go and dynamic.go model what each decoder asks it for.
 
 // Go runtime size classes; an allocation is rounded up to the next one.
 var goSizeClasses = []int{
@@ -49,26 +31,80 @@ var goSizeClasses = []int{
 	19072, 20480, 21760, 24576, 27264, 28672, 32768,
 }
 
+// sizeClassByWord maps ceil(n/8) to n's size class, since every class is a
+// multiple of 8, to spare allocSize a search on the hot path.
+var sizeClassByWord = func() []uint16 {
+	maxSmall := goSizeClasses[len(goSizeClasses)-1]
+	table := make([]uint16, maxSmall/8+1)
+	for i := range table {
+		c, _ := slices.BinarySearch(goSizeClasses, i*8)
+		table[i] = uint16(goSizeClasses[c])
+	}
+	return table
+}()
+
 func allocSize(n int) int {
 	if n <= 0 {
 		return 0
 	}
-	if i, _ := slices.BinarySearch(goSizeClasses, n); i < len(goSizeClasses) {
-		return goSizeClasses[i]
+	if i := (n + 7) >> 3; i < len(sizeClassByWord) {
+		return int(sizeClassByWord[i])
 	}
 	const page = 8192
 	return (n + page - 1) / page * page
+}
+
+// pointerAlloc is allocSize for an object holding pointers, which carries an
+// 8-byte malloc header between 512 bytes and 32 KiB, and the usable size.
+func pointerAlloc(n int) (size, usable int) {
+	const minHeader, maxSmall, header = 512, 32768, 8
+	if n > minHeader && n <= maxSmall-header {
+		size = allocSize(n + header)
+		return size, size - header
+	}
+	size = allocSize(n)
+	return size, size
+}
+
+// tmpCopySize is the allocation for a temporary copy of n bytes; one that does
+// not escape and fits runtime.tmpBuf stays on the stack.
+func tmpCopySize(n int) int {
+	if n <= 32 {
+		return 0
+	}
+	return allocSize(n)
 }
 
 // appendGrow is the allocation for appending add elements of elem bytes to a
 // slice of length l and capacity c, and the resulting capacity, following
 // runtime.growslice.
 func appendGrow(l, c, add, elem int) (mem, newCap int) {
-	newLen := l + add
-	if newLen <= c {
+	newCap = nextSliceCap(l+add, c)
+	if newCap == c {
 		return 0, c
 	}
-	newCap = c + c
+	mem = allocSize(newCap * elem)
+	return mem, mem / elem
+}
+
+// appendGrowPointers is appendGrow for elements holding pointers, whose
+// backing arrays can carry a malloc header.
+func appendGrowPointers(l, c, add, elem int) (mem, newCap int) {
+	newCap = nextSliceCap(l+add, c)
+	if newCap == c {
+		return 0, c
+	}
+	size, usable := pointerAlloc(newCap * elem)
+	return size, usable / elem
+}
+
+// nextSliceCap is the capacity growslice requests, before size-class rounding,
+// to hold newLen elements in a slice of capacity c.
+func nextSliceCap(newLen, c int) int {
+	if newLen <= c {
+		return c
+	}
+	newCap := c + c
 	switch {
 	case newLen > newCap:
 		newCap = newLen
@@ -78,8 +114,7 @@ func appendGrow(l, c, add, elem int) (mem, newCap int) {
 			newCap += (newCap + 3*256) >> 2
 		}
 	}
-	mem = allocSize(newCap * elem)
-	return mem, mem / elem
+	return newCap
 }
 
 // appendAllocBytes is the total size of the backing arrays append allocates
@@ -94,87 +129,64 @@ func appendAllocBytes(n, elem int) int {
 	return total
 }
 
-var protoStructSizes sync.Map // protoreflect.FullName -> int
+// Go's map layout (internal/runtime/maps): a header, then one group of 8
+// slots, then a table that doubles at 7/8 load up to 1024 slots, after which
+// each full table splits into two new ones.
+const (
+	mapHeaderSize    = 48
+	mapTableSize     = 32
+	mapGroupSlots    = 8
+	mapMaxTableSlots = 1024
+)
 
-// protoStructSize is the allocation for one message of desc's generated Go type.
-func protoStructSize(desc protoreflect.MessageDescriptor) int {
-	if v, ok := protoStructSizes.Load(desc.FullName()); ok {
-		return v.(int)
-	}
-	// A dynamicpb message keeps its fields in a map.
-	size := 64 + 32*desc.Fields().Len()
-	if mt, err := protoregistry.GlobalTypes.FindMessageByName(desc.FullName()); err == nil {
-		if t := reflect.TypeOf(mt.Zero().Interface()); t != reflect.TypeFor[*dynamicpb.Message]() && t.Kind() == reflect.Pointer && t.Elem().Kind() == reflect.Struct {
-			size = int(t.Elem().Size())
+// mapGrowth is the allocation for inserting a new key into a map holding n
+// entries, excluding the header, for slots of slot bytes.
+func mapGrowth(n, slot int, pointers bool) int {
+	group := mapGroupSlots + mapGroupSlots*slot
+	alloc := func(n int) int {
+		if !pointers {
+			return allocSize(n)
 		}
+		size, _ := pointerAlloc(n)
+		return size
 	}
-	size = allocSize(size)
-	protoStructSizes.Store(desc.FullName(), size)
-	return size
-}
-
-// goValueSize is the size of one value of field's kind as a slice element, map
-// slot or oneof wrapper field.
-func goValueSize(field protoreflect.FieldDescriptor) int {
-	switch field.Kind() {
-	case protoreflect.BoolKind:
-		return 1
-	case protoreflect.EnumKind, protoreflect.Int32Kind, protoreflect.Sint32Kind, protoreflect.Uint32Kind,
-		protoreflect.FloatKind, protoreflect.Fixed32Kind, protoreflect.Sfixed32Kind:
-		return 4
-	case protoreflect.StringKind:
-		return 16
-	case protoreflect.BytesKind:
-		return 24
-	default:
-		// 64-bit scalars and message pointers.
-		return 8
-	}
-}
-
-func mapEntryCost(field protoreflect.FieldDescriptor) int {
-	return mapGrowthFactor*(goValueSize(field.MapKey())+goValueSize(field.MapValue())) + mapEntryOverhead
-}
-
-func oneofWrapperCost(field protoreflect.FieldDescriptor) int {
-	switch field.Kind() {
-	case protoreflect.StringKind, protoreflect.BytesKind, protoreflect.MessageKind, protoreflect.GroupKind:
-		return allocSize(goValueSize(field))
-	default:
-		return allocSize(goValueSize(field))
-	}
-}
-
-// presenceCost is the pointer a generated struct allocates the first time a
-// scalar field with explicit presence, such as proto3 optional, is set.
-func presenceCost(field protoreflect.FieldDescriptor) int {
-	if !field.HasPresence() || field.IsList() || field.Message() != nil || field.IsExtension() ||
-		(field.ContainingOneof() != nil && !field.ContainingOneof().IsSynthetic()) ||
-		field.ContainingMessage().IsMapEntry() {
-		return 0
-	}
-	return allocSize(goValueSize(field))
-}
-
-// fieldAllocCost is the allocation for one occurrence of field with a string or
-// bytes payload of payloadLen. Nested message contents are charged separately.
-func fieldAllocCost(field protoreflect.FieldDescriptor, payloadLen int) int {
-	cost := 0
-	if field.Message() != nil && !field.IsMap() {
-		cost += protoStructSize(field.Message())
-	}
-	if k := field.Kind(); k == protoreflect.StringKind || k == protoreflect.BytesKind {
-		cost += allocSize(payloadLen)
+	table := func(slots int) int {
+		return allocSize(mapTableSize) + alloc(slots/mapGroupSlots*group)
 	}
 	switch {
-	case field.IsMap():
-		cost += mapEntryCost(field)
-	case field.IsList():
-		// Slice growth depends on earlier occurrences; the caller charges it.
-	case field.IsExtension():
-		cost += extensionCost
-	case field.ContainingOneof() != nil && !field.ContainingOneof().IsSynthetic():
-		cost += oneofWrapperCost(field)
+	case n == 0:
+		return alloc(group)
+	case n < mapGroupSlots:
+		return 0
+	case n == mapGroupSlots:
+		// The first table comes with a one-entry directory.
+		return table(2*mapGroupSlots) + allocSize(8)
+	case n < mapMaxTableSlots*7/8:
+		for c := 2 * mapGroupSlots; c < mapMaxTableSlots; c *= 2 {
+			if n == c*7/8 {
+				return table(2 * c)
+			}
+		}
+		return 0
 	}
-	return cost
+	return mapSplitCost(n, table(mapMaxTableSlots))
+}
+
+// mapSplitCost charges the round of splits that takes a map from t to 2t
+// full-size tables, plus the directory that doubles for it. Tables fill
+// unevenly, so a round with several tables can start at 3/4 average load;
+// the whole round is charged there so the estimate never trails the splits.
+func mapSplitCost(n, table int) int {
+	t := 1
+	for n >= 2*t*mapMaxTableSlots*3/4 {
+		t *= 2
+	}
+	begin := t * mapMaxTableSlots * 7 / 8
+	if t > 1 {
+		begin = t * mapMaxTableSlots * 3 / 4
+	}
+	if n != begin {
+		return 0
+	}
+	return 2*t*table + allocSize(2*t*8)
 }
