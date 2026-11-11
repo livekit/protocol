@@ -199,6 +199,8 @@ func (r *noopJobReporter) ReportSIPInviteLatency(v uint32)                  {}
 func (r *noopJobReporter) ReportUserArrivedAt(v time.Time)                  {}
 func (r *noopJobReporter) ReportJoinOutcome(v JoinOutcome)                  {}
 func (r *noopJobReporter) ReportLatencyScope(v LatencyScope)                {}
+func (r *noopJobReporter) ReportOrigin(v JoinOrigin)                        {}
+func (r *noopJobReporter) ReportDispatchTrigger(v DispatchTrigger)          {}
 func (r *noopJobReporter) ReportAttempts(v uint8)                           {}
 func (r *noopJobReporter) ReportTotalLatencyMs(v uint32)                    {}
 func (r *noopJobReporter) ReportAttributableLatencyMs(v uint32)             {}
@@ -209,20 +211,22 @@ func (t *noopJobTx) Worker() WorkerTx {
 	return &noopWorkerTx{}
 }
 
-func (t *noopJobTx) ReportRoomSessionID(v string)         {}
-func (t *noopJobTx) ReportKind(v JobKind)                 {}
-func (t *noopJobTx) ReportWorkerKind(v WorkerKind)        {}
-func (t *noopJobTx) ReportStatus(v JobStatus)             {}
-func (t *noopJobTx) ReportDuration(v uint32)              {}
-func (t *noopJobTx) ReportDurationSeconds(v uint32)       {}
-func (t *noopJobTx) ReportDurationMinutes(v uint8)        {}
-func (t *noopJobTx) ReportStartTime(v time.Time)          {}
-func (t *noopJobTx) ReportEndTime(v time.Time)            {}
-func (t *noopJobTx) ReportJoinLatency(v uint32)           {}
-func (t *noopJobTx) ReportSIPInviteLatency(v uint32)      {}
-func (t *noopJobTx) ReportUserArrivedAt(v time.Time)      {}
-func (t *noopJobTx) ReportJoinOutcome(v JoinOutcome)      {}
-func (t *noopJobTx) ReportLatencyScope(v LatencyScope)    {}
-func (t *noopJobTx) ReportAttempts(v uint8)               {}
-func (t *noopJobTx) ReportTotalLatencyMs(v uint32)        {}
-func (t *noopJobTx) ReportAttributableLatencyMs(v uint32) {}
+func (t *noopJobTx) ReportRoomSessionID(v string)            {}
+func (t *noopJobTx) ReportKind(v JobKind)                    {}
+func (t *noopJobTx) ReportWorkerKind(v WorkerKind)           {}
+func (t *noopJobTx) ReportStatus(v JobStatus)                {}
+func (t *noopJobTx) ReportDuration(v uint32)                 {}
+func (t *noopJobTx) ReportDurationSeconds(v uint32)          {}
+func (t *noopJobTx) ReportDurationMinutes(v uint8)           {}
+func (t *noopJobTx) ReportStartTime(v time.Time)             {}
+func (t *noopJobTx) ReportEndTime(v time.Time)               {}
+func (t *noopJobTx) ReportJoinLatency(v uint32)              {}
+func (t *noopJobTx) ReportSIPInviteLatency(v uint32)         {}
+func (t *noopJobTx) ReportUserArrivedAt(v time.Time)         {}
+func (t *noopJobTx) ReportJoinOutcome(v JoinOutcome)         {}
+func (t *noopJobTx) ReportLatencyScope(v LatencyScope)       {}
+func (t *noopJobTx) ReportOrigin(v JoinOrigin)               {}
+func (t *noopJobTx) ReportDispatchTrigger(v DispatchTrigger) {}
+func (t *noopJobTx) ReportAttempts(v uint8)                  {}
+func (t *noopJobTx) ReportTotalLatencyMs(v uint32)           {}
+func (t *noopJobTx) ReportAttributableLatencyMs(v uint32)    {}
