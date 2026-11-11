@@ -560,10 +560,43 @@ func TestAgentThreadGrantChecks(t *testing.T) {
 	require.False(t, all.CanUpdate())
 	require.True(t, (&AgentThreadGrant{All: true, Write: true}).CanUpdate())
 
+	sql := &AgentThreadGrant{ThreadIDs: []string{"AT_1"}, Read: true, Write: true, SQL: true}
+	require.True(t, sql.CanSQL("AT_1"))
+	require.False(t, sql.CanSQL("AT_2"))
+	require.False(t, g.CanSQL("AT_1"))
+	require.True(t, (&AgentThreadGrant{All: true, SQL: true}).CanSQL("AT_9"))
+
 	var none *AgentThreadGrant
+	require.False(t, none.CanSQL("AT_1"))
 	require.False(t, none.CanRead("AT_1"))
 	require.False(t, none.CanCreate("u1"))
 	require.False(t, none.CanUpdate())
+}
+
+func TestAgentDatabaseGrantChecks(t *testing.T) {
+	t.Parallel()
+
+	g := &AgentDatabaseGrant{DatabaseIDs: []string{"DB_1"}, Read: true}
+	require.True(t, g.CanRead("DB_1"))
+	require.False(t, g.CanRead("DB_2"))
+	require.False(t, g.CanRead(""))
+	require.False(t, g.CanWrite("DB_1"))
+
+	// Admin covers every database of the project, threads' included.
+	admin := &AgentDatabaseGrant{Admin: true}
+	require.True(t, admin.CanRead("DB_9"))
+	require.True(t, admin.CanWrite("AT_9"))
+
+	var none *AgentDatabaseGrant
+	require.False(t, none.CanRead("DB_1"))
+	require.False(t, none.CanWrite("DB_1"))
+
+	grants := &ClaimGrants{AgentDatabase: &AgentDatabaseGrant{DatabaseIDs: []string{"DB_1"}, Write: true}}
+	clone := grants.Clone()
+	require.NotSame(t, grants.AgentDatabase, clone.AgentDatabase)
+	require.True(t, reflect.DeepEqual(grants.AgentDatabase, clone.AgentDatabase))
+	clone.AgentDatabase.DatabaseIDs[0] = "DB_2"
+	require.Equal(t, "DB_1", grants.AgentDatabase.DatabaseIDs[0])
 }
 
 func TestAgentThreadGrantCloneIndependent(t *testing.T) {

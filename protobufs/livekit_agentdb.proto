@@ -38,7 +38,7 @@ message AgentDB {
   }
 
   message CreateResponse {
-    string database_id = 1;      // "DB_..."
+    string database_id = 1;      // "DB_..." for a standalone database, the thread id ("AT_...") for a thread's
     google.protobuf.Timestamp expires_at = 2;
   }
 
