@@ -768,7 +768,9 @@ func (p *SIPInboundTrunkUpdate) ApplyAddresses(info *SIPInboundTrunkInfo) error 
 	return p.applyResult(info, true).Error()
 }
 
-// ApplyResultAddresses is like ApplyResult, but also rejects invalid allowed_addresses entries in the updated trunk.
+// ApplyResultAddresses is like ApplyResult, but also rejects invalid
+// allowed_addresses entries in the updated trunk. This will fail if the trunk
+// has any existing invalid address entries that are not deleted in the update.
 func (p *SIPInboundTrunkUpdate) ApplyResultAddresses(info *SIPInboundTrunkInfo) ValidationResult {
 	return p.applyResult(info, true)
 }
