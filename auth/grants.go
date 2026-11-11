@@ -644,9 +644,11 @@ func (s *InferenceGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 // ------------------------------------------------------------------
 
 type ObservabilityGrant struct {
-	// Write grants to publish observability data
+	// Write grants to publish observability data on all observability routes,
+	// including client SDK telemetry (/observability/client/*)
 	Write bool `json:"write,omitempty"`
-	// ClientWrite grants to publish client SDK telemetry only (/observability/client/*)
+	// ClientWrite grants to publish client SDK telemetry only (/observability/client/*).
+	// Write already includes this access.
 	ClientWrite bool `json:"clientWrite,omitempty"`
 }
 
