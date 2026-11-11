@@ -3,6 +3,7 @@ package livekit
 import (
 	"errors"
 	"fmt"
+	"net/netip"
 	"regexp"
 	"slices"
 	"strconv"
@@ -523,17 +524,31 @@ func (p *CreateSIPOutboundTrunkRequest) ValidateResult() ValidationResult {
 }
 
 func (p *CreateSIPInboundTrunkRequest) Validate() error {
-	return p.ValidateResult().Error()
+	return p.validateResult(false).Error()
 }
 
 func (p *CreateSIPInboundTrunkRequest) ValidateResult() ValidationResult {
+	return p.validateResult(false)
+}
+
+// ValidateAddresses is like Validate, but also rejects invalid allowed_addresses entries.
+func (p *CreateSIPInboundTrunkRequest) ValidateAddresses() error {
+	return p.validateResult(true).Error()
+}
+
+// ValidateResultAddresses is like ValidateResult, but also rejects invalid allowed_addresses entries.
+func (p *CreateSIPInboundTrunkRequest) ValidateResultAddresses() ValidationResult {
+	return p.validateResult(true)
+}
+
+func (p *CreateSIPInboundTrunkRequest) validateResult(enforceAddressValidation bool) ValidationResult {
 	if p.Trunk == nil {
 		return ValidationFailure(errors.New("missing trunk"))
 	}
 	if p.Trunk.SipTrunkId != "" {
 		return ValidationFailure(errors.New("trunk id must not be set"))
 	}
-	return p.Trunk.ValidateResult()
+	return p.Trunk.validateResult(enforceAddressValidation)
 }
 
 func (p *UpdateSIPOutboundTrunkRequest) Validate() error {
@@ -569,10 +584,24 @@ func (p *UpdateSIPOutboundTrunkRequest) ValidateResult() ValidationResult {
 }
 
 func (p *UpdateSIPInboundTrunkRequest) Validate() error {
-	return p.ValidateResult().Error()
+	return p.validateResult(false).Error()
 }
 
 func (p *UpdateSIPInboundTrunkRequest) ValidateResult() ValidationResult {
+	return p.validateResult(false)
+}
+
+// ValidateAddresses is like Validate, but also rejects invalid allowed_addresses entries being set or added.
+func (p *UpdateSIPInboundTrunkRequest) ValidateAddresses() error {
+	return p.validateResult(true).Error()
+}
+
+// ValidateResultAddresses is like ValidateResult, but also rejects invalid allowed_addresses entries being set or added.
+func (p *UpdateSIPInboundTrunkRequest) ValidateResultAddresses() ValidationResult {
+	return p.validateResult(true)
+}
+
+func (p *UpdateSIPInboundTrunkRequest) validateResult(enforceAddressValidation bool) ValidationResult {
 	if p.SipTrunkId == "" {
 		return ValidationFailure(errors.New("trunk id must be set"))
 	}
@@ -590,21 +619,72 @@ func (p *UpdateSIPInboundTrunkRequest) ValidateResult() ValidationResult {
 		if info.SipTrunkId != "" && info.SipTrunkId != p.SipTrunkId {
 			return ValidationFailure(errors.New("trunk id in the info must be empty or match the id in the update"))
 		}
-		return info.ValidateResult()
+		return info.validateResult(enforceAddressValidation)
 	case *UpdateSIPInboundTrunkRequest_Update:
 		diff := a.Update
 		if diff == nil {
 			return ValidationFailure(errors.New("missing trunk update"))
 		}
-		return ValidationResult{diff.Validate(), nil}
+		return ValidationResult{diff.validate(enforceAddressValidation), nil}
 	}
 }
 
-func (p *SIPInboundTrunkInfo) Validate() error {
-	return p.ValidateResult().Error()
+func validateAllowedAddresses(addresses []string) error {
+	var errs []error
+	for _, address := range addresses {
+		if err := validateAllowedAddressEntry(address); err != nil {
+			errs = append(errs, err)
+		}
+	}
+	return errors.Join(errs...)
 }
 
+// validateAllowedAddressEntry checks a single allowed_addresses entry of an inbound trunk.
+//
+// An entry must be an IPv4 or IPv6 address or CIDR block.
+func validateAllowedAddressEntry(address string) error {
+	_, err := ParseSIPAllowedAddress(address)
+	return err
+}
+
+// ParseSIPAllowedAddress parses a single allowed_addresses entry of an inbound trunk.
+//
+// An entry must be an IPv4 or IPv6 address or CIDR block. A single address is returned as a full-length prefix.
+// This is the same check used by strict inbound trunk validation, so callers matching addresses stay in sync with it.
+func ParseSIPAllowedAddress(address string) (netip.Prefix, error) {
+	var prefix netip.Prefix
+	if strings.Contains(address, "/") {
+		p, err := netip.ParsePrefix(address)
+		if err != nil {
+			return netip.Prefix{}, fmt.Errorf("invalid allowed address %q: must be an IP address or CIDR block", address)
+		}
+		prefix = p
+	} else {
+		a, err := netip.ParseAddr(address)
+		if err != nil {
+			return netip.Prefix{}, fmt.Errorf("invalid allowed address %q: must be an IP address or CIDR block", address)
+		}
+		if a.Zone() != "" {
+			return netip.Prefix{}, fmt.Errorf("invalid allowed address %q: IPv6 zones are not allowed", address)
+		}
+		prefix = netip.PrefixFrom(a, a.BitLen())
+	}
+	if prefix.Addr().Is4In6() {
+		return netip.Prefix{}, fmt.Errorf("invalid allowed address %q: use the IPv4 form instead of an IPv4-mapped IPv6 address", address)
+	}
+	return prefix, nil
+}
+
+func (p *SIPInboundTrunkInfo) Validate() error {
+	return p.validateResult(false).Error()
+}
+
+// ValidateResult is like Validate, but also returns soft errors, including invalid allowed_addresses entries.
 func (p *SIPInboundTrunkInfo) ValidateResult() ValidationResult {
+	return p.validateResult(false)
+}
+
+func (p *SIPInboundTrunkInfo) validateResult(enforceAddressValidation bool) ValidationResult {
 	hasAuth := p.AuthUsername != "" || p.AuthPassword != ""
 	hasCIDR := len(p.AllowedAddresses) != 0
 	hasNumbers := len(p.Numbers) != 0 // TODO: remove this condition, it doesn't really help with security
@@ -618,7 +698,15 @@ func (p *SIPInboundTrunkInfo) ValidateResult() ValidationResult {
 		return ValidationFailure(psrpc.NewErrorf(psrpc.InvalidArgument, "ringing timeout status must be 4xx-6xx, got %d", c))
 	}
 
-	result := validateHeaders(p.Headers)
+	var result ValidationResult
+	if err := validateAllowedAddresses(p.AllowedAddresses); err != nil {
+		if enforceAddressValidation {
+			return ValidationFailure(psrpc.NewError(psrpc.InvalidArgument, err))
+		}
+		result.softErrs = append(result.softErrs, err)
+	}
+
+	result = result.Combine(validateHeaders(p.Headers))
 	if !result.OK() {
 		return result
 	}
@@ -629,15 +717,31 @@ func (p *SIPInboundTrunkInfo) ValidateResult() ValidationResult {
 	if err := validateHeaderToAttributes(p.HeadersToAttributes); err != nil {
 		return result.WithError(err)
 	}
+
 	return result
 }
 
+// Validate validates the update itself. It does not check allowed_addresses entries; use ValidateAddresses for that.
 func (p *SIPInboundTrunkUpdate) Validate() error {
+	return p.validate(false)
+}
+
+// ValidateAddresses is like Validate, but also rejects invalid allowed_addresses entries being set or added.
+func (p *SIPInboundTrunkUpdate) ValidateAddresses() error {
+	return p.validate(true)
+}
+
+func (p *SIPInboundTrunkUpdate) validate(enforceAddressValidation bool) error {
 	if err := p.Numbers.Validate(); err != nil {
 		return err
 	}
 	if err := p.AllowedAddresses.Validate(); err != nil {
 		return err
+	}
+	if enforceAddressValidation && p.AllowedAddresses != nil {
+		if err := validateAllowedAddresses(slices.Concat(p.AllowedAddresses.Set, p.AllowedAddresses.Add)); err != nil {
+			return psrpc.NewError(psrpc.InvalidArgument, err)
+		}
 	}
 	if err := p.AllowedNumbers.Validate(); err != nil {
 		return err
@@ -648,12 +752,31 @@ func (p *SIPInboundTrunkUpdate) Validate() error {
 	return nil
 }
 
+// Apply applies the update to the trunk and validates the result.
+// Invalid allowed_addresses entries are not rejected; use ApplyAddresses for that.
 func (p *SIPInboundTrunkUpdate) Apply(info *SIPInboundTrunkInfo) error {
-	return p.ApplyResult(info).Error()
+	return p.applyResult(info, false).Error()
 }
 
+// ApplyResult is like Apply, but returns the full validation result.
 func (p *SIPInboundTrunkUpdate) ApplyResult(info *SIPInboundTrunkInfo) ValidationResult {
-	if err := p.Validate(); err != nil {
+	return p.applyResult(info, false)
+}
+
+// ApplyAddresses is like Apply, but also rejects invalid allowed_addresses entries in the updated trunk.
+func (p *SIPInboundTrunkUpdate) ApplyAddresses(info *SIPInboundTrunkInfo) error {
+	return p.applyResult(info, true).Error()
+}
+
+// ApplyResultAddresses is like ApplyResult, but also rejects invalid
+// allowed_addresses entries in the updated trunk. This will fail if the trunk
+// has any existing invalid address entries that are not deleted in the update.
+func (p *SIPInboundTrunkUpdate) ApplyResultAddresses(info *SIPInboundTrunkInfo) ValidationResult {
+	return p.applyResult(info, true)
+}
+
+func (p *SIPInboundTrunkUpdate) applyResult(info *SIPInboundTrunkInfo, enforceAddressValidation bool) ValidationResult {
+	if err := p.validate(enforceAddressValidation); err != nil {
 		return ValidationFailure(err)
 	}
 	applyListUpdate(&info.Numbers, p.Numbers)
@@ -666,7 +789,7 @@ func (p *SIPInboundTrunkUpdate) ApplyResult(info *SIPInboundTrunkInfo) Validatio
 	applyUpdate(&info.Metadata, p.Metadata)
 	updateMediaConfig(info, &info.Media, &info.MediaEncryption, p.Media, p.MediaEncryption)
 	info.Upgrade()
-	return info.ValidateResult()
+	return info.validateResult(enforceAddressValidation)
 }
 
 type UpdateSIPOutboundTrunkRequestAction interface {
@@ -814,6 +937,9 @@ type UpdateSIPInboundTrunkRequestAction interface {
 	isUpdateSIPInboundTrunkRequest_Action
 	Apply(info *SIPInboundTrunkInfo) (*SIPInboundTrunkInfo, error)
 	ApplyResult(info *SIPInboundTrunkInfo) (*SIPInboundTrunkInfo, ValidationResult)
+	// ApplyAddresses and ApplyResultAddresses also reject invalid allowed_addresses entries in the updated trunk.
+	ApplyAddresses(info *SIPInboundTrunkInfo) (*SIPInboundTrunkInfo, error)
+	ApplyResultAddresses(info *SIPInboundTrunkInfo) (*SIPInboundTrunkInfo, ValidationResult)
 }
 
 var (
@@ -822,14 +948,22 @@ var (
 )
 
 func (p *UpdateSIPInboundTrunkRequest_Replace) Apply(info *SIPInboundTrunkInfo) (*SIPInboundTrunkInfo, error) {
-	val, result := p.ApplyResult(info)
-	if !result.OK() {
-		return nil, result.Error()
-	}
-	return val, nil
+	return resultToError(p.applyResult(info, false))
 }
 
 func (p *UpdateSIPInboundTrunkRequest_Replace) ApplyResult(info *SIPInboundTrunkInfo) (*SIPInboundTrunkInfo, ValidationResult) {
+	return p.applyResult(info, false)
+}
+
+func (p *UpdateSIPInboundTrunkRequest_Replace) ApplyAddresses(info *SIPInboundTrunkInfo) (*SIPInboundTrunkInfo, error) {
+	return resultToError(p.applyResult(info, true))
+}
+
+func (p *UpdateSIPInboundTrunkRequest_Replace) ApplyResultAddresses(info *SIPInboundTrunkInfo) (*SIPInboundTrunkInfo, ValidationResult) {
+	return p.applyResult(info, true)
+}
+
+func (p *UpdateSIPInboundTrunkRequest_Replace) applyResult(info *SIPInboundTrunkInfo, enforceAddressValidation bool) (*SIPInboundTrunkInfo, ValidationResult) {
 	val := proto.CloneOf(p.Replace)
 	if val == nil {
 		return nil, ValidationFailure(errors.New("missing trunk"))
@@ -837,30 +971,45 @@ func (p *UpdateSIPInboundTrunkRequest_Replace) ApplyResult(info *SIPInboundTrunk
 	if info.SipTrunkId != "" {
 		val.SipTrunkId = info.SipTrunkId
 	}
-	if result := val.ValidateResult(); !result.OK() {
+	if result := val.validateResult(enforceAddressValidation); !result.OK() {
 		return nil, result
 	}
 	return val, ValidationResult{}
 }
 
 func (p *UpdateSIPInboundTrunkRequest_Update) Apply(info *SIPInboundTrunkInfo) (*SIPInboundTrunkInfo, error) {
-	val, result := p.ApplyResult(info)
-	if !result.OK() {
-		return nil, result.Error()
-	}
-	return val, nil
+	return resultToError(p.applyResult(info, false))
 }
 
 func (p *UpdateSIPInboundTrunkRequest_Update) ApplyResult(info *SIPInboundTrunkInfo) (*SIPInboundTrunkInfo, ValidationResult) {
+	return p.applyResult(info, false)
+}
+
+func (p *UpdateSIPInboundTrunkRequest_Update) ApplyAddresses(info *SIPInboundTrunkInfo) (*SIPInboundTrunkInfo, error) {
+	return resultToError(p.applyResult(info, true))
+}
+
+func (p *UpdateSIPInboundTrunkRequest_Update) ApplyResultAddresses(info *SIPInboundTrunkInfo) (*SIPInboundTrunkInfo, ValidationResult) {
+	return p.applyResult(info, true)
+}
+
+func (p *UpdateSIPInboundTrunkRequest_Update) applyResult(info *SIPInboundTrunkInfo, enforceAddressValidation bool) (*SIPInboundTrunkInfo, ValidationResult) {
 	diff := p.Update
 	if diff == nil {
 		return nil, ValidationFailure(errors.New("missing trunk update"))
 	}
 	val := proto.CloneOf(info)
-	if result := diff.ApplyResult(val); !result.OK() {
+	if result := diff.applyResult(val, enforceAddressValidation); !result.OK() {
 		return nil, result
 	}
 	return val, ValidationResult{}
+}
+
+func resultToError(val *SIPInboundTrunkInfo, result ValidationResult) (*SIPInboundTrunkInfo, error) {
+	if !result.OK() {
+		return nil, result.Error()
+	}
+	return val, nil
 }
 
 func (p *CreateSIPDispatchRuleRequest) DispatchRuleInfo() *SIPDispatchRuleInfo {
