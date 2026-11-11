@@ -381,7 +381,10 @@ type Job struct {
 	Attributes      map[string]string `protobuf:"bytes,12,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	EnableRedaction bool              `protobuf:"varint,13,opt,name=enable_redaction,json=enableRedaction,proto3" json:"enable_redaction,omitempty"`
 	// when the server created the job, in Unix nanoseconds
-	CreatedAt     int64 `protobuf:"varint,14,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	CreatedAt int64 `protobuf:"varint,14,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	// The agent thread (an AT_ id, see agent/livekit_agent_thread.proto) the dispatched job's
+	// call reads and writes. Empty means the call keeps no durable thread.
+	ThreadId      string `protobuf:"bytes,15,opt,name=thread_id,json=threadId,proto3" json:"thread_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -513,6 +516,13 @@ func (x *Job) GetCreatedAt() int64 {
 		return x.CreatedAt
 	}
 	return 0
+}
+
+func (x *Job) GetThreadId() string {
+	if x != nil {
+		return x.ThreadId
+	}
+	return ""
 }
 
 type JobState struct {
@@ -2257,7 +2267,7 @@ var File_livekit_agent_proto protoreflect.FileDescriptor
 
 const file_livekit_agent_proto_rawDesc = "" +
 	"\n" +
-	"\x13livekit_agent.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14logger/options.proto\"\x81\x05\n" +
+	"\x13livekit_agent.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14logger/options.proto\"\x9e\x05\n" +
 	"\x03Job\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12.\n" +
 	"\vdispatch_id\x18\t \x01(\tB\r\xbaP\n" +
@@ -2281,7 +2291,8 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"attributes\x12)\n" +
 	"\x10enable_redaction\x18\r \x01(\bR\x0fenableRedaction\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\x0e \x01(\x03R\tcreatedAt\x1a=\n" +
+	"created_at\x18\x0e \x01(\x03R\tcreatedAt\x12\x1b\n" +
+	"\tthread_id\x18\x0f \x01(\tR\bthreadId\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x0e\n" +

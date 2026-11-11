@@ -38,6 +38,9 @@ message Job {
   bool enable_redaction = 13;
   // when the server created the job, in Unix nanoseconds
   int64 created_at = 14;
+  // The agent thread (an AT_ id, see agent/livekit_agent_thread.proto) the dispatched job's
+  // call reads and writes. Empty means the call keeps no durable thread.
+  string thread_id = 15;
 }
 
 message JobState {
