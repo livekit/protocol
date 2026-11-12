@@ -293,10 +293,8 @@ message SessionDescription {
 
 message ParticipantUpdate {
   repeated ParticipantInfo participants = 1;
-  // when set, `participants` holds every participant visible to the receiver (the receiver itself
-  // included, hidden participants excluded) at the time the server built the message: the receiver
-  // drops any remote participant that is not listed. Unset for incremental updates.
-  bool full_snapshot = 2;
+  
+  // NEXT-ID: 3
 }
 
 message UpdateSubscription {
