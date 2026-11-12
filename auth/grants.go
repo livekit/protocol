@@ -91,6 +91,26 @@ func (c *RoomConfiguration) CheckCredentials() error {
 			// do not leak stream key
 			return ErrSensitiveCredentials
 		}
+		// Deprecated singular output oneof. Still accepted by the API, so a
+		// secret here must fail the same way as the repeated fields.
+		switch output := c.Egress.Room.Output.(type) {
+		case *livekit.RoomCompositeEgressRequest_File:
+			if output.File != nil {
+				if err := checkOutputForCredentials(output.File.Output); err != nil {
+					return err
+				}
+			}
+		case *livekit.RoomCompositeEgressRequest_Segments:
+			if output.Segments != nil {
+				if err := checkOutputForCredentials(output.Segments.Output); err != nil {
+					return err
+				}
+			}
+		case *livekit.RoomCompositeEgressRequest_Stream:
+			if output.Stream != nil {
+				return ErrSensitiveCredentials
+			}
+		}
 	}
 	if c.Egress.Tracks != nil {
 		if err := checkOutputForCredentials(c.Egress.Tracks.Output); err != nil {
@@ -151,6 +171,22 @@ func checkOutputForCredentials(output any) error {
 			return ErrSensitiveCredentials
 		}
 	case *livekit.AutoTrackEgress_AliOSS:
+		if msg.AliOSS.Secret != "" {
+			return ErrSensitiveCredentials
+		}
+	case *livekit.ImageOutput_S3:
+		if msg.S3.Secret != "" {
+			return ErrSensitiveCredentials
+		}
+	case *livekit.ImageOutput_Gcp:
+		if msg.Gcp.Credentials != "" {
+			return ErrSensitiveCredentials
+		}
+	case *livekit.ImageOutput_Azure:
+		if msg.Azure.AccountKey != "" {
+			return ErrSensitiveCredentials
+		}
+	case *livekit.ImageOutput_AliOSS:
 		if msg.AliOSS.Secret != "" {
 			return ErrSensitiveCredentials
 		}
