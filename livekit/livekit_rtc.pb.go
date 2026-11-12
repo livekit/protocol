@@ -2420,8 +2420,12 @@ func (x *SessionDescription) GetMidToTrackId() map[string]string {
 }
 
 type ParticipantUpdate struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Participants  []*ParticipantInfo     `protobuf:"bytes,1,rep,name=participants,proto3" json:"participants,omitempty"`
+	state        protoimpl.MessageState `protogen:"open.v1"`
+	Participants []*ParticipantInfo     `protobuf:"bytes,1,rep,name=participants,proto3" json:"participants,omitempty"`
+	// when set, `participants` holds every participant visible to the receiver (the receiver itself
+	// included, hidden participants excluded) at the time the server built the message: the receiver
+	// drops any remote participant that is not listed. Unset for incremental updates.
+	FullSnapshot  bool `protobuf:"varint,2,opt,name=full_snapshot,json=fullSnapshot,proto3" json:"full_snapshot,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2461,6 +2465,13 @@ func (x *ParticipantUpdate) GetParticipants() []*ParticipantInfo {
 		return x.Participants
 	}
 	return nil
+}
+
+func (x *ParticipantUpdate) GetFullSnapshot() bool {
+	if x != nil {
+		return x.FullSnapshot
+	}
+	return false
 }
 
 type UpdateSubscription struct {
@@ -5550,9 +5561,10 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x0fmid_to_track_id\x18\x04 \x03(\v2-.livekit.SessionDescription.MidToTrackIdEntryB\x0f\xbaP\fmidToTrackIDR\fmidToTrackId\x1a?\n" +
 	"\x11MidToTrackIdEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"Q\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"v\n" +
 	"\x11ParticipantUpdate\x12<\n" +
-	"\fparticipants\x18\x01 \x03(\v2\x18.livekit.ParticipantInfoR\fparticipants\"\x9c\x01\n" +
+	"\fparticipants\x18\x01 \x03(\v2\x18.livekit.ParticipantInfoR\fparticipants\x12#\n" +
+	"\rfull_snapshot\x18\x02 \x01(\bR\ffullSnapshot\"\x9c\x01\n" +
 	"\x12UpdateSubscription\x12\x1d\n" +
 	"\n" +
 	"track_sids\x18\x01 \x03(\tR\ttrackSids\x12\x1c\n" +
