@@ -338,6 +338,10 @@ message SimulationRun {
 
       // Named deployment of agent_name to dispatch to; empty is production.
       string deployment = 18;
+
+      // Surfaced to the agent under test as SimulationContext defines, the
+      // same on every job of the run.
+      map<string, string> defines = 19;
     }
     message Response {
       string simulation_run_id = 1;
@@ -461,6 +465,8 @@ message SimulationRun {
   optional CI ci = 22;
   // Absent when the run ran each scenario once and required it to pass.
   optional SamplingOptions sampling = 23;
+  // As given on Create.Request.
+  map<string, string> defines = 24;
 
   message Usage {
     int32 text_turns_count = 1;
@@ -528,6 +534,8 @@ message SimulationDispatch {
   string job_id = 2;
   Scenario scenario = 3;
   SimulationMode mode = 4;
+  // The run's defines; see SimulationRun.Create.Request.defines.
+  map<string, string> defines = 5;
 }
 
 service AgentSimulation {
