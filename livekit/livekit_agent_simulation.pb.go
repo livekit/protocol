@@ -263,6 +263,7 @@ const (
 	SimulationRun_JobMetrics_END_REASON_TURN_LIMIT         SimulationRun_JobMetrics_EndReason = 4 // the caller ran out of turns
 	SimulationRun_JobMetrics_END_REASON_EMPTY_RESPONSE     SimulationRun_JobMetrics_EndReason = 5 // the agent under test kept replying with nothing
 	SimulationRun_JobMetrics_END_REASON_AGENT_ERROR        SimulationRun_JobMetrics_EndReason = 6 // the agent under test failed mid-call
+	SimulationRun_JobMetrics_END_REASON_SIMULATOR_ERROR    SimulationRun_JobMetrics_EndReason = 7 // the caller's own models failed: not the agent's doing
 )
 
 // Enum value maps for SimulationRun_JobMetrics_EndReason.
@@ -275,6 +276,7 @@ var (
 		4: "END_REASON_TURN_LIMIT",
 		5: "END_REASON_EMPTY_RESPONSE",
 		6: "END_REASON_AGENT_ERROR",
+		7: "END_REASON_SIMULATOR_ERROR",
 	}
 	SimulationRun_JobMetrics_EndReason_value = map[string]int32{
 		"END_REASON_UNSPECIFIED":        0,
@@ -284,6 +286,7 @@ var (
 		"END_REASON_TURN_LIMIT":         4,
 		"END_REASON_EMPTY_RESPONSE":     5,
 		"END_REASON_AGENT_ERROR":        6,
+		"END_REASON_SIMULATOR_ERROR":    7,
 	}
 )
 
@@ -3697,7 +3700,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\xb9V\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\xd9V\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -3758,7 +3761,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\rFailureReason\x12\x1e\n" +
 	"\x1aFAILURE_REASON_UNSPECIFIED\x10\x00\x12%\n" +
 	"!FAILURE_REASON_AGENT_JOIN_TIMEOUT\x10\x01J\x04\b\t\x10\n" +
-	"\x1a\x82+\n" +
+	"\x1a\xa2+\n" +
 	"\n" +
 	"JobMetrics\x12,\n" +
 	"\x0ftask_completion\x18\x03 \x01(\x02H\x00R\x0etaskCompletion\x88\x01\x01\x12(\n" +
@@ -3934,7 +3937,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\f_concisenessB\x14\n" +
 	"\x12_eot_mispredictionB\x12\n" +
 	"\x10_awkward_silenceB\r\n" +
-	"\v_unanswered\"\xd7\x01\n" +
+	"\v_unanswered\"\xf7\x01\n" +
 	"\tEndReason\x12\x1a\n" +
 	"\x16END_REASON_UNSPECIFIED\x10\x00\x12!\n" +
 	"\x1dEND_REASON_SCENARIO_COMPLETED\x10\x01\x12\x1a\n" +
@@ -3942,7 +3945,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x15END_REASON_INACTIVITY\x10\x03\x12\x19\n" +
 	"\x15END_REASON_TURN_LIMIT\x10\x04\x12\x1d\n" +
 	"\x19END_REASON_EMPTY_RESPONSE\x10\x05\x12\x1a\n" +
-	"\x16END_REASON_AGENT_ERROR\x10\x06B\x12\n" +
+	"\x16END_REASON_AGENT_ERROR\x10\x06\x12\x1e\n" +
+	"\x1aEND_REASON_SIMULATOR_ERROR\x10\aB\x12\n" +
 	"\x10_task_completionB\x10\n" +
 	"\x0e_overall_scoreB\x0e\n" +
 	"\f_concisenessB\x19\n" +
