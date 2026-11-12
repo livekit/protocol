@@ -109,6 +109,48 @@ func (c *Config) Update(o *Config) error {
 	return nil
 }
 
+// updateLevels replaces only the levels and notifies the same observers as Update. The other
+// fields are read once when a logger is built, and WithItemSampler reads the item sampler
+// settings without the lock, so a running process must never have them rewritten.
+func (c *Config) updateLevels(level string, componentLevels map[string]string) error {
+	c.lock.Lock()
+	c.Level = level
+	c.ComponentLevels = componentLevels
+	callbacks := c.onUpdatedCallbacks
+	c.lock.Unlock()
+
+	for _, cb := range callbacks {
+		if err := cb(c); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// snapshot copies the data fields so a file can be unmarshalled over the config in force.
+// Update assigns every field, so decoding a partial file into a zero Config would silently reset
+// the rest — including ComponentLevels, which is where livekit-server puts pion_level.
+func (c *Config) snapshot() *Config {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+
+	componentLevels := make(map[string]string, len(c.ComponentLevels))
+	for component, level := range c.ComponentLevels {
+		componentLevels[component] = level
+	}
+	return &Config{
+		JSON:               c.JSON,
+		Level:              c.Level,
+		Sample:             c.Sample,
+		ComponentLevels:    componentLevels,
+		SampleInitial:      c.SampleInitial,
+		SampleInterval:     c.SampleInterval,
+		ItemSampleSeconds:  c.ItemSampleSeconds,
+		ItemSampleInitial:  c.ItemSampleInitial,
+		ItemSampleInterval: c.ItemSampleInterval,
+	}
+}
+
 func (c *Config) AddUpdateObserver(cb ConfigObserver) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
