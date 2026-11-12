@@ -763,14 +763,12 @@ func (p *SIPInboundTrunkUpdate) ApplyResult(info *SIPInboundTrunkInfo) Validatio
 	return p.applyResult(info, false)
 }
 
-// ApplyAddresses is like Apply, but also rejects invalid allowed_addresses entries in the updated trunk.
+// ApplyAddresses is like Apply, but also rejects invalid allowed_addresses entries being set or added.
 func (p *SIPInboundTrunkUpdate) ApplyAddresses(info *SIPInboundTrunkInfo) error {
 	return p.applyResult(info, true).Error()
 }
 
-// ApplyResultAddresses is like ApplyResult, but also rejects invalid
-// allowed_addresses entries in the updated trunk. This will fail if the trunk
-// has any existing invalid address entries that are not deleted in the update.
+// ApplyResultAddresses is like ApplyResult, but also rejects invalid allowed_addresses entries being set or added.
 func (p *SIPInboundTrunkUpdate) ApplyResultAddresses(info *SIPInboundTrunkInfo) ValidationResult {
 	return p.applyResult(info, true)
 }
@@ -789,7 +787,8 @@ func (p *SIPInboundTrunkUpdate) applyResult(info *SIPInboundTrunkInfo, enforceAd
 	applyUpdate(&info.Metadata, p.Metadata)
 	updateMediaConfig(info, &info.Media, &info.MediaEncryption, p.Media, p.MediaEncryption)
 	info.Upgrade()
-	return info.validateResult(enforceAddressValidation)
+	// New entries were checked by validate above, so entries already on the trunk are only soft errors.
+	return info.validateResult(false)
 }
 
 type UpdateSIPOutboundTrunkRequestAction interface {
@@ -937,7 +936,8 @@ type UpdateSIPInboundTrunkRequestAction interface {
 	isUpdateSIPInboundTrunkRequest_Action
 	Apply(info *SIPInboundTrunkInfo) (*SIPInboundTrunkInfo, error)
 	ApplyResult(info *SIPInboundTrunkInfo) (*SIPInboundTrunkInfo, ValidationResult)
-	// ApplyAddresses and ApplyResultAddresses also reject invalid allowed_addresses entries in the updated trunk.
+	// ApplyAddresses and ApplyResultAddresses also reject invalid allowed_addresses entries.
+	// Replace checks the whole new trunk; Update checks only the entries being set or added.
 	ApplyAddresses(info *SIPInboundTrunkInfo) (*SIPInboundTrunkInfo, error)
 	ApplyResultAddresses(info *SIPInboundTrunkInfo) (*SIPInboundTrunkInfo, ValidationResult)
 }
