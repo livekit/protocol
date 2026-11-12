@@ -1092,7 +1092,7 @@ var File_agent_livekit_agent_thread_proto protoreflect.FileDescriptor
 
 const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\n" +
-	" agent/livekit_agent_thread.proto\x12\rlivekit.agent\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a!agent/livekit_agent_session.proto\x1a\x14logger/options.proto\"\xfb\x0e\n" +
+	" agent/livekit_agent_thread.proto\x12\rlivekit.agent\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a!agent/livekit_agent_session.proto\x1a\x14logger/options.proto\"\xe8\x0e\n" +
 	"\vAgentThread\x1a\xfe\x01\n" +
 	"\rCreateRequest\x12\x19\n" +
 	"\x05scope\x18\x01 \x01(\tB\x03\xc0P\x01R\x05scope\x12]\n" +
@@ -1142,7 +1142,7 @@ const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\x03seq\x18\x02 \x01(\x03R\x03seq\x12\x1d\n" +
 	"\n" +
 	"message_id\x18\x03 \x01(\tR\tmessageId\x12<\n" +
-	"\x04item\x18\x04 \x01(\v2#.livekit.agent.ChatContext.ChatItemB\x03\xc0P\x01R\x04item\x1a\xe0\x03\n" +
+	"\x04item\x18\x04 \x01(\v2#.livekit.agent.ChatContext.ChatItemB\x03\xc0P\x01R\x04item\x1a\xcd\x03\n" +
 	"\x06Thread\x12(\n" +
 	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x12\x19\n" +
 	"\x05scope\x18\x02 \x01(\tB\x03\xc0P\x01R\x05scope\x12V\n" +
@@ -1158,7 +1158,7 @@ const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\bidle_ttl\x18\a \x01(\v2\x19.google.protobuf.DurationR\aidleTtl\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01J\x04\b\b\x10\tR\vdatabase_id\"P\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"P\n" +
 	"\tSortOrder\x12\x1a\n" +
 	"\x16SORT_ORDER_UNSPECIFIED\x10\x00\x12\x12\n" +
 	"\x0eSORT_ORDER_ASC\x10\x01\x12\x13\n" +

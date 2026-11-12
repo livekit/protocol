@@ -118,9 +118,6 @@ message AgentThread {
     // database are deleted once it passes.
     google.protobuf.Timestamp expires_at = 6;
     google.protobuf.Duration idle_ttl = 7;
-    // The thread's database has the thread's id.
-    reserved 8;
-    reserved "database_id";
   }
 }
 
