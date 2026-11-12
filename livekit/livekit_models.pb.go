@@ -943,7 +943,7 @@ type ParticipantInfo_State int32
 const (
 	// websocket' connected, but not offered yet
 	ParticipantInfo_JOINING ParticipantInfo_State = 0
-	// server received client offer
+	// server sent the join response
 	ParticipantInfo_JOINED ParticipantInfo_State = 1
 	// ICE connectivity established
 	ParticipantInfo_ACTIVE ParticipantInfo_State = 2
