@@ -170,6 +170,7 @@ type ClaimGrants struct {
 	Observability *ObservabilityGrant `json:"observability,omitempty"`
 	AgentEndpoint *AgentEndpointGrant `json:"agentEndpoint,omitempty"`
 	AgentThread   *AgentThreadGrant   `json:"agentThread,omitempty"`
+	AgentDatabase *AgentDatabaseGrant `json:"agentDatabase,omitempty"`
 	// Room configuration to use if this participant initiates the room
 	RoomConfig *RoomConfiguration `json:"roomConfig,omitempty"`
 	// Cloud-only, config preset to use
@@ -218,6 +219,7 @@ func (c *ClaimGrants) Clone() *ClaimGrants {
 	clone.Observability = c.Observability.Clone()
 	clone.AgentEndpoint = c.AgentEndpoint.Clone()
 	clone.AgentThread = c.AgentThread.Clone()
+	clone.AgentDatabase = c.AgentDatabase.Clone()
 	clone.Attributes = maps.Clone(c.Attributes)
 	clone.RoomConfig = c.RoomConfig.Clone()
 	if len(c.KindDetails) > 0 {
@@ -242,6 +244,7 @@ func (c *ClaimGrants) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	e.AddObject("Observability", c.Observability)
 	e.AddObject("AgentEndpoint", c.AgentEndpoint)
 	e.AddObject("AgentThread", c.AgentThread)
+	e.AddObject("AgentDatabase", c.AgentDatabase)
 	e.AddObject("RoomConfig", logger.Proto((*livekit.RoomConfiguration)(c.RoomConfig)))
 	e.AddString("RoomPreset", c.RoomPreset)
 	return nil
@@ -587,8 +590,6 @@ type AgentGrant struct {
 	Admin bool `json:"admin,omitempty"`
 	// SimulationAdmin grants access to manage simulations and scenarios for evaluating agents.
 	SimulationAdmin bool `json:"simulationAdmin,omitempty"`
-	// DatabaseAdmin grants access to a project's agent databases (AgentDB).
-	DatabaseAdmin bool `json:"databaseAdmin,omitempty"`
 	// DispatchAdmin grants access to manage a project's agent dispatch queue.
 	DispatchAdmin bool `json:"dispatchAdmin,omitempty"`
 }
@@ -610,7 +611,6 @@ func (s *AgentGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 
 	e.AddBool("Admin", s.Admin)
 	e.AddBool("SimulationAdmin", s.SimulationAdmin)
-	e.AddBool("DatabaseAdmin", s.DatabaseAdmin)
 	e.AddBool("DispatchAdmin", s.DispatchAdmin)
 	return nil
 }
@@ -718,8 +718,9 @@ func (s *AgentEndpointGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 // AgentThreadGrant gives a token access to threads, across the project's
 // agents: list and create within Scope, and read, write and delete the threads
 // in ThreadIDs. All extends it to every thread and scope of the project; the
-// action flags still apply. It grants thread data only; which endpoints a token
-// may call is agentEndpoint's.
+// action flags still apply. SQL opens a covered thread's database, whose id is
+// the thread's. It grants thread data only; which endpoints a token may call is
+// agentEndpoint's.
 type AgentThreadGrant struct {
 	All       bool     `json:"all,omitempty"`
 	Scope     string   `json:"scope,omitempty"`
@@ -729,6 +730,7 @@ type AgentThreadGrant struct {
 	Write     bool     `json:"write,omitempty"`
 	Read      bool     `json:"read,omitempty"`
 	Delete    bool     `json:"delete,omitempty"`
+	SQL       bool     `json:"sql,omitempty"`
 }
 
 // CanCreate reports whether the holder may create threads in scope. A scoped
@@ -761,6 +763,11 @@ func (s *AgentThreadGrant) CanWrite(threadID string) bool {
 // CanDelete reports whether the holder may delete threadID.
 func (s *AgentThreadGrant) CanDelete(threadID string) bool {
 	return s != nil && s.Delete && s.includes(threadID)
+}
+
+// CanSQL reports whether the holder may open threadID's database.
+func (s *AgentThreadGrant) CanSQL(threadID string) bool {
+	return s != nil && s.SQL && s.includes(threadID)
 }
 
 func (s *AgentThreadGrant) inScope(scope string) bool {
@@ -797,6 +804,78 @@ func (s *AgentThreadGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	e.AddBool("Write", s.Write)
 	e.AddBool("Read", s.Read)
 	e.AddBool("Delete", s.Delete)
+	e.AddBool("SQL", s.SQL)
+	return nil
+}
+
+// ------------------------------------------------------------------
+
+// AgentDatabaseGrant gives a token access to standalone agent databases
+// ("DB_..."): Read, Write and Delete apply to the databases in DatabaseIDs,
+// Create and List to the project. A thread's own database is agentThread's,
+// with SQL.
+type AgentDatabaseGrant struct {
+	DatabaseIDs []string `json:"databaseIds,omitempty"`
+	Read        bool     `json:"read,omitempty"`
+	Write       bool     `json:"write,omitempty"`
+	Delete      bool     `json:"delete,omitempty"`
+	Create      bool     `json:"create,omitempty"`
+	List        bool     `json:"list,omitempty"`
+}
+
+// CanRead reports whether the holder may read databaseID.
+func (s *AgentDatabaseGrant) CanRead(databaseID string) bool {
+	return s != nil && s.Read && s.includes(databaseID)
+}
+
+// CanWrite reports whether the holder may write databaseID.
+func (s *AgentDatabaseGrant) CanWrite(databaseID string) bool {
+	return s != nil && s.Write && s.includes(databaseID)
+}
+
+// CanDelete reports whether the holder may delete databaseID.
+func (s *AgentDatabaseGrant) CanDelete(databaseID string) bool {
+	return s != nil && s.Delete && s.includes(databaseID)
+}
+
+// CanCreate reports whether the holder may create databases.
+func (s *AgentDatabaseGrant) CanCreate() bool {
+	return s != nil && s.Create
+}
+
+// CanList reports whether the holder may list the project's databases.
+func (s *AgentDatabaseGrant) CanList() bool {
+	return s != nil && s.List
+}
+
+func (s *AgentDatabaseGrant) includes(databaseID string) bool {
+	return databaseID != "" && slices.Contains(s.DatabaseIDs, databaseID)
+}
+
+func (s *AgentDatabaseGrant) Clone() *AgentDatabaseGrant {
+	if s == nil {
+		return nil
+	}
+
+	clone := *s
+	if len(s.DatabaseIDs) > 0 {
+		clone.DatabaseIDs = append([]string{}, s.DatabaseIDs...)
+	}
+
+	return &clone
+}
+
+func (s *AgentDatabaseGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
+	if s == nil {
+		return nil
+	}
+
+	zap.Strings("DatabaseIDs", s.DatabaseIDs).AddTo(e)
+	e.AddBool("Read", s.Read)
+	e.AddBool("Write", s.Write)
+	e.AddBool("Delete", s.Delete)
+	e.AddBool("Create", s.Create)
+	e.AddBool("List", s.List)
 	return nil
 }
 

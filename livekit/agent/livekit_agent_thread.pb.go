@@ -14,7 +14,7 @@
 
 // AgentThread: the durable conversation between an agent and a person, across
 // channels and over time. Identified by an "AT_" id. Holds a scope, attributes,
-// an idle TTL and the AgentDB database created with it. Served by
+// an idle TTL and the AgentDB database created with it, whose id is the thread's. Served by
 // cloud-protocol's AgentThreads. The conversation inside follows thread_schema_v1.sql, shared
 // by the agents framework, which writes it, and the platform, which reads it.
 
@@ -802,10 +802,8 @@ type AgentThread_Thread struct {
 	LastActive *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=last_active,json=lastActive,proto3" json:"last_active,omitempty"`
 	// last_active + idle_ttl; every update pushes it out. The thread and its
 	// database are deleted once it passes.
-	ExpiresAt *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
-	IdleTtl   *durationpb.Duration   `protobuf:"bytes,7,opt,name=idle_ttl,json=idleTtl,proto3" json:"idle_ttl,omitempty"`
-	// The thread's database ("DB_..."), created with the thread.
-	DatabaseId    string `protobuf:"bytes,8,opt,name=database_id,json=databaseId,proto3" json:"database_id,omitempty"`
+	ExpiresAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	IdleTtl       *durationpb.Duration   `protobuf:"bytes,7,opt,name=idle_ttl,json=idleTtl,proto3" json:"idle_ttl,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -887,13 +885,6 @@ func (x *AgentThread_Thread) GetIdleTtl() *durationpb.Duration {
 		return x.IdleTtl
 	}
 	return nil
-}
-
-func (x *AgentThread_Thread) GetDatabaseId() string {
-	if x != nil {
-		return x.DatabaseId
-	}
-	return ""
 }
 
 // A thread's tasks, oldest first.
@@ -1101,7 +1092,7 @@ var File_agent_livekit_agent_thread_proto protoreflect.FileDescriptor
 
 const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\n" +
-	" agent/livekit_agent_thread.proto\x12\rlivekit.agent\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a!agent/livekit_agent_session.proto\x1a\x14logger/options.proto\"\x89\x0f\n" +
+	" agent/livekit_agent_thread.proto\x12\rlivekit.agent\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a!agent/livekit_agent_session.proto\x1a\x14logger/options.proto\"\xe8\x0e\n" +
 	"\vAgentThread\x1a\xfe\x01\n" +
 	"\rCreateRequest\x12\x19\n" +
 	"\x05scope\x18\x01 \x01(\tB\x03\xc0P\x01R\x05scope\x12]\n" +
@@ -1151,7 +1142,7 @@ const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\x03seq\x18\x02 \x01(\x03R\x03seq\x12\x1d\n" +
 	"\n" +
 	"message_id\x18\x03 \x01(\tR\tmessageId\x12<\n" +
-	"\x04item\x18\x04 \x01(\v2#.livekit.agent.ChatContext.ChatItemB\x03\xc0P\x01R\x04item\x1a\xee\x03\n" +
+	"\x04item\x18\x04 \x01(\v2#.livekit.agent.ChatContext.ChatItemB\x03\xc0P\x01R\x04item\x1a\xcd\x03\n" +
 	"\x06Thread\x12(\n" +
 	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x12\x19\n" +
 	"\x05scope\x18\x02 \x01(\tB\x03\xc0P\x01R\x05scope\x12V\n" +
@@ -1164,9 +1155,7 @@ const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"lastActive\x129\n" +
 	"\n" +
 	"expires_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\x124\n" +
-	"\bidle_ttl\x18\a \x01(\v2\x19.google.protobuf.DurationR\aidleTtl\x12\x1f\n" +
-	"\vdatabase_id\x18\b \x01(\tR\n" +
-	"databaseId\x1a=\n" +
+	"\bidle_ttl\x18\a \x01(\v2\x19.google.protobuf.DurationR\aidleTtl\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"P\n" +
