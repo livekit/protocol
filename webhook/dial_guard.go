@@ -16,39 +16,45 @@ package webhook
 
 import (
 	"errors"
-	"net/netip"
+	"fmt"
+	"net"
 	"strings"
 	"syscall"
 )
 
-// ErrWebhookTargetBlocked rejects a webhook URL that points at an address this
-// server must not reach on a caller's behalf.
-var ErrWebhookTargetBlocked = errors.New("webhook url must resolve to a public address")
+// Marks a destination that the SSRF guard rejects. It threads through the transport's url.Error.
+// Callers can then classify it as permanent.
+var ErrBlockedAddress = errors.New("blocked destination address")
 
-// blockedWebhookPrefixes are reserved ranges netip's predicates do not cover.
-var blockedWebhookPrefixes = []netip.Prefix{
-	netip.MustParsePrefix("0.0.0.0/8"),     // "this network"; 0.0.0.0 reaches localhost
-	netip.MustParsePrefix("100.64.0.0/10"), // carrier-grade NAT
-	netip.MustParsePrefix("192.0.0.0/24"),  // IETF protocol assignments
-	netip.MustParsePrefix("198.18.0.0/15"), // benchmarking
-	netip.MustParsePrefix("240.0.0.0/4"),   // reserved
-}
-
-// checkWebhookAddr rejects loopback, private, link-local (including cloud
-// metadata at 169.254.169.254), multicast, unspecified and other reserved
-// addresses, in IPv4, IPv6 and IPv4-mapped IPv6 form.
-func checkWebhookAddr(addr netip.Addr) error {
-	addr = addr.Unmap()
-	if !addr.IsValid() || !addr.IsGlobalUnicast() || addr.IsPrivate() {
-		return ErrWebhookTargetBlocked
+var blockedNets = func() []*net.IPNet {
+	cidrs := []string{
+		"100.64.0.0/10",   // RFC 6598 CGNAT (carrier-grade NAT)
+		"0.0.0.0/8",       // "this network" (RFC 1122)
+		"240.0.0.0/4",     // reserved for future use (RFC 1112)
+		"198.18.0.0/15",   // benchmarking (RFC 2544)
+		"192.0.0.0/24",    // IETF protocol assignments (RFC 6890)
+		"192.88.99.0/24",  // 6to4 relay anycast (RFC 3068, deprecated)
+		"192.0.2.0/24",    // TEST-NET-1 documentation (RFC 5737)
+		"198.51.100.0/24", // TEST-NET-2 documentation (RFC 5737)
+		"203.0.113.0/24",  // TEST-NET-3 documentation (RFC 5737)
+		"64:ff9b::/96",    // NAT64 well-known prefix (RFC 6052)
+		"64:ff9b:1::/48",  // NAT64 local-use prefix (RFC 8215)
+		"::/96",           // IPv4-compatible IPv6 (RFC 4291, deprecated; embeds a v4 address)
+		"2002::/16",       // 6to4 (RFC 3056; embeds a v4 address)
+		"2001::/23",       // IETF protocol assignments (RFC 2928), includes Teredo 2001::/32 (RFC 4380; embeds a v4 address)
+		"fec0::/10",       // IPv6 site-local (deprecated, RFC 3879)
+		"100::/64",        // discard-only (RFC 6666)
+		"2001:db8::/32",   // IPv6 documentation (RFC 3849)
+		"3fff::/20",       // IPv6 documentation (RFC 9637)
+		"5f00::/16",       // SRv6 SIDs (RFC 9602)
 	}
-	for _, p := range blockedWebhookPrefixes {
-		if p.Contains(addr) {
-			return ErrWebhookTargetBlocked
-		}
+	nets := make([]*net.IPNet, 0, len(cidrs))
+	for _, c := range cidrs {
+		_, n, _ := net.ParseCIDR(c)
+		nets = append(nets, n)
 	}
-	return nil
-}
+	return nets
+}()
 
 // CheckWebhookHost rejects a URL host that is localhost or a blocked IP
 // literal, so the mistake surfaces when the webhook is saved. Hostnames are
@@ -56,21 +62,46 @@ func checkWebhookAddr(addr netip.Addr) error {
 func CheckWebhookHost(host string) error {
 	host = strings.TrimSuffix(strings.ToLower(host), ".")
 	if host == "localhost" || strings.HasSuffix(host, ".localhost") {
-		return ErrWebhookTargetBlocked
+		return ErrBlockedAddress
 	}
-	if addr, err := netip.ParseAddr(host); err == nil {
-		return checkWebhookAddr(addr)
+	if ip := net.ParseIP(host); ip != nil && isBlockedIP(ip) {
+		return ErrBlockedAddress
 	}
 	return nil
 }
 
-// GuardWebhookDial runs after DNS resolution, on the address actually
-// dialed, so a hostname resolving (or rebinding) to a blocked address is
-// refused before a connection opens.
-func GuardWebhookDial(_, address string, _ syscall.RawConn) error {
-	ap, err := netip.ParseAddrPort(address)
+func BlockInternal(network, address string, _ syscall.RawConn) error {
+	host, _, err := net.SplitHostPort(address)
 	if err != nil {
-		return ErrWebhookTargetBlocked
+		return err
 	}
-	return checkWebhookAddr(ap.Addr())
+	ip := net.ParseIP(host)
+	if ip == nil {
+		return fmt.Errorf("cannot resolve %q", address)
+	}
+	if isBlockedIP(ip) {
+		return fmt.Errorf("%w: %s", ErrBlockedAddress, ip)
+	}
+	return nil
+}
+
+// Reports whether IP falls in a range the service must never dial:
+// loopback, RFC1918 private and IPv6 ULA (fc00::/7), link-local unicast
+// (including the 169.254.169.254 cloud-metadata IP and fe80::/10), link-local
+// multicast, the unspecified address, any multicast, and the blockedNets ranges.
+func isBlockedIP(ip net.IP) bool {
+	if ip.IsLoopback() ||
+		ip.IsPrivate() ||
+		ip.IsLinkLocalUnicast() ||
+		ip.IsLinkLocalMulticast() ||
+		ip.IsUnspecified() ||
+		ip.IsMulticast() {
+		return true
+	}
+	for _, n := range blockedNets {
+		if n.Contains(ip) {
+			return true
+		}
+	}
+	return false
 }

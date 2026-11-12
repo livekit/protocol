@@ -17,7 +17,10 @@ package webhook
 import (
 	"context"
 	"fmt"
+	"net"
+	"net/netip"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/livekit/protocol/auth"
@@ -27,11 +30,14 @@ import (
 )
 
 type WebHookConfig struct {
-	URLs                []string                  `yaml:"urls,omitempty"`
-	APIKey              string                    `yaml:"api_key,omitempty"`
-	URLNotifier         URLNotifierConfig         `yaml:"url_notifier,omitempty"`
-	ResourceURLNotifier ResourceURLNotifierConfig `yaml:"resource_url_notifier,omitempty"`
-	FilterParams        FilterParams              `yaml:"filter_params,omitempty"`
+	URLs                  []string                  `yaml:"urls,omitempty"`
+	APIKey                string                    `yaml:"api_key,omitempty"`
+	URLNotifier           URLNotifierConfig         `yaml:"url_notifier,omitempty"`
+	ResourceURLNotifier   ResourceURLNotifierConfig `yaml:"resource_url_notifier,omitempty"`
+	FilterParams          FilterParams              `yaml:"filter_params,omitempty"`
+	BlockPrivateAddresses bool                      `yaml:"block_private_addresses,omitempty"`
+	BlockedCIDRs          []string                  `yaml:"blocked_cidrs,omitempty"`
+	AllowedCIDRs          []string                  `yaml:"allowed_cidrs,omitempty"`
 }
 
 var DefaultWebHookConfig = WebHookConfig{
@@ -80,29 +86,88 @@ func NewDefaultNotifier(config WebHookConfig, kp auth.KeyProvider) (QueuedNotifi
 		return nil, fmt.Errorf("unknown api key in webhook config")
 	}
 
+	var httpParams HTTPClientParams
+	if config.BlockPrivateAddresses || len(config.BlockedCIDRs) > 0 {
+		control, err := newDialControl(config.BlockPrivateAddresses, config.BlockedCIDRs, config.AllowedCIDRs)
+		if err != nil {
+			return nil, err
+		}
+		httpParams.DialControl = control
+	}
+
 	n := &DefaultNotifier{
 		kp: kp,
 	}
 	for _, url := range config.URLs {
 		u := NewResourceURLNotifier(ResourceURLNotifierParams{
-			URL:          url,
-			Logger:       logger.GetLogger().WithComponent("webhook"),
-			APIKey:       config.APIKey,
-			APISecret:    apiSecret,
-			Config:       config.ResourceURLNotifier,
-			FilterParams: config.FilterParams,
+			URL:              url,
+			Logger:           logger.GetLogger().WithComponent("webhook"),
+			APIKey:           config.APIKey,
+			APISecret:        apiSecret,
+			Config:           config.ResourceURLNotifier,
+			HTTPClientParams: httpParams,
+			FilterParams:     config.FilterParams,
 		})
 		n.notifiers = append(n.notifiers, u)
 	}
 
 	n.extraWebhookNotifier = NewResourceURLNotifier(ResourceURLNotifierParams{
-		Logger:    logger.GetLogger().WithComponent("webhook"),
-		APIKey:    config.APIKey,
-		APISecret: apiSecret,
-		Config:    config.ResourceURLNotifier,
+		Logger:           logger.GetLogger().WithComponent("webhook"),
+		APIKey:           config.APIKey,
+		APISecret:        apiSecret,
+		Config:           config.ResourceURLNotifier,
+		HTTPClientParams: httpParams,
 	})
 
 	return n, nil
+}
+
+// newDialControl refuses addresses that are private, when blockPrivate is set,
+// or in blocked, unless they are also in allowed.
+func newDialControl(blockPrivate bool, blocked, allowed []string) (func(network, address string, c syscall.RawConn) error, error) {
+	blockedPrefixes, err := parseCIDRs("blocked_cidrs", blocked)
+	if err != nil {
+		return nil, err
+	}
+	allowedPrefixes, err := parseCIDRs("allowed_cidrs", allowed)
+	if err != nil {
+		return nil, err
+	}
+	return func(_, address string, _ syscall.RawConn) error {
+		ap, err := netip.ParseAddrPort(address)
+		if err != nil {
+			return err
+		}
+		addr := ap.Addr().Unmap()
+		if prefixesContain(allowedPrefixes, addr) {
+			return nil
+		}
+		if (blockPrivate && isBlockedIP(net.IP(addr.AsSlice()))) || prefixesContain(blockedPrefixes, addr) {
+			return fmt.Errorf("%w: %s", ErrBlockedAddress, addr)
+		}
+		return nil
+	}, nil
+}
+
+func parseCIDRs(key string, cidrs []string) ([]netip.Prefix, error) {
+	prefixes := make([]netip.Prefix, 0, len(cidrs))
+	for _, c := range cidrs {
+		p, err := netip.ParsePrefix(c)
+		if err != nil {
+			return nil, fmt.Errorf("invalid webhook %s entry %q: %w", key, c, err)
+		}
+		prefixes = append(prefixes, p.Masked())
+	}
+	return prefixes, nil
+}
+
+func prefixesContain(prefixes []netip.Prefix, addr netip.Addr) bool {
+	for _, p := range prefixes {
+		if p.Contains(addr) {
+			return true
+		}
+	}
+	return false
 }
 
 func (n *DefaultNotifier) Stop(force bool) {
@@ -181,12 +246,12 @@ func (n *DefaultNotifier) SetFilter(params FilterParams) {
 // ---------------------------------
 
 type HTTPClientParams struct {
-	RetryWaitMin          time.Duration
-	RetryWaitMax          time.Duration
-	MaxRetries            int
-	ClientTimeout         time.Duration
-	ForceIPv4             bool
-	BlockPrivateAddresses bool
+	RetryWaitMin  time.Duration
+	RetryWaitMax  time.Duration
+	MaxRetries    int
+	ClientTimeout time.Duration
+	ForceIPv4     bool
+	DialControl   func(network, address string, c syscall.RawConn) error
 	// receivers pin WAF rules to this, so it must stay stable across releases
 	// defaults to DefaultUserAgent
 	UserAgent string
