@@ -1,5 +1,44 @@
 # @livekit/protocol
 
+## 1.54.0
+
+### Minor Changes
+
+- SIP inbound trunks: add validation of allowed_addresses and a new strict validation mode for MatchTrunkIter. - [#1961](https://github.com/livekit/protocol/pull/1961) ([@alexfish8](https://github.com/alexfish8))
+
+### Patch Changes
+
+- Add self-hosted join counts and per-job join values (`origin`, dispatch trigger, worker kind, outcome, scope, latency) to the agents observability schema - [#1966](https://github.com/livekit/protocol/pull/1966) ([@boks1971](https://github.com/boks1971))
+
+- Add `lk.connector.requestTime` and `lk.connector.answerTime` connector participant attributes, with helpers to set and parse them - [#1956](https://github.com/livekit/protocol/pull/1956) ([@boks1971](https://github.com/boks1971))
+
+- Add `CreateJobTokenRequest` and `CreateJobTokenResponse` to the agent worker protocol, for a job to ask the server for an access token - [#1970](https://github.com/livekit/protocol/pull/1970) ([@davidzhao](https://github.com/davidzhao))
+  
+  Add `agent.ParseJobTokenClaims` and `agent.BuildJobToken`, which read the claims a job asks for strictly and sign a 10-minute job token; neither accepts `sha256` or `video.agent`
+
+- Add `thread_id` to `CreateAgentDispatchRequest`, `RoomAgentDispatch`, `AgentDispatch` and `Job`, the agent thread a dispatched job's call reads and writes - [#1958](https://github.com/livekit/protocol/pull/1958) ([@theomonnom](https://github.com/theomonnom))
+  
+  Add `guid.IsValidWithPrefix`, a strict check that an id is a prefix followed by exactly `guid.Size` characters of `guid.IDAlphabet`
+
+- Add `attempts`, `first_started_at` and `agent_failed_attempts_ns` to `JobState`, so every node that syncs a job sees how many attempts it took, when the first one started, and how long the attempts the agent's own code failed took - [#1949](https://github.com/livekit/protocol/pull/1949) ([@boks1971](https://github.com/boks1971))
+
+- Add `workers_asked` to `JobState`: how many workers were asked to take the current attempt, the one that took it included - [#1953](https://github.com/livekit/protocol/pull/1953) ([@boks1971](https://github.com/boks1971))
+
+- Add the `no_user` latency scope to the agents observability schema, for an agent join that no user waited for - [#1953](https://github.com/livekit/protocol/pull/1953) ([@boks1971](https://github.com/boks1971))
+
+- Add `full_snapshot` to `ParticipantUpdate`, set when the message lists every visible participant so clients can drop remote participants that are missing from it - [#1967](https://github.com/livekit/protocol/pull/1967) ([@lukasIO](https://github.com/lukasIO))
+
+- `SimulationRun.JobMetrics.Turn.entities`: each key-entity saying in the turn, with what the listener heard and whether it was recognized. - [#1894](https://github.com/livekit/protocol/pull/1894) ([@u9g](https://github.com/u9g))
+  `SimulationRun.JobMetrics.Turn.item_id`: the agent's chat item id for the turn's first message, so a turn can link to its place in the stored transcript.
+
+- Add `sip_source_call_id` to `CreateSIPParticipantRequest`, to forward the caller ID of a live inbound call (cloud only) - [#1960](https://github.com/livekit/protocol/pull/1960) ([@genseric-ghiro](https://github.com/genseric-ghiro))
+
+- Add the telemetry semantic-conventions registry under `otel/` - [#1866](https://github.com/livekit/protocol/pull/1866) ([@pblazej](https://github.com/pblazej))
+
+- Group generated Python telemetry attribute values in plain classes while preserving string values. - [#1881](https://github.com/livekit/protocol/pull/1881) ([@pblazej](https://github.com/pblazej))
+
+- Group generated TypeScript telemetry attribute values in const objects with matching union types. - [#1872](https://github.com/livekit/protocol/pull/1872) ([@lukasIO](https://github.com/lukasIO))
+
 ## 1.53.4
 
 ### Patch Changes
