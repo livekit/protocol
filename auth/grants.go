@@ -811,24 +811,41 @@ func (s *AgentThreadGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 // ------------------------------------------------------------------
 
 // AgentDatabaseGrant gives a token access to standalone agent databases
-// ("DB_..."), read or write, in DatabaseIDs. Admin extends it to every database
-// of the project, threads' included, for reading and writing. A thread's own
-// database is agentThread's, with SQL.
+// ("DB_..."): Read, Write and Delete apply to the databases in DatabaseIDs,
+// Create and List to the project. A thread's own database is agentThread's,
+// with SQL.
 type AgentDatabaseGrant struct {
 	DatabaseIDs []string `json:"databaseIds,omitempty"`
 	Read        bool     `json:"read,omitempty"`
 	Write       bool     `json:"write,omitempty"`
-	Admin       bool     `json:"admin,omitempty"`
+	Delete      bool     `json:"delete,omitempty"`
+	Create      bool     `json:"create,omitempty"`
+	List        bool     `json:"list,omitempty"`
 }
 
 // CanRead reports whether the holder may read databaseID.
 func (s *AgentDatabaseGrant) CanRead(databaseID string) bool {
-	return s != nil && (s.Admin || (s.Read && s.includes(databaseID)))
+	return s != nil && s.Read && s.includes(databaseID)
 }
 
 // CanWrite reports whether the holder may write databaseID.
 func (s *AgentDatabaseGrant) CanWrite(databaseID string) bool {
-	return s != nil && (s.Admin || (s.Write && s.includes(databaseID)))
+	return s != nil && s.Write && s.includes(databaseID)
+}
+
+// CanDelete reports whether the holder may delete databaseID.
+func (s *AgentDatabaseGrant) CanDelete(databaseID string) bool {
+	return s != nil && s.Delete && s.includes(databaseID)
+}
+
+// CanCreate reports whether the holder may create databases.
+func (s *AgentDatabaseGrant) CanCreate() bool {
+	return s != nil && s.Create
+}
+
+// CanList reports whether the holder may list the project's databases.
+func (s *AgentDatabaseGrant) CanList() bool {
+	return s != nil && s.List
 }
 
 func (s *AgentDatabaseGrant) includes(databaseID string) bool {
@@ -856,7 +873,9 @@ func (s *AgentDatabaseGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	zap.Strings("DatabaseIDs", s.DatabaseIDs).AddTo(e)
 	e.AddBool("Read", s.Read)
 	e.AddBool("Write", s.Write)
-	e.AddBool("Admin", s.Admin)
+	e.AddBool("Delete", s.Delete)
+	e.AddBool("Create", s.Create)
+	e.AddBool("List", s.List)
 	return nil
 }
 

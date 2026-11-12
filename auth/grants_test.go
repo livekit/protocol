@@ -582,14 +582,24 @@ func TestAgentDatabaseGrantChecks(t *testing.T) {
 	require.False(t, g.CanRead(""))
 	require.False(t, g.CanWrite("DB_1"))
 
-	// Admin covers every database of the project, threads' included.
-	admin := &AgentDatabaseGrant{Admin: true}
-	require.True(t, admin.CanRead("DB_9"))
-	require.True(t, admin.CanWrite("AT_9"))
+	require.False(t, g.CanDelete("DB_1"))
+	require.False(t, g.CanCreate())
+	require.False(t, g.CanList())
+
+	// Create and List name no database; Delete is scoped like Read and Write.
+	manage := &AgentDatabaseGrant{DatabaseIDs: []string{"DB_1"}, Delete: true, Create: true, List: true}
+	require.True(t, manage.CanDelete("DB_1"))
+	require.False(t, manage.CanDelete("DB_2"))
+	require.True(t, manage.CanCreate())
+	require.True(t, manage.CanList())
+	require.False(t, manage.CanRead("DB_1"))
 
 	var none *AgentDatabaseGrant
 	require.False(t, none.CanRead("DB_1"))
 	require.False(t, none.CanWrite("DB_1"))
+	require.False(t, none.CanDelete("DB_1"))
+	require.False(t, none.CanCreate())
+	require.False(t, none.CanList())
 
 	grants := &ClaimGrants{AgentDatabase: &AgentDatabaseGrant{DatabaseIDs: []string{"DB_1"}, Write: true}}
 	clone := grants.Clone()
