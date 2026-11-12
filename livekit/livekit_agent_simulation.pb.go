@@ -433,6 +433,7 @@ type SimulationRun struct {
 	Ci *SimulationRun_CI `protobuf:"bytes,22,opt,name=ci,proto3,oneof" json:"ci,omitempty"`
 	// Absent when the run ran each scenario once and required it to pass.
 	Sampling      *SimulationRun_SamplingOptions `protobuf:"bytes,23,opt,name=sampling,proto3,oneof" json:"sampling,omitempty"`
+	PersonaModel  string                         `protobuf:"bytes,24,opt,name=persona_model,json=personaModel,proto3" json:"persona_model,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -619,6 +620,13 @@ func (x *SimulationRun) GetSampling() *SimulationRun_SamplingOptions {
 		return x.Sampling
 	}
 	return nil
+}
+
+func (x *SimulationRun) GetPersonaModel() string {
+	if x != nil {
+		return x.PersonaModel
+	}
+	return ""
 }
 
 // A single scenario, mirroring one entry in a scenarios.yaml file. Scenarios
@@ -2709,6 +2717,7 @@ type SimulationRun_Create_Request struct {
 	SipNumber  string `protobuf:"bytes,17,opt,name=sip_number,json=sipNumber,proto3" json:"sip_number,omitempty"`
 	// Named deployment of agent_name to dispatch to; empty is production.
 	Deployment    string `protobuf:"bytes,18,opt,name=deployment,proto3" json:"deployment,omitempty"`
+	PersonaModel  string `protobuf:"bytes,19,opt,name=persona_model,json=personaModel,proto3" json:"persona_model,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2851,6 +2860,13 @@ func (x *SimulationRun_Create_Request) GetSipNumber() string {
 func (x *SimulationRun_Create_Request) GetDeployment() string {
 	if x != nil {
 		return x.Deployment
+	}
+	return ""
+}
+
+func (x *SimulationRun_Create_Request) GetPersonaModel() string {
+	if x != nil {
+		return x.PersonaModel
 	}
 	return ""
 }
@@ -3697,7 +3713,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\xb9V\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\x83W\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -3725,7 +3741,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\vissue_count\x18\x15 \x01(\x05H\x00R\n" +
 	"issueCount\x88\x01\x01\x12.\n" +
 	"\x02ci\x18\x16 \x01(\v2\x19.livekit.SimulationRun.CIH\x01R\x02ci\x88\x01\x01\x12G\n" +
-	"\bsampling\x18\x17 \x01(\v2&.livekit.SimulationRun.SamplingOptionsH\x02R\bsampling\x88\x01\x01\x1a\xb8\a\n" +
+	"\bsampling\x18\x17 \x01(\v2&.livekit.SimulationRun.SamplingOptionsH\x02R\bsampling\x88\x01\x01\x12#\n" +
+	"\rpersona_model\x18\x18 \x01(\tR\fpersonaModel\x1a\xb8\a\n" +
 	"\x03Job\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x129\n" +
 	"\x06status\x18\x02 \x01(\x0e2!.livekit.SimulationRun.Job.StatusR\x06status\x12\"\n" +
@@ -3976,8 +3993,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x05actor\x18\x06 \x01(\tR\x05actor\x1aH\n" +
 	"\x0fSamplingOptions\x12\x18\n" +
 	"\asamples\x18\x01 \x01(\x05R\asamples\x12\x1b\n" +
-	"\tpass_rate\x18\x02 \x01(\x01R\bpassRate\x1a\x85\a\n" +
-	"\x06Create\x1a\xec\x05\n" +
+	"\tpass_rate\x18\x02 \x01(\x01R\bpassRate\x1a\xaa\a\n" +
+	"\x06Create\x1a\x91\x06\n" +
 	"\aRequest\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1d\n" +
@@ -4002,7 +4019,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"sip_number\x18\x11 \x01(\tR\tsipNumber\x12\x1e\n" +
 	"\n" +
 	"deployment\x18\x12 \x01(\tR\n" +
-	"deploymentB\x11\n" +
+	"deployment\x12#\n" +
+	"\rpersona_model\x18\x13 \x01(\tR\fpersonaModelB\x11\n" +
 	"\x0f_scenario_groupB\x0e\n" +
 	"\f_concurrencyB\x05\n" +
 	"\x03_ciB\v\n" +
