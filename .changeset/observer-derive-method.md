@@ -2,4 +2,4 @@
 "@livekit/protocol": patch
 ---
 
-Add Observer.Derive method (Go 1.27+)
+configutil: Derive returns *Observer, and Observer.Derive allows chaining on Go 1.27

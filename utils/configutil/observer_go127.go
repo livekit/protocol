@@ -16,7 +16,7 @@
 
 package configutil
 
-func (c *Observer[T]) Derive[Dst any](project func(*T) *Dst) Observable[Dst] {
+func (c *Observer[T]) Derive[Dst any](project func(*T) *Dst) *Observer[Dst] {
 	if c == nil {
 		return nil
 	}

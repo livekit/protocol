@@ -23,7 +23,7 @@ import (
 //
 // The nil builder is safe only because load is unreachable without a watcher.
 func NewStaticObserver[T any](conf *T) *Observer[T] {
-	c := &Observer[T]{observers: events.NewObserverList[*T](events.WithBlocking())}
+	c := &rootObserver[T]{observers: events.NewObserverList[*T](events.WithBlocking())}
 	c.conf.Store(conf)
-	return c
+	return &Observer[T]{impl: c}
 }

@@ -26,9 +26,11 @@ package configutil
 //
 // The result holds no state and needs no cleanup: it subscribes to src only
 // while something is subscribed to it, and forwards src's Observe and
-// ObserveCurrent semantics unchanged.
-func Derive[Src, Dst any](src Observable[Src], project func(*Src) *Dst) Observable[Dst] {
-	return derived[Src, Dst]{src: src, project: project}
+// ObserveCurrent semantics unchanged. Close is a no-op because the result
+// doesn't own src, and EmitConfigUpdate panics because a subtree can't be
+// written back into src; emit on src instead.
+func Derive[Src, Dst any](src Observable[Src], project func(*Src) *Dst) *Observer[Dst] {
+	return &Observer[Dst]{impl: derived[Src, Dst]{src: src, project: project}}
 }
 
 type derived[Src, Dst any] struct {
@@ -47,3 +49,9 @@ func (d derived[Src, Dst]) ObserveCurrent(cb func(*Dst)) func() {
 func (d derived[Src, Dst]) Load() *Dst {
 	return d.project(d.src.Load())
 }
+
+func (d derived[Src, Dst]) EmitConfigUpdate(*Dst) {
+	panic("configutil: EmitConfigUpdate on a derived Observer; emit on its source")
+}
+
+func (d derived[Src, Dst]) Close() {}

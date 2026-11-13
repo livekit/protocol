@@ -48,8 +48,9 @@ func TestObserverDeriveMethodChained(t *testing.T) {
 	src := NewStaticObserver(&deriveAppConfig{
 		Nested: deriveNestedConfig{Inner: deriveInnerConfig{Name: "a"}},
 	})
-	nested := src.Derive(func(c *deriveAppConfig) *deriveNestedConfig { return &c.Nested })
-	inner := Derive(nested, func(c *deriveNestedConfig) *deriveInnerConfig { return &c.Inner })
+	inner := src.
+		Derive(func(c *deriveAppConfig) *deriveNestedConfig { return &c.Nested }).
+		Derive(func(c *deriveNestedConfig) *deriveInnerConfig { return &c.Inner })
 
 	var seen []string
 	stop := inner.ObserveCurrent(func(c *deriveInnerConfig) { seen = append(seen, c.Name) })
@@ -57,12 +58,16 @@ func TestObserverDeriveMethodChained(t *testing.T) {
 	stop()
 
 	require.Equal(t, []string{"a", "b"}, seen)
+	require.Equal(t, "b", inner.Load().Name)
 }
 
 func TestObserverDeriveMethodNilReceiver(t *testing.T) {
 	var src *Observer[deriveAppConfig]
-	derived := src.Derive(func(c *deriveAppConfig) *deriveSweeperConfig { return &c.Sweeper })
+	inner := src.
+		Derive(func(c *deriveAppConfig) *deriveNestedConfig { return &c.Nested }).
+		Derive(func(c *deriveNestedConfig) *deriveInnerConfig { return &c.Inner })
 
-	// A typed-nil wrapper would pass a != nil check and panic on first use.
-	require.True(t, derived == nil)
+	require.Nil(t, inner)
+	inner.Observe(func(*deriveInnerConfig) { t.Fatal("called on nil observer") })()
+	inner.Close()
 }

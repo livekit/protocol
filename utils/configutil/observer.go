@@ -45,7 +45,53 @@ type Validator[T any] interface {
 	Validate(*T) error
 }
 
+// Observer is the handle callers hold for both a loaded config and a Derive'd
+// subtree of one, so a subtree can be passed anywhere the whole config can.
 type Observer[T any] struct {
+	impl observerImpl[T]
+}
+
+type observerImpl[T any] interface {
+	Observable[T]
+	EmitConfigUpdate(*T)
+	Close()
+}
+
+func (c *Observer[T]) Close() {
+	if c != nil {
+		c.impl.Close()
+	}
+}
+
+func (c *Observer[T]) EmitConfigUpdate(conf *T) {
+	c.impl.EmitConfigUpdate(conf)
+}
+
+// Observe delivers only configs emitted after it returns.
+func (c *Observer[T]) Observe(cb func(*T)) func() {
+	if c == nil {
+		return func() {}
+	}
+	return c.impl.Observe(cb)
+}
+
+// ObserveCurrent calls cb with the current config before returning, then on
+// every later emit; cb never sees a config older than one it already received.
+//
+// Callbacks run under the observer's lock: they must not call Observe,
+// ObserveCurrent, EmitConfigUpdate or a stop func.
+func (c *Observer[T]) ObserveCurrent(cb func(*T)) func() {
+	if c == nil {
+		return func() {}
+	}
+	return c.impl.ObserveCurrent(cb)
+}
+
+func (c *Observer[T]) Load() *T {
+	return c.impl.Load()
+}
+
+type rootObserver[T any] struct {
 	builder   Builder[T]
 	watcher   *fsnotify.Watcher
 	observers *events.ObserverList[*T]
@@ -55,7 +101,7 @@ type Observer[T any] struct {
 }
 
 func NewObserver[T any](path string, builder Builder[T]) (*Observer[T], *T, error) {
-	c := &Observer[T]{
+	c := &rootObserver[T]{
 		builder:   builder,
 		observers: events.NewObserverList[*T](events.WithBlocking()),
 	}
@@ -78,39 +124,27 @@ func NewObserver[T any](path string, builder Builder[T]) (*Observer[T], *T, erro
 		go c.watch()
 	}
 
-	return c, conf, nil
+	return &Observer[T]{impl: c}, conf, nil
 }
 
-func (c *Observer[T]) Close() {
-	if c != nil && c.watcher != nil {
+func (c *rootObserver[T]) Close() {
+	if c.watcher != nil {
 		c.watcher.Close()
 	}
 }
 
-func (c *Observer[T]) EmitConfigUpdate(conf *T) {
+func (c *rootObserver[T]) EmitConfigUpdate(conf *T) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.conf.Store(conf)
 	c.observers.Emit(conf)
 }
 
-// Observe delivers only configs emitted after it returns.
-func (c *Observer[T]) Observe(cb func(*T)) func() {
-	if c == nil {
-		return func() {}
-	}
+func (c *rootObserver[T]) Observe(cb func(*T)) func() {
 	return c.observers.On(cb)
 }
 
-// ObserveCurrent calls cb with the current config before returning, then on
-// every later emit; cb never sees a config older than one it already received.
-//
-// Callbacks run under the observer's lock: they must not call Observe,
-// ObserveCurrent, EmitConfigUpdate or a stop func.
-func (c *Observer[T]) ObserveCurrent(cb func(*T)) func() {
-	if c == nil {
-		return func() {}
-	}
+func (c *rootObserver[T]) ObserveCurrent(cb func(*T)) func() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	stop := c.observers.On(cb)
@@ -118,11 +152,11 @@ func (c *Observer[T]) ObserveCurrent(cb func(*T)) func() {
 	return stop
 }
 
-func (c *Observer[T]) Load() *T {
+func (c *rootObserver[T]) Load() *T {
 	return c.conf.Load()
 }
 
-func (c *Observer[T]) watch() {
+func (c *rootObserver[T]) watch() {
 	for {
 		select {
 		case event, ok := <-c.watcher.Events:
@@ -150,7 +184,7 @@ func (c *Observer[T]) watch() {
 	}
 }
 
-func (c *Observer[T]) reload(path string) error {
+func (c *rootObserver[T]) reload(path string) error {
 	conf, err := c.load(path)
 	if err != nil {
 		recordConfigReload(path, false)
@@ -162,7 +196,7 @@ func (c *Observer[T]) reload(path string) error {
 	return nil
 }
 
-func (c *Observer[T]) load(path string) (conf *T, err error) {
+func (c *rootObserver[T]) load(path string) (conf *T, err error) {
 	// always record the load outcome so livekit_config_load_state is populated
 	// from the initial load onward and flips on every subsequent load attempt.
 	if path != "" {

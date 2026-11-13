@@ -122,3 +122,21 @@ func TestDeriveObserveCurrent(t *testing.T) {
 	src.EmitConfigUpdate(&deriveAppConfig{Nested: deriveNestedConfig{Inner: deriveInnerConfig{Name: "d"}}})
 	require.Equal(t, []string{"b", "c"}, seen)
 }
+
+func TestDeriveCloseLeavesSource(t *testing.T) {
+	src := NewStaticObserver(&deriveAppConfig{})
+	sweeper := Derive(src, func(c *deriveAppConfig) *deriveSweeperConfig { return &c.Sweeper })
+
+	var observed []time.Duration
+	stop := sweeper.Observe(func(c *deriveSweeperConfig) { observed = append(observed, c.Period) })
+	defer stop()
+
+	sweeper.Close()
+	src.EmitConfigUpdate(&deriveAppConfig{Sweeper: deriveSweeperConfig{Period: time.Second}})
+	require.Equal(t, []time.Duration{time.Second}, observed)
+}
+
+func TestDeriveEmitPanics(t *testing.T) {
+	sweeper := Derive(NewStaticObserver(&deriveAppConfig{}), func(c *deriveAppConfig) *deriveSweeperConfig { return &c.Sweeper })
+	require.Panics(t, func() { sweeper.EmitConfigUpdate(&deriveSweeperConfig{}) })
+}
