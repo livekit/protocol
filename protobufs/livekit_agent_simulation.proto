@@ -134,6 +134,10 @@ message SimulationRun {
     // Audio only: what the caller's audio went through before the agent heard
     // it. Absent for a clean call.
     SimulationImpairments impairments = 24;
+    // The persona_model that played the simulated caller: the run's
+    // persona_model, or empty when the default persona played it, as it does
+    // a scenario that model can't play.
+    string persona_model = 25;
 
     enum EndReason {
       END_REASON_UNSPECIFIED = 0;
