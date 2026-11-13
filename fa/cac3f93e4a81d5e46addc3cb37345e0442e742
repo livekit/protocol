@@ -1,0 +1,349 @@
+.changeset/agent-db-scoped-grants.md
+  s_aaf78334cb7322::t_155fa6517a5f3c 5
+.changeset/sim-persona-model.md
+  s_aaf78334cb7322::t_40af82518310dc 2,6
+.changeset/slow-buses-dress.md
+  s_aaf78334cb7322::t_af67937c7b911d 5
+.gitattributes
+  s_aaf78334cb7322::t_8c2dc5943c56cb 3
+.github/workflows/generate.yaml
+  s_aaf78334cb7322::t_6b6c66d4147639 68-81,85
+.github/workflows/otel.yaml
+  s_aaf78334cb7322::t_ab29f977092133 1-69
+CHANGELOG.md
+  s_aaf78334cb7322::t_47aa7162a432be 3-46
+agent/environment.go
+  s_aaf78334cb7322::t_49c200084c986e 3-7,29-37
+agent/environment_test.go
+  s_aaf78334cb7322::t_753d4134017c86 8-9,46-53
+agent/token.go
+  s_aaf78334cb7322::t_689289add68ccb 4-8,45-105
+agent/token_test.go
+  s_aaf78334cb7322::t_3965b67a68f042 1-102
+auth/accesstoken.go
+  s_aaf78334cb7322::t_6806a6d210de08 122-126
+auth/grants.go
+  s_aaf78334cb7322::t_675625e4297d12 173,222,247,424,450,721-723,733,768-772,807-878
+auth/grants_test.go
+  s_aaf78334cb7322::t_3d8203fa6c1041 563-568,570,576-611,626-641
+go.mod
+  s_aaf78334cb7322::t_e910d077692263 48
+livekit/livekit_agent_simulation.pb.go
+  s_995d41eb514baf::t_a6e8da0079aa61 487,676-682,2899,3046-3052,4002,4030-4031,4283-4284,4309-4310
+livekit/sip.go
+  s_aaf78334cb7322::t_e6f057ff2500ea 6,527,531-544,551,587,591-604,622,628-637,639-675,679,682,684-687,701-709,720,724,726-734,741-745,755-756,758,761,763-779,792,940-942,951,955-966,974,981,985-996,1002,1008-1014
+livekit/sip_test.go
+  s_aaf78334cb7322::t_130953b06bdf4e 1632-1927
+magefile.go
+  s_aaf78334cb7322::t_29319bee3d58da 262-268
+observability/agentsobs/gen_reporter.go
+  s_aaf78334cb7322::t_d37221836d3868 9,117-118
+observability/agentsobs/gen_reporter_noop.go
+  s_aaf78334cb7322::t_b64811e2085ec0 178-179,190-208
+observability/agentsobs/gen_source.go
+  s_aaf78334cb7322::t_e7e2826685b7c4 67-88
+observability/agentsv3obs/gen_reporter.go
+  s_aaf78334cb7322::t_5da2afa07c1ddc 9,134-135
+observability/agentsv3obs/gen_reporter_noop.go
+  s_aaf78334cb7322::t_5cb13bd79256bf 202-203,214-232
+observability/agentsv3obs/gen_source.go
+  s_aaf78334cb7322::t_de0664e86c049c 67-88
+observability/gatewayobs/gen_reporter.go
+  s_aaf78334cb7322::t_af93e863bec52c 9,111-112
+observability/gatewayobs/gen_reporter_noop.go
+  s_aaf78334cb7322::t_fcbae11b23bb86 166-167,199-200
+otel/README.md
+  s_aaf78334cb7322::t_4292f650ce1ba4 1-316
+otel/advice/livekit.rego
+  s_aaf78334cb7322::t_c2f7df96c2f4ef 1-27
+otel/check.sh
+  s_aaf78334cb7322::t_e12840316cc84f 1-36
+otel/gen/docs/semconv.md
+  s_aaf78334cb7322::t_ce950bad37cc84 1-1810
+otel/gen/python/semconv.py
+  s_aaf78334cb7322::t_02aaea367239da 1-1712
+otel/gen/rust/semconv.rs
+  s_aaf78334cb7322::t_37de4d162d439a 1-1615
+otel/gen/ts/semconv.ts
+  s_aaf78334cb7322::t_8c9c4d10dbc74f 1-1301
+otel/generate.sh
+  s_aaf78334cb7322::t_c10150436ce18d 1-13
+otel/live-check.sh
+  s_aaf78334cb7322::t_bfee68b54e01e5 1-36
+otel/live-check/lib.rego
+  s_aaf78334cb7322::t_974e4dea5dd1b4 1
+otel/live-check/livekit.rego
+  s_aaf78334cb7322::t_3f7b3f11268529 1-185
+otel/live-check/otlp2samples.py
+  s_aaf78334cb7322::t_01c58cdb3761d3 1-65
+otel/live-check/renames.jq
+  s_aaf78334cb7322::t_a7c33518d651e7 1-16
+otel/live-check/summarize.py
+  s_aaf78334cb7322::t_947b6a99f0bdcf 1-29
+otel/live-check/weaver.toml
+  s_aaf78334cb7322::t_6002e7843fcd96 1-65
+otel/model/agents/groups.yaml
+  s_aaf78334cb7322::t_06871877a3dbb5 1-37
+otel/model/agents/registry.yaml
+  s_aaf78334cb7322::t_2a3c2591584b73 1-275
+otel/model/agents/signals.yaml
+  s_aaf78334cb7322::t_b688b9106e9839 1-962
+otel/model/client/groups.yaml
+  s_aaf78334cb7322::t_9b76ac78dfedf0 1-110
+otel/model/client/registry.yaml
+  s_aaf78334cb7322::t_d9896daca72f34 1-760
+otel/model/client/signals.yaml
+  s_aaf78334cb7322::t_1656d31eaa426a 1-453
+otel/model/manifest.yaml
+  s_aaf78334cb7322::t_fcec766b2032da 1-14
+otel/model/shared/registry.yaml
+  s_aaf78334cb7322::t_c576eeca32bbf0 1-243
+otel/policies/lib.rego
+  s_aaf78334cb7322::t_dee848757c21b5 1-225
+otel/policies/livekit.rego
+  s_aaf78334cb7322::t_24565b9af33156 1-41
+otel/policies/resolved.rego
+  s_aaf78334cb7322::t_b40de6d8de553d 1-185
+otel/templates/registry/markdown/semconv.md.j2
+  s_aaf78334cb7322::t_cad01f3da7578e 1-215
+otel/templates/registry/markdown/weaver.yaml
+  s_aaf78334cb7322::t_c1d70c6eefed35 1-5
+otel/templates/registry/python/semconv.py.j2
+  s_aaf78334cb7322::t_5c2f266f04e699 1-64
+otel/templates/registry/python/weaver.yaml
+  s_aaf78334cb7322::t_34da9f51f4b80c 1-5
+otel/templates/registry/rust/semconv.rs.j2
+  s_aaf78334cb7322::t_1dac353e920e88 1-73
+otel/templates/registry/rust/weaver.yaml
+  s_aaf78334cb7322::t_38441d4aea33b2 1-5
+otel/templates/registry/typescript/semconv.ts.j2
+  s_aaf78334cb7322::t_5a4a1500d61ba4 1-32
+otel/templates/registry/typescript/weaver.yaml
+  s_aaf78334cb7322::t_e5f8c299bea35a 1-5
+otel/tests/codegen.sh
+  s_aaf78334cb7322::t_4684c338caf9e5 1-27
+otel/tests/codegen/escape.yaml
+  s_aaf78334cb7322::t_a92d884b95e46c 1-23
+otel/tests/generate.sh
+  s_aaf78334cb7322::t_de160248f757cc 1-31
+otel/tests/live-agents-before-7973.json
+  s_aaf78334cb7322::t_325dc8f5ced6b7 1-15
+otel/tests/live-agents.json
+  s_aaf78334cb7322::t_9e78aea3124331 1-15
+otel/tests/live-check.sh
+  s_aaf78334cb7322::t_88731bfb7a31ee 1-174
+otel/tests/live-js-network.json
+  s_aaf78334cb7322::t_b6489d8a89ef28 1-5
+otel/tests/live-no-severity-text.json
+  s_aaf78334cb7322::t_3d1580ec6c15ff 1-3
+otel/tests/live-no-severity-text.jsonl
+  s_aaf78334cb7322::t_a3eb9949935feb 1
+otel/tests/live-sample.json
+  s_aaf78334cb7322::t_fff16d99edf8de 1-11
+otel/tests/live-sparse.json
+  s_aaf78334cb7322::t_74d60d2198d107 1-3
+otel/tests/negatives.sh
+  s_aaf78334cb7322::t_d13a6462b564a1 1-25
+otel/tests/negatives/cardinality-extends.yaml
+  s_aaf78334cb7322::t_a8b959cb09679b 1-16
+otel/tests/negatives/cardinality-refinement.yaml
+  s_aaf78334cb7322::t_e99c4d73fa25d9 1-15
+otel/tests/negatives/cardinality-v2.yaml
+  s_aaf78334cb7322::t_8114fa85b06e08 1-11
+otel/tests/negatives/cardinality.yaml
+  s_aaf78334cb7322::t_65a886ef528c1f 1-12
+otel/tests/negatives/duplicate.yaml
+  s_aaf78334cb7322::t_30bc29a97a973e 1-11
+otel/tests/negatives/event-severity-null.yaml
+  s_aaf78334cb7322::t_bd38e0a6076188 1-10
+otel/tests/negatives/event-severity-string.yaml
+  s_aaf78334cb7322::t_21e3c6657a611c 1-10
+otel/tests/negatives/event-severity-unknown.yaml
+  s_aaf78334cb7322::t_a588fbafbe39ce 1-10
+otel/tests/negatives/flat-identity-sid-deprecated-ref.yaml
+  s_aaf78334cb7322::t_dd9ecc24baa815 1-20
+otel/tests/negatives/flat-identity-sid-deprecated.yaml
+  s_aaf78334cb7322::t_5ec9704597144c 1-12
+otel/tests/negatives/flat-identity-sid.yaml
+  s_aaf78334cb7322::t_8afb68d826e677 1-11
+otel/tests/negatives/flat-identity-track-sid-deprecated-ref.yaml
+  s_aaf78334cb7322::t_b81cc6e957c8ed 1-20
+otel/tests/negatives/flat-identity-track-sid-deprecated.yaml
+  s_aaf78334cb7322::t_dc046d19f20cae 1-12
+otel/tests/negatives/flat-identity.yaml
+  s_aaf78334cb7322::t_961f54923f539f 1-11
+otel/tests/negatives/metric-unit-v2.yaml
+  s_aaf78334cb7322::t_d66802e3285568 1-8
+otel/tests/negatives/metric-unit.yaml
+  s_aaf78334cb7322::t_b6eb6b8c454ec2 1-9
+otel/tests/negatives/owner.yaml
+  s_aaf78334cb7322::t_5e44759aadc08c 1-11
+otel/tests/negatives/pii-heuristic-exception.yaml
+  s_aaf78334cb7322::t_72a549cf9c1c37 1-14
+otel/tests/negatives/pii-heuristic.yaml
+  s_aaf78334cb7322::t_a6f18a51cd0ea1 1-11
+otel/tests/negatives/pii-marker.yaml
+  s_aaf78334cb7322::t_05b93d72973df4 1-11
+otel/tests/negatives/pii-metric-allowlisted.yaml
+  s_aaf78334cb7322::t_211bdff89ce463 1-13
+otel/tests/negatives/pii-metric-declared.yaml
+  s_aaf78334cb7322::t_d86815246556b1 1-18
+otel/tests/negatives/pii-metric-ref.yaml
+  s_aaf78334cb7322::t_66b28bbe7abd07 1-13
+otel/tests/negatives/pii-metric-refinement.yaml
+  s_aaf78334cb7322::t_8b3d7c75f98a3e 1-15
+otel/tests/negatives/pii-metric-v2.yaml
+  s_aaf78334cb7322::t_5150c7f5515c41 1-12
+otel/tests/negatives/ref-override-drop-owner.yaml
+  s_aaf78334cb7322::t_448205bfdecbdd 1-12
+otel/tests/negatives/ref-override-empty-annotations.yaml
+  s_aaf78334cb7322::t_7f4fd08727a99e 1-12
+otel/tests/negatives/ref-override-null-owner.yaml
+  s_aaf78334cb7322::t_4e5ecbeda97fa1 1-12
+otel/tests/negatives/ref-override-unprefixed.yaml
+  s_aaf78334cb7322::t_7fe9586b3b54cd 1-11
+otel/tests/negatives/ref-override-v2.yaml
+  s_aaf78334cb7322::t_ea80b9c8025cec 1-11
+otel/tests/negatives/ref-override.yaml
+  s_aaf78334cb7322::t_1393aff6a4fead 1-11
+otel/tests/negatives/rename-value.yaml
+  s_aaf78334cb7322::t_21a38c537d9e54 1-17
+otel/tests/negatives/rtt-aggregate.yaml
+  s_aaf78334cb7322::t_d980c19cf20b66 1-11
+otel/tests/negatives/seconds.yaml
+  s_aaf78334cb7322::t_7ed59418f0ea88 1-11
+otel/tests/negatives/secret.yaml
+  s_aaf78334cb7322::t_dd06073d2d691e 1-11
+otel/tests/negatives/sensitivity.yaml
+  s_aaf78334cb7322::t_5d2170b78964dc 1-11
+otel/tests/negatives/shared-rename-deprecated.yaml
+  s_aaf78334cb7322::t_e0dbf6ae79c610 1-22
+otel/tests/negatives/shared-rename.yaml
+  s_aaf78334cb7322::t_e736a6421431d8 1-12
+otel/tests/negatives/shipped-value-camelcase-duplicate.yaml
+  s_aaf78334cb7322::t_c2a48f925e8c96 1-13
+otel/tests/negatives/shipped-value-camelcase-id.yaml
+  s_aaf78334cb7322::t_798400a043369f 1-13
+otel/tests/negatives/shipped-value-definition.yaml
+  s_aaf78334cb7322::t_ca66c1d214d06d 1-17
+otel/tests/negatives/shipped-value-duplicate-id.yaml
+  s_aaf78334cb7322::t_d1f09ec0593a67 1-13
+otel/tests/negatives/shipped-value-normalized-id.yaml
+  s_aaf78334cb7322::t_1b54b7afb41236 1-13
+otel/tests/negatives/shipped-value-not-list-boolean.yaml
+  s_aaf78334cb7322::t_2171941cd6fb25 1-13
+otel/tests/negatives/shipped-value-not-list-mapping.yaml
+  s_aaf78334cb7322::t_9d5d58e748bbc4 1-13
+otel/tests/negatives/shipped-value-not-list-string.yaml
+  s_aaf78334cb7322::t_7ebce600993cfe 1-13
+otel/tests/negatives/shipped-value-numeric-enum.yaml
+  s_aaf78334cb7322::t_443feae7e07e9b 1-13
+otel/tests/negatives/shipped-value-split-groups.yaml
+  s_aaf78334cb7322::t_244883067cf7b2 1-22
+otel/tests/negatives/shipped-value-upstream.yaml
+  s_aaf78334cb7322::t_4b45c655d1aa15 1-13
+otel/tests/negatives/unit.yaml
+  s_aaf78334cb7322::t_d47ca2987318bb 1-11
+otel/tests/negatives/unknown-field.yaml
+  s_aaf78334cb7322::t_3ce8551ff583da 1-12
+otel/tests/negatives/unprefixed-owner.yaml
+  s_aaf78334cb7322::t_708998b6c43eb6 1-12
+otel/tests/negatives/unprefixed-pii.yaml
+  s_aaf78334cb7322::t_59b908a4ec69cb 1-13
+otel/tests/negatives/v2-definition.yaml
+  s_aaf78334cb7322::t_cc39d9e91b1bca 1-8
+package.json
+  s_aaf78334cb7322::t_47f0d99e94b25e 4
+packages/javascript/CHANGELOG.md
+  s_aaf78334cb7322::t_f5ac9940e5b169 3-41
+packages/javascript/package.json
+  s_aaf78334cb7322::t_356e1c3ea8b748 3
+protobufs/agent/livekit_agent_thread.proto
+  s_aaf78334cb7322::t_d9fe8998df7fc9 17
+protobufs/livekit_agent.proto
+  s_aaf78334cb7322::t_6f9074e5a81f91 41-43,89-90,108,266-283
+protobufs/livekit_agent_dispatch.proto
+  s_aaf78334cb7322::t_502dc66fd56538 49-51,66-68,100-102
+protobufs/livekit_agent_simulation.proto
+  s_aaf78334cb7322::t_bc7d13e7ee1f7f 342-343,467
+protobufs/livekit_agentdb.proto
+  s_aaf78334cb7322::t_c29f079321fe3b 41
+protobufs/livekit_rtc.proto
+  s_aaf78334cb7322::t_e35b14e8b0a6e3 296-297
+protobufs/livekit_sip.proto
+  s_aaf78334cb7322::t_ceb8befbc5a631 868-878
+sip/sip.go
+  s_aaf78334cb7322::t_01a72c89665e05 472-497,581,638-642,682-694
+sip/sip_test.go
+  s_aaf78334cb7322::t_63f5b4c309018b 1356-1443
+utils/decodebudget/bench_test.go
+  s_aaf78334cb7322::t_d59f76763dfdac 1-66
+utils/decodebudget/budget.go
+  s_aaf78334cb7322::t_f9884e1c462085 56-57,59-64,69-72,75,105-108,110,125-126,135
+utils/decodebudget/budget_test.go
+  s_aaf78334cb7322::t_1e53020fb8c515 8,10,37-61
+utils/decodebudget/calibration_test.go
+  s_aaf78334cb7322::t_490c738ec1967c 12,14,22,25,27-31,34,144-174,218-242,279-428,442-454,456,463-465,470-473,478-492,494-496,498,534,537-547,554-555,559-633,643-644,648-781
+utils/decodebudget/cost.go
+  s_aaf78334cb7322::t_3fd676e3813f3d 22-23,34-45,50-51,57-77,82-83,86-107,117,132-140,142-148,150-151,153-154,156-169,172,175-182,184-186,188-191
+utils/decodebudget/cost_test.go
+  s_aaf78334cb7322::t_7243be907aa573 4,15-26
+utils/decodebudget/dynamic.go
+  s_aaf78334cb7322::t_f015b641bd91b8 1-192
+utils/decodebudget/extension.go
+  s_aaf78334cb7322::t_98936baea86312 1-139
+utils/decodebudget/fieldinfo.go
+  s_aaf78334cb7322::t_8bb5615a2852d7 1-187
+utils/decodebudget/generated.go
+  s_aaf78334cb7322::t_976384ba7170fc 1-219
+utils/decodebudget/layout.go
+  s_aaf78334cb7322::t_d1f7a3dd9057c2 1-84
+utils/decodebudget/protojson.go
+  s_aaf78334cb7322::t_56d34e6dbc667c 22-24,27,41-46,53-58,64,73-85,89-94,98,107-112,122,135,139-141,143-146,148,154-204,207,218-222,229,247-254,265-266,282,290,292-300,306-314,323-334,337,370-420,422
+utils/decodebudget/protojson_strings.go
+  s_aaf78334cb7322::t_3bd373ad03ba89 1-199
+utils/decodebudget/protojson_test.go
+  s_aaf78334cb7322::t_f077d4a1df53bc 4-7,9-10,13-15,30-166
+utils/decodebudget/protojson_wkt.go
+  s_aaf78334cb7322::t_b5cae5c22daa16 1-398
+utils/decodebudget/wire.go
+  s_aaf78334cb7322::t_a504c3147df024 25-26,29-59,63,69-72,76-84,92,95,97,101-183,188,204-206,208,227-234,241-242,244,246-247,249,258-262,264-266,268-270,273-278,280-281,283,287-288,292-293,295,309
+utils/decodebudget/wire_test.go
+  s_aaf78334cb7322::t_18ca19612a84dc 5,283-310
+utils/guid/id.go
+  s_aaf78334cb7322::t_2c2ef859bb84a2 255-269
+utils/guid/id_test.go
+  s_aaf78334cb7322::t_219a52af39c468 124-144
+webhook/dial_guard.go
+  s_aaf78334cb7322::t_bf4fc74e951bd4 1-107
+webhook/dial_guard_test.go
+  s_aaf78334cb7322::t_827e8462a0da6a 1-82
+webhook/notifier.go
+  s_aaf78334cb7322::t_5378fb9aad2e48 20-21,23,33-40,89-97,103-109,115-119,125-172,254
+webhook/resource_url_notifier.go
+  s_aaf78334cb7322::t_734a580e898aee 166-167,169-179
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "facac3f93e4a81d5e46addc3cb37345e0442e742",
+  "prompts": {},
+  "sessions": {
+    "s_995d41eb514baf": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a11ab7-fefb-7cf1-afdb-fcb71fe9d657",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Chenghao Mou <chenghao.mou@livekit.io>"
+    },
+    "s_aaf78334cb7322": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d2193486-0057-4a50-bb24-44082ff248d9",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Chenghao Mou <chenghao.mou@livekit.io>"
+    }
+  }
+}
