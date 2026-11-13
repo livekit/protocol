@@ -24,17 +24,22 @@ CREATE TABLE schema_version (
 -- One typed model-context item: message, tool call, tool result or handoff.
 -- payload is ChatContext.ChatItem protobuf JSON. Query keys stay outside it.
 -- Upsert by id with DO UPDATE, preserving pos. REPLACE would move the cursor.
+-- seq is the item's position in its partition's conversation, which the writer
+-- gives for every row it writes: its place in the whole history it holds. A row
+-- written early moves to its place when a later write puts something before it.
+-- Read history ORDER BY seq, pos (pos breaks ties between appending writers),
+-- never in write order.
 CREATE TABLE items (
   pos           INTEGER PRIMARY KEY AUTOINCREMENT, -- [platform] stable insertion cursor
   id            TEXT NOT NULL UNIQUE,            -- [framework] item's upsert identity
   partition_key TEXT NOT NULL                    -- [platform, framework]
                 CHECK(length(partition_key)>0),
-  seq           INTEGER NOT NULL,                -- [platform, framework] model-context order
+  seq           INTEGER NOT NULL,                -- [platform, framework] conversation position
   message_id    TEXT DEFAULT NULL,               -- [platform, framework] optional messageId
   payload       JSONB NOT NULL                   -- [platform, framework] typed ChatItem
 );
 -- History order and insertion pagination are separate access paths.
-CREATE INDEX items_partition_seq ON items (partition_key, seq);
+CREATE INDEX items_partition_seq ON items (partition_key, seq, pos);
 CREATE INDEX items_partition_pos ON items (partition_key, pos);
 CREATE UNIQUE INDEX items_partition_message
   ON items (partition_key, message_id) WHERE message_id IS NOT NULL;

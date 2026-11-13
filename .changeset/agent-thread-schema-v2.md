@@ -13,3 +13,5 @@ Define DefaultPartitionKey for framework default resolution and require every SQ
 Standardize stored timestamps and lease arithmetic on Unix milliseconds, using explicit _ms field names.
 
 Remove the cross-worker interruption marker from partition lease rows. New requests wait for ownership without signaling the active turn to stop.
+
+Store each history item's position in its partition's conversation in `items.seq`, written by the framework for every row, and read history by `(seq, pos)` rather than write order.
