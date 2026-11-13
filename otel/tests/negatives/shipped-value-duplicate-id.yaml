@@ -1,0 +1,13 @@
+# expect: livekit_shipped_value
+# Two shipped entries with the same id generate the same constant twice.
+file_format: definition/2
+attribute_groups:
+  - id: livekit.review
+    visibility: public
+    stability: development
+    brief: review
+    attributes:
+      - ref: gen_ai.operation.name
+        annotations:
+          livekit:
+            shipped_values: [{id: other, value: custom1, brief: fake}, {id: other, value: custom2, brief: fake}]

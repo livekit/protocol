@@ -38,6 +38,9 @@ message Job {
   bool enable_redaction = 13;
   // when the server created the job, in Unix nanoseconds
   int64 created_at = 14;
+  // The agent thread (an AT_ id, see agent/livekit_agent_thread.proto) the dispatched job's
+  // call reads and writes. Empty means the call keeps no durable thread.
+  string thread_id = 15;
 }
 
 message JobState {
@@ -83,6 +86,8 @@ message WorkerMessage {
     WorkerPing ping = 5;
     SimulateJobRequest simulate_job = 6;
     MigrateJobRequest migrate_job = 7;
+    // a running job asks the server to sign an access token for it
+    CreateJobTokenRequest create_job_token = 8;
   };
 }
 
@@ -100,6 +105,7 @@ message ServerMessage {
     // the server is draining this control connection: re-register elsewhere,
     // in-flight agent HTTP streams run to completion
     AgentHttp.GoAway go_away = 6;
+    CreateJobTokenResponse create_job_token = 7;
   }
 }
 
@@ -255,6 +261,24 @@ message JobAssignment {
 
 message JobTermination {
   string job_id = 1 [(logger.name) = "jobID"];
+}
+
+message CreateJobTokenRequest {
+  // echoed in the response
+  string request_id = 1 [(logger.name) = "requestID"];
+  string job_id = 2 [(logger.name) = "jobID"];
+  // The claims of the token the job wants, as JSON, in the same shape as an
+  // access token's payload: identity, name, attributes, video, sip, and so on.
+  string claims = 3;
+}
+
+message CreateJobTokenResponse {
+  string request_id = 1 [(logger.name) = "requestID"];
+  string token = 2 [(logger.sensitivity) = SENSITIVITY_SECRET];
+  // Unix seconds
+  int64 expires_at = 3;
+  // empty on success; otherwise why the token was refused, naming any refused claim
+  string error = 4;
 }
 
 // ----- agent HTTP endpoints data plane -----

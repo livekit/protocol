@@ -1629,3 +1629,299 @@ func TestSIPTransferErrorAsError(t *testing.T) {
 	require.Equal(t, codes.Unknown, st2.Code())
 	require.True(t, proto.Equal(timedOut, SIPTransferErrorFrom(st2.Err())))
 }
+
+func TestValidateAllowedAddressEntry(t *testing.T) {
+	cases := []struct {
+		name  string
+		entry string
+		valid bool
+	}{
+		{"ipv4", "192.0.2.10", true},
+		{"ipv4 cidr", "192.0.2.0/24", true},
+		{"ipv4 cidr host bits set", "192.0.2.10/24", true},
+		{"ipv4 single host cidr", "192.0.2.10/32", true},
+		{"ipv4 allow all", "0.0.0.0/0", true},
+		{"ipv6", "2001:db8::1", true},
+		{"ipv6 cidr", "2001:db8::/32", true},
+		{"ipv6 allow all", "::/0", true},
+		{"ipv6 loopback", "::1", true},
+
+		{"empty", "", false},
+		{"hostname", "sip.twilio.com", false},
+		{"hostname with port", "sip.twilio.com:5060", false},
+		{"ipv4 with port", "192.0.2.10:5060", false},
+		{"quoted", `"0.0.0.0/0"`, false},
+		{"leading space", " 192.0.2.10", false},
+		{"trailing space", "192.0.2.10 ", false},
+		{"comma separated", "192.0.2.10,192.0.2.11", false},
+		{"ipv4 leading zeros", "192.000.002.010", false},
+		{"ipv4 out of range", "192.0.2.256", false},
+		{"ipv4 short", "192.0.2", false},
+		{"ipv4 range", "192.0.2.10-192.0.2.20", false},
+		{"ipv4 prefix too long", "192.0.2.0/33", false},
+		{"ipv4 prefix missing", "192.0.2.0/", false},
+		{"ipv4 wildcard", "192.0.2.*", false},
+		{"ipv6 bracketed", "[2001:db8::1]", false},
+		{"ipv6 bracketed cidr", "[2001:db8::]/32", false},
+		{"ipv6 zone", "fe80::1%eth0", false},
+		{"ipv6 cidr zone", "fe80::%eth0/64", false},
+		{"ipv6 prefix too long", "2001:db8::/129", false},
+		{"ipv4-mapped ipv6", "::ffff:192.0.2.10", false},
+		{"ipv4-mapped ipv6 cidr", "::ffff:192.0.2.0/120", false},
+		{"url", "sip://192.0.2.10", false},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			err := validateAllowedAddressEntry(c.entry)
+			if c.valid {
+				require.NoError(t, err)
+			} else {
+				require.Error(t, err)
+			}
+		})
+	}
+}
+
+func TestValidateAllowedAddresses(t *testing.T) {
+	require.NoError(t, validateAllowedAddresses(nil))
+	require.NoError(t, validateAllowedAddresses([]string{"192.0.2.10", "2001:db8::/32"}))
+
+	err := validateAllowedAddresses([]string{"192.0.2.10", "sip.twilio.com", `"0.0.0.0/0"`})
+	require.Error(t, err)
+	require.ErrorContains(t, err, `"sip.twilio.com"`)
+	require.ErrorContains(t, err, `"\"0.0.0.0/0\""`)
+	require.NotContains(t, err.Error(), `"192.0.2.10"`)
+}
+
+func TestSIPInboundTrunkAllowedAddressesValidation(t *testing.T) {
+	trunk := func(addrs ...string) *SIPInboundTrunkInfo {
+		return &SIPInboundTrunkInfo{
+			Numbers:          []string{"+15550100"},
+			AllowedAddresses: addrs,
+		}
+	}
+	requireInvalidArgument := func(t *testing.T, err error) {
+		t.Helper()
+		var perr psrpc.Error
+		require.ErrorAs(t, err, &perr)
+		require.Equal(t, psrpc.InvalidArgument, perr.Code())
+	}
+
+	t.Run("trunk", func(t *testing.T) {
+		t.Run("valid entries", func(t *testing.T) {
+			tr := trunk("192.0.2.10", "192.0.2.0/24", "2001:db8::1", "2001:db8::/32")
+			require.NoError(t, tr.Validate())
+			require.NoError(t, tr.validateResult(true).Error())
+			res := tr.validateResult(true)
+			require.True(t, res.OK())
+			require.Empty(t, res.SoftErrors())
+		})
+		t.Run("no entries", func(t *testing.T) {
+			require.NoError(t, trunk().validateResult(true).Error())
+		})
+		t.Run("allowed addresses alone satisfy the security check", func(t *testing.T) {
+			require.NoError(t, (&SIPInboundTrunkInfo{AllowedAddresses: []string{"192.0.2.10"}}).validateResult(true).Error())
+		})
+		t.Run("default: invalid entry is a soft error", func(t *testing.T) {
+			tr := trunk("192.0.2.10", "sip.twilio.com")
+			require.NoError(t, tr.Validate())
+			res := tr.ValidateResult()
+			require.True(t, res.OK())
+			require.Len(t, res.SoftErrors(), 1)
+			require.ErrorContains(t, res.SoftErrors()[0], `"sip.twilio.com"`)
+		})
+		t.Run("default: valid entries have no soft errors", func(t *testing.T) {
+			require.Empty(t, trunk("192.0.2.10").ValidateResult().SoftErrors())
+		})
+		t.Run("default: other errors still fail and keep the soft error", func(t *testing.T) {
+			tr := trunk("sip.twilio.com")
+			tr.Headers = map[string]string{"bad header name": "x"}
+			res := tr.ValidateResult()
+			require.False(t, res.OK())
+			require.Len(t, res.SoftErrors(), 1)
+		})
+		t.Run("addresses: invalid entry is a hard error", func(t *testing.T) {
+			tr := trunk("192.0.2.10", "sip.twilio.com")
+			err := tr.validateResult(true).Error()
+			require.ErrorContains(t, err, `"sip.twilio.com"`)
+			requireInvalidArgument(t, err)
+			res := tr.validateResult(true)
+			require.False(t, res.OK())
+			requireInvalidArgument(t, res.Error())
+		})
+	})
+
+	t.Run("create request", func(t *testing.T) {
+		req := &CreateSIPInboundTrunkRequest{Trunk: trunk("sip.twilio.com")}
+		require.NoError(t, req.Validate())
+		require.Len(t, req.ValidateResult().SoftErrors(), 1)
+		err := req.ValidateAddresses()
+		require.ErrorContains(t, err, `"sip.twilio.com"`)
+		requireInvalidArgument(t, err)
+		requireInvalidArgument(t, req.ValidateResultAddresses().Error())
+		require.NoError(t, (&CreateSIPInboundTrunkRequest{Trunk: trunk("192.0.2.0/24")}).ValidateAddresses())
+
+		require.Error(t, (&CreateSIPInboundTrunkRequest{}).ValidateAddresses())
+		require.Error(t, (&CreateSIPInboundTrunkRequest{Trunk: &SIPInboundTrunkInfo{SipTrunkId: "ST_1", AllowedAddresses: []string{"192.0.2.10"}}}).ValidateAddresses())
+
+		t.Run("valid entries", func(t *testing.T) {
+			req := &CreateSIPInboundTrunkRequest{Trunk: trunk("192.0.2.10", "192.0.2.0/24", "2001:db8::1", "2001:db8::/32")}
+			require.NoError(t, req.Validate())
+			require.Empty(t, req.ValidateResult().SoftErrors())
+			require.NoError(t, req.ValidateAddresses())
+			res := req.ValidateResultAddresses()
+			require.True(t, res.OK())
+			require.Empty(t, res.SoftErrors())
+		})
+	})
+
+	t.Run("update request", func(t *testing.T) {
+		replace := func(info *SIPInboundTrunkInfo) *UpdateSIPInboundTrunkRequest {
+			return &UpdateSIPInboundTrunkRequest{SipTrunkId: "ST_1", Action: &UpdateSIPInboundTrunkRequest_Replace{Replace: info}}
+		}
+		update := func(u *SIPInboundTrunkUpdate) *UpdateSIPInboundTrunkRequest {
+			return &UpdateSIPInboundTrunkRequest{SipTrunkId: "ST_1", Action: &UpdateSIPInboundTrunkRequest_Update{Update: u}}
+		}
+
+		t.Run("replace", func(t *testing.T) {
+			req := replace(trunk("sip.twilio.com"))
+			require.NoError(t, req.Validate())
+			require.Len(t, req.ValidateResult().SoftErrors(), 1)
+			requireInvalidArgument(t, req.ValidateAddresses())
+			require.NoError(t, replace(trunk("192.0.2.0/24")).ValidateAddresses())
+		})
+		t.Run("update add", func(t *testing.T) {
+			req := update(&SIPInboundTrunkUpdate{AllowedAddresses: &ListUpdate{Add: []string{"sip.twilio.com"}}})
+			require.NoError(t, req.Validate())
+			requireInvalidArgument(t, req.ValidateAddresses())
+		})
+		t.Run("update set", func(t *testing.T) {
+			req := update(&SIPInboundTrunkUpdate{AllowedAddresses: &ListUpdate{Set: []string{"192.0.2.10", "[2001:db8::1]"}}})
+			require.NoError(t, req.Validate())
+			requireInvalidArgument(t, req.ValidateAddresses())
+		})
+		t.Run("update remove is not checked", func(t *testing.T) {
+			req := update(&SIPInboundTrunkUpdate{AllowedAddresses: &ListUpdate{Remove: []string{"sip.twilio.com"}}})
+			require.NoError(t, req.ValidateAddresses())
+		})
+		t.Run("update without addresses", func(t *testing.T) {
+			name := "renamed"
+			require.NoError(t, update(&SIPInboundTrunkUpdate{Name: &name}).ValidateAddresses())
+		})
+		t.Run("valid entries", func(t *testing.T) {
+			valid := []string{"192.0.2.10", "192.0.2.0/24", "2001:db8::1", "2001:db8::/32"}
+			for name, req := range map[string]*UpdateSIPInboundTrunkRequest{
+				"replace": replace(trunk(valid...)),
+				"set":     update(&SIPInboundTrunkUpdate{AllowedAddresses: &ListUpdate{Set: valid}}),
+				"add":     update(&SIPInboundTrunkUpdate{AllowedAddresses: &ListUpdate{Add: valid}}),
+			} {
+				t.Run(name, func(t *testing.T) {
+					require.NoError(t, req.Validate())
+					require.Empty(t, req.ValidateResult().SoftErrors())
+					require.NoError(t, req.ValidateAddresses())
+					res := req.ValidateResultAddresses()
+					require.True(t, res.OK())
+					require.Empty(t, res.SoftErrors())
+
+					val, res := req.Action.(UpdateSIPInboundTrunkRequestAction).ApplyResultAddresses(trunk("192.0.2.10"))
+					require.True(t, res.OK())
+					require.Empty(t, res.SoftErrors())
+					require.Subset(t, val.AllowedAddresses, valid)
+				})
+			}
+		})
+	})
+
+	t.Run("replace action", func(t *testing.T) {
+		act := &UpdateSIPInboundTrunkRequest_Replace{Replace: trunk("sip.twilio.com")}
+		val, err := act.Apply(trunk("192.0.2.10"))
+		require.NoError(t, err)
+		require.Equal(t, []string{"sip.twilio.com"}, val.AllowedAddresses)
+
+		_, err = act.ApplyAddresses(trunk("192.0.2.10"))
+		requireInvalidArgument(t, err)
+
+		_, res := act.ApplyResultAddresses(trunk("192.0.2.10"))
+		require.False(t, res.OK())
+
+		val, err = (&UpdateSIPInboundTrunkRequest_Replace{Replace: trunk("192.0.2.0/24")}).ApplyAddresses(trunk("sip.twilio.com"))
+		require.NoError(t, err)
+		require.Equal(t, []string{"192.0.2.0/24"}, val.AllowedAddresses)
+	})
+
+	t.Run("update action", func(t *testing.T) {
+		apply := func(t *testing.T, u *SIPInboundTrunkUpdate, tr *SIPInboundTrunkInfo, strict bool) (*SIPInboundTrunkInfo, error) {
+			t.Helper()
+			act := &UpdateSIPInboundTrunkRequest_Update{Update: u}
+			if strict {
+				return act.ApplyAddresses(tr)
+			}
+			return act.Apply(tr)
+		}
+
+		t.Run("adding an invalid entry", func(t *testing.T) {
+			u := &SIPInboundTrunkUpdate{AllowedAddresses: &ListUpdate{Add: []string{"sip.twilio.com"}}}
+			val, err := apply(t, u, trunk("192.0.2.10"), false)
+			require.NoError(t, err)
+			require.Equal(t, []string{"192.0.2.10", "sip.twilio.com"}, val.AllowedAddresses)
+
+			_, err = apply(t, u, trunk("192.0.2.10"), true)
+			requireInvalidArgument(t, err)
+		})
+		t.Run("setting an invalid list", func(t *testing.T) {
+			u := &SIPInboundTrunkUpdate{AllowedAddresses: &ListUpdate{Set: []string{"192.0.2.10", "[2001:db8::1]"}}}
+			_, err := apply(t, u, trunk(), false)
+			require.NoError(t, err)
+			_, err = apply(t, u, trunk(), true)
+			requireInvalidArgument(t, err)
+		})
+		t.Run("adding a valid entry", func(t *testing.T) {
+			u := &SIPInboundTrunkUpdate{AllowedAddresses: &ListUpdate{Add: []string{"2001:db8::/32"}}}
+			val, err := apply(t, u, trunk("192.0.2.10"), true)
+			require.NoError(t, err)
+			require.Equal(t, []string{"192.0.2.10", "2001:db8::/32"}, val.AllowedAddresses)
+		})
+		t.Run("removing a legacy invalid entry", func(t *testing.T) {
+			u := &SIPInboundTrunkUpdate{AllowedAddresses: &ListUpdate{Remove: []string{"sip.twilio.com"}}}
+			val, err := apply(t, u, trunk("192.0.2.10", "sip.twilio.com"), true)
+			require.NoError(t, err)
+			require.Equal(t, []string{"192.0.2.10"}, val.AllowedAddresses)
+		})
+		t.Run("clearing a legacy invalid list", func(t *testing.T) {
+			u := &SIPInboundTrunkUpdate{AllowedAddresses: &ListUpdate{Clear: true}}
+			val, err := apply(t, u, trunk("sip.twilio.com"), true)
+			require.NoError(t, err)
+			require.Empty(t, val.AllowedAddresses)
+		})
+
+		t.Run("unrelated change on a trunk with a legacy invalid entry", func(t *testing.T) {
+			name := "renamed"
+			u := &SIPInboundTrunkUpdate{Name: &name}
+			val, err := apply(t, u, trunk("sip.twilio.com"), false)
+			require.NoError(t, err)
+			require.Equal(t, "renamed", val.Name)
+
+			_, err = apply(t, u, trunk("sip.twilio.com"), true)
+			requireInvalidArgument(t, err)
+		})
+		t.Run("does not modify the input trunk", func(t *testing.T) {
+			tr := trunk("192.0.2.10")
+			u := &SIPInboundTrunkUpdate{AllowedAddresses: &ListUpdate{Add: []string{"sip.twilio.com"}}}
+			_, err := apply(t, u, tr, true)
+			requireInvalidArgument(t, err)
+			require.Equal(t, []string{"192.0.2.10"}, tr.AllowedAddresses)
+		})
+	})
+
+	t.Run("trunk update", func(t *testing.T) {
+		u := &SIPInboundTrunkUpdate{AllowedAddresses: &ListUpdate{Add: []string{"sip.twilio.com"}}}
+		require.NoError(t, u.Validate())
+		requireInvalidArgument(t, u.ValidateAddresses())
+
+		tr := trunk("192.0.2.10")
+		require.NoError(t, u.Apply(tr))
+		require.Len(t, u.ApplyResult(trunk("192.0.2.10")).SoftErrors(), 1)
+		requireInvalidArgument(t, u.ApplyAddresses(trunk("192.0.2.10")))
+		require.False(t, u.ApplyResultAddresses(trunk("192.0.2.10")).OK())
+	})
+}

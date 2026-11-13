@@ -1,0 +1,11 @@
+# expect: livekit_cardinality
+file_format: definition/2
+metrics:
+  - name: client.negative.count
+    instrument: counter
+    unit: "{event}"
+    stability: development
+    brief: A definition/2 metric with a high-cardinality dimension.
+    attributes:
+      - ref: lk.room_id
+        requirement_level: required

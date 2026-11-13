@@ -46,6 +46,9 @@ message CreateAgentDispatchRequest {
     (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
+  // The agent thread (an AT_ id, see agent/livekit_agent_thread.proto) the dispatched job's
+  // call reads and writes. Empty means the call keeps no durable thread.
+  string thread_id = 7;
 }
 
 message RoomAgentDispatch {
@@ -60,6 +63,9 @@ message RoomAgentDispatch {
     (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
+  // The agent thread (an AT_ id, see agent/livekit_agent_thread.proto) the dispatched job's
+  // call reads and writes. Empty means the call keeps no durable thread.
+  string thread_id = 6;
 }
 
 message DeleteAgentDispatchRequest {
@@ -91,6 +97,9 @@ message AgentDispatch {
     (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
+  // The agent thread (an AT_ id, see agent/livekit_agent_thread.proto) the dispatched job's
+  // call reads and writes. Empty means the call keeps no durable thread.
+  string thread_id = 9;
 }
 
 message AgentDispatchState {

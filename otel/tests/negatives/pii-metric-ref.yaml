@@ -1,0 +1,13 @@
+# expect: livekit_pii_metric
+# A metric that references a registered PII key.
+groups:
+  - id: metric.client.negative.count
+    type: metric
+    metric_name: client.negative.count
+    instrument: counter
+    unit: "{event}"
+    stability: development
+    brief: A metric with a PII dimension.
+    attributes:
+      - ref: lk.pii.room_name
+        requirement_level: recommended

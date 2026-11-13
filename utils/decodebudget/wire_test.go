@@ -2,6 +2,7 @@ package decodebudget
 
 import (
 	"bytes"
+	"fmt"
 	"sync"
 	"testing"
 	"time"
@@ -278,4 +279,32 @@ func TestProtoRejectsQuadraticMergedPackedRuns(t *testing.T) {
 	desc := (&metricsv1.ExponentialHistogramDataPoint{}).ProtoReflect().Descriptor()
 	err := Proto{MaxFields: 1 << 24, MaxDepth: 8, MaxDecodedBytes: 512 << 20}.Validate(b, desc)
 	require.ErrorIs(t, err, ErrMessageComplexity) // decode allocates ~6.5 GB
+}
+
+// A schema rebuilt at runtime reuses its message names, so the layout must
+// come from the descriptor passed in, not the first one cached under the name.
+func TestReloadedDescriptorLayout(t *testing.T) {
+	build := func(fields int) protoreflect.MessageDescriptor {
+		msg := &descriptorpb.DescriptorProto{Name: proto.String("Reloaded")}
+		for i := 1; i <= fields; i++ {
+			msg.Field = append(msg.Field, &descriptorpb.FieldDescriptorProto{
+				Name:   proto.String(fmt.Sprintf("f%d", i)),
+				Number: proto.Int32(int32(i)),
+				Label:  descriptorpb.FieldDescriptorProto_LABEL_OPTIONAL.Enum(),
+				Type:   descriptorpb.FieldDescriptorProto_TYPE_INT64.Enum(),
+			})
+		}
+		file, err := protodesc.NewFile(&descriptorpb.FileDescriptorProto{
+			Name:        proto.String("decode_budget_reload_test.proto"),
+			Package:     proto.String("decode_budget_reload_test"),
+			MessageType: []*descriptorpb.DescriptorProto{msg},
+		}, new(protoregistry.Files))
+		require.NoError(t, err)
+		return file.Messages().Get(0)
+	}
+	before := build(1)
+	require.Equal(t, newLayout(before).size, protoStructSize(before))
+	after := build(16)
+	require.Equal(t, newLayout(after).size, protoStructSize(after))
+	require.Greater(t, protoStructSize(after), protoStructSize(before))
 }

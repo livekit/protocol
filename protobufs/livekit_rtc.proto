@@ -293,6 +293,8 @@ message SessionDescription {
 
 message ParticipantUpdate {
   repeated ParticipantInfo participants = 1;
+  
+  // NEXT-ID: 3
 }
 
 message UpdateSubscription {

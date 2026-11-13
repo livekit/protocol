@@ -121,3 +121,24 @@ func TestIsValidID(t *testing.T) {
 	require.False(t, IsValidID("_SFo4igEG5Dg5"))
 	require.False(t, IsValidID("SFo4igEG5Dg5"))
 }
+
+func TestIsValidWithPrefix(t *testing.T) {
+	require.True(t, IsValidWithPrefix(AgentThreadPrefix, New(AgentThreadPrefix)))
+
+	body := New("")
+	invalid := map[string]string{
+		"wrong prefix":   RoomPrefix + body,
+		"missing prefix": body,
+		"11 chars":       AgentThreadPrefix + body[:Size-1],
+		"13 chars":       AgentThreadPrefix + body + "A",
+		"empty":          "",
+		"prefix only":    AgentThreadPrefix,
+		"hex":            AgentThreadPrefix + "0123456789ab",
+	}
+	for _, c := range []byte("01lIO_") {
+		invalid["char "+string(c)] = AgentThreadPrefix + body[:Size-1] + string(c)
+	}
+	for name, id := range invalid {
+		require.False(t, IsValidWithPrefix(AgentThreadPrefix, id), name)
+	}
+}

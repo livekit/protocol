@@ -1,0 +1,11 @@
+# expect: livekit_pii_heuristic
+groups:
+  - id: registry.lk.negative
+    type: attribute_group
+    brief: Negative fixture.
+    attributes:
+      - id: lk.participant.identity
+        type: string
+        stability: development
+        brief: PII without the pii segment.
+        annotations: {livekit: {owner: shared, sensitivity: none}}

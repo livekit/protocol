@@ -339,6 +339,8 @@ message SimulationRun {
 
       // Named deployment of agent_name to dispatch to; empty is production.
       string deployment = 18;
+
+      string persona_model = 19;
     }
     message Response {
       string simulation_run_id = 1;
@@ -462,6 +464,7 @@ message SimulationRun {
   optional CI ci = 22;
   // Absent when the run ran each scenario once and required it to pass.
   optional SamplingOptions sampling = 23;
+  string persona_model = 24;
 
   message Usage {
     int32 text_turns_count = 1;
