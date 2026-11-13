@@ -149,6 +149,12 @@ func init() {
 	headerValuesCharacters.AddUTF8()
 }
 
+// maxHeaderValueLength caps a single SIP header value. It is not an RFC limit
+// (RFC 3261 §7.1 bounds the message, not headers), but guards against abusive
+// or oversized values. Set above carriers' real-world maximums — Twilio's
+// X-Twilio-CallToken exceeds 1 KB — and well below the 8 KB UDP datagram bound.
+const maxHeaderValueLength = 4096
+
 // Required headers for SIP requests per RFC 3261 Section 8.1.1
 var RequiredRequestHeaders = map[string]bool{
 	"via":          true,
@@ -257,8 +263,13 @@ func ValidateHeaderValueResult(name, value string) ValidationResult {
 		return ValidationResult{}
 	}
 
-	if len(value) > 1024 {
-		return ValidationFailure(fmt.Errorf("header %s: value too long (max 1024 characters)", name))
+	// RFC 3261 caps the whole message (8 KB per §7.1 when UDP), not individual
+	// header values. Carriers do exceed 1 KB on a single header — e.g. Twilio's
+	// X-Twilio-CallToken carries an Immutable Call Forwarding token with
+	// SHAKEN/STIR + DIV PASSporTs that must be forwarded unchanged. 4096 keeps
+	// a single header from dominating a datagram while tolerating those.
+	if len(value) > maxHeaderValueLength {
+		return ValidationFailure(fmt.Errorf("header %s: value too long (max %d characters)", name, maxHeaderValueLength))
 	}
 
 	// Basic character validation - printable ASCII. We're stricter than the spec here - no UTF-8 for now
