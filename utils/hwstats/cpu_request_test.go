@@ -60,6 +60,26 @@ type subprocessResult struct {
 	NumCPU       float64 `json:"num_cpu"`
 	PlatformCPU  float64 `json:"platform_cpu"`
 	HostNumCPU   float64 `json:"host_num_cpu"`
+
+	Samples map[string]sampleResult `json:"samples"`
+}
+
+type sampleResult struct {
+	Idle         float64 `json:"idle"`
+	CallbackIdle float64 `json:"callback_idle"`
+	Load         float64 `json:"load"`
+}
+
+// sampleOnce takes one sample from plat and returns the stored idle, the idle passed
+// to the idle callback, and the load.
+func sampleOnce(plat platformCPUMonitor, hostCPU bool) sampleResult {
+	var r sampleResult
+	c := newTestCPUStats(plat)
+	c.hostCPU = hostCPU
+	c.idleCallback = func(idle float64) { r.CallbackIdle = idle }
+	c.sampleCPUIdle()
+	r.Idle, r.Load = c.GetCPUIdle(), c.GetCPULoad()
+	return r
 }
 
 func TestEffectiveCPURequest(t *testing.T) {
@@ -91,6 +111,42 @@ func TestNumCPU_HostIgnoresCPURequest(t *testing.T) {
 	result := runSubprocess(t, "2")
 	assert.Equal(t, 2.0, result.NumCPU)
 	assert.Equal(t, result.PlatformCPU, result.HostNumCPU)
+}
+
+// With LIVEKIT_CPU_REQUEST=8, idle sampled against a larger platform count (the cgroup
+// quota, or every CPU without a limit) must be expressed against the request, or
+// GetCPULoad (idle / request) reads 0 on a busy pod.
+func TestSampleCPUIdle_CPURequest(t *testing.T) {
+	result := runSubprocess(t, "8")
+
+	for _, tc := range []struct {
+		name string
+		idle float64
+		load float64
+	}{
+		// request below the platform count: idle is request minus used
+		{"no limit, 4 of 64 busy", 4, 0.5},
+		{"no limit, 10 of 64 busy", 0, 1},
+		{"limit 16, 4 busy", 4, 0.5},
+
+		// request equal to the platform count: nothing to rescale
+		{"limit 8, 4 busy", 4, 0.5},
+
+		// request above the platform count (Downward API rounds 7500m up to 8):
+		// idle is left as measured, so a saturated cgroup still reads as full load
+		{"limit 7.5, idle", 7.5, 0.0625},
+		{"limit 7.5, 2 busy", 5.5, 0.3125},
+		{"limit 7.5, saturated", 0, 1},
+
+		// WithHostCPU ignores the request
+		{"host cpu, 4 of 64 busy", 60, 0.0625},
+	} {
+		s, ok := result.Samples[tc.name]
+		require.True(t, ok, tc.name)
+		assert.InDelta(t, tc.idle, s.Idle, 0.001, tc.name)
+		assert.InDelta(t, tc.idle, s.CallbackIdle, 0.001, tc.name)
+		assert.InDelta(t, tc.load, s.Load, 0.001, tc.name)
+	}
 }
 
 func runSubprocess(t *testing.T, cpuRequestEnv string) subprocessResult {
@@ -149,6 +205,16 @@ func TestSubprocessWorker(t *testing.T) {
 		NumCPU:       c.NumCPU(),
 		PlatformCPU:  plat.numCPU(),
 		HostNumCPU:   host.NumCPU(),
+		Samples: map[string]sampleResult{
+			"no limit, 4 of 64 busy":  sampleOnce(&fakeCPUMonitor{n: 64, idle: 60}, false),
+			"no limit, 10 of 64 busy": sampleOnce(&fakeCPUMonitor{n: 64, idle: 54}, false),
+			"limit 16, 4 busy":        sampleOnce(&fakeCPUMonitor{n: 16, idle: 12}, false),
+			"limit 8, 4 busy":         sampleOnce(&fakeCPUMonitor{n: 8, idle: 4}, false),
+			"limit 7.5, idle":         sampleOnce(&fakeCPUMonitor{n: 7.5, idle: 7.5}, false),
+			"limit 7.5, 2 busy":       sampleOnce(&fakeCPUMonitor{n: 7.5, idle: 5.5}, false),
+			"limit 7.5, saturated":    sampleOnce(&fakeCPUMonitor{n: 7.5, idle: 0}, false),
+			"host cpu, 4 of 64 busy":  sampleOnce(&fakeCPUMonitor{n: 64, idle: 60}, true),
+		},
 	}
 
 	b, _ := json.Marshal(result)
