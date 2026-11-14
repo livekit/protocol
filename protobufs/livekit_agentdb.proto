@@ -223,6 +223,8 @@ message AgentDB {
       optional int64 if_tip = 2;
     }
 
+    // Unsupported: a request is one transaction and none spans requests, so
+    // these are answered invalid_argument. Send the statements as one Batch.
     message Begin {}
     message Commit {}
     message Rollback {}

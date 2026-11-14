@@ -1663,6 +1663,8 @@ func (x *AgentDB_Wire_Batch) GetIfTip() int64 {
 	return 0
 }
 
+// Unsupported: a request is one transaction and none spans requests, so
+// these are answered invalid_argument. Send the statements as one Batch.
 type AgentDB_Wire_Begin struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
