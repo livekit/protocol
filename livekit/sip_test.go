@@ -1901,8 +1901,20 @@ func TestSIPInboundTrunkAllowedAddressesValidation(t *testing.T) {
 			require.NoError(t, err)
 			require.Equal(t, "renamed", val.Name)
 
-			_, err = apply(t, u, trunk("sip.twilio.com"), true)
-			requireInvalidArgument(t, err)
+			val, err = apply(t, u, trunk("sip.twilio.com"), true)
+			require.NoError(t, err)
+			require.Equal(t, "renamed", val.Name)
+			require.Equal(t, []string{"sip.twilio.com"}, val.AllowedAddresses)
+
+			res := u.ApplyResultAddresses(trunk("sip.twilio.com"))
+			require.True(t, res.OK())
+			require.Len(t, res.SoftErrors(), 1)
+		})
+		t.Run("adding a valid entry to a trunk with a legacy invalid entry", func(t *testing.T) {
+			u := &SIPInboundTrunkUpdate{AllowedAddresses: &ListUpdate{Add: []string{"192.0.2.10"}}}
+			val, err := apply(t, u, trunk("sip.twilio.com"), true)
+			require.NoError(t, err)
+			require.Equal(t, []string{"sip.twilio.com", "192.0.2.10"}, val.AllowedAddresses)
 		})
 		t.Run("does not modify the input trunk", func(t *testing.T) {
 			tr := trunk("192.0.2.10")

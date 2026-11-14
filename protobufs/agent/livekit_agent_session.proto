@@ -62,10 +62,10 @@ message FunctionCall {
   string arguments = 3;
   string name = 4;
   google.protobuf.Timestamp created_at = 5;
-  // Framework metadata recorded on the call, kept with the history. A delegating call records
-  // where the request went: lk.delegation.task_id, lk.delegation.endpoint,
-  // lk.delegation.transport and lk.delegation.profile.
-  map<string, string> extra = 6;
+  // livekit-agents 1.7.0 to 1.8.8 fill every field declared here from their own
+  // FunctionCall, whose extra is not a map<string, string>: never reuse this field.
+  reserved 6;
+  reserved "extra";
 }
 
 message FunctionCallOutput {
