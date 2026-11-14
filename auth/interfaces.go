@@ -22,6 +22,10 @@ import (
 
 var (
 	ErrKeysMissing = errors.New("missing API key or secret key")
+
+	ErrKeyAlgorithmMismatch  = errors.New("token signing algorithm does not match the API key")
+	ErrUnsupportedKeyVersion = errors.New("unsupported API key version")
+	ErrInvalidPublicKey      = errors.New("invalid API key public key")
 )
 
 //counterfeiter:generate . TokenVerifier

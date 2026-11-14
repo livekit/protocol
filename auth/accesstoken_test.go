@@ -15,6 +15,7 @@
 package auth
 
 import (
+	"crypto/ed25519"
 	"encoding/base64"
 	"encoding/json"
 	"strings"
@@ -35,6 +36,26 @@ func TestAccessToken(t *testing.T) {
 		token := NewAccessToken("", "")
 		_, err := token.ToJWT()
 		require.Equal(t, ErrKeysMissing, err)
+
+		apiKey, _ := apiKeypair()
+		_, err = NewAccessTokenWithPrivateKey(apiKey, nil).ToJWT()
+		require.Equal(t, ErrKeysMissing, err)
+		_, err = NewAccessTokenWithPrivateKey(apiKey, make(ed25519.PrivateKey, 16)).ToJWT()
+		require.Equal(t, ErrKeysMissing, err)
+	})
+
+	t.Run("private key signs with EdDSA", func(t *testing.T) {
+		apiKey, _ := apiKeypair()
+		_, priv, err := ed25519.GenerateKey(nil)
+		require.NoError(t, err)
+		value, err := NewAccessTokenWithPrivateKey(apiKey, priv).SetIdentity("user").ToJWT()
+		require.NoError(t, err)
+
+		decoded := tokenClaims{}
+		token, _, err := unverifiedParser.ParseUnverified(value, &decoded)
+		require.NoError(t, err)
+		require.Equal(t, "EdDSA", token.Method.Alg())
+		require.Equal(t, apiKey, decoded.Issuer)
 	})
 
 	t.Run("generates a decode-able key", func(t *testing.T) {
