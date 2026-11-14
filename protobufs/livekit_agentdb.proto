@@ -24,6 +24,7 @@ option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
+import "google/protobuf/descriptor.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 import "logger/options.proto";
@@ -31,6 +32,72 @@ import "logger/options.proto";
 // Nested so that names like Value and Ping need not be unique across the
 // livekit package. `tip` throughout is the latest durable commit sequence.
 message AgentDB {
+  // Whether a request answered with an error may have taken effect. The zero
+  // value is the safe reading, so a code without the option, or one a reader
+  // does not know, is MAYBE.
+  enum Applied {
+    APPLIED_MAYBE = 0;           // it may have committed, whole: resend only under its idempotency key
+    APPLIED_NO = 1;              // nothing took effect
+  }
+
+  // Whether the same request can succeed if sent again. The zero value is the
+  // safe reading: a code without the option, or one a reader does not know,
+  // is NEVER.
+  enum Retry {
+    RETRY_NEVER = 0;             // the same request fails the same way
+    RETRY_HERE = 1;              // on the same connection, after a backoff
+    RETRY_ELSEWHERE = 2;         // on a new connection, which may reach another node
+  }
+
+  extend google.protobuf.EnumValueOptions {
+    Applied applied = 1290;
+    Retry retry = 1291;
+  }
+
+  // Every error agent-db reports, on the data plane (Wire.Error.code) and on
+  // the management services, each with what a client may conclude from it. A
+  // code travels as its name in lowercase ("unavailable"). The management
+  // services carry it as their gRPC status code: 1 to 16 are the gRPC codes,
+  // by number and name, and gRPC's UNKNOWN (2) is UNKNOWN. A code a reader
+  // does not know is UNKNOWN. INTERNAL is a broken invariant, after which a
+  // write may have applied.
+  enum ErrorCode {
+    UNKNOWN = 0;
+    CANCELED = 1 [(applied) = APPLIED_MAYBE, (retry) = RETRY_HERE];
+    reserved 2;
+    INVALID_ARGUMENT = 3 [(applied) = APPLIED_NO, (retry) = RETRY_NEVER];
+    DEADLINE_EXCEEDED = 4 [(applied) = APPLIED_MAYBE, (retry) = RETRY_HERE];
+    NOT_FOUND = 5 [(applied) = APPLIED_NO, (retry) = RETRY_NEVER];
+    ALREADY_EXISTS = 6 [(applied) = APPLIED_NO, (retry) = RETRY_NEVER];
+    PERMISSION_DENIED = 7 [(applied) = APPLIED_NO, (retry) = RETRY_NEVER];
+    RESOURCE_EXHAUSTED = 8 [(applied) = APPLIED_NO, (retry) = RETRY_HERE];
+    FAILED_PRECONDITION = 9 [(applied) = APPLIED_NO, (retry) = RETRY_NEVER];
+    ABORTED = 10 [(applied) = APPLIED_NO, (retry) = RETRY_HERE];
+    OUT_OF_RANGE = 11 [(applied) = APPLIED_NO, (retry) = RETRY_NEVER];
+    UNIMPLEMENTED = 12 [(applied) = APPLIED_NO, (retry) = RETRY_NEVER];
+    INTERNAL = 13 [(applied) = APPLIED_MAYBE, (retry) = RETRY_NEVER];
+    // The node cannot serve the database: not its owner, or the database
+    // closed under the request. A write may have committed before it did.
+    UNAVAILABLE = 14 [(applied) = APPLIED_MAYBE, (retry) = RETRY_ELSEWHERE];
+    DATA_LOSS = 15 [(applied) = APPLIED_MAYBE, (retry) = RETRY_NEVER];
+    UNAUTHENTICATED = 16 [(applied) = APPLIED_NO, (retry) = RETRY_NEVER];
+
+    // The data plane's own.
+    PROTOCOL = 17 [(applied) = APPLIED_NO, (retry) = RETRY_NEVER];      // a frame out of order or unknown
+    EXEC = 18 [(applied) = APPLIED_NO, (retry) = RETRY_NEVER];          // a statement the engine refused
+    QUERY = 19 [(applied) = APPLIED_NO, (retry) = RETRY_NEVER];
+    TXN = 20 [(applied) = APPLIED_NO, (retry) = RETRY_NEVER];           // a Begin, Commit or Rollback refused
+    RETRY = 21 [(applied) = APPLIED_NO, (retry) = RETRY_HERE];          // refused before it applied anything
+    // A write whose durable flush failed: it may have committed, whole.
+    OUTCOME_UNKNOWN = 22 [(applied) = APPLIED_MAYBE, (retry) = RETRY_HERE];
+    // A notice on request id 0: the database was evicted while the connection
+    // had nothing in flight, and the socket ends. Redial when next needed.
+    IDLE_EVICTED = 23 [(applied) = APPLIED_NO, (retry) = RETRY_ELSEWHERE];
+    // A Rollback of a transaction the server had already aborted: none of it
+    // applied, and the whole transaction may run again.
+    TXN_ABORTED = 24 [(applied) = APPLIED_NO, (retry) = RETRY_HERE];
+  }
+
   message CreateRequest {
     // Unset: never expires, and expires_at is then unset everywhere.
     // Otherwise clamped to the server cap, and never extended.
@@ -222,7 +289,9 @@ message AgentDB {
     }
 
     message Error {
-      string code = 1;             // stable, machine-readable
+      // An ErrorCode's name in lowercase, kept a string so that a reader
+      // older than a code still reads it, as UNKNOWN.
+      string code = 1;
       string message = 2;
     }
   }
