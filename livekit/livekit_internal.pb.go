@@ -47,6 +47,7 @@ const (
 	NodeType_DIRECTOR     NodeType = 6
 	NodeType_HOSTED_AGENT NodeType = 7
 	NodeType_SETTINGS     NodeType = 8
+	NodeType_SIGNAL       NodeType = 9
 )
 
 // Enum value maps for NodeType.
@@ -60,6 +61,7 @@ var (
 		6: "DIRECTOR",
 		7: "HOSTED_AGENT",
 		8: "SETTINGS",
+		9: "SIGNAL",
 	}
 	NodeType_value = map[string]int32{
 		"SERVER":       0,
@@ -70,6 +72,7 @@ var (
 		"DIRECTOR":     6,
 		"HOSTED_AGENT": 7,
 		"SETTINGS":     8,
+		"SIGNAL":       9,
 	}
 )
 
@@ -1649,7 +1652,7 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xa9\x01\n" +
 	"\tICEConfig\x12N\n" +
 	"\x15preference_subscriber\x18\x01 \x01(\x0e2\x19.livekit.ICECandidateTypeR\x14preferenceSubscriber\x12L\n" +
-	"\x14preference_publisher\x18\x02 \x01(\x0e2\x19.livekit.ICECandidateTypeR\x13preferencePublisher*v\n" +
+	"\x14preference_publisher\x18\x02 \x01(\x0e2\x19.livekit.ICECandidateTypeR\x13preferencePublisher*\x82\x01\n" +
 	"\bNodeType\x12\n" +
 	"\n" +
 	"\x06SERVER\x10\x00\x12\x0e\n" +
@@ -1660,7 +1663,9 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"\aSWEEPER\x10\x05\x12\f\n" +
 	"\bDIRECTOR\x10\x06\x12\x10\n" +
 	"\fHOSTED_AGENT\x10\a\x12\f\n" +
-	"\bSETTINGS\x10\b*K\n" +
+	"\bSETTINGS\x10\b\x12\n" +
+	"\n" +
+	"\x06SIGNAL\x10\t*K\n" +
 	"\tNodeState\x12\x0f\n" +
 	"\vSTARTING_UP\x10\x00\x12\v\n" +
 	"\aSERVING\x10\x01\x12\x11\n" +
