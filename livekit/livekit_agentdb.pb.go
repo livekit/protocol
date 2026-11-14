@@ -1010,8 +1010,11 @@ type AgentDB_Wire_ClientMessage struct {
 	// the request within it, and work not yet committed stops when it
 	// runs out. 0: the server's default.
 	DeadlineMs uint32 `protobuf:"varint,12,opt,name=deadline_ms,json=deadlineMs,proto3" json:"deadline_ms,omitempty"`
-	// On a write (exec, batch): its number in client_id's sequence, which
-	// with client_id keys the write, so a resend applies it at most once.
+	// On a write (exec, batch): its number in client_id's sequence, unique
+	// per write and kept across its resends. A resend within the server's
+	// window of the client's recent writes answers the first send's result.
+	// Seqs need not arrive in order. A seq below a full window is refused
+	// failed_precondition.
 	Seq uint64 `protobuf:"varint,13,opt,name=seq,proto3" json:"seq,omitempty"`
 	// Types that are valid to be assigned to Message:
 	//
@@ -1953,8 +1956,10 @@ type AgentDB_Wire_Hello struct {
 	state      protoimpl.MessageState `protogen:"open.v1"`
 	Token      string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
 	DatabaseId string                 `protobuf:"bytes,2,opt,name=database_id,json=databaseId,proto3" json:"database_id,omitempty"`
-	// Stable for the client process's run: it keys the writes it sends
-	// with their seq.
+	// Stable for the client process's run and shared by its sockets: it
+	// keys the writes it sends with their seq. The server keeps the answers
+	// of a client's last 16 keyed writes per database, so at most 16 of
+	// them may be in flight to one database at once.
 	ClientId      string `protobuf:"bytes,3,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
 	ClientVersion string `protobuf:"bytes,4,opt,name=client_version,json=clientVersion,proto3" json:"client_version,omitempty"`
 	// The largest frame the client reads, in bytes; the server never sends
