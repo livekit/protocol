@@ -1125,7 +1125,7 @@ type StartSession struct {
 	// A user's ClaimGrants serialized in JSON
 	GrantsJson     string `protobuf:"bytes,14,opt,name=grants_json,json=grantsJson,proto3" json:"grants_json,omitempty"`
 	AdaptiveStream bool   `protobuf:"varint,15,opt,name=adaptive_stream,json=adaptiveStream,proto3" json:"adaptive_stream,omitempty"`
-	//if reconnect, client will set current sid
+	// if reconnect, client will set current sid
 	ParticipantId           string              `protobuf:"bytes,16,opt,name=participant_id,json=participantId,proto3" json:"participant_id,omitempty"`
 	ReconnectReason         ReconnectReason     `protobuf:"varint,17,opt,name=reconnect_reason,json=reconnectReason,proto3,enum=livekit.ReconnectReason" json:"reconnect_reason,omitempty"`
 	SubscriberAllowPause    *bool               `protobuf:"varint,18,opt,name=subscriber_allow_pause,json=subscriberAllowPause,proto3,oneof" json:"subscriber_allow_pause,omitempty"`
