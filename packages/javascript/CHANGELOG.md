@@ -1,5 +1,19 @@
 # @livekit/protocol
 
+## 1.54.1
+
+### Patch Changes
+
+- Scope agent database access: `agentThread.sql` opens a covered thread's database, whose id is the thread's; `agentDatabase` reads, writes or deletes the standalone databases it lists, and creates or lists the project's. Remove `agent.databaseAdmin` and `AgentThread.Thread.database_id` - [#1969](https://github.com/livekit/protocol/pull/1969) ([@theomonnom](https://github.com/theomonnom))
+
+- Remove `FunctionCall.extra`: livekit-agents 1.7.0 to 1.8.8 fill it from their own `FunctionCall.extra` and fail to encode the session history. - [#1978](https://github.com/livekit/protocol/pull/1978) ([@theomonnom](https://github.com/theomonnom))
+
+- Add SIGNAL node type - [#1979](https://github.com/livekit/protocol/pull/1979) ([@paulwe](https://github.com/paulwe))
+
+- agent_simulation: choose the persona's model per run - [#1968](https://github.com/livekit/protocol/pull/1968) ([@u9g](https://github.com/u9g))
+
+- Remove unused full_snapshot from ParticipantUpdate - [#1971](https://github.com/livekit/protocol/pull/1971) ([@lukasIO](https://github.com/lukasIO))
+
 ## 1.54.0
 
 ### Minor Changes
