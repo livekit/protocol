@@ -16,6 +16,10 @@ package agent
 
 import _ "embed"
 
+// DefaultPartitionKey is used by frameworks when an application omits its partition key.
+// Storage operations must always supply the resolved key explicitly.
+const DefaultPartitionKey = "default"
+
 // ThreadSchemaVersion is the newest conversation schema a thread's database
 // can hold.
 const ThreadSchemaVersion = 1
