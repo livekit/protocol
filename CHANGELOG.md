@@ -1,5 +1,15 @@
 # github.com/livekit/protocol
 
+## 1.54.1
+
+### Patch Changes
+
+- Remove `FunctionCall.extra`: livekit-agents 1.7.0 to 1.8.8 fill it from their own `FunctionCall.extra` and fail to encode the session history. - [#1978](https://github.com/livekit/protocol/pull/1978) ([@theomonnom](https://github.com/theomonnom))
+
+- agent_simulation: choose the persona's model per run - [#1968](https://github.com/livekit/protocol/pull/1968) ([@u9g](https://github.com/u9g))
+
+- A `TimeoutQueue` iteration no longer revisits items reset during it, so resetting every item while iterating ends even when the clock has not moved - [#1981](https://github.com/livekit/protocol/pull/1981) ([@theomonnom](https://github.com/theomonnom))
+
 ## 1.54.0
 
 ### Minor Changes
