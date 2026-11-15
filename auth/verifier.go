@@ -25,9 +25,11 @@ import (
 // matches go-jose's previous DefaultLeeway for validation tolerance.
 const tokenLeeway = time.Minute
 
+// TokenTypeV2 is the typ header of a token signed with a version 2 key.
+const TokenTypeV2 = "livekit-v2+jwt"
+
 var (
-	// The token is parsed before its key is known, so both methods are allowed here.
-	// The key picks the one method that verifies the signature.
+	// Parsing runs before the key is known, so it allows both. The key picks one.
 	allowedSigningMethods = []string{jwt.SigningMethodHS256.Alg(), jwt.SigningMethodEdDSA.Alg()}
 	unverifiedParser      = jwt.NewParser(jwt.WithValidMethods(allowedSigningMethods))
 )
@@ -46,6 +48,8 @@ type APIKeyTokenVerifier struct {
 	identity string
 	apiKey   string
 	alg      string
+	keyID    string // kid header
+	typ      string // typ header
 }
 
 // ParseAPIToken parses an encoded JWT token without verifying its signature.
@@ -63,6 +67,8 @@ func ParseAPIToken(raw string) (*APIKeyTokenVerifier, error) {
 		identity: claims.Subject,
 		alg:      token.Method.Alg(),
 	}
+	v.keyID, _ = token.Header["kid"].(string)
+	v.typ, _ = token.Header["typ"].(string)
 	if v.identity == "" {
 		v.identity = claims.ID
 	}
@@ -91,6 +97,8 @@ func (v *APIKeyTokenVerifier) Verify(key interface{}) (*jwt.RegisteredClaims, *C
 
 // VerifyWithKey picks the algorithm from the key, never from the token header:
 // HS256 with the secret for version 1, EdDSA with the public key for version 2.
+// A version 2 token must also name the API key in its kid header and have the
+// type TokenTypeV2.
 func (v *APIKeyTokenVerifier) VerifyWithKey(k VerificationKey) (*jwt.RegisteredClaims, *ClaimGrants, error) {
 	switch k.Version {
 	case 1:
@@ -105,7 +113,17 @@ func (v *APIKeyTokenVerifier) VerifyWithKey(k VerificationKey) (*jwt.RegisteredC
 		if len(k.PublicKey) != ed25519.PublicKeySize {
 			return nil, nil, ErrInvalidPublicKey
 		}
-		return v.verify(jwt.SigningMethodEdDSA, k.PublicKey)
+		claims, grants, err := v.verify(jwt.SigningMethodEdDSA, k.PublicKey)
+		if err != nil {
+			return nil, nil, err
+		}
+		if v.keyID != v.apiKey {
+			return nil, nil, ErrKeyIDMismatch
+		}
+		if v.typ != TokenTypeV2 {
+			return nil, nil, ErrTokenTypeMismatch
+		}
+		return claims, grants, nil
 	default:
 		return nil, nil, fmt.Errorf("%w: %d", ErrUnsupportedKeyVersion, k.Version)
 	}

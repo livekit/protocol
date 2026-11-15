@@ -240,6 +240,37 @@ func TestVerifyWithKey(t *testing.T) {
 		require.Error(t, err)
 	})
 
+	t.Run("v2 key refuses a token with no kid or a kid that is not the issuer", func(t *testing.T) {
+		for _, kid := range []string{"", "APIother"} {
+			tok := jwt.NewWithClaims(jwt.SigningMethodEdDSA, jwt.MapClaims{
+				"iss": apiKey,
+				"sub": "me",
+				"exp": jwt.NewNumericDate(time.Now().Add(time.Hour)),
+			})
+			if kid != "" {
+				tok.Header["kid"] = kid
+			}
+			token, err := tok.SignedString(priv)
+			require.NoError(t, err)
+			_, _, err = parse(t, token).VerifyWithKey(v2Key)
+			require.ErrorIs(t, err, auth.ErrKeyIDMismatch)
+		}
+	})
+
+	t.Run("v2 key refuses a token that is not of the v2 type", func(t *testing.T) {
+		// jwt sets typ to JWT by default
+		tok := jwt.NewWithClaims(jwt.SigningMethodEdDSA, jwt.MapClaims{
+			"iss": apiKey,
+			"sub": "me",
+			"exp": jwt.NewNumericDate(time.Now().Add(time.Hour)),
+		})
+		tok.Header["kid"] = apiKey
+		token, err := tok.SignedString(priv)
+		require.NoError(t, err)
+		_, _, err = parse(t, token).VerifyWithKey(v2Key)
+		require.ErrorIs(t, err, auth.ErrTokenTypeMismatch)
+	})
+
 	t.Run("expired EdDSA token is refused", func(t *testing.T) {
 		token, err := jwt.NewWithClaims(jwt.SigningMethodEdDSA, jwt.MapClaims{
 			"iss": apiKey,

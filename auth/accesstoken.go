@@ -225,7 +225,10 @@ func (t *AccessToken) ToJWT() (string, error) {
 		ClaimGrants: t.grant,
 	}
 	if t.privateKey != nil {
-		return jwt.NewWithClaims(jwt.SigningMethodEdDSA, claims).SignedString(t.privateKey)
+		token := jwt.NewWithClaims(jwt.SigningMethodEdDSA, claims)
+		token.Header["kid"] = t.apiKey
+		token.Header["typ"] = TokenTypeV2
+		return token.SignedString(t.privateKey)
 	}
 	return jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(t.secret))
 }
