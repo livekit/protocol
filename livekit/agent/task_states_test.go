@@ -3,7 +3,7 @@ package agent
 import (
 	"testing"
 
-	"google.golang.org/protobuf/encoding/protojson"
+	"github.com/livekit/protocol/utils/protojson"
 	"google.golang.org/protobuf/proto"
 )
 
