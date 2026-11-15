@@ -16,6 +16,7 @@ const (
 	DataChannelRpcRecipientDisconnected
 	DataChannelRpcResponsePayloadTooLarge
 	DataChannelRpcSendFailed
+	DataChannelRpcConnectionClosed
 )
 
 const (
@@ -41,6 +42,7 @@ var dataChannelRpcErrorMessages = map[DataChannelRpcErrorCode]string{
 	DataChannelRpcRecipientDisconnected:   "Recipient disconnected",
 	DataChannelRpcResponsePayloadTooLarge: "Response payload too large",
 	DataChannelRpcSendFailed:              "Failed to send",
+	DataChannelRpcConnectionClosed:        "Connection closed",
 
 	DataChannelRpcUnsupportedMethod:      "Method not supported at destination",
 	DataChannelRpcRecipientNotFound:      "Recipient not found",
@@ -76,6 +78,8 @@ func (e *DataChannelRpcError) PsrpcError() psrpc.Error {
 		return psrpc.NewError(psrpc.MalformedResponse, e)
 	case DataChannelRpcSendFailed:
 		return psrpc.NewError(psrpc.Internal, e)
+	case DataChannelRpcConnectionClosed:
+		return psrpc.NewError(psrpc.Unavailable, e)
 	case DataChannelRpcUnsupportedMethod:
 		return psrpc.NewError(psrpc.InvalidArgument, e)
 	case DataChannelRpcRecipientNotFound:
