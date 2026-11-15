@@ -65,7 +65,10 @@ message FunctionCall {
   // livekit-agents 1.7.0 to 1.8.8 fill every field declared here from their own
   // FunctionCall, whose extra is not a map<string, string>: never reuse this field.
   reserved 6;
-  reserved "extra";
+  // Framework and provider metadata, including approval identities and resumable
+  // tool/delegation state. Each value is JSON text, including quoted strings.
+  // Readers may treat a value that is not valid JSON as a legacy plain string.
+  map<string, string> extra = 7;
 }
 
 message FunctionCallOutput {
