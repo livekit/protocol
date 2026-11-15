@@ -1,5 +1,107 @@
 # github.com/livekit/protocol
 
+## 1.54.1
+
+### Patch Changes
+
+- Remove `FunctionCall.extra`: livekit-agents 1.7.0 to 1.8.8 fill it from their own `FunctionCall.extra` and fail to encode the session history. - [#1978](https://github.com/livekit/protocol/pull/1978) ([@theomonnom](https://github.com/theomonnom))
+
+- agent_simulation: choose the persona's model per run - [#1968](https://github.com/livekit/protocol/pull/1968) ([@u9g](https://github.com/u9g))
+
+- A `TimeoutQueue` iteration no longer revisits items reset during it, so resetting every item while iterating ends even when the clock has not moved - [#1981](https://github.com/livekit/protocol/pull/1981) ([@theomonnom](https://github.com/theomonnom))
+
+## 1.54.0
+
+### Minor Changes
+
+- SIP inbound trunks: add validation of allowed_addresses and a new strict validation mode for MatchTrunkIter. - [#1961](https://github.com/livekit/protocol/pull/1961) ([@alexfish8](https://github.com/alexfish8))
+
+### Patch Changes
+
+- utils: CloneProtoRedacted no longer panics on unannotated scalar-valued maps - [#1951](https://github.com/livekit/protocol/pull/1951) ([@paulwe](https://github.com/paulwe))
+
+- Add `lk.connector.requestTime` and `lk.connector.answerTime` connector participant attributes, with helpers to set and parse them - [#1956](https://github.com/livekit/protocol/pull/1956) ([@boks1971](https://github.com/boks1971))
+
+- datatrack: size marshalled extensions from the extension list so a stale `ExtensionsSize` cannot corrupt the marshalled header. - [#1944](https://github.com/livekit/protocol/pull/1944) ([@boks1971](https://github.com/boks1971))
+  datatrack: reset extensions on each `Unmarshal` and reject packets that repeat an extension ID.
+
+- decodebudget: price protojson well-known types, extensions, numbers, escapes and maps, wire-type mismatches and dynamicpb destinations; cut Estimate's own allocation - [#1950](https://github.com/livekit/protocol/pull/1950) ([@paulwe](https://github.com/paulwe))
+
+- guid: invalid IDs marshal to a sentinel and malformed input unmarshals to the zero ID instead of panicking - [#1952](https://github.com/livekit/protocol/pull/1952) ([@paulwe](https://github.com/paulwe))
+
+- `utils.MetricsBatchBuilder.Merge` rejects out-of-range `str_data` indexes on 32-bit builds. - [#1946](https://github.com/livekit/protocol/pull/1946) ([@boks1971](https://github.com/boks1971))
+
+- auth: UpdateFromPermission and MatchesPermission ignore agent, so a permission update cannot grant it - [#1962](https://github.com/livekit/protocol/pull/1962) ([@boks1971](https://github.com/boks1971))
+
+- `rtputil.RTPConverter` returns a zero duration when the clock rate is 0. - [#1942](https://github.com/livekit/protocol/pull/1942) ([@boks1971](https://github.com/boks1971))
+
+- `sdp.CodecsFromMediaDescription` builds the codec map once and returns each payload type once, even when the m= line repeats it. - [#1941](https://github.com/livekit/protocol/pull/1941) ([@boks1971](https://github.com/boks1971))
+  `SDPFragment.PatchICECredentialAndCandidatesIntoSDP` adds the fragment's candidates only to the media section with the fragment's mid.
+
+- `signalling.FromProtoSessionDescription` returns an empty description for a nil input, the same zero value that `ToProtoSessionDescription` maps to nil. - [#1943](https://github.com/livekit/protocol/pull/1943) ([@boks1971](https://github.com/boks1971))
+
+- `SimulationRun.JobMetrics.Turn.entities`: each key-entity saying in the turn, with what the listener heard and whether it was recognized. - [#1894](https://github.com/livekit/protocol/pull/1894) ([@u9g](https://github.com/u9g))
+  `SimulationRun.JobMetrics.Turn.item_id`: the agent's chat item id for the turn's first message, so a turn can link to its place in the stored transcript.
+
+- Add `sip_source_call_id` to `CreateSIPParticipantRequest`, to forward the caller ID of a live inbound call (cloud only) - [#1960](https://github.com/livekit/protocol/pull/1960) ([@genseric-ghiro](https://github.com/genseric-ghiro))
+
+- Add the telemetry semantic-conventions registry under `otel/` - [#1866](https://github.com/livekit/protocol/pull/1866) ([@pblazej](https://github.com/pblazej))
+
+- Group generated Python telemetry attribute values in plain classes while preserving string values. - [#1881](https://github.com/livekit/protocol/pull/1881) ([@pblazej](https://github.com/pblazej))
+
+- Group generated TypeScript telemetry attribute values in const objects with matching union types. - [#1872](https://github.com/livekit/protocol/pull/1872) ([@lukasIO](https://github.com/lukasIO))
+
+- webhook: bound each delivery attempt by default (10 s client timeout when none is set) and cap a `Retry-After` wait at `RetryWaitMax`. - [#1945](https://github.com/livekit/protocol/pull/1945) ([@boks1971](https://github.com/boks1971))
+  webhook: mask userinfo and query values of the delivery URL in logs and send errors, log `http.StatusText` instead of the endpoint's status text, and cap the response head at 64 KiB.
+
+## 1.53.4
+
+### Patch Changes
+
+- Add `AgentSessionEvent.SessionClosed`, sent when an agent session ends while its host keeps serving requests - [#1888](https://github.com/livekit/protocol/pull/1888) ([@u9g](https://github.com/u9g))
+
+## 1.53.3
+
+### Patch Changes
+
+- AMD v2 in agent session events (`livekit_agent_session.proto`): `AmdCategory` adds `AMD_MACHINE_SCREENING` and `AMD_WAIT`, `AmdPrediction` adds the turn ID, the stage, and the inference time, and a new `AmdCompleted` event reports the final result and the last prediction once per AMD run. - [#1880](https://github.com/livekit/protocol/pull/1880) ([@chenghao-mou](https://github.com/chenghao-mou))
+
+- agent_simulation: dispatch a simulation run to a named agent deployment - [#1932](https://github.com/livekit/protocol/pull/1932) ([@u9g](https://github.com/u9g))
+
+## 1.53.2
+
+### Patch Changes
+
+- Add `Job.created_at`, `JobState.accepted_at`, `JobState.assigned_at` and `AgentDispatchState.trigger`, and the `lk.rtc.joinRequestTime` participant attribute - [#1929](https://github.com/livekit/protocol/pull/1929) ([@boks1971](https://github.com/boks1971))
+
+- Add `UpdateJobStatus.join_timing`, the instants of an agent join on the worker's monotonic clock - [#1900](https://github.com/livekit/protocol/pull/1900) ([@boks1971](https://github.com/boks1971))
+
+- `agentsobs` and `agentsv3obs` report agent join latency per job: the user arrival time, the join outcome, whether the join counts toward the latency figures, the attempts, and the total and attributable latency - [#1927](https://github.com/livekit/protocol/pull/1927) ([@boks1971](https://github.com/boks1971))
+
+- decodebudget: move the protobuf/JSON decoding budgets to `utils/decodebudget` and add a calibrated decoded-allocation estimate (`MaxDecodedBytes`, `Estimate`, `ValidateProtoJSON`) - [#1920](https://github.com/livekit/protocol/pull/1920) ([@paulwe](https://github.com/paulwe))
+
+- decodebudget: charge repeated occurrences of a singular message field against the merged message, closing a quadratic undercount - [#1921](https://github.com/livekit/protocol/pull/1921) ([@paulwe](https://github.com/paulwe))
+
+- Replace `NodeStats.forward_scheduling_delay` with `NodeStats.forward_processing_per_write`, the mean forwarding work per write to a subscriber - [#1895](https://github.com/livekit/protocol/pull/1895) ([@boks1971](https://github.com/boks1971))
+
+- hwstats: ignore LIVEKIT_CPU_REQUEST when measuring whole-host CPU - [#1904](https://github.com/livekit/protocol/pull/1904) ([@boks1971](https://github.com/boks1971))
+
+- hwstats: add WithHostCPU option to measure whole-host CPU from /proc/stat - [#1903](https://github.com/livekit/protocol/pull/1903) ([@boks1971](https://github.com/boks1971))
+
+- webhook: `ResourceURLNotifier.Stop(false)` waits for queued events to be sent, as `URLNotifier.Stop(false)` does - [#1901](https://github.com/livekit/protocol/pull/1901) ([@mnjalale](https://github.com/mnjalale))
+
+- sdp: add CodecsFromSessionDescription and ParseFmtp helpers - [#1899](https://github.com/livekit/protocol/pull/1899) ([@anunaym14](https://github.com/anunaym14))
+
+- agent_simulation: dial a phone number over SIP instead of dispatching an agent - [#1858](https://github.com/livekit/protocol/pull/1858) ([@u9g](https://github.com/u9g))
+
+- Add `SIPDialtone` to select a regional dial tone on CreateSIPParticipant and TransferSIPParticipant; deprecate `play_dialtone` - [#1892](https://github.com/livekit/protocol/pull/1892) ([@dennwc](https://github.com/dennwc))
+
+- sip: add `SIPMediaConfig.drop_audio_during_dtmf` to stop sending audio RTP while DTMF is sent - [#1907](https://github.com/livekit/protocol/pull/1907) ([@alexlivekit](https://github.com/alexlivekit))
+
+- Add `lk.sip.pinEnteredTime` and `lk.sip.answerTime` SIP participant attributes, with helpers to set and parse them - [#1928](https://github.com/livekit/protocol/pull/1928) ([@boks1971](https://github.com/boks1971))
+
+- SIP authentication: compare IP masks against remote address rather than From header. - [#1889](https://github.com/livekit/protocol/pull/1889) ([@alexfish8](https://github.com/alexfish8))
+
 ## 1.53.1
 
 ### Patch Changes

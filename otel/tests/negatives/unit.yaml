@@ -1,0 +1,11 @@
+# expect: livekit_unit
+groups:
+  - id: registry.lk.negative
+    type: attribute_group
+    brief: Negative fixture.
+    attributes:
+      - id: lk.client.connection.duration
+        type: double
+        stability: development
+        brief: A duration without unit s.
+        annotations: {livekit: {owner: client, sensitivity: none}}

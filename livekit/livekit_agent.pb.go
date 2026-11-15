@@ -290,7 +290,7 @@ func (x AgentHttp_AgentEndpointKind) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use AgentHttp_AgentEndpointKind.Descriptor instead.
 func (AgentHttp_AgentEndpointKind) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_agent_proto_rawDescGZIP(), []int{16, 0}
+	return file_livekit_agent_proto_rawDescGZIP(), []int{19, 0}
 }
 
 // why a stream was reset before any HTTP bytes flowed. This travels as the
@@ -361,7 +361,7 @@ func (x AgentHttp_HttpStreamResetCode) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use AgentHttp_HttpStreamResetCode.Descriptor instead.
 func (AgentHttp_HttpStreamResetCode) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_agent_proto_rawDescGZIP(), []int{16, 1}
+	return file_livekit_agent_proto_rawDescGZIP(), []int{19, 1}
 }
 
 type Job struct {
@@ -380,8 +380,13 @@ type Job struct {
 	Deployment      string            `protobuf:"bytes,11,opt,name=deployment,proto3" json:"deployment,omitempty"`
 	Attributes      map[string]string `protobuf:"bytes,12,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	EnableRedaction bool              `protobuf:"varint,13,opt,name=enable_redaction,json=enableRedaction,proto3" json:"enable_redaction,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// when the server created the job, in Unix nanoseconds
+	CreatedAt int64 `protobuf:"varint,14,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	// The agent thread (an AT_ id, see agent/livekit_agent_thread.proto) the dispatched job's
+	// call reads and writes. Empty means the call keeps no durable thread.
+	ThreadId      string `protobuf:"bytes,15,opt,name=thread_id,json=threadId,proto3" json:"thread_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Job) Reset() {
@@ -506,6 +511,20 @@ func (x *Job) GetEnableRedaction() bool {
 	return false
 }
 
+func (x *Job) GetCreatedAt() int64 {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return 0
+}
+
+func (x *Job) GetThreadId() string {
+	if x != nil {
+		return x.ThreadId
+	}
+	return ""
+}
+
 type JobState struct {
 	state               protoimpl.MessageState `protogen:"open.v1"`
 	Status              JobStatus              `protobuf:"varint,1,opt,name=status,proto3,enum=livekit.JobStatus" json:"status,omitempty"`
@@ -517,7 +536,21 @@ type JobState struct {
 	WorkerId            string                 `protobuf:"bytes,7,opt,name=worker_id,json=workerId,proto3" json:"worker_id,omitempty"`
 	AgentId             string                 `protobuf:"bytes,8,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
 	// why the job has no agent, for JS_PENDING and JS_CANCELLED jobs
-	Reason        JobStateReason `protobuf:"varint,9,opt,name=reason,proto3,enum=livekit.JobStateReason" json:"reason,omitempty"`
+	Reason JobStateReason `protobuf:"varint,9,opt,name=reason,proto3,enum=livekit.JobStateReason" json:"reason,omitempty"`
+	// when the server received the worker's accept for this attempt, in Unix nanoseconds
+	AcceptedAt int64 `protobuf:"varint,10,opt,name=accepted_at,json=acceptedAt,proto3" json:"accepted_at,omitempty"`
+	// when the server sent the assignment for this attempt, in Unix nanoseconds
+	AssignedAt int64 `protobuf:"varint,11,opt,name=assigned_at,json=assignedAt,proto3" json:"assigned_at,omitempty"`
+	// attempts assigned to a worker so far, the current one included
+	Attempts uint32 `protobuf:"varint,12,opt,name=attempts,proto3" json:"attempts,omitempty"`
+	// started_at of the first attempt assigned to a worker, in Unix nanoseconds
+	FirstStartedAt int64 `protobuf:"varint,13,opt,name=first_started_at,json=firstStartedAt,proto3" json:"first_started_at,omitempty"`
+	// time spent in attempts the agent's own code failed before the agent
+	// joined, as an entrypoint that fails before it connects: from each such
+	// attempt's start to the next attempt's start, in nanoseconds
+	AgentFailedAttemptsNs int64 `protobuf:"varint,14,opt,name=agent_failed_attempts_ns,json=agentFailedAttemptsNs,proto3" json:"agent_failed_attempts_ns,omitempty"`
+	// workers asked to take this attempt, the one that took it included
+	WorkersAsked  uint32 `protobuf:"varint,15,opt,name=workers_asked,json=workersAsked,proto3" json:"workers_asked,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -615,6 +648,48 @@ func (x *JobState) GetReason() JobStateReason {
 	return JobStateReason_JSR_UNSPECIFIED
 }
 
+func (x *JobState) GetAcceptedAt() int64 {
+	if x != nil {
+		return x.AcceptedAt
+	}
+	return 0
+}
+
+func (x *JobState) GetAssignedAt() int64 {
+	if x != nil {
+		return x.AssignedAt
+	}
+	return 0
+}
+
+func (x *JobState) GetAttempts() uint32 {
+	if x != nil {
+		return x.Attempts
+	}
+	return 0
+}
+
+func (x *JobState) GetFirstStartedAt() int64 {
+	if x != nil {
+		return x.FirstStartedAt
+	}
+	return 0
+}
+
+func (x *JobState) GetAgentFailedAttemptsNs() int64 {
+	if x != nil {
+		return x.AgentFailedAttemptsNs
+	}
+	return 0
+}
+
+func (x *JobState) GetWorkersAsked() uint32 {
+	if x != nil {
+		return x.WorkersAsked
+	}
+	return 0
+}
+
 // from Worker to Server
 type WorkerMessage struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -627,6 +702,7 @@ type WorkerMessage struct {
 	//	*WorkerMessage_Ping
 	//	*WorkerMessage_SimulateJob
 	//	*WorkerMessage_MigrateJob
+	//	*WorkerMessage_CreateJobToken
 	Message       isWorkerMessage_Message `protobuf_oneof:"message"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -732,6 +808,15 @@ func (x *WorkerMessage) GetMigrateJob() *MigrateJobRequest {
 	return nil
 }
 
+func (x *WorkerMessage) GetCreateJobToken() *CreateJobTokenRequest {
+	if x != nil {
+		if x, ok := x.Message.(*WorkerMessage_CreateJobToken); ok {
+			return x.CreateJobToken
+		}
+	}
+	return nil
+}
+
 type isWorkerMessage_Message interface {
 	isWorkerMessage_Message()
 }
@@ -768,6 +853,11 @@ type WorkerMessage_MigrateJob struct {
 	MigrateJob *MigrateJobRequest `protobuf:"bytes,7,opt,name=migrate_job,json=migrateJob,proto3,oneof"`
 }
 
+type WorkerMessage_CreateJobToken struct {
+	// a running job asks the server to sign an access token for it
+	CreateJobToken *CreateJobTokenRequest `protobuf:"bytes,8,opt,name=create_job_token,json=createJobToken,proto3,oneof"`
+}
+
 func (*WorkerMessage_Register) isWorkerMessage_Message() {}
 
 func (*WorkerMessage_Availability) isWorkerMessage_Message() {}
@@ -782,6 +872,8 @@ func (*WorkerMessage_SimulateJob) isWorkerMessage_Message() {}
 
 func (*WorkerMessage_MigrateJob) isWorkerMessage_Message() {}
 
+func (*WorkerMessage_CreateJobToken) isWorkerMessage_Message() {}
+
 // from Server to Worker
 type ServerMessage struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -793,6 +885,7 @@ type ServerMessage struct {
 	//	*ServerMessage_Termination
 	//	*ServerMessage_Pong
 	//	*ServerMessage_GoAway
+	//	*ServerMessage_CreateJobToken
 	Message       isServerMessage_Message `protobuf_oneof:"message"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -889,6 +982,15 @@ func (x *ServerMessage) GetGoAway() *AgentHttp_GoAway {
 	return nil
 }
 
+func (x *ServerMessage) GetCreateJobToken() *CreateJobTokenResponse {
+	if x != nil {
+		if x, ok := x.Message.(*ServerMessage_CreateJobToken); ok {
+			return x.CreateJobToken
+		}
+	}
+	return nil
+}
+
 type isServerMessage_Message interface {
 	isServerMessage_Message()
 }
@@ -921,6 +1023,10 @@ type ServerMessage_GoAway struct {
 	GoAway *AgentHttp_GoAway `protobuf:"bytes,6,opt,name=go_away,json=goAway,proto3,oneof"`
 }
 
+type ServerMessage_CreateJobToken struct {
+	CreateJobToken *CreateJobTokenResponse `protobuf:"bytes,7,opt,name=create_job_token,json=createJobToken,proto3,oneof"`
+}
+
 func (*ServerMessage_Register) isServerMessage_Message() {}
 
 func (*ServerMessage_Availability) isServerMessage_Message() {}
@@ -932,6 +1038,8 @@ func (*ServerMessage_Termination) isServerMessage_Message() {}
 func (*ServerMessage_Pong) isServerMessage_Message() {}
 
 func (*ServerMessage_GoAway) isServerMessage_Message() {}
+
+func (*ServerMessage_CreateJobToken) isServerMessage_Message() {}
 
 type SimulateJobRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -1486,7 +1594,9 @@ type UpdateJobStatus struct {
 	// The worker can indicate the job end by either specifying SUCCESS or FAILED
 	Status JobStatus `protobuf:"varint,2,opt,name=status,proto3,enum=livekit.JobStatus" json:"status,omitempty"`
 	// metadata shown on the dashboard, useful for debugging
-	Error         string `protobuf:"bytes,3,opt,name=error,proto3" json:"error,omitempty"`
+	Error string `protobuf:"bytes,3,opt,name=error,proto3" json:"error,omitempty"`
+	// set once the agent has connected to the room
+	JoinTiming    *JobJoinTiming `protobuf:"bytes,4,opt,name=join_timing,json=joinTiming,proto3" json:"join_timing,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1542,6 +1652,116 @@ func (x *UpdateJobStatus) GetError() string {
 	return ""
 }
 
+func (x *UpdateJobStatus) GetJoinTiming() *JobJoinTiming {
+	if x != nil {
+		return x.JoinTiming
+	}
+	return nil
+}
+
+// Instants of one agent join on the worker host's monotonic clock, in microseconds. The
+// clock origin is arbitrary, so only differences between these values carry meaning on
+// their own. The worker and its job processes share this clock.
+type JobJoinTiming struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	OfferReceivedUs      int64                  `protobuf:"varint,1,opt,name=offer_received_us,json=offerReceivedUs,proto3" json:"offer_received_us,omitempty"`                // availability request received
+	AcceptedUs           int64                  `protobuf:"varint,2,opt,name=accepted_us,json=acceptedUs,proto3" json:"accepted_us,omitempty"`                                 // request handler accepted the job
+	AssignmentReceivedUs int64                  `protobuf:"varint,3,opt,name=assignment_received_us,json=assignmentReceivedUs,proto3" json:"assignment_received_us,omitempty"` // job assignment received
+	LaunchedUs           int64                  `protobuf:"varint,4,opt,name=launched_us,json=launchedUs,proto3" json:"launched_us,omitempty"`                                 // a job process was handed the job
+	LaunchWarm           bool                   `protobuf:"varint,5,opt,name=launch_warm,json=launchWarm,proto3" json:"launch_warm,omitempty"`                                 // an idle process took the job; false means one was spawned
+	EntrypointStartedUs  int64                  `protobuf:"varint,6,opt,name=entrypoint_started_us,json=entrypointStartedUs,proto3" json:"entrypoint_started_us,omitempty"`    // the agent's entrypoint started
+	ConnectCalledUs      int64                  `protobuf:"varint,7,opt,name=connect_called_us,json=connectCalledUs,proto3" json:"connect_called_us,omitempty"`                // the agent called room connect
+	ConnectedUs          int64                  `protobuf:"varint,8,opt,name=connected_us,json=connectedUs,proto3" json:"connected_us,omitempty"`                              // the agent's primary transport connected
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *JobJoinTiming) Reset() {
+	*x = JobJoinTiming{}
+	mi := &file_livekit_agent_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *JobJoinTiming) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*JobJoinTiming) ProtoMessage() {}
+
+func (x *JobJoinTiming) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_agent_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use JobJoinTiming.ProtoReflect.Descriptor instead.
+func (*JobJoinTiming) Descriptor() ([]byte, []int) {
+	return file_livekit_agent_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *JobJoinTiming) GetOfferReceivedUs() int64 {
+	if x != nil {
+		return x.OfferReceivedUs
+	}
+	return 0
+}
+
+func (x *JobJoinTiming) GetAcceptedUs() int64 {
+	if x != nil {
+		return x.AcceptedUs
+	}
+	return 0
+}
+
+func (x *JobJoinTiming) GetAssignmentReceivedUs() int64 {
+	if x != nil {
+		return x.AssignmentReceivedUs
+	}
+	return 0
+}
+
+func (x *JobJoinTiming) GetLaunchedUs() int64 {
+	if x != nil {
+		return x.LaunchedUs
+	}
+	return 0
+}
+
+func (x *JobJoinTiming) GetLaunchWarm() bool {
+	if x != nil {
+		return x.LaunchWarm
+	}
+	return false
+}
+
+func (x *JobJoinTiming) GetEntrypointStartedUs() int64 {
+	if x != nil {
+		return x.EntrypointStartedUs
+	}
+	return 0
+}
+
+func (x *JobJoinTiming) GetConnectCalledUs() int64 {
+	if x != nil {
+		return x.ConnectCalledUs
+	}
+	return 0
+}
+
+func (x *JobJoinTiming) GetConnectedUs() int64 {
+	if x != nil {
+		return x.ConnectedUs
+	}
+	return 0
+}
+
 type UpdateWorkerStatus struct {
 	state    protoimpl.MessageState `protogen:"open.v1"`
 	Status   *WorkerStatus          `protobuf:"varint,1,opt,name=status,proto3,enum=livekit.WorkerStatus,oneof" json:"status,omitempty"`
@@ -1558,7 +1778,7 @@ type UpdateWorkerStatus struct {
 
 func (x *UpdateWorkerStatus) Reset() {
 	*x = UpdateWorkerStatus{}
-	mi := &file_livekit_agent_proto_msgTypes[13]
+	mi := &file_livekit_agent_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1570,7 +1790,7 @@ func (x *UpdateWorkerStatus) String() string {
 func (*UpdateWorkerStatus) ProtoMessage() {}
 
 func (x *UpdateWorkerStatus) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_proto_msgTypes[13]
+	mi := &file_livekit_agent_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1583,7 +1803,7 @@ func (x *UpdateWorkerStatus) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateWorkerStatus.ProtoReflect.Descriptor instead.
 func (*UpdateWorkerStatus) Descriptor() ([]byte, []int) {
-	return file_livekit_agent_proto_rawDescGZIP(), []int{13}
+	return file_livekit_agent_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *UpdateWorkerStatus) GetStatus() WorkerStatus {
@@ -1632,7 +1852,7 @@ type JobAssignment struct {
 
 func (x *JobAssignment) Reset() {
 	*x = JobAssignment{}
-	mi := &file_livekit_agent_proto_msgTypes[14]
+	mi := &file_livekit_agent_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1644,7 +1864,7 @@ func (x *JobAssignment) String() string {
 func (*JobAssignment) ProtoMessage() {}
 
 func (x *JobAssignment) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_proto_msgTypes[14]
+	mi := &file_livekit_agent_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1657,7 +1877,7 @@ func (x *JobAssignment) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use JobAssignment.ProtoReflect.Descriptor instead.
 func (*JobAssignment) Descriptor() ([]byte, []int) {
-	return file_livekit_agent_proto_rawDescGZIP(), []int{14}
+	return file_livekit_agent_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *JobAssignment) GetJob() *Job {
@@ -1690,7 +1910,7 @@ type JobTermination struct {
 
 func (x *JobTermination) Reset() {
 	*x = JobTermination{}
-	mi := &file_livekit_agent_proto_msgTypes[15]
+	mi := &file_livekit_agent_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1702,7 +1922,7 @@ func (x *JobTermination) String() string {
 func (*JobTermination) ProtoMessage() {}
 
 func (x *JobTermination) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_proto_msgTypes[15]
+	mi := &file_livekit_agent_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1715,12 +1935,145 @@ func (x *JobTermination) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use JobTermination.ProtoReflect.Descriptor instead.
 func (*JobTermination) Descriptor() ([]byte, []int) {
-	return file_livekit_agent_proto_rawDescGZIP(), []int{15}
+	return file_livekit_agent_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *JobTermination) GetJobId() string {
 	if x != nil {
 		return x.JobId
+	}
+	return ""
+}
+
+type CreateJobTokenRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// echoed in the response
+	RequestId string `protobuf:"bytes,1,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	JobId     string `protobuf:"bytes,2,opt,name=job_id,json=jobId,proto3" json:"job_id,omitempty"`
+	// The claims of the token the job wants, as JSON, in the same shape as an
+	// access token's payload: identity, name, attributes, video, sip, and so on.
+	Claims        string `protobuf:"bytes,3,opt,name=claims,proto3" json:"claims,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateJobTokenRequest) Reset() {
+	*x = CreateJobTokenRequest{}
+	mi := &file_livekit_agent_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateJobTokenRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateJobTokenRequest) ProtoMessage() {}
+
+func (x *CreateJobTokenRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_agent_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateJobTokenRequest.ProtoReflect.Descriptor instead.
+func (*CreateJobTokenRequest) Descriptor() ([]byte, []int) {
+	return file_livekit_agent_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *CreateJobTokenRequest) GetRequestId() string {
+	if x != nil {
+		return x.RequestId
+	}
+	return ""
+}
+
+func (x *CreateJobTokenRequest) GetJobId() string {
+	if x != nil {
+		return x.JobId
+	}
+	return ""
+}
+
+func (x *CreateJobTokenRequest) GetClaims() string {
+	if x != nil {
+		return x.Claims
+	}
+	return ""
+}
+
+type CreateJobTokenResponse struct {
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	RequestId string                 `protobuf:"bytes,1,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	Token     string                 `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
+	// Unix seconds
+	ExpiresAt int64 `protobuf:"varint,3,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	// empty on success; otherwise why the token was refused, naming any refused claim
+	Error         string `protobuf:"bytes,4,opt,name=error,proto3" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateJobTokenResponse) Reset() {
+	*x = CreateJobTokenResponse{}
+	mi := &file_livekit_agent_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateJobTokenResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateJobTokenResponse) ProtoMessage() {}
+
+func (x *CreateJobTokenResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_agent_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateJobTokenResponse.ProtoReflect.Descriptor instead.
+func (*CreateJobTokenResponse) Descriptor() ([]byte, []int) {
+	return file_livekit_agent_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *CreateJobTokenResponse) GetRequestId() string {
+	if x != nil {
+		return x.RequestId
+	}
+	return ""
+}
+
+func (x *CreateJobTokenResponse) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+func (x *CreateJobTokenResponse) GetExpiresAt() int64 {
+	if x != nil {
+		return x.ExpiresAt
+	}
+	return 0
+}
+
+func (x *CreateJobTokenResponse) GetError() string {
+	if x != nil {
+		return x.Error
 	}
 	return ""
 }
@@ -1775,7 +2128,7 @@ type AgentHttp struct {
 
 func (x *AgentHttp) Reset() {
 	*x = AgentHttp{}
-	mi := &file_livekit_agent_proto_msgTypes[16]
+	mi := &file_livekit_agent_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1787,7 +2140,7 @@ func (x *AgentHttp) String() string {
 func (*AgentHttp) ProtoMessage() {}
 
 func (x *AgentHttp) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_proto_msgTypes[16]
+	mi := &file_livekit_agent_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1800,7 +2153,7 @@ func (x *AgentHttp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentHttp.ProtoReflect.Descriptor instead.
 func (*AgentHttp) Descriptor() ([]byte, []int) {
-	return file_livekit_agent_proto_rawDescGZIP(), []int{16}
+	return file_livekit_agent_proto_rawDescGZIP(), []int{19}
 }
 
 type AgentHttp_AgentEndpoint struct {
@@ -1821,7 +2174,7 @@ type AgentHttp_AgentEndpoint struct {
 
 func (x *AgentHttp_AgentEndpoint) Reset() {
 	*x = AgentHttp_AgentEndpoint{}
-	mi := &file_livekit_agent_proto_msgTypes[19]
+	mi := &file_livekit_agent_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1833,7 +2186,7 @@ func (x *AgentHttp_AgentEndpoint) String() string {
 func (*AgentHttp_AgentEndpoint) ProtoMessage() {}
 
 func (x *AgentHttp_AgentEndpoint) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_proto_msgTypes[19]
+	mi := &file_livekit_agent_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1846,7 +2199,7 @@ func (x *AgentHttp_AgentEndpoint) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentHttp_AgentEndpoint.ProtoReflect.Descriptor instead.
 func (*AgentHttp_AgentEndpoint) Descriptor() ([]byte, []int) {
-	return file_livekit_agent_proto_rawDescGZIP(), []int{16, 0}
+	return file_livekit_agent_proto_rawDescGZIP(), []int{19, 0}
 }
 
 func (x *AgentHttp_AgentEndpoint) GetPath() string {
@@ -1891,7 +2244,7 @@ type AgentHttp_AgentEndpointSettings struct {
 
 func (x *AgentHttp_AgentEndpointSettings) Reset() {
 	*x = AgentHttp_AgentEndpointSettings{}
-	mi := &file_livekit_agent_proto_msgTypes[20]
+	mi := &file_livekit_agent_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1903,7 +2256,7 @@ func (x *AgentHttp_AgentEndpointSettings) String() string {
 func (*AgentHttp_AgentEndpointSettings) ProtoMessage() {}
 
 func (x *AgentHttp_AgentEndpointSettings) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_proto_msgTypes[20]
+	mi := &file_livekit_agent_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1916,7 +2269,7 @@ func (x *AgentHttp_AgentEndpointSettings) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentHttp_AgentEndpointSettings.ProtoReflect.Descriptor instead.
 func (*AgentHttp_AgentEndpointSettings) Descriptor() ([]byte, []int) {
-	return file_livekit_agent_proto_rawDescGZIP(), []int{16, 1}
+	return file_livekit_agent_proto_rawDescGZIP(), []int{19, 1}
 }
 
 func (x *AgentHttp_AgentEndpointSettings) GetProtocol() uint32 {
@@ -1953,7 +2306,7 @@ type AgentHttp_StreamPreamble struct {
 
 func (x *AgentHttp_StreamPreamble) Reset() {
 	*x = AgentHttp_StreamPreamble{}
-	mi := &file_livekit_agent_proto_msgTypes[21]
+	mi := &file_livekit_agent_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1965,7 +2318,7 @@ func (x *AgentHttp_StreamPreamble) String() string {
 func (*AgentHttp_StreamPreamble) ProtoMessage() {}
 
 func (x *AgentHttp_StreamPreamble) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_proto_msgTypes[21]
+	mi := &file_livekit_agent_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1978,7 +2331,7 @@ func (x *AgentHttp_StreamPreamble) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentHttp_StreamPreamble.ProtoReflect.Descriptor instead.
 func (*AgentHttp_StreamPreamble) Descriptor() ([]byte, []int) {
-	return file_livekit_agent_proto_rawDescGZIP(), []int{16, 2}
+	return file_livekit_agent_proto_rawDescGZIP(), []int{19, 2}
 }
 
 func (x *AgentHttp_StreamPreamble) GetKind() AgentHttp_AgentEndpointKind {
@@ -2041,7 +2394,7 @@ type AgentHttp_GoAway struct {
 
 func (x *AgentHttp_GoAway) Reset() {
 	*x = AgentHttp_GoAway{}
-	mi := &file_livekit_agent_proto_msgTypes[22]
+	mi := &file_livekit_agent_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2053,7 +2406,7 @@ func (x *AgentHttp_GoAway) String() string {
 func (*AgentHttp_GoAway) ProtoMessage() {}
 
 func (x *AgentHttp_GoAway) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_proto_msgTypes[22]
+	mi := &file_livekit_agent_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2066,7 +2419,7 @@ func (x *AgentHttp_GoAway) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentHttp_GoAway.ProtoReflect.Descriptor instead.
 func (*AgentHttp_GoAway) Descriptor() ([]byte, []int) {
-	return file_livekit_agent_proto_rawDescGZIP(), []int{16, 3}
+	return file_livekit_agent_proto_rawDescGZIP(), []int{19, 3}
 }
 
 func (x *AgentHttp_GoAway) GetReason() string {
@@ -2080,7 +2433,7 @@ var File_livekit_agent_proto protoreflect.FileDescriptor
 
 const file_livekit_agent_proto_rawDesc = "" +
 	"\n" +
-	"\x13livekit_agent.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14logger/options.proto\"\xe2\x04\n" +
+	"\x13livekit_agent.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14logger/options.proto\"\x9e\x05\n" +
 	"\x03Job\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12.\n" +
 	"\vdispatch_id\x18\t \x01(\tB\r\xbaP\n" +
@@ -2102,11 +2455,14 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\n" +
 	"attributes\x18\f \x03(\v2\x1c.livekit.Job.AttributesEntryB\x03\xc0P\x01R\n" +
 	"attributes\x12)\n" +
-	"\x10enable_redaction\x18\r \x01(\bR\x0fenableRedaction\x1a=\n" +
+	"\x10enable_redaction\x18\r \x01(\bR\x0fenableRedaction\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\x0e \x01(\x03R\tcreatedAt\x12\x1b\n" +
+	"\tthread_id\x18\x0f \x01(\tR\bthreadId\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x0e\n" +
-	"\f_participant\"\xda\x02\n" +
+	"\f_participant\"\xc0\x04\n" +
 	"\bJobState\x12*\n" +
 	"\x06status\x18\x01 \x01(\x0e2\x12.livekit.JobStatusR\x06status\x12\x14\n" +
 	"\x05error\x18\x02 \x01(\tR\x05error\x12\x1d\n" +
@@ -2119,7 +2475,16 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\tworker_id\x18\a \x01(\tB\v\xbaP\bworkerIDR\bworkerId\x12%\n" +
 	"\bagent_id\x18\b \x01(\tB\n" +
 	"\xbaP\aagentIDR\aagentId\x12/\n" +
-	"\x06reason\x18\t \x01(\x0e2\x17.livekit.JobStateReasonR\x06reason\"\xc8\x03\n" +
+	"\x06reason\x18\t \x01(\x0e2\x17.livekit.JobStateReasonR\x06reason\x12\x1f\n" +
+	"\vaccepted_at\x18\n" +
+	" \x01(\x03R\n" +
+	"acceptedAt\x12\x1f\n" +
+	"\vassigned_at\x18\v \x01(\x03R\n" +
+	"assignedAt\x12\x1a\n" +
+	"\battempts\x18\f \x01(\rR\battempts\x12(\n" +
+	"\x10first_started_at\x18\r \x01(\x03R\x0efirstStartedAt\x127\n" +
+	"\x18agent_failed_attempts_ns\x18\x0e \x01(\x03R\x15agentFailedAttemptsNs\x12#\n" +
+	"\rworkers_asked\x18\x0f \x01(\rR\fworkersAsked\"\x94\x04\n" +
 	"\rWorkerMessage\x12<\n" +
 	"\bregister\x18\x01 \x01(\v2\x1e.livekit.RegisterWorkerRequestH\x00R\bregister\x12C\n" +
 	"\favailability\x18\x02 \x01(\v2\x1d.livekit.AvailabilityResponseH\x00R\favailability\x12B\n" +
@@ -2129,8 +2494,9 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\x04ping\x18\x05 \x01(\v2\x13.livekit.WorkerPingH\x00R\x04ping\x12@\n" +
 	"\fsimulate_job\x18\x06 \x01(\v2\x1b.livekit.SimulateJobRequestH\x00R\vsimulateJob\x12=\n" +
 	"\vmigrate_job\x18\a \x01(\v2\x1a.livekit.MigrateJobRequestH\x00R\n" +
-	"migrateJobB\t\n" +
-	"\amessage\"\xf5\x02\n" +
+	"migrateJob\x12J\n" +
+	"\x10create_job_token\x18\b \x01(\v2\x1e.livekit.CreateJobTokenRequestH\x00R\x0ecreateJobTokenB\t\n" +
+	"\amessage\"\xc2\x03\n" +
 	"\rServerMessage\x12=\n" +
 	"\bregister\x18\x01 \x01(\v2\x1f.livekit.RegisterWorkerResponseH\x00R\bregister\x12B\n" +
 	"\favailability\x18\x02 \x01(\v2\x1c.livekit.AvailabilityRequestH\x00R\favailability\x128\n" +
@@ -2139,7 +2505,8 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"assignment\x12;\n" +
 	"\vtermination\x18\x05 \x01(\v2\x17.livekit.JobTerminationH\x00R\vtermination\x12)\n" +
 	"\x04pong\x18\x04 \x01(\v2\x13.livekit.WorkerPongH\x00R\x04pong\x124\n" +
-	"\ago_away\x18\x06 \x01(\v2\x19.livekit.AgentHttp.GoAwayH\x00R\x06goAwayB\t\n" +
+	"\ago_away\x18\x06 \x01(\v2\x19.livekit.AgentHttp.GoAwayH\x00R\x06goAway\x12K\n" +
+	"\x10create_job_token\x18\a \x01(\v2\x1f.livekit.CreateJobTokenResponseH\x00R\x0ecreateJobTokenB\t\n" +
 	"\amessage\"\x99\x01\n" +
 	"\x12SimulateJobRequest\x12$\n" +
 	"\x04type\x18\x01 \x01(\x0e2\x10.livekit.JobTypeR\x04type\x12!\n" +
@@ -2193,11 +2560,25 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\x16participant_attributes\x18\a \x03(\v28.livekit.AvailabilityResponse.ParticipantAttributesEntryR\x15participantAttributes\x1aH\n" +
 	"\x1aParticipantAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"t\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xad\x01\n" +
 	"\x0fUpdateJobStatus\x12\x1f\n" +
 	"\x06job_id\x18\x01 \x01(\tB\b\xbaP\x05jobIDR\x05jobId\x12*\n" +
 	"\x06status\x18\x02 \x01(\x0e2\x12.livekit.JobStatusR\x06status\x12\x14\n" +
-	"\x05error\x18\x03 \x01(\tR\x05error\"\xb8\x01\n" +
+	"\x05error\x18\x03 \x01(\tR\x05error\x127\n" +
+	"\vjoin_timing\x18\x04 \x01(\v2\x16.livekit.JobJoinTimingR\n" +
+	"joinTiming\"\xd7\x02\n" +
+	"\rJobJoinTiming\x12*\n" +
+	"\x11offer_received_us\x18\x01 \x01(\x03R\x0fofferReceivedUs\x12\x1f\n" +
+	"\vaccepted_us\x18\x02 \x01(\x03R\n" +
+	"acceptedUs\x124\n" +
+	"\x16assignment_received_us\x18\x03 \x01(\x03R\x14assignmentReceivedUs\x12\x1f\n" +
+	"\vlaunched_us\x18\x04 \x01(\x03R\n" +
+	"launchedUs\x12\x1f\n" +
+	"\vlaunch_warm\x18\x05 \x01(\bR\n" +
+	"launchWarm\x122\n" +
+	"\x15entrypoint_started_us\x18\x06 \x01(\x03R\x13entrypointStartedUs\x12*\n" +
+	"\x11connect_called_us\x18\a \x01(\x03R\x0fconnectCalledUs\x12!\n" +
+	"\fconnected_us\x18\b \x01(\x03R\vconnectedUs\"\xb8\x01\n" +
 	"\x12UpdateWorkerStatus\x122\n" +
 	"\x06status\x18\x01 \x01(\x0e2\x15.livekit.WorkerStatusH\x00R\x06status\x88\x01\x01\x12\x12\n" +
 	"\x04load\x18\x03 \x01(\x02R\x04load\x12\x1b\n" +
@@ -2211,7 +2592,19 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\x05token\x18\x03 \x01(\tB\x03\xc0P\x02R\x05tokenB\x06\n" +
 	"\x04_url\"1\n" +
 	"\x0eJobTermination\x12\x1f\n" +
-	"\x06job_id\x18\x01 \x01(\tB\b\xbaP\x05jobIDR\x05jobId\"\xaa\x05\n" +
+	"\x06job_id\x18\x01 \x01(\tB\b\xbaP\x05jobIDR\x05jobId\"}\n" +
+	"\x15CreateJobTokenRequest\x12+\n" +
+	"\n" +
+	"request_id\x18\x01 \x01(\tB\f\xbaP\trequestIDR\trequestId\x12\x1f\n" +
+	"\x06job_id\x18\x02 \x01(\tB\b\xbaP\x05jobIDR\x05jobId\x12\x16\n" +
+	"\x06claims\x18\x03 \x01(\tR\x06claims\"\x95\x01\n" +
+	"\x16CreateJobTokenResponse\x12+\n" +
+	"\n" +
+	"request_id\x18\x01 \x01(\tB\f\xbaP\trequestIDR\trequestId\x12\x19\n" +
+	"\x05token\x18\x02 \x01(\tB\x03\xc0P\x02R\x05token\x12\x1d\n" +
+	"\n" +
+	"expires_at\x18\x03 \x01(\x03R\texpiresAt\x12\x14\n" +
+	"\x05error\x18\x04 \x01(\tR\x05error\"\xaa\x05\n" +
 	"\tAgentHttp\x1a\x8f\x01\n" +
 	"\rAgentEndpoint\x12\x12\n" +
 	"\x04path\x18\x01 \x01(\tR\x04path\x12\x18\n" +
@@ -2280,7 +2673,7 @@ func file_livekit_agent_proto_rawDescGZIP() []byte {
 }
 
 var file_livekit_agent_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
-var file_livekit_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
+var file_livekit_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
 var file_livekit_agent_proto_goTypes = []any{
 	(JobType)(0),                            // 0: livekit.JobType
 	(WorkerStatus)(0),                       // 1: livekit.WorkerStatus
@@ -2301,63 +2694,69 @@ var file_livekit_agent_proto_goTypes = []any{
 	(*AvailabilityRequest)(nil),             // 16: livekit.AvailabilityRequest
 	(*AvailabilityResponse)(nil),            // 17: livekit.AvailabilityResponse
 	(*UpdateJobStatus)(nil),                 // 18: livekit.UpdateJobStatus
-	(*UpdateWorkerStatus)(nil),              // 19: livekit.UpdateWorkerStatus
-	(*JobAssignment)(nil),                   // 20: livekit.JobAssignment
-	(*JobTermination)(nil),                  // 21: livekit.JobTermination
-	(*AgentHttp)(nil),                       // 22: livekit.AgentHttp
-	nil,                                     // 23: livekit.Job.AttributesEntry
-	nil,                                     // 24: livekit.AvailabilityResponse.ParticipantAttributesEntry
-	(*AgentHttp_AgentEndpoint)(nil),         // 25: livekit.AgentHttp.AgentEndpoint
-	(*AgentHttp_AgentEndpointSettings)(nil), // 26: livekit.AgentHttp.AgentEndpointSettings
-	(*AgentHttp_StreamPreamble)(nil),        // 27: livekit.AgentHttp.StreamPreamble
-	(*AgentHttp_GoAway)(nil),                // 28: livekit.AgentHttp.GoAway
-	(*Room)(nil),                            // 29: livekit.Room
-	(*ParticipantInfo)(nil),                 // 30: livekit.ParticipantInfo
-	(*ParticipantPermission)(nil),           // 31: livekit.ParticipantPermission
-	(*ServerInfo)(nil),                      // 32: livekit.ServerInfo
+	(*JobJoinTiming)(nil),                   // 19: livekit.JobJoinTiming
+	(*UpdateWorkerStatus)(nil),              // 20: livekit.UpdateWorkerStatus
+	(*JobAssignment)(nil),                   // 21: livekit.JobAssignment
+	(*JobTermination)(nil),                  // 22: livekit.JobTermination
+	(*CreateJobTokenRequest)(nil),           // 23: livekit.CreateJobTokenRequest
+	(*CreateJobTokenResponse)(nil),          // 24: livekit.CreateJobTokenResponse
+	(*AgentHttp)(nil),                       // 25: livekit.AgentHttp
+	nil,                                     // 26: livekit.Job.AttributesEntry
+	nil,                                     // 27: livekit.AvailabilityResponse.ParticipantAttributesEntry
+	(*AgentHttp_AgentEndpoint)(nil),         // 28: livekit.AgentHttp.AgentEndpoint
+	(*AgentHttp_AgentEndpointSettings)(nil), // 29: livekit.AgentHttp.AgentEndpointSettings
+	(*AgentHttp_StreamPreamble)(nil),        // 30: livekit.AgentHttp.StreamPreamble
+	(*AgentHttp_GoAway)(nil),                // 31: livekit.AgentHttp.GoAway
+	(*Room)(nil),                            // 32: livekit.Room
+	(*ParticipantInfo)(nil),                 // 33: livekit.ParticipantInfo
+	(*ParticipantPermission)(nil),           // 34: livekit.ParticipantPermission
+	(*ServerInfo)(nil),                      // 35: livekit.ServerInfo
 }
 var file_livekit_agent_proto_depIdxs = []int32{
 	0,  // 0: livekit.Job.type:type_name -> livekit.JobType
-	29, // 1: livekit.Job.room:type_name -> livekit.Room
-	30, // 2: livekit.Job.participant:type_name -> livekit.ParticipantInfo
+	32, // 1: livekit.Job.room:type_name -> livekit.Room
+	33, // 2: livekit.Job.participant:type_name -> livekit.ParticipantInfo
 	7,  // 3: livekit.Job.state:type_name -> livekit.JobState
-	23, // 4: livekit.Job.attributes:type_name -> livekit.Job.AttributesEntry
+	26, // 4: livekit.Job.attributes:type_name -> livekit.Job.AttributesEntry
 	2,  // 5: livekit.JobState.status:type_name -> livekit.JobStatus
 	3,  // 6: livekit.JobState.reason:type_name -> livekit.JobStateReason
 	13, // 7: livekit.WorkerMessage.register:type_name -> livekit.RegisterWorkerRequest
 	17, // 8: livekit.WorkerMessage.availability:type_name -> livekit.AvailabilityResponse
-	19, // 9: livekit.WorkerMessage.update_worker:type_name -> livekit.UpdateWorkerStatus
+	20, // 9: livekit.WorkerMessage.update_worker:type_name -> livekit.UpdateWorkerStatus
 	18, // 10: livekit.WorkerMessage.update_job:type_name -> livekit.UpdateJobStatus
 	11, // 11: livekit.WorkerMessage.ping:type_name -> livekit.WorkerPing
 	10, // 12: livekit.WorkerMessage.simulate_job:type_name -> livekit.SimulateJobRequest
 	15, // 13: livekit.WorkerMessage.migrate_job:type_name -> livekit.MigrateJobRequest
-	14, // 14: livekit.ServerMessage.register:type_name -> livekit.RegisterWorkerResponse
-	16, // 15: livekit.ServerMessage.availability:type_name -> livekit.AvailabilityRequest
-	20, // 16: livekit.ServerMessage.assignment:type_name -> livekit.JobAssignment
-	21, // 17: livekit.ServerMessage.termination:type_name -> livekit.JobTermination
-	12, // 18: livekit.ServerMessage.pong:type_name -> livekit.WorkerPong
-	28, // 19: livekit.ServerMessage.go_away:type_name -> livekit.AgentHttp.GoAway
-	0,  // 20: livekit.SimulateJobRequest.type:type_name -> livekit.JobType
-	29, // 21: livekit.SimulateJobRequest.room:type_name -> livekit.Room
-	30, // 22: livekit.SimulateJobRequest.participant:type_name -> livekit.ParticipantInfo
-	0,  // 23: livekit.RegisterWorkerRequest.type:type_name -> livekit.JobType
-	31, // 24: livekit.RegisterWorkerRequest.allowed_permissions:type_name -> livekit.ParticipantPermission
-	25, // 25: livekit.RegisterWorkerRequest.endpoints:type_name -> livekit.AgentHttp.AgentEndpoint
-	32, // 26: livekit.RegisterWorkerResponse.server_info:type_name -> livekit.ServerInfo
-	26, // 27: livekit.RegisterWorkerResponse.endpoint_settings:type_name -> livekit.AgentHttp.AgentEndpointSettings
-	6,  // 28: livekit.MigrateJobRequest.jobs:type_name -> livekit.Job
-	6,  // 29: livekit.AvailabilityRequest.job:type_name -> livekit.Job
-	24, // 30: livekit.AvailabilityResponse.participant_attributes:type_name -> livekit.AvailabilityResponse.ParticipantAttributesEntry
-	2,  // 31: livekit.UpdateJobStatus.status:type_name -> livekit.JobStatus
-	1,  // 32: livekit.UpdateWorkerStatus.status:type_name -> livekit.WorkerStatus
-	6,  // 33: livekit.JobAssignment.job:type_name -> livekit.Job
-	4,  // 34: livekit.AgentHttp.AgentEndpoint.kind:type_name -> livekit.AgentHttp.AgentEndpointKind
-	4,  // 35: livekit.AgentHttp.StreamPreamble.kind:type_name -> livekit.AgentHttp.AgentEndpointKind
-	36, // [36:36] is the sub-list for method output_type
-	36, // [36:36] is the sub-list for method input_type
-	36, // [36:36] is the sub-list for extension type_name
-	36, // [36:36] is the sub-list for extension extendee
-	0,  // [0:36] is the sub-list for field type_name
+	23, // 14: livekit.WorkerMessage.create_job_token:type_name -> livekit.CreateJobTokenRequest
+	14, // 15: livekit.ServerMessage.register:type_name -> livekit.RegisterWorkerResponse
+	16, // 16: livekit.ServerMessage.availability:type_name -> livekit.AvailabilityRequest
+	21, // 17: livekit.ServerMessage.assignment:type_name -> livekit.JobAssignment
+	22, // 18: livekit.ServerMessage.termination:type_name -> livekit.JobTermination
+	12, // 19: livekit.ServerMessage.pong:type_name -> livekit.WorkerPong
+	31, // 20: livekit.ServerMessage.go_away:type_name -> livekit.AgentHttp.GoAway
+	24, // 21: livekit.ServerMessage.create_job_token:type_name -> livekit.CreateJobTokenResponse
+	0,  // 22: livekit.SimulateJobRequest.type:type_name -> livekit.JobType
+	32, // 23: livekit.SimulateJobRequest.room:type_name -> livekit.Room
+	33, // 24: livekit.SimulateJobRequest.participant:type_name -> livekit.ParticipantInfo
+	0,  // 25: livekit.RegisterWorkerRequest.type:type_name -> livekit.JobType
+	34, // 26: livekit.RegisterWorkerRequest.allowed_permissions:type_name -> livekit.ParticipantPermission
+	28, // 27: livekit.RegisterWorkerRequest.endpoints:type_name -> livekit.AgentHttp.AgentEndpoint
+	35, // 28: livekit.RegisterWorkerResponse.server_info:type_name -> livekit.ServerInfo
+	29, // 29: livekit.RegisterWorkerResponse.endpoint_settings:type_name -> livekit.AgentHttp.AgentEndpointSettings
+	6,  // 30: livekit.MigrateJobRequest.jobs:type_name -> livekit.Job
+	6,  // 31: livekit.AvailabilityRequest.job:type_name -> livekit.Job
+	27, // 32: livekit.AvailabilityResponse.participant_attributes:type_name -> livekit.AvailabilityResponse.ParticipantAttributesEntry
+	2,  // 33: livekit.UpdateJobStatus.status:type_name -> livekit.JobStatus
+	19, // 34: livekit.UpdateJobStatus.join_timing:type_name -> livekit.JobJoinTiming
+	1,  // 35: livekit.UpdateWorkerStatus.status:type_name -> livekit.WorkerStatus
+	6,  // 36: livekit.JobAssignment.job:type_name -> livekit.Job
+	4,  // 37: livekit.AgentHttp.AgentEndpoint.kind:type_name -> livekit.AgentHttp.AgentEndpointKind
+	4,  // 38: livekit.AgentHttp.StreamPreamble.kind:type_name -> livekit.AgentHttp.AgentEndpointKind
+	39, // [39:39] is the sub-list for method output_type
+	39, // [39:39] is the sub-list for method input_type
+	39, // [39:39] is the sub-list for extension type_name
+	39, // [39:39] is the sub-list for extension extendee
+	0,  // [0:39] is the sub-list for field type_name
 }
 
 func init() { file_livekit_agent_proto_init() }
@@ -2375,6 +2774,7 @@ func file_livekit_agent_proto_init() {
 		(*WorkerMessage_Ping)(nil),
 		(*WorkerMessage_SimulateJob)(nil),
 		(*WorkerMessage_MigrateJob)(nil),
+		(*WorkerMessage_CreateJobToken)(nil),
 	}
 	file_livekit_agent_proto_msgTypes[3].OneofWrappers = []any{
 		(*ServerMessage_Register)(nil),
@@ -2383,17 +2783,18 @@ func file_livekit_agent_proto_init() {
 		(*ServerMessage_Termination)(nil),
 		(*ServerMessage_Pong)(nil),
 		(*ServerMessage_GoAway)(nil),
+		(*ServerMessage_CreateJobToken)(nil),
 	}
 	file_livekit_agent_proto_msgTypes[7].OneofWrappers = []any{}
-	file_livekit_agent_proto_msgTypes[13].OneofWrappers = []any{}
 	file_livekit_agent_proto_msgTypes[14].OneofWrappers = []any{}
+	file_livekit_agent_proto_msgTypes[15].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_agent_proto_rawDesc), len(file_livekit_agent_proto_rawDesc)),
 			NumEnums:      6,
-			NumMessages:   23,
+			NumMessages:   26,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

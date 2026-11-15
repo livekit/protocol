@@ -226,7 +226,7 @@ func (x *AgentDB_CreateRequest) GetTtl() *durationpb.Duration {
 
 type AgentDB_CreateResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	DatabaseId    string                 `protobuf:"bytes,1,opt,name=database_id,json=databaseId,proto3" json:"database_id,omitempty"` // "DB_..."
+	DatabaseId    string                 `protobuf:"bytes,1,opt,name=database_id,json=databaseId,proto3" json:"database_id,omitempty"` // "DB_..." for a standalone database, the thread id ("AT_...") for a thread's
 	ExpiresAt     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

@@ -9,10 +9,25 @@ import (
 	"github.com/livekit/protocol/livekit"
 )
 
-func TestInviteTimeAttributes(t *testing.T) {
+func TestTimeAttributes(t *testing.T) {
+	cases := []struct {
+		key    string
+		format func(time.Time) map[string]string
+		parse  func(map[string]string) time.Time
+	}{
+		{livekit.AttrSIPInviteTime, InviteTimeAttributes, ParseInviteTime},
+		{livekit.AttrSIPPinEnteredTime, PinEnteredTimeAttributes, ParsePinEnteredTime},
+		{livekit.AttrSIPAnswerTime, AnswerTimeAttributes, ParseAnswerTime},
+	}
 	at := time.UnixMilli(time.Now().UnixMilli())
-	require.True(t, at.Equal(ParseInviteTime(InviteTimeAttributes(at))))
+	for _, c := range cases {
+		t.Run(c.key, func(t *testing.T) {
+			attrs := c.format(at)
+			require.Contains(t, attrs, c.key)
+			require.True(t, at.Equal(c.parse(attrs)))
 
-	require.True(t, ParseInviteTime(nil).IsZero())
-	require.True(t, ParseInviteTime(map[string]string{livekit.AttrSIPInviteTime: "bad"}).IsZero())
+			require.True(t, c.parse(nil).IsZero())
+			require.True(t, c.parse(map[string]string{c.key: "bad"}).IsZero())
+		})
+	}
 }

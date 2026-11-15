@@ -4039,10 +4039,19 @@ type CreateSIPParticipantRequest struct {
 	// 1) Unspecified: Use legacy behavior - display name will be set to be the caller's number.
 	// 2) Empty string: Do not send a display name, which will result in a CNAM lookup downstream.
 	// 3) Non-empty: Use the specified value as the display name.
-	DisplayName   *string      `protobuf:"bytes,21,opt,name=display_name,json=displayName,proto3,oneof" json:"display_name,omitempty"`
-	Destination   *Destination `protobuf:"bytes,22,opt,name=destination,proto3,oneof" json:"destination,omitempty"` // NEXT ID: 29
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	DisplayName *string      `protobuf:"bytes,21,opt,name=display_name,json=displayName,proto3,oneof" json:"display_name,omitempty"`
+	Destination *Destination `protobuf:"bytes,22,opt,name=destination,proto3,oneof" json:"destination,omitempty"`
+	// cloud only
+	// LiveKit SIP call ID (SCL_[...]) of a live inbound call in the same project.
+	// This is the ID that LiveKit assigns to the call (sip_call_id on
+	// SIPParticipantInfo), not the SIP Call-ID header from the provider. It is
+	// used for forwarding an inbound call, while keeping the original caller's ID
+	// as the caller ID of this new call.
+	// If sip_from_header is set, its user must match the caller's number. If not,
+	// the caller's number is used.
+	SipSourceCallId string `protobuf:"bytes,29,opt,name=sip_source_call_id,json=sipSourceCallId,proto3" json:"sip_source_call_id,omitempty"` // NEXT ID: 30
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *CreateSIPParticipantRequest) Reset() {
@@ -4272,6 +4281,13 @@ func (x *CreateSIPParticipantRequest) GetDestination() *Destination {
 		return x.Destination
 	}
 	return nil
+}
+
+func (x *CreateSIPParticipantRequest) GetSipSourceCallId() string {
+	if x != nil {
+		return x.SipSourceCallId
+	}
+	return ""
 }
 
 type SIPParticipantInfo struct {
@@ -5589,7 +5605,7 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1aF\n" +
 	"\x18AttributesToHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xc5\x0e\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x86\x0f\n" +
 	"\x1bCreateSIPParticipantRequest\x12/\n" +
 	"\fsip_trunk_id\x18\x01 \x01(\tB\r\xbaP\n" +
 	"sipTrunkIDR\n" +
@@ -5622,7 +5638,8 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x05media\x18\x17 \x01(\v2\x17.livekit.SIPMediaConfigR\x05media\x12.\n" +
 	"\x13wait_until_answered\x18\x13 \x01(\bR\x11waitUntilAnswered\x12L\n" +
 	"\fdisplay_name\x18\x15 \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01H\x00R\vdisplayName\x88\x01\x01\x12;\n" +
-	"\vdestination\x18\x16 \x01(\v2\x14.livekit.DestinationH\x01R\vdestination\x88\x01\x01\x1aH\n" +
+	"\vdestination\x18\x16 \x01(\v2\x14.livekit.DestinationH\x01R\vdestination\x88\x01\x01\x12?\n" +
+	"\x12sip_source_call_id\x18\x1d \x01(\tB\x12\xbaP\x0fsipSourceCallIDR\x0fsipSourceCallId\x1aH\n" +
 	"\x1aParticipantAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a:\n" +

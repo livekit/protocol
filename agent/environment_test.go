@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/livekit/protocol/utils/guid"
 )
 
 func TestValidateDeployment(t *testing.T) {
@@ -39,5 +41,13 @@ func TestValidateDeployment(t *testing.T) {
 				require.Error(t, err)
 			}
 		})
+	}
+}
+
+func TestValidateThreadID(t *testing.T) {
+	require.NoError(t, ValidateThreadID(""))
+	require.NoError(t, ValidateThreadID(guid.New(guid.AgentThreadPrefix)))
+	for _, id := range []string{"AT_", "AT_not-valid", "AT_0123456789ab", "RM_" + guid.New("")} {
+		require.Error(t, ValidateThreadID(id), id)
 	}
 }

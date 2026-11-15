@@ -1,0 +1,13 @@
+# expect: livekit_shipped_value
+# Codex r2 normalized-camelcase: id invokeAgent is not lowercase snake_case (it would generate INVOKE_AGENT, the upstream invoke_agent constant).
+file_format: definition/2
+attribute_groups:
+  - id: livekit.review
+    visibility: public
+    stability: development
+    brief: review
+    attributes:
+      - ref: gen_ai.operation.name
+        annotations:
+          livekit:
+            shipped_values: [{id: invokeAgent, value: custom, brief: fake}]

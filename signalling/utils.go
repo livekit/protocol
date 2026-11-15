@@ -36,7 +36,8 @@ func ToProtoSessionDescription(sd webrtc.SessionDescription, id uint32, midToTra
 
 func FromProtoSessionDescription(sd *livekit.SessionDescription) (webrtc.SessionDescription, uint32, map[string]string) {
 	var sdType webrtc.SDPType
-	switch sd.Type {
+	// getters make a nil description (an omitted optional field) convert to the zero value
+	switch sd.GetType() {
 	case webrtc.SDPTypeOffer.String():
 		sdType = webrtc.SDPTypeOffer
 	case webrtc.SDPTypeAnswer.String():
@@ -48,8 +49,8 @@ func FromProtoSessionDescription(sd *livekit.SessionDescription) (webrtc.Session
 	}
 	return webrtc.SessionDescription{
 		Type: sdType,
-		SDP:  sd.Sdp,
-	}, sd.Id, sd.MidToTrackId
+		SDP:  sd.GetSdp(),
+	}, sd.GetId(), sd.GetMidToTrackId()
 }
 
 func ToProtoTrickle(candidateInit webrtc.ICECandidateInit, target livekit.SignalTarget, final bool) *livekit.TrickleRequest {

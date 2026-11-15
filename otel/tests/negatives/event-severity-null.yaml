@@ -1,0 +1,10 @@
+# expect: livekit_event_severity
+# An explicit null is a declaration, not an absent one: it must be a list of severity texts.
+groups:
+  - id: event.lk.negative
+    type: event
+    name: lk.negative
+    stability: development
+    brief: An event with a severity declaration live-check cannot match.
+    annotations:
+      livekit: {severity: null}

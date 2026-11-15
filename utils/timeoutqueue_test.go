@@ -16,6 +16,7 @@ package utils
 
 import (
 	"testing"
+	"testing/synctest"
 	"time"
 
 	"github.com/stretchr/testify/require"
@@ -66,9 +67,30 @@ func TestTimeoutQueue(t *testing.T) {
 		}
 
 		ts := time.Now().UnixNano()
-		q.popBefore(ts, true)
+		q.popBefore(ts, q.seq, true)
 		require.EqualValues(t, []int{1, 2, 3, 4}, debugTimeoutQueueItems(&q))
-		q.popBefore(ts, true)
+		q.popBefore(ts, q.seq, true)
 		require.EqualValues(t, []int{2, 3, 4}, debugTimeoutQueueItems(&q))
+	})
+
+	t.Run("an iteration does not revisit items reset during it", func(t *testing.T) {
+		t.Parallel()
+		// The clock does not move inside a synctest bubble, so a reset stamps
+		// the item with the iteration's own cutoff.
+		synctest.Test(t, func(t *testing.T) {
+			var q TimeoutQueue[int]
+			for i := 0; i < 3; i++ {
+				q.Reset(&TimeoutQueueItem[int]{Value: i})
+			}
+
+			visited := 0
+			for it := q.IterateAfter(0); it.Next(); {
+				visited++
+				require.Less(t, visited, 100, "the iteration keeps revisiting reset items")
+				q.Reset(it.Item())
+			}
+			require.Equal(t, 3, visited)
+			require.EqualValues(t, []int{0, 1, 2}, debugTimeoutQueueItems(&q))
+		})
 	})
 }

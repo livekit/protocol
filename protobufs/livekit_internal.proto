@@ -37,6 +37,7 @@ enum NodeType {
   DIRECTOR = 6;
   HOSTED_AGENT = 7;
   SETTINGS = 8;
+  SIGNAL = 9;
 }
 
 enum NodeState {

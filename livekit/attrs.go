@@ -1,5 +1,11 @@
 package livekit
 
+// Names of participant attributes set by LiveKit.
+const (
+	// AttrRTCJoinRequestTime attribute contains the time the server received a participant's join request, in Unix milliseconds.
+	AttrRTCJoinRequestTime = "lk.rtc.joinRequestTime"
+)
+
 // Names of participant attributes for SIP.
 const (
 	// AttrSIPPrefix is shared for all SIP attributes.
@@ -26,6 +32,15 @@ const (
 	AttrSIPHeaderPrefix = AttrSIPPrefix + "h."
 	// AttrSIPInviteTime attribute contains the time the inbound INVITE was received, in Unix milliseconds.
 	AttrSIPInviteTime = "lk.sip.inviteTime"
+	// AttrSIPPinEnteredTime attribute contains the time the caller finished entering the PIN on an inbound PIN call, in Unix milliseconds.
+	AttrSIPPinEnteredTime = "lk.sip.pinEnteredTime"
+	// AttrSIPAnswerTime attribute contains the time the callee answered an outbound call, in Unix milliseconds.
+	AttrSIPAnswerTime = "lk.sip.answerTime"
+
+	// AttrConnectorRequestTime attribute contains the time the API request for an inbound connector call arrived, in Unix milliseconds.
+	AttrConnectorRequestTime = "lk.connector.requestTime"
+	// AttrConnectorAnswerTime attribute contains the time the callee answered an outbound connector call, in Unix milliseconds.
+	AttrConnectorAnswerTime = "lk.connector.answerTime"
 
 	// AttrIngressPrefix is shared for all Ingress attributes
 	AttrIngressPrefix = "ingress."

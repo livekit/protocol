@@ -163,6 +163,8 @@ func (r *noopModelReporter) ReportInferencePromptCacheTokens(v uint64)          
 func (r *noopModelReporter) ReportInferenceCompletionTokens(v uint64)             {}
 func (r *noopModelReporter) ReportInferenceTotalTokens(v uint64)                  {}
 func (r *noopModelReporter) ReportInferenceCacheCreateTokens(v uint64)            {}
+func (r *noopModelReporter) ReportInferenceCacheCreateStandardTokens(v uint64)    {}
+func (r *noopModelReporter) ReportInferenceCacheCreateExtendedTokens(v uint64)    {}
 func (r *noopModelReporter) ReportInferenceCacheReadTokens(v uint64)              {}
 func (r *noopModelReporter) ReportRealtimeDurationSeconds(v uint32)               {}
 func (r *noopModelReporter) ReportRealtimeInputTextTokens(v uint64)               {}
@@ -194,6 +196,8 @@ func (t *noopModelTx) ReportInferencePromptCacheTokens(v uint64)            {}
 func (t *noopModelTx) ReportInferenceCompletionTokens(v uint64)             {}
 func (t *noopModelTx) ReportInferenceTotalTokens(v uint64)                  {}
 func (t *noopModelTx) ReportInferenceCacheCreateTokens(v uint64)            {}
+func (t *noopModelTx) ReportInferenceCacheCreateStandardTokens(v uint64)    {}
+func (t *noopModelTx) ReportInferenceCacheCreateExtendedTokens(v uint64)    {}
 func (t *noopModelTx) ReportInferenceCacheReadTokens(v uint64)              {}
 func (t *noopModelTx) ReportRealtimeDurationSeconds(v uint32)               {}
 func (t *noopModelTx) ReportRealtimeInputTextTokens(v uint64)               {}

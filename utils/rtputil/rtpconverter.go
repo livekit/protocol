@@ -34,10 +34,17 @@ func NewRTPConverter(clockRate int64) *RTPConverter {
 }
 
 func (r *RTPConverter) ToDuration(rtpTicks uint32) time.Duration {
+	// a remote SDP can negotiate a clock rate of 0
+	if r.rtp == 0 {
+		return 0
+	}
 	return time.Duration(uint64(rtpTicks) * r.ts / r.rtp)
 }
 
 func (r *RTPConverter) ToDurationExt(rtpExtTicks uint64) time.Duration {
+	if r.rtp == 0 {
+		return 0
+	}
 	return time.Duration(uint64(rtpExtTicks) * r.ts / r.rtp)
 }
 

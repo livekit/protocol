@@ -15,6 +15,7 @@
 package guid
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -41,6 +42,62 @@ func TestMarshalAppend(t *testing.T) {
 	require.Equal(t, id1, Unmarshal[livekit.RoomID](livekit.GuidBlock(b[9:])))
 }
 
+func TestMarshalInvalidID(t *testing.T) {
+	for _, id := range []livekit.TrackID{
+		"",
+		TrackPrefix,
+		TrackPrefix + "abc",
+		TrackPrefix + "01IOl01IOl01",
+		"TR_ABCDEFGHIJ",
+	} {
+		require.Equal(t, invalidBlock(), Marshal(id), id)
+		require.Equal(t, []byte{0, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}, MarshalAppend([]byte{0}, id), id)
+		require.Equal(t, livekit.TrackID(""), Unmarshal[livekit.TrackID](Marshal(id)), id)
+	}
+}
+
+func TestUnmarshalInvalidBlock(t *testing.T) {
+	for _, b := range []livekit.GuidBlock{
+		{0xff},
+		{0x03, 0x90},
+		{0, 0, 57},
+		{0, 0, 0, 0, 0, 0, 0xe4},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0x39},
+		invalidBlock(),
+	} {
+		require.Equal(t, livekit.TrackID(""), Unmarshal[livekit.TrackID](b), b)
+	}
+	require.Equal(t, livekit.TrackID(TrackPrefix+"22222222222z"), Unmarshal[livekit.TrackID](livekit.GuidBlock{0, 0, 0, 0, 0, 0, 0, 0, 0x38}))
+	require.Equal(t, livekit.TrackID(TrackPrefix+"222222222222"), Unmarshal[livekit.TrackID](livekit.GuidBlock{}))
+}
+
+func FuzzUnmarshal(f *testing.F) {
+	f.Add(make([]byte, 9))
+	f.Add(bytes.Repeat([]byte{0xff}, 9))
+	f.Add([]byte{0, 0, 0, 0, 0, 0, 0, 0, 0x38})
+	f.Fuzz(func(t *testing.T, data []byte) {
+		var b livekit.GuidBlock
+		copy(b[:], data)
+		id := Unmarshal[livekit.ParticipantID](b)
+		if id != "" {
+			require.Equal(t, b, Marshal(id))
+		}
+	})
+}
+
+func FuzzMarshal(f *testing.F) {
+	f.Add("")
+	f.Add("RM_abc")
+	f.Add(New(RoomPrefix))
+	f.Fuzz(func(t *testing.T, s string) {
+		b := Marshal(livekit.RoomID(s))
+		if b == invalidBlock() {
+			return
+		}
+		require.Equal(t, livekit.RoomID(RoomPrefix+s[len(s)-Size:]), Unmarshal[livekit.RoomID](b))
+	})
+}
+
 func TestHash(t *testing.T) {
 	id := Hash(AgentPrefix, []byte("test"))
 	require.Equal(t, "A_SFo4igEG5Dg5", id)
@@ -63,4 +120,25 @@ func TestIsValidID(t *testing.T) {
 	require.False(t, IsValidID("_A_SFo4igEG5Dg5"))
 	require.False(t, IsValidID("_SFo4igEG5Dg5"))
 	require.False(t, IsValidID("SFo4igEG5Dg5"))
+}
+
+func TestIsValidWithPrefix(t *testing.T) {
+	require.True(t, IsValidWithPrefix(AgentThreadPrefix, New(AgentThreadPrefix)))
+
+	body := New("")
+	invalid := map[string]string{
+		"wrong prefix":   RoomPrefix + body,
+		"missing prefix": body,
+		"11 chars":       AgentThreadPrefix + body[:Size-1],
+		"13 chars":       AgentThreadPrefix + body + "A",
+		"empty":          "",
+		"prefix only":    AgentThreadPrefix,
+		"hex":            AgentThreadPrefix + "0123456789ab",
+	}
+	for _, c := range []byte("01lIO_") {
+		invalid["char "+string(c)] = AgentThreadPrefix + body[:Size-1] + string(c)
+	}
+	for name, id := range invalid {
+		require.False(t, IsValidWithPrefix(AgentThreadPrefix, id), name)
+	}
 }

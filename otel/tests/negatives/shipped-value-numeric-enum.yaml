@@ -1,0 +1,13 @@
+# expect: livekit_shipped_value
+# An upstream enum with integer values (rpc.grpc.status_code) cannot take string shipped values.
+file_format: definition/2
+attribute_groups:
+  - id: livekit.review
+    visibility: public
+    stability: development
+    brief: review
+    attributes:
+      - ref: rpc.grpc.status_code
+        annotations:
+          livekit:
+            shipped_values: [{id: other, value: mistral, brief: fake}]

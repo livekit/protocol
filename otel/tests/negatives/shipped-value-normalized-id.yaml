@@ -1,0 +1,13 @@
+# expect: livekit_shipped_value
+# Id actian_ingres generates the same constant as the upstream member actian.ingres.
+file_format: definition/2
+attribute_groups:
+  - id: livekit.review
+    visibility: public
+    stability: development
+    brief: review
+    attributes:
+      - ref: db.system.name
+        annotations:
+          livekit:
+            shipped_values: [{id: actian_ingres, value: custom, brief: fake}]

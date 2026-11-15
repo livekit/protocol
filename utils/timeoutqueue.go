@@ -22,6 +22,7 @@ import (
 type TimeoutQueueItem[T any] struct {
 	Value      T
 	time       int64
+	seq        uint64
 	next, prev *TimeoutQueueItem[T]
 	removed    bool
 }
@@ -29,6 +30,7 @@ type TimeoutQueueItem[T any] struct {
 type TimeoutQueue[T any] struct {
 	mu         sync.Mutex
 	head, tail *TimeoutQueueItem[T]
+	seq        uint64
 }
 
 func (q *TimeoutQueue[T]) Reset(i *TimeoutQueueItem[T]) bool {
@@ -53,12 +55,15 @@ func (q *TimeoutQueue[T]) Remove(i *TimeoutQueueItem[T]) {
 	q.remove(i)
 }
 
-func (q *TimeoutQueue[T]) popBefore(t int64, remove bool) *TimeoutQueueItem[T] {
+// popBefore pops the head if it was stamped at or before t and queued at or
+// before seq: an item reset after an iteration began is not visited by it,
+// even when the clock has not moved since.
+func (q *TimeoutQueue[T]) popBefore(t int64, seq uint64, remove bool) *TimeoutQueueItem[T] {
 	q.mu.Lock()
 	defer q.mu.Unlock()
 
 	i := q.head
-	if i == nil || i.time > t {
+	if i == nil || i.time > t || i.seq > seq {
 		return nil
 	}
 
@@ -70,6 +75,8 @@ func (q *TimeoutQueue[T]) popBefore(t int64, remove bool) *TimeoutQueueItem[T] {
 }
 
 func (q *TimeoutQueue[T]) push(i *TimeoutQueueItem[T]) {
+	q.seq++
+	i.seq = q.seq
 	i.prev = q.tail
 	i.next = nil
 
@@ -111,20 +118,25 @@ func (q *TimeoutQueue[T]) IterateRemoveAfter(timeout time.Duration) TimeoutQueue
 type TimeoutQueueIterator[T any] struct {
 	q      *TimeoutQueue[T]
 	time   int64
+	seq    uint64
 	remove bool
 	item   *TimeoutQueueItem[T]
 }
 
 func newTimeoutQueueIterator[T any](q *TimeoutQueue[T], timeout time.Duration, remove bool) TimeoutQueueIterator[T] {
+	q.mu.Lock()
+	seq := q.seq
+	q.mu.Unlock()
 	return TimeoutQueueIterator[T]{
 		q:      q,
 		time:   time.Now().Add(-timeout).UnixNano(),
+		seq:    seq,
 		remove: remove,
 	}
 }
 
 func (i *TimeoutQueueIterator[T]) Next() bool {
-	i.item = i.q.popBefore(i.time, i.remove)
+	i.item = i.q.popBefore(i.time, i.seq, i.remove)
 	return i.item != nil
 }
 

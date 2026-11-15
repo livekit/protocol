@@ -1,0 +1,11 @@
+# expect: livekit_pii_marker
+groups:
+  - id: registry.lk.negative
+    type: attribute_group
+    brief: Negative fixture.
+    attributes:
+      - id: lk.pii.client_note
+        type: string
+        stability: development
+        brief: A pii segment on a non-PII key.
+        annotations: {livekit: {owner: client, sensitivity: none}}

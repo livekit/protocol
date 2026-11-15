@@ -65,9 +65,23 @@ jobs:
         run: |
           pnpm --filter @livekit/protocol run generate:proto
 
+      # Only the telemetry conventions in otel/ need weaver; the protobuf and JS generation
+      # above do not. Pinned like otel.yaml, which checks the registry. A failure in this step
+      # or the next leaves otel/gen as it was and never blocks the protobuf and JS commit
+      # below; otel.yaml's freshness check fails while otel/gen is stale.
+      - name: Set up weaver
+        continue-on-error: true
+        uses: open-telemetry/weaver/.github/actions/setup-weaver@51a5bf95bdbb2e20fb6e16638e6bbe7dde911e93 # v0.28.0
+        with:
+          version: "0.28.0"
+
+      - name: Generate the telemetry conventions
+        continue-on-error: true
+        run: go tool mage otel
+
       - name: Add changes
         uses: EndBug/add-and-commit@cc9c08ba6c8df3b93a8f2db63e89b98368ae2ae8 # v11.1.1
         with:
-          add: '["livekit", "replay", "rpc", "infra", "packages/javascript/src/gen"]'
+          add: '["livekit", "replay", "rpc", "infra", "packages/javascript/src/gen", "otel/gen"]'
           default_author: github_actions
           message: generated protobuf

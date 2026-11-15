@@ -1,0 +1,18 @@
+# expect: livekit_pii_metric
+# A PII key declared on the metric itself (not a ref).
+groups:
+  - id: metric.client.negative.count
+    type: metric
+    metric_name: client.negative.count
+    instrument: counter
+    unit: "{event}"
+    stability: development
+    brief: A metric that declares a PII dimension.
+    attributes:
+      - id: lk.pii.negative_dimension
+        type: string
+        stability: development
+        brief: A PII key declared on a metric.
+        examples: [fake]
+        annotations:
+          livekit: {owner: client, sensitivity: pii}

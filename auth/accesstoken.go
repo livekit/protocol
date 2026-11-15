@@ -119,6 +119,11 @@ func (t *AccessToken) SetAgentThreadGrant(grant *AgentThreadGrant) *AccessToken 
 	return t
 }
 
+func (t *AccessToken) SetAgentDatabaseGrant(grant *AgentDatabaseGrant) *AccessToken {
+	t.grant.AgentDatabase = grant
+	return t
+}
+
 func (t *AccessToken) SetMetadata(md string) *AccessToken {
 	t.grant.Metadata = md
 	return t

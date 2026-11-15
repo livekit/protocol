@@ -1,0 +1,13 @@
+# expect: shipped_values must be a list
+# A string where a list belongs: one clear finding, not a policy evaluation error or per-entry noise.
+file_format: definition/2
+attribute_groups:
+  - id: livekit.review
+    visibility: public
+    stability: development
+    brief: review
+    attributes:
+      - ref: gen_ai.operation.name
+        annotations:
+          livekit:
+            shipped_values: "fake"

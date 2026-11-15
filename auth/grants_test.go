@@ -560,10 +560,53 @@ func TestAgentThreadGrantChecks(t *testing.T) {
 	require.False(t, all.CanUpdate())
 	require.True(t, (&AgentThreadGrant{All: true, Write: true}).CanUpdate())
 
+	sql := &AgentThreadGrant{ThreadIDs: []string{"AT_1"}, Read: true, Write: true, SQL: true}
+	require.True(t, sql.CanSQL("AT_1"))
+	require.False(t, sql.CanSQL("AT_2"))
+	require.False(t, g.CanSQL("AT_1"))
+	require.True(t, (&AgentThreadGrant{All: true, SQL: true}).CanSQL("AT_9"))
+
 	var none *AgentThreadGrant
+	require.False(t, none.CanSQL("AT_1"))
 	require.False(t, none.CanRead("AT_1"))
 	require.False(t, none.CanCreate("u1"))
 	require.False(t, none.CanUpdate())
+}
+
+func TestAgentDatabaseGrantChecks(t *testing.T) {
+	t.Parallel()
+
+	g := &AgentDatabaseGrant{DatabaseIDs: []string{"DB_1"}, Read: true}
+	require.True(t, g.CanRead("DB_1"))
+	require.False(t, g.CanRead("DB_2"))
+	require.False(t, g.CanRead(""))
+	require.False(t, g.CanWrite("DB_1"))
+
+	require.False(t, g.CanDelete("DB_1"))
+	require.False(t, g.CanCreate())
+	require.False(t, g.CanList())
+
+	// Create and List name no database; Delete is scoped like Read and Write.
+	manage := &AgentDatabaseGrant{DatabaseIDs: []string{"DB_1"}, Delete: true, Create: true, List: true}
+	require.True(t, manage.CanDelete("DB_1"))
+	require.False(t, manage.CanDelete("DB_2"))
+	require.True(t, manage.CanCreate())
+	require.True(t, manage.CanList())
+	require.False(t, manage.CanRead("DB_1"))
+
+	var none *AgentDatabaseGrant
+	require.False(t, none.CanRead("DB_1"))
+	require.False(t, none.CanWrite("DB_1"))
+	require.False(t, none.CanDelete("DB_1"))
+	require.False(t, none.CanCreate())
+	require.False(t, none.CanList())
+
+	grants := &ClaimGrants{AgentDatabase: &AgentDatabaseGrant{DatabaseIDs: []string{"DB_1"}, Write: true}}
+	clone := grants.Clone()
+	require.NotSame(t, grants.AgentDatabase, clone.AgentDatabase)
+	require.True(t, reflect.DeepEqual(grants.AgentDatabase, clone.AgentDatabase))
+	clone.AgentDatabase.DatabaseIDs[0] = "DB_2"
+	require.Equal(t, "DB_1", grants.AgentDatabase.DatabaseIDs[0])
 }
 
 func TestAgentThreadGrantCloneIndependent(t *testing.T) {
@@ -579,4 +622,20 @@ func TestAgentThreadGrantCloneIndependent(t *testing.T) {
 	clone.AgentThread.ThreadIDs = append(clone.AgentThread.ThreadIDs, "AT_3")
 	require.True(t, grants.AgentThread.Write)
 	require.Equal(t, []string{"AT_1"}, grants.AgentThread.ThreadIDs)
+}
+
+func TestUpdateFromPermissionKeepsAgent(t *testing.T) {
+	v := &VideoGrant{}
+	v.UpdateFromPermission(&livekit.ParticipantPermission{CanSubscribe: true})
+	escalate := &livekit.ParticipantPermission{CanSubscribe: true, Agent: true}
+	require.True(t, v.MatchesPermission(escalate))
+
+	v.UpdateFromPermission(escalate)
+	require.False(t, v.Agent)
+
+	v = &VideoGrant{Agent: true}
+	v.UpdateFromPermission(&livekit.ParticipantPermission{CanPublish: true, Hidden: true})
+	require.True(t, v.Agent)
+	require.True(t, v.Hidden)
+	require.True(t, v.GetCanPublish())
 }

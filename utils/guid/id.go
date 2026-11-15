@@ -185,14 +185,34 @@ func guidPrefix[T livekit.Guid]() string {
 	}
 }
 
+// invalidBlock has every 6-bit group outside the alphabet, so it never aliases a real ID's encoding.
+func invalidBlock() livekit.GuidBlock {
+	return livekit.GuidBlock{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+}
+
+// Marshal returns a block that Unmarshal decodes to the zero ID if id does not
+// end in Size characters of IDAlphabet.
 func Marshal[T livekit.Guid](id T) livekit.GuidBlock {
 	return livekit.GuidBlock(MarshalAppend(nil, id))
 }
 
+func appendInvalid(b []byte) []byte {
+	ib := invalidBlock()
+	return append(b, ib[:]...)
+}
+
 func MarshalAppend[T livekit.Guid](b []byte, id T) []byte {
+	if len(id) < Size {
+		return appendInvalid(b)
+	}
+	idb := []byte(id)[len(id)-Size:]
+	for _, c := range idb {
+		if b57Chars[b57Index[c]] != c {
+			return appendInvalid(b)
+		}
+	}
 	off := len(b)
 	b = append(b, make([]byte, Size*3/4)...)
-	idb := []byte(id)[len(id)-Size:]
 	for i := 0; i < 3; i++ {
 		j := i*3 + off
 		k := i * 4
@@ -203,6 +223,7 @@ func MarshalAppend[T livekit.Guid](b []byte, id T) []byte {
 	return b
 }
 
+// Unmarshal returns the zero ID if b is not a valid encoding.
 func Unmarshal[T livekit.Guid](b livekit.GuidBlock) T {
 	prefix := guidPrefix[T]()
 	id := make([]byte, len(prefix)+Size)
@@ -211,10 +232,17 @@ func Unmarshal[T livekit.Guid](b livekit.GuidBlock) T {
 	for i := 0; i < 3; i++ {
 		j := i * 3
 		k := i * 4
-		idb[k] = b57Chars[b[j]>>2]
-		idb[k+1] = b57Chars[(b[j]&3)<<4|b[j+1]>>4]
-		idb[k+2] = b57Chars[(b[j+1]&15)<<2|b[j+2]>>6]
-		idb[k+3] = b57Chars[b[j+2]&63]
+		idb[k] = b[j] >> 2
+		idb[k+1] = (b[j]&3)<<4 | b[j+1]>>4
+		idb[k+2] = (b[j+1]&15)<<2 | b[j+2]>>6
+		idb[k+3] = b[j+2] & 63
+	}
+	for k, c := range idb {
+		if int(c) >= len(b57Chars) {
+			var zero T
+			return zero
+		}
+		idb[k] = b57Chars[c]
 	}
 	return T(unsafe.String(unsafe.SliceData(id), len(id)))
 }
@@ -223,4 +251,19 @@ var validIDPattern = regexp.MustCompile(`^([a-zA-Z0-9]{1,16}_){1,2}[a-zA-Z0-9]{0
 
 func IsValidID[T ~string](id T) bool {
 	return validIDPattern.MatchString(string(id))
+}
+
+// IsValidWithPrefix reports whether id is prefix followed by exactly Size characters of IDAlphabet,
+// the form New(prefix) produces.
+func IsValidWithPrefix(prefix, id string) bool {
+	if len(id) != len(prefix)+Size || id[:len(prefix)] != prefix {
+		return false
+	}
+	for i := len(prefix); i < len(id); i++ {
+		c := id[i]
+		if b57Chars[b57Index[c]] != c {
+			return false
+		}
+	}
+	return true
 }

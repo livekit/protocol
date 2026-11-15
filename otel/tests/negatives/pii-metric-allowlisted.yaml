@@ -1,0 +1,13 @@
+# expect: livekit_pii_metric
+# A key on the PII heuristic's allowlist: the exception covers Agents' spans, not metric dimensions.
+groups:
+  - id: metric.client.negative.count
+    type: metric
+    metric_name: client.negative.count
+    instrument: counter
+    unit: "{event}"
+    stability: development
+    brief: A metric with an allowlisted identity dimension.
+    attributes:
+      - ref: lk.rpc.caller_identity
+        requirement_level: recommended
