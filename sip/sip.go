@@ -428,19 +428,23 @@ func filterInvalidAddrMasks(masks []string) []string {
 	return out
 }
 
-func matchAddrMask(ip netip.Addr, mask string) bool {
-	if !strings.Contains(mask, "/") {
-		expIP, err := netip.ParseAddr(mask)
+func parseIPMask(mask string) (netip.Prefix, bool) {
+	addr, bits, hasBits := strings.Cut(mask, "/")
+	if strings.HasPrefix(addr, "[") && strings.HasSuffix(addr, "]") {
+		addr = addr[1 : len(addr)-1]
+	}
+	if !hasBits {
+		ip, err := netip.ParseAddr(addr)
 		if err != nil {
-			return false
+			return netip.Prefix{}, false
 		}
-		return ip == expIP
+		return netip.PrefixFrom(ip, ip.BitLen()), true
 	}
-	pref, err := netip.ParsePrefix(mask)
+	pref, err := netip.ParsePrefix(fmt.Sprintf("%s/%s", addr, bits))
 	if err != nil {
-		return false
+		return netip.Prefix{}, false
 	}
-	return pref.Contains(ip)
+	return pref, true
 }
 
 func matchAddrMasks(addr string, host string, masks []string) bool {
@@ -453,7 +457,12 @@ func matchAddrMasks(addr string, host string, masks []string) bool {
 		return true
 	}
 	for _, mask := range masks {
-		if mask == host || matchAddrMask(ip, mask) {
+		if pref, ok := parseIPMask(mask); ok {
+			// IP masks must only match the source IP, never the (spoofable) From host.
+			if pref.Contains(ip) {
+				return true
+			}
+		} else if mask == host {
 			return true
 		}
 	}

@@ -311,6 +311,14 @@ message SimulationRun {
       // scenario_group. The run fails if any scenario fails; pass@k and
       // pass^k report over scenarios and neither gates.
       optional SamplingOptions sampling = 14;
+
+      // When set, every job dials this number over SIP instead of dispatching
+      // agent_name, as CreateSIPParticipantRequest would. AUDIO mode only.
+      string sip_call_to = 15;
+      // Outbound trunk to dial through. Empty dials from sip_number, which must
+      // then be a LiveKit phone number the project owns.
+      string sip_trunk_id = 16;
+      string sip_number = 17;
     }
     message Response {
       string simulation_run_id = 1;

@@ -341,12 +341,10 @@ func fieldSensitivity(f protoreflect.FieldDescriptor) logger.Sensitivity {
 
 func protoFieldIsZero(f protoreflect.FieldDescriptor, v protoreflect.Value) bool {
 	if f.IsList() {
-		l := v.List()
-		return l == nil || l.Len() == 0
+		return v.List().Len() == 0
 	}
 	if f.IsMap() {
-		m := v.Map()
-		return m == nil || m.Len() == 0
+		return v.Map().Len() == 0
 	}
 	switch f.Kind() {
 	case protoreflect.BoolKind:

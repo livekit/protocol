@@ -134,6 +134,17 @@ enum ToolReplyStatus {
   TR_SKIPPED = 3;
 }
 
+// Why an agent session closed. Agent evals read it from the recording upload's session
+// summary (MetricsRecordingHeader.session_summary), as the value name.
+enum CloseReason {
+  CR_UNKNOWN = 0; // not reported, or an SDK-specific reason
+  CR_ERROR = 1;
+  CR_JOB_SHUTDOWN = 2;
+  CR_PARTICIPANT_DISCONNECTED = 3;
+  CR_USER_INITIATED = 4;
+  CR_COMPLETED = 5;
+}
+
 enum AmdCategory {
   AMD_UNKNOWN = 0;
   AMD_HUMAN = 1;
