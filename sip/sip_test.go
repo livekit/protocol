@@ -1344,6 +1344,30 @@ func TestMatchMasks(t *testing.T) {
 			},
 			exp: true,
 		},
+		{
+			name: "ipv4-mapped source",
+			addr: "::ffff:192.168.0.10",
+			masks: []string{
+				"192.168.0.10",
+			},
+			exp: true,
+		},
+		{
+			name: "ipv4-mapped source in range",
+			addr: "::ffff:192.168.0.10",
+			masks: []string{
+				"192.168.0.0/24",
+			},
+			exp: true,
+		},
+		{
+			name: "ipv4-mapped source out of range",
+			addr: "::ffff:192.168.1.10",
+			masks: []string{
+				"192.168.0.0/24",
+			},
+			exp: false,
+		},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
