@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"encoding/json"
 	"io"
 	"reflect"
 	"testing"
@@ -78,4 +79,26 @@ sample_initial: 5
 	b, err = yaml.Marshal(&Config{})
 	require.NoError(t, err)
 	require.Equal(t, "{}\n", string(b))
+}
+
+func TestConfigMarshalJSON(t *testing.T) {
+	conf := &Config{
+		JSON:            true,
+		Level:           "debug",
+		ComponentLevels: map[string]string{"rtc.room": "debug"},
+		SampleInitial:   5,
+	}
+
+	b, err := json.Marshal(conf)
+	require.NoError(t, err)
+	require.JSONEq(t, `{
+		"json": true,
+		"level": "debug",
+		"component_levels": {"rtc.room": "debug"},
+		"sample_initial": 5
+	}`, string(b))
+
+	b, err = json.Marshal(&Config{})
+	require.NoError(t, err)
+	require.JSONEq(t, `{}`, string(b))
 }
