@@ -3,4 +3,4 @@
 "@livekit/protocol": minor
 ---
 
-Add per-track subscription FEC protection presets (none, low, medium, and high) through the optional UpdateTrackSettings.fec field.
+Add per-track subscription FEC protection through the optional UpdateTrackSettings.fec field, with disabled, adaptive, fixed, and minimum modes and low, medium, and high levels.
