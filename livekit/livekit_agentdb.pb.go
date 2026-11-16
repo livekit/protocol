@@ -28,7 +28,6 @@ import (
 	_ "github.com/livekit/protocol/livekit/logger"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	descriptorpb "google.golang.org/protobuf/types/descriptorpb"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
@@ -42,234 +41,6 @@ const (
 	// Verify that runtime/protoimpl is sufficiently up-to-date.
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
-
-// Whether a request answered with an error may have taken effect. The zero
-// value is the safe reading, so a code without the option, or one a reader
-// does not know, is MAYBE.
-type AgentDB_Applied int32
-
-const (
-	AgentDB_APPLIED_MAYBE AgentDB_Applied = 0 // it may have committed, whole: resend only under its idempotency key
-	AgentDB_APPLIED_NO    AgentDB_Applied = 1 // nothing took effect
-)
-
-// Enum value maps for AgentDB_Applied.
-var (
-	AgentDB_Applied_name = map[int32]string{
-		0: "APPLIED_MAYBE",
-		1: "APPLIED_NO",
-	}
-	AgentDB_Applied_value = map[string]int32{
-		"APPLIED_MAYBE": 0,
-		"APPLIED_NO":    1,
-	}
-)
-
-func (x AgentDB_Applied) Enum() *AgentDB_Applied {
-	p := new(AgentDB_Applied)
-	*p = x
-	return p
-}
-
-func (x AgentDB_Applied) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (AgentDB_Applied) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_agentdb_proto_enumTypes[0].Descriptor()
-}
-
-func (AgentDB_Applied) Type() protoreflect.EnumType {
-	return &file_livekit_agentdb_proto_enumTypes[0]
-}
-
-func (x AgentDB_Applied) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use AgentDB_Applied.Descriptor instead.
-func (AgentDB_Applied) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_agentdb_proto_rawDescGZIP(), []int{0, 0}
-}
-
-// Whether the same request can succeed if sent again. The zero value is the
-// safe reading: a code without the option, or one a reader does not know,
-// is NEVER.
-type AgentDB_Retry int32
-
-const (
-	AgentDB_RETRY_NEVER     AgentDB_Retry = 0 // the same request fails the same way
-	AgentDB_RETRY_HERE      AgentDB_Retry = 1 // on the same connection, after a backoff
-	AgentDB_RETRY_ELSEWHERE AgentDB_Retry = 2 // on a new connection, which may reach another node
-)
-
-// Enum value maps for AgentDB_Retry.
-var (
-	AgentDB_Retry_name = map[int32]string{
-		0: "RETRY_NEVER",
-		1: "RETRY_HERE",
-		2: "RETRY_ELSEWHERE",
-	}
-	AgentDB_Retry_value = map[string]int32{
-		"RETRY_NEVER":     0,
-		"RETRY_HERE":      1,
-		"RETRY_ELSEWHERE": 2,
-	}
-)
-
-func (x AgentDB_Retry) Enum() *AgentDB_Retry {
-	p := new(AgentDB_Retry)
-	*p = x
-	return p
-}
-
-func (x AgentDB_Retry) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (AgentDB_Retry) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_agentdb_proto_enumTypes[1].Descriptor()
-}
-
-func (AgentDB_Retry) Type() protoreflect.EnumType {
-	return &file_livekit_agentdb_proto_enumTypes[1]
-}
-
-func (x AgentDB_Retry) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use AgentDB_Retry.Descriptor instead.
-func (AgentDB_Retry) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_agentdb_proto_rawDescGZIP(), []int{0, 1}
-}
-
-// Every error agent-db reports, on the data plane (Wire.Error.code) and on
-// the management services, each with what a client may conclude from it. A
-// code travels as its name in lowercase ("unavailable"). The management
-// services carry it as their gRPC status code: 1 to 16 are the gRPC codes,
-// by number and name, and gRPC's UNKNOWN (2) is UNKNOWN. A code a reader
-// does not know is UNKNOWN. INTERNAL is a broken invariant, after which a
-// write may have applied.
-type AgentDB_ErrorCode int32
-
-const (
-	AgentDB_UNKNOWN             AgentDB_ErrorCode = 0
-	AgentDB_CANCELED            AgentDB_ErrorCode = 1
-	AgentDB_INVALID_ARGUMENT    AgentDB_ErrorCode = 3
-	AgentDB_DEADLINE_EXCEEDED   AgentDB_ErrorCode = 4
-	AgentDB_NOT_FOUND           AgentDB_ErrorCode = 5
-	AgentDB_ALREADY_EXISTS      AgentDB_ErrorCode = 6
-	AgentDB_PERMISSION_DENIED   AgentDB_ErrorCode = 7
-	AgentDB_RESOURCE_EXHAUSTED  AgentDB_ErrorCode = 8
-	AgentDB_FAILED_PRECONDITION AgentDB_ErrorCode = 9
-	AgentDB_ABORTED             AgentDB_ErrorCode = 10
-	AgentDB_OUT_OF_RANGE        AgentDB_ErrorCode = 11
-	AgentDB_UNIMPLEMENTED       AgentDB_ErrorCode = 12
-	AgentDB_INTERNAL            AgentDB_ErrorCode = 13
-	// The node cannot serve the database: not its owner, or the database
-	// closed under the request. A write may have committed before it did.
-	AgentDB_UNAVAILABLE     AgentDB_ErrorCode = 14
-	AgentDB_DATA_LOSS       AgentDB_ErrorCode = 15
-	AgentDB_UNAUTHENTICATED AgentDB_ErrorCode = 16
-	// The data plane's own.
-	AgentDB_PROTOCOL AgentDB_ErrorCode = 17 // a frame out of order or unknown
-	AgentDB_EXEC     AgentDB_ErrorCode = 18 // a statement the engine refused
-	AgentDB_QUERY    AgentDB_ErrorCode = 19
-	AgentDB_TXN      AgentDB_ErrorCode = 20 // a Begin, Commit or Rollback refused
-	AgentDB_RETRY    AgentDB_ErrorCode = 21 // refused before it applied anything
-	// A write whose durable flush failed: it may have committed, whole.
-	AgentDB_OUTCOME_UNKNOWN AgentDB_ErrorCode = 22
-	// A notice on request id 0: the database was evicted while the connection
-	// had nothing in flight, and the socket ends. Redial when next needed.
-	AgentDB_IDLE_EVICTED AgentDB_ErrorCode = 23
-	// A Rollback of a transaction the server had already aborted: none of it
-	// applied, and the whole transaction may run again.
-	AgentDB_TXN_ABORTED AgentDB_ErrorCode = 24
-)
-
-// Enum value maps for AgentDB_ErrorCode.
-var (
-	AgentDB_ErrorCode_name = map[int32]string{
-		0:  "UNKNOWN",
-		1:  "CANCELED",
-		3:  "INVALID_ARGUMENT",
-		4:  "DEADLINE_EXCEEDED",
-		5:  "NOT_FOUND",
-		6:  "ALREADY_EXISTS",
-		7:  "PERMISSION_DENIED",
-		8:  "RESOURCE_EXHAUSTED",
-		9:  "FAILED_PRECONDITION",
-		10: "ABORTED",
-		11: "OUT_OF_RANGE",
-		12: "UNIMPLEMENTED",
-		13: "INTERNAL",
-		14: "UNAVAILABLE",
-		15: "DATA_LOSS",
-		16: "UNAUTHENTICATED",
-		17: "PROTOCOL",
-		18: "EXEC",
-		19: "QUERY",
-		20: "TXN",
-		21: "RETRY",
-		22: "OUTCOME_UNKNOWN",
-		23: "IDLE_EVICTED",
-		24: "TXN_ABORTED",
-	}
-	AgentDB_ErrorCode_value = map[string]int32{
-		"UNKNOWN":             0,
-		"CANCELED":            1,
-		"INVALID_ARGUMENT":    3,
-		"DEADLINE_EXCEEDED":   4,
-		"NOT_FOUND":           5,
-		"ALREADY_EXISTS":      6,
-		"PERMISSION_DENIED":   7,
-		"RESOURCE_EXHAUSTED":  8,
-		"FAILED_PRECONDITION": 9,
-		"ABORTED":             10,
-		"OUT_OF_RANGE":        11,
-		"UNIMPLEMENTED":       12,
-		"INTERNAL":            13,
-		"UNAVAILABLE":         14,
-		"DATA_LOSS":           15,
-		"UNAUTHENTICATED":     16,
-		"PROTOCOL":            17,
-		"EXEC":                18,
-		"QUERY":               19,
-		"TXN":                 20,
-		"RETRY":               21,
-		"OUTCOME_UNKNOWN":     22,
-		"IDLE_EVICTED":        23,
-		"TXN_ABORTED":         24,
-	}
-)
-
-func (x AgentDB_ErrorCode) Enum() *AgentDB_ErrorCode {
-	p := new(AgentDB_ErrorCode)
-	*p = x
-	return p
-}
-
-func (x AgentDB_ErrorCode) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (AgentDB_ErrorCode) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_agentdb_proto_enumTypes[2].Descriptor()
-}
-
-func (AgentDB_ErrorCode) Type() protoreflect.EnumType {
-	return &file_livekit_agentdb_proto_enumTypes[2]
-}
-
-func (x AgentDB_ErrorCode) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use AgentDB_ErrorCode.Descriptor instead.
-func (AgentDB_ErrorCode) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_agentdb_proto_rawDescGZIP(), []int{0, 2}
-}
 
 type AgentDB_Wire_QueryLang int32
 
@@ -298,11 +69,11 @@ func (x AgentDB_Wire_QueryLang) String() string {
 }
 
 func (AgentDB_Wire_QueryLang) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_agentdb_proto_enumTypes[3].Descriptor()
+	return file_livekit_agentdb_proto_enumTypes[0].Descriptor()
 }
 
 func (AgentDB_Wire_QueryLang) Type() protoreflect.EnumType {
-	return &file_livekit_agentdb_proto_enumTypes[3]
+	return &file_livekit_agentdb_proto_enumTypes[0]
 }
 
 func (x AgentDB_Wire_QueryLang) Number() protoreflect.EnumNumber {
@@ -320,7 +91,6 @@ type AgentDB_Wire_Capability int32
 const (
 	AgentDB_Wire_CAPABILITY_UNSPECIFIED AgentDB_Wire_Capability = 0
 	AgentDB_Wire_IF_TIP                 AgentDB_Wire_Capability = 1 // Batch.if_tip
-	AgentDB_Wire_KEYED_WRITES           AgentDB_Wire_Capability = 2 // Hello.client_id with ClientMessage.seq
 )
 
 // Enum value maps for AgentDB_Wire_Capability.
@@ -328,12 +98,10 @@ var (
 	AgentDB_Wire_Capability_name = map[int32]string{
 		0: "CAPABILITY_UNSPECIFIED",
 		1: "IF_TIP",
-		2: "KEYED_WRITES",
 	}
 	AgentDB_Wire_Capability_value = map[string]int32{
 		"CAPABILITY_UNSPECIFIED": 0,
 		"IF_TIP":                 1,
-		"KEYED_WRITES":           2,
 	}
 )
 
@@ -348,11 +116,11 @@ func (x AgentDB_Wire_Capability) String() string {
 }
 
 func (AgentDB_Wire_Capability) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_agentdb_proto_enumTypes[4].Descriptor()
+	return file_livekit_agentdb_proto_enumTypes[1].Descriptor()
 }
 
 func (AgentDB_Wire_Capability) Type() protoreflect.EnumType {
-	return &file_livekit_agentdb_proto_enumTypes[4]
+	return &file_livekit_agentdb_proto_enumTypes[1]
 }
 
 func (x AgentDB_Wire_Capability) Number() protoreflect.EnumNumber {
@@ -403,11 +171,11 @@ func (x AgentDB_Wire_ValueType) String() string {
 }
 
 func (AgentDB_Wire_ValueType) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_agentdb_proto_enumTypes[5].Descriptor()
+	return file_livekit_agentdb_proto_enumTypes[2].Descriptor()
 }
 
 func (AgentDB_Wire_ValueType) Type() protoreflect.EnumType {
-	return &file_livekit_agentdb_proto_enumTypes[5]
+	return &file_livekit_agentdb_proto_enumTypes[2]
 }
 
 func (x AgentDB_Wire_ValueType) Number() protoreflect.EnumNumber {
@@ -1010,12 +778,6 @@ type AgentDB_Wire_ClientMessage struct {
 	// the request within it, and work not yet committed stops when it
 	// runs out. 0: the server's default.
 	DeadlineMs uint32 `protobuf:"varint,12,opt,name=deadline_ms,json=deadlineMs,proto3" json:"deadline_ms,omitempty"`
-	// On a write (exec, batch): its number in client_id's sequence, unique
-	// per write and kept across its resends. A resend within the server's
-	// window of the client's recent writes answers the first send's result.
-	// Seqs need not arrive in order. A seq below a full window is refused
-	// failed_precondition.
-	Seq uint64 `protobuf:"varint,13,opt,name=seq,proto3" json:"seq,omitempty"`
 	// Types that are valid to be assigned to Message:
 	//
 	//	*AgentDB_Wire_ClientMessage_Hello
@@ -1073,13 +835,6 @@ func (x *AgentDB_Wire_ClientMessage) GetRequestId() uint32 {
 func (x *AgentDB_Wire_ClientMessage) GetDeadlineMs() uint32 {
 	if x != nil {
 		return x.DeadlineMs
-	}
-	return 0
-}
-
-func (x *AgentDB_Wire_ClientMessage) GetSeq() uint64 {
-	if x != nil {
-		return x.Seq
 	}
 	return 0
 }
@@ -1667,7 +1422,7 @@ func (x *AgentDB_Wire_Batch) GetIfTip() int64 {
 }
 
 // Unsupported: a request is one transaction and none spans requests, so
-// these are answered invalid_argument. Send the statements as one Batch.
+// these are refused. Send the statements as one Batch.
 type AgentDB_Wire_Begin struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -1953,15 +1708,10 @@ func (x *AgentDB_Wire_Pong) GetTimestampMs() int64 {
 }
 
 type AgentDB_Wire_Hello struct {
-	state      protoimpl.MessageState `protogen:"open.v1"`
-	Token      string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
-	DatabaseId string                 `protobuf:"bytes,2,opt,name=database_id,json=databaseId,proto3" json:"database_id,omitempty"`
-	// Stable for the client process's run and shared by its sockets: it
-	// keys the writes it sends with their seq. The server keeps the answers
-	// of a client's last 16 keyed writes per database, so at most 16 of
-	// them may be in flight to one database at once.
-	ClientId      string `protobuf:"bytes,3,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
-	ClientVersion string `protobuf:"bytes,4,opt,name=client_version,json=clientVersion,proto3" json:"client_version,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	DatabaseId    string                 `protobuf:"bytes,2,opt,name=database_id,json=databaseId,proto3" json:"database_id,omitempty"`
+	ClientVersion string                 `protobuf:"bytes,4,opt,name=client_version,json=clientVersion,proto3" json:"client_version,omitempty"`
 	// The largest frame the client reads, in bytes; the server never sends
 	// a larger one. 0: the server's default.
 	MaxFrame      uint32 `protobuf:"varint,5,opt,name=max_frame,json=maxFrame,proto3" json:"max_frame,omitempty"`
@@ -2009,13 +1759,6 @@ func (x *AgentDB_Wire_Hello) GetToken() string {
 func (x *AgentDB_Wire_Hello) GetDatabaseId() string {
 	if x != nil {
 		return x.DatabaseId
-	}
-	return ""
-}
-
-func (x *AgentDB_Wire_Hello) GetClientId() string {
-	if x != nil {
-		return x.ClientId
 	}
 	return ""
 }
@@ -2431,12 +2174,14 @@ func (x *AgentDB_Wire_Done) GetTotalRows() uint64 {
 	return 0
 }
 
+// A failed request. The server's table of codes says, for each, whether
+// the request may have applied and whether it may be sent again: a client
+// branches on code alone. Name and description are for people.
 type AgentDB_Wire_Error struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// An ErrorCode's name in lowercase, kept a string so that a reader
-	// older than a code still reads it, as UNKNOWN.
-	Code          string `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
-	Message       string `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Code          uint32                 `protobuf:"varint,3,opt,name=code,proto3" json:"code,omitempty"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2471,52 +2216,32 @@ func (*AgentDB_Wire_Error) Descriptor() ([]byte, []int) {
 	return file_livekit_agentdb_proto_rawDescGZIP(), []int{0, 10, 19}
 }
 
-func (x *AgentDB_Wire_Error) GetCode() string {
+func (x *AgentDB_Wire_Error) GetCode() uint32 {
 	if x != nil {
 		return x.Code
 	}
-	return ""
+	return 0
 }
 
-func (x *AgentDB_Wire_Error) GetMessage() string {
+func (x *AgentDB_Wire_Error) GetName() string {
 	if x != nil {
-		return x.Message
+		return x.Name
 	}
 	return ""
 }
 
-var file_livekit_agentdb_proto_extTypes = []protoimpl.ExtensionInfo{
-	{
-		ExtendedType:  (*descriptorpb.EnumValueOptions)(nil),
-		ExtensionType: (*AgentDB_Applied)(nil),
-		Field:         1290,
-		Name:          "livekit.AgentDB.applied",
-		Tag:           "varint,1290,opt,name=applied,enum=livekit.AgentDB_Applied",
-		Filename:      "livekit_agentdb.proto",
-	},
-	{
-		ExtendedType:  (*descriptorpb.EnumValueOptions)(nil),
-		ExtensionType: (*AgentDB_Retry)(nil),
-		Field:         1291,
-		Name:          "livekit.AgentDB.retry",
-		Tag:           "varint,1291,opt,name=retry,enum=livekit.AgentDB_Retry",
-		Filename:      "livekit_agentdb.proto",
-	},
+func (x *AgentDB_Wire_Error) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
 }
-
-// Extension fields to descriptorpb.EnumValueOptions.
-var (
-	// optional livekit.AgentDB.Applied applied = 1290;
-	E_AgentDB_Applied = &file_livekit_agentdb_proto_extTypes[0]
-	// optional livekit.AgentDB.Retry retry = 1291;
-	E_AgentDB_Retry = &file_livekit_agentdb_proto_extTypes[1]
-)
 
 var File_livekit_agentdb_proto protoreflect.FileDescriptor
 
 const file_livekit_agentdb_proto_rawDesc = "" +
 	"\n" +
-	"\x15livekit_agentdb.proto\x12\alivekit\x1a google/protobuf/descriptor.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x14logger/options.proto\"\xe6$\n" +
+	"\x15livekit_agentdb.proto\x12\alivekit\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x14logger/options.proto\"\xc7\x1d\n" +
 	"\aAgentDB\x1a<\n" +
 	"\rCreateRequest\x12+\n" +
 	"\x03ttl\x18\x01 \x01(\v2\x19.google.protobuf.DurationR\x03ttl\x1al\n" +
@@ -2556,14 +2281,13 @@ const file_livekit_agentdb_proto_rawDesc = "" +
 	"\fdownload_url\x18\x01 \x01(\tR\vdownloadUrl\x129\n" +
 	"\n" +
 	"expires_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\x12\x10\n" +
-	"\x03tip\x18\x03 \x01(\x03R\x03tip\x1a\xf8\x16\n" +
-	"\x04Wire\x1a\x93\x05\n" +
+	"\x03tip\x18\x03 \x01(\x03R\x03tip\x1a\xd3\x16\n" +
+	"\x04Wire\x1a\x81\x05\n" +
 	"\rClientMessage\x12\x1d\n" +
 	"\n" +
 	"request_id\x18\x01 \x01(\rR\trequestId\x12\x1f\n" +
 	"\vdeadline_ms\x18\f \x01(\rR\n" +
-	"deadlineMs\x12\x10\n" +
-	"\x03seq\x18\r \x01(\x04R\x03seq\x123\n" +
+	"deadlineMs\x123\n" +
 	"\x05hello\x18\x02 \x01(\v2\x1b.livekit.AgentDB.Wire.HelloH\x00R\x05hello\x125\n" +
 	"\x04exec\x18\x03 \x01(\v2\x1f.livekit.AgentDB.Wire.StatementH\x00R\x04exec\x127\n" +
 	"\x05query\x18\x04 \x01(\v2\x1f.livekit.AgentDB.Wire.StatementH\x00R\x05query\x123\n" +
@@ -2619,12 +2343,11 @@ const file_livekit_agentdb_proto_rawDesc = "" +
 	"\ftimestamp_ms\x18\x01 \x01(\x03R\vtimestampMs\x1a^\n" +
 	"\x04Pong\x123\n" +
 	"\x16last_ping_timestamp_ms\x18\x01 \x01(\x03R\x13lastPingTimestampMs\x12!\n" +
-	"\ftimestamp_ms\x18\x02 \x01(\x03R\vtimestampMs\x1a\xa4\x01\n" +
+	"\ftimestamp_ms\x18\x02 \x01(\x03R\vtimestampMs\x1a\x87\x01\n" +
 	"\x05Hello\x12\x19\n" +
 	"\x05token\x18\x01 \x01(\tB\x03\xc0P\x02R\x05token\x12\x1f\n" +
 	"\vdatabase_id\x18\x02 \x01(\tR\n" +
-	"databaseId\x12\x1b\n" +
-	"\tclient_id\x18\x03 \x01(\tR\bclientId\x12%\n" +
+	"databaseId\x12%\n" +
 	"\x0eclient_version\x18\x04 \x01(\tR\rclientVersion\x12\x1b\n" +
 	"\tmax_frame\x18\x05 \x01(\rR\bmaxFrame\x1a\xb3\x01\n" +
 	"\aHelloOk\x12\x10\n" +
@@ -2656,64 +2379,25 @@ const file_livekit_agentdb_proto_rawDesc = "" +
 	"\x04Done\x12\x10\n" +
 	"\x03tip\x18\x01 \x01(\x03R\x03tip\x12\x1d\n" +
 	"\n" +
-	"total_rows\x18\x02 \x01(\x04R\ttotalRows\x1a5\n" +
+	"total_rows\x18\x02 \x01(\x04R\ttotalRows\x1aQ\n" +
 	"\x05Error\x12\x12\n" +
-	"\x04code\x18\x01 \x01(\tR\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"\x1a\n" +
+	"\x04code\x18\x03 \x01(\rR\x04code\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\"\x1a\n" +
 	"\tQueryLang\x12\a\n" +
-	"\x03SQL\x10\x00\"\x04\b\x01\x10\x01\"F\n" +
+	"\x03SQL\x10\x00\"\x04\b\x01\x10\x01\"4\n" +
 	"\n" +
 	"Capability\x12\x1a\n" +
 	"\x16CAPABILITY_UNSPECIFIED\x10\x00\x12\n" +
 	"\n" +
-	"\x06IF_TIP\x10\x01\x12\x10\n" +
-	"\fKEYED_WRITES\x10\x02\">\n" +
+	"\x06IF_TIP\x10\x01\">\n" +
 	"\tValueType\x12\b\n" +
 	"\x04NULL\x10\x00\x12\a\n" +
 	"\x03INT\x10\x01\x12\n" +
 	"\n" +
 	"\x06DOUBLE\x10\x02\x12\b\n" +
 	"\x04TEXT\x10\x03\x12\b\n" +
-	"\x04BLOB\x10\x04\",\n" +
-	"\aApplied\x12\x11\n" +
-	"\rAPPLIED_MAYBE\x10\x00\x12\x0e\n" +
-	"\n" +
-	"APPLIED_NO\x10\x01\"=\n" +
-	"\x05Retry\x12\x0f\n" +
-	"\vRETRY_NEVER\x10\x00\x12\x0e\n" +
-	"\n" +
-	"RETRY_HERE\x10\x01\x12\x13\n" +
-	"\x0fRETRY_ELSEWHERE\x10\x02\"\xe0\x04\n" +
-	"\tErrorCode\x12\v\n" +
-	"\aUNKNOWN\x10\x00\x12\x14\n" +
-	"\bCANCELED\x10\x01\x1a\x06\xd0P\x00\xd8P\x01\x12\x1c\n" +
-	"\x10INVALID_ARGUMENT\x10\x03\x1a\x06\xd0P\x01\xd8P\x00\x12\x1d\n" +
-	"\x11DEADLINE_EXCEEDED\x10\x04\x1a\x06\xd0P\x00\xd8P\x01\x12\x15\n" +
-	"\tNOT_FOUND\x10\x05\x1a\x06\xd0P\x01\xd8P\x00\x12\x1a\n" +
-	"\x0eALREADY_EXISTS\x10\x06\x1a\x06\xd0P\x01\xd8P\x00\x12\x1d\n" +
-	"\x11PERMISSION_DENIED\x10\a\x1a\x06\xd0P\x01\xd8P\x00\x12\x1e\n" +
-	"\x12RESOURCE_EXHAUSTED\x10\b\x1a\x06\xd0P\x01\xd8P\x01\x12\x1f\n" +
-	"\x13FAILED_PRECONDITION\x10\t\x1a\x06\xd0P\x01\xd8P\x00\x12\x13\n" +
-	"\aABORTED\x10\n" +
-	"\x1a\x06\xd0P\x01\xd8P\x01\x12\x18\n" +
-	"\fOUT_OF_RANGE\x10\v\x1a\x06\xd0P\x01\xd8P\x00\x12\x19\n" +
-	"\rUNIMPLEMENTED\x10\f\x1a\x06\xd0P\x01\xd8P\x00\x12\x14\n" +
-	"\bINTERNAL\x10\r\x1a\x06\xd0P\x00\xd8P\x00\x12\x17\n" +
-	"\vUNAVAILABLE\x10\x0e\x1a\x06\xd0P\x00\xd8P\x02\x12\x15\n" +
-	"\tDATA_LOSS\x10\x0f\x1a\x06\xd0P\x00\xd8P\x00\x12\x1b\n" +
-	"\x0fUNAUTHENTICATED\x10\x10\x1a\x06\xd0P\x01\xd8P\x00\x12\x14\n" +
-	"\bPROTOCOL\x10\x11\x1a\x06\xd0P\x01\xd8P\x00\x12\x10\n" +
-	"\x04EXEC\x10\x12\x1a\x06\xd0P\x01\xd8P\x00\x12\x11\n" +
-	"\x05QUERY\x10\x13\x1a\x06\xd0P\x01\xd8P\x00\x12\x0f\n" +
-	"\x03TXN\x10\x14\x1a\x06\xd0P\x01\xd8P\x00\x12\x11\n" +
-	"\x05RETRY\x10\x15\x1a\x06\xd0P\x01\xd8P\x01\x12\x1b\n" +
-	"\x0fOUTCOME_UNKNOWN\x10\x16\x1a\x06\xd0P\x00\xd8P\x01\x12\x18\n" +
-	"\fIDLE_EVICTED\x10\x17\x1a\x06\xd0P\x01\xd8P\x02\x12\x17\n" +
-	"\vTXN_ABORTED\x10\x18\x1a\x06\xd0P\x01\xd8P\x01\"\x04\b\x02\x10\x022V\n" +
-	"\aapplied\x12!.google.protobuf.EnumValueOptions\x18\x8a\n" +
-	" \x01(\x0e2\x18.livekit.AgentDB.AppliedR\aapplied2P\n" +
-	"\x05retry\x12!.google.protobuf.EnumValueOptions\x18\x8b\n" +
-	" \x01(\x0e2\x16.livekit.AgentDB.RetryR\x05retryBFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
+	"\x04BLOB\x10\x04BFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
 
 var (
 	file_livekit_agentdb_proto_rawDescOnce sync.Once
@@ -2727,88 +2411,80 @@ func file_livekit_agentdb_proto_rawDescGZIP() []byte {
 	return file_livekit_agentdb_proto_rawDescData
 }
 
-var file_livekit_agentdb_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
+var file_livekit_agentdb_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
 var file_livekit_agentdb_proto_msgTypes = make([]protoimpl.MessageInfo, 32)
 var file_livekit_agentdb_proto_goTypes = []any{
-	(AgentDB_Applied)(0),                  // 0: livekit.AgentDB.Applied
-	(AgentDB_Retry)(0),                    // 1: livekit.AgentDB.Retry
-	(AgentDB_ErrorCode)(0),                // 2: livekit.AgentDB.ErrorCode
-	(AgentDB_Wire_QueryLang)(0),           // 3: livekit.AgentDB.Wire.QueryLang
-	(AgentDB_Wire_Capability)(0),          // 4: livekit.AgentDB.Wire.Capability
-	(AgentDB_Wire_ValueType)(0),           // 5: livekit.AgentDB.Wire.ValueType
-	(*AgentDB)(nil),                       // 6: livekit.AgentDB
-	(*AgentDB_CreateRequest)(nil),         // 7: livekit.AgentDB.CreateRequest
-	(*AgentDB_CreateResponse)(nil),        // 8: livekit.AgentDB.CreateResponse
-	(*AgentDB_GetRequest)(nil),            // 9: livekit.AgentDB.GetRequest
-	(*AgentDB_ListRequest)(nil),           // 10: livekit.AgentDB.ListRequest
-	(*AgentDB_ListResponse)(nil),          // 11: livekit.AgentDB.ListResponse
-	(*AgentDB_AgentDatabase)(nil),         // 12: livekit.AgentDB.AgentDatabase
-	(*AgentDB_DeleteRequest)(nil),         // 13: livekit.AgentDB.DeleteRequest
-	(*AgentDB_DeleteResponse)(nil),        // 14: livekit.AgentDB.DeleteResponse
-	(*AgentDB_ExportRequest)(nil),         // 15: livekit.AgentDB.ExportRequest
-	(*AgentDB_ExportResponse)(nil),        // 16: livekit.AgentDB.ExportResponse
-	(*AgentDB_Wire)(nil),                  // 17: livekit.AgentDB.Wire
-	(*AgentDB_Wire_ClientMessage)(nil),    // 18: livekit.AgentDB.Wire.ClientMessage
-	(*AgentDB_Wire_ServerMessage)(nil),    // 19: livekit.AgentDB.Wire.ServerMessage
-	(*AgentDB_Wire_Value)(nil),            // 20: livekit.AgentDB.Wire.Value
-	(*AgentDB_Wire_Statement)(nil),        // 21: livekit.AgentDB.Wire.Statement
-	(*AgentDB_Wire_Batch)(nil),            // 22: livekit.AgentDB.Wire.Batch
-	(*AgentDB_Wire_Begin)(nil),            // 23: livekit.AgentDB.Wire.Begin
-	(*AgentDB_Wire_Commit)(nil),           // 24: livekit.AgentDB.Wire.Commit
-	(*AgentDB_Wire_Rollback)(nil),         // 25: livekit.AgentDB.Wire.Rollback
-	(*AgentDB_Wire_Cancel)(nil),           // 26: livekit.AgentDB.Wire.Cancel
-	(*AgentDB_Wire_Credit)(nil),           // 27: livekit.AgentDB.Wire.Credit
-	(*AgentDB_Wire_Ping)(nil),             // 28: livekit.AgentDB.Wire.Ping
-	(*AgentDB_Wire_Pong)(nil),             // 29: livekit.AgentDB.Wire.Pong
-	(*AgentDB_Wire_Hello)(nil),            // 30: livekit.AgentDB.Wire.Hello
-	(*AgentDB_Wire_HelloOk)(nil),          // 31: livekit.AgentDB.Wire.HelloOk
-	(*AgentDB_Wire_Columns)(nil),          // 32: livekit.AgentDB.Wire.Columns
-	(*AgentDB_Wire_Column)(nil),           // 33: livekit.AgentDB.Wire.Column
-	(*AgentDB_Wire_ColumnBatch)(nil),      // 34: livekit.AgentDB.Wire.ColumnBatch
-	(*AgentDB_Wire_ExecResult)(nil),       // 35: livekit.AgentDB.Wire.ExecResult
-	(*AgentDB_Wire_Done)(nil),             // 36: livekit.AgentDB.Wire.Done
-	(*AgentDB_Wire_Error)(nil),            // 37: livekit.AgentDB.Wire.Error
-	(*durationpb.Duration)(nil),           // 38: google.protobuf.Duration
-	(*timestamppb.Timestamp)(nil),         // 39: google.protobuf.Timestamp
-	(*descriptorpb.EnumValueOptions)(nil), // 40: google.protobuf.EnumValueOptions
+	(AgentDB_Wire_QueryLang)(0),        // 0: livekit.AgentDB.Wire.QueryLang
+	(AgentDB_Wire_Capability)(0),       // 1: livekit.AgentDB.Wire.Capability
+	(AgentDB_Wire_ValueType)(0),        // 2: livekit.AgentDB.Wire.ValueType
+	(*AgentDB)(nil),                    // 3: livekit.AgentDB
+	(*AgentDB_CreateRequest)(nil),      // 4: livekit.AgentDB.CreateRequest
+	(*AgentDB_CreateResponse)(nil),     // 5: livekit.AgentDB.CreateResponse
+	(*AgentDB_GetRequest)(nil),         // 6: livekit.AgentDB.GetRequest
+	(*AgentDB_ListRequest)(nil),        // 7: livekit.AgentDB.ListRequest
+	(*AgentDB_ListResponse)(nil),       // 8: livekit.AgentDB.ListResponse
+	(*AgentDB_AgentDatabase)(nil),      // 9: livekit.AgentDB.AgentDatabase
+	(*AgentDB_DeleteRequest)(nil),      // 10: livekit.AgentDB.DeleteRequest
+	(*AgentDB_DeleteResponse)(nil),     // 11: livekit.AgentDB.DeleteResponse
+	(*AgentDB_ExportRequest)(nil),      // 12: livekit.AgentDB.ExportRequest
+	(*AgentDB_ExportResponse)(nil),     // 13: livekit.AgentDB.ExportResponse
+	(*AgentDB_Wire)(nil),               // 14: livekit.AgentDB.Wire
+	(*AgentDB_Wire_ClientMessage)(nil), // 15: livekit.AgentDB.Wire.ClientMessage
+	(*AgentDB_Wire_ServerMessage)(nil), // 16: livekit.AgentDB.Wire.ServerMessage
+	(*AgentDB_Wire_Value)(nil),         // 17: livekit.AgentDB.Wire.Value
+	(*AgentDB_Wire_Statement)(nil),     // 18: livekit.AgentDB.Wire.Statement
+	(*AgentDB_Wire_Batch)(nil),         // 19: livekit.AgentDB.Wire.Batch
+	(*AgentDB_Wire_Begin)(nil),         // 20: livekit.AgentDB.Wire.Begin
+	(*AgentDB_Wire_Commit)(nil),        // 21: livekit.AgentDB.Wire.Commit
+	(*AgentDB_Wire_Rollback)(nil),      // 22: livekit.AgentDB.Wire.Rollback
+	(*AgentDB_Wire_Cancel)(nil),        // 23: livekit.AgentDB.Wire.Cancel
+	(*AgentDB_Wire_Credit)(nil),        // 24: livekit.AgentDB.Wire.Credit
+	(*AgentDB_Wire_Ping)(nil),          // 25: livekit.AgentDB.Wire.Ping
+	(*AgentDB_Wire_Pong)(nil),          // 26: livekit.AgentDB.Wire.Pong
+	(*AgentDB_Wire_Hello)(nil),         // 27: livekit.AgentDB.Wire.Hello
+	(*AgentDB_Wire_HelloOk)(nil),       // 28: livekit.AgentDB.Wire.HelloOk
+	(*AgentDB_Wire_Columns)(nil),       // 29: livekit.AgentDB.Wire.Columns
+	(*AgentDB_Wire_Column)(nil),        // 30: livekit.AgentDB.Wire.Column
+	(*AgentDB_Wire_ColumnBatch)(nil),   // 31: livekit.AgentDB.Wire.ColumnBatch
+	(*AgentDB_Wire_ExecResult)(nil),    // 32: livekit.AgentDB.Wire.ExecResult
+	(*AgentDB_Wire_Done)(nil),          // 33: livekit.AgentDB.Wire.Done
+	(*AgentDB_Wire_Error)(nil),         // 34: livekit.AgentDB.Wire.Error
+	(*durationpb.Duration)(nil),        // 35: google.protobuf.Duration
+	(*timestamppb.Timestamp)(nil),      // 36: google.protobuf.Timestamp
 }
 var file_livekit_agentdb_proto_depIdxs = []int32{
-	38, // 0: livekit.AgentDB.CreateRequest.ttl:type_name -> google.protobuf.Duration
-	39, // 1: livekit.AgentDB.CreateResponse.expires_at:type_name -> google.protobuf.Timestamp
-	12, // 2: livekit.AgentDB.ListResponse.databases:type_name -> livekit.AgentDB.AgentDatabase
-	39, // 3: livekit.AgentDB.AgentDatabase.created_at:type_name -> google.protobuf.Timestamp
-	39, // 4: livekit.AgentDB.AgentDatabase.expires_at:type_name -> google.protobuf.Timestamp
-	39, // 5: livekit.AgentDB.ExportResponse.expires_at:type_name -> google.protobuf.Timestamp
-	30, // 6: livekit.AgentDB.Wire.ClientMessage.hello:type_name -> livekit.AgentDB.Wire.Hello
-	21, // 7: livekit.AgentDB.Wire.ClientMessage.exec:type_name -> livekit.AgentDB.Wire.Statement
-	21, // 8: livekit.AgentDB.Wire.ClientMessage.query:type_name -> livekit.AgentDB.Wire.Statement
-	22, // 9: livekit.AgentDB.Wire.ClientMessage.batch:type_name -> livekit.AgentDB.Wire.Batch
-	23, // 10: livekit.AgentDB.Wire.ClientMessage.begin:type_name -> livekit.AgentDB.Wire.Begin
-	24, // 11: livekit.AgentDB.Wire.ClientMessage.commit:type_name -> livekit.AgentDB.Wire.Commit
-	25, // 12: livekit.AgentDB.Wire.ClientMessage.rollback:type_name -> livekit.AgentDB.Wire.Rollback
-	26, // 13: livekit.AgentDB.Wire.ClientMessage.cancel:type_name -> livekit.AgentDB.Wire.Cancel
-	27, // 14: livekit.AgentDB.Wire.ClientMessage.credit:type_name -> livekit.AgentDB.Wire.Credit
-	28, // 15: livekit.AgentDB.Wire.ClientMessage.ping:type_name -> livekit.AgentDB.Wire.Ping
-	31, // 16: livekit.AgentDB.Wire.ServerMessage.hello_ok:type_name -> livekit.AgentDB.Wire.HelloOk
-	32, // 17: livekit.AgentDB.Wire.ServerMessage.columns:type_name -> livekit.AgentDB.Wire.Columns
-	34, // 18: livekit.AgentDB.Wire.ServerMessage.column_batch:type_name -> livekit.AgentDB.Wire.ColumnBatch
-	35, // 19: livekit.AgentDB.Wire.ServerMessage.exec_result:type_name -> livekit.AgentDB.Wire.ExecResult
-	36, // 20: livekit.AgentDB.Wire.ServerMessage.done:type_name -> livekit.AgentDB.Wire.Done
-	37, // 21: livekit.AgentDB.Wire.ServerMessage.error:type_name -> livekit.AgentDB.Wire.Error
-	29, // 22: livekit.AgentDB.Wire.ServerMessage.pong:type_name -> livekit.AgentDB.Wire.Pong
-	20, // 23: livekit.AgentDB.Wire.Statement.params:type_name -> livekit.AgentDB.Wire.Value
-	3,  // 24: livekit.AgentDB.Wire.Statement.lang:type_name -> livekit.AgentDB.Wire.QueryLang
-	21, // 25: livekit.AgentDB.Wire.Batch.statements:type_name -> livekit.AgentDB.Wire.Statement
-	4,  // 26: livekit.AgentDB.Wire.HelloOk.capabilities:type_name -> livekit.AgentDB.Wire.Capability
-	33, // 27: livekit.AgentDB.Wire.ColumnBatch.columns:type_name -> livekit.AgentDB.Wire.Column
-	40, // 28: livekit.AgentDB.applied:extendee -> google.protobuf.EnumValueOptions
-	40, // 29: livekit.AgentDB.retry:extendee -> google.protobuf.EnumValueOptions
-	0,  // 30: livekit.AgentDB.applied:type_name -> livekit.AgentDB.Applied
-	1,  // 31: livekit.AgentDB.retry:type_name -> livekit.AgentDB.Retry
-	32, // [32:32] is the sub-list for method output_type
-	32, // [32:32] is the sub-list for method input_type
-	30, // [30:32] is the sub-list for extension type_name
-	28, // [28:30] is the sub-list for extension extendee
+	35, // 0: livekit.AgentDB.CreateRequest.ttl:type_name -> google.protobuf.Duration
+	36, // 1: livekit.AgentDB.CreateResponse.expires_at:type_name -> google.protobuf.Timestamp
+	9,  // 2: livekit.AgentDB.ListResponse.databases:type_name -> livekit.AgentDB.AgentDatabase
+	36, // 3: livekit.AgentDB.AgentDatabase.created_at:type_name -> google.protobuf.Timestamp
+	36, // 4: livekit.AgentDB.AgentDatabase.expires_at:type_name -> google.protobuf.Timestamp
+	36, // 5: livekit.AgentDB.ExportResponse.expires_at:type_name -> google.protobuf.Timestamp
+	27, // 6: livekit.AgentDB.Wire.ClientMessage.hello:type_name -> livekit.AgentDB.Wire.Hello
+	18, // 7: livekit.AgentDB.Wire.ClientMessage.exec:type_name -> livekit.AgentDB.Wire.Statement
+	18, // 8: livekit.AgentDB.Wire.ClientMessage.query:type_name -> livekit.AgentDB.Wire.Statement
+	19, // 9: livekit.AgentDB.Wire.ClientMessage.batch:type_name -> livekit.AgentDB.Wire.Batch
+	20, // 10: livekit.AgentDB.Wire.ClientMessage.begin:type_name -> livekit.AgentDB.Wire.Begin
+	21, // 11: livekit.AgentDB.Wire.ClientMessage.commit:type_name -> livekit.AgentDB.Wire.Commit
+	22, // 12: livekit.AgentDB.Wire.ClientMessage.rollback:type_name -> livekit.AgentDB.Wire.Rollback
+	23, // 13: livekit.AgentDB.Wire.ClientMessage.cancel:type_name -> livekit.AgentDB.Wire.Cancel
+	24, // 14: livekit.AgentDB.Wire.ClientMessage.credit:type_name -> livekit.AgentDB.Wire.Credit
+	25, // 15: livekit.AgentDB.Wire.ClientMessage.ping:type_name -> livekit.AgentDB.Wire.Ping
+	28, // 16: livekit.AgentDB.Wire.ServerMessage.hello_ok:type_name -> livekit.AgentDB.Wire.HelloOk
+	29, // 17: livekit.AgentDB.Wire.ServerMessage.columns:type_name -> livekit.AgentDB.Wire.Columns
+	31, // 18: livekit.AgentDB.Wire.ServerMessage.column_batch:type_name -> livekit.AgentDB.Wire.ColumnBatch
+	32, // 19: livekit.AgentDB.Wire.ServerMessage.exec_result:type_name -> livekit.AgentDB.Wire.ExecResult
+	33, // 20: livekit.AgentDB.Wire.ServerMessage.done:type_name -> livekit.AgentDB.Wire.Done
+	34, // 21: livekit.AgentDB.Wire.ServerMessage.error:type_name -> livekit.AgentDB.Wire.Error
+	26, // 22: livekit.AgentDB.Wire.ServerMessage.pong:type_name -> livekit.AgentDB.Wire.Pong
+	17, // 23: livekit.AgentDB.Wire.Statement.params:type_name -> livekit.AgentDB.Wire.Value
+	0,  // 24: livekit.AgentDB.Wire.Statement.lang:type_name -> livekit.AgentDB.Wire.QueryLang
+	18, // 25: livekit.AgentDB.Wire.Batch.statements:type_name -> livekit.AgentDB.Wire.Statement
+	1,  // 26: livekit.AgentDB.Wire.HelloOk.capabilities:type_name -> livekit.AgentDB.Wire.Capability
+	30, // 27: livekit.AgentDB.Wire.ColumnBatch.columns:type_name -> livekit.AgentDB.Wire.Column
+	28, // [28:28] is the sub-list for method output_type
+	28, // [28:28] is the sub-list for method input_type
+	28, // [28:28] is the sub-list for extension type_name
+	28, // [28:28] is the sub-list for extension extendee
 	0,  // [0:28] is the sub-list for field type_name
 }
 
@@ -2851,16 +2527,15 @@ func file_livekit_agentdb_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_agentdb_proto_rawDesc), len(file_livekit_agentdb_proto_rawDesc)),
-			NumEnums:      6,
+			NumEnums:      3,
 			NumMessages:   32,
-			NumExtensions: 2,
+			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_livekit_agentdb_proto_goTypes,
 		DependencyIndexes: file_livekit_agentdb_proto_depIdxs,
 		EnumInfos:         file_livekit_agentdb_proto_enumTypes,
 		MessageInfos:      file_livekit_agentdb_proto_msgTypes,
-		ExtensionInfos:    file_livekit_agentdb_proto_extTypes,
 	}.Build()
 	File_livekit_agentdb_proto = out.File
 	file_livekit_agentdb_proto_goTypes = nil
