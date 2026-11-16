@@ -88,10 +88,6 @@ message AgentDB {
   message Wire {
     message ClientMessage {
       uint32 request_id = 1;
-      // The caller's budget left when the request was sent; the server runs
-      // the request within it, and work not yet committed stops when it
-      // runs out. 0: the server's default.
-      uint32 deadline_ms = 12;
       oneof message {
         Hello hello = 2;           // must be first on the socket
         Statement exec = 3;        // answers ExecResult

@@ -728,10 +728,6 @@ func (*AgentDB_Wire) Descriptor() ([]byte, []int) {
 type AgentDB_Wire_ClientMessage struct {
 	state     protoimpl.MessageState `protogen:"open.v1"`
 	RequestId uint32                 `protobuf:"varint,1,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
-	// The caller's budget left when the request was sent; the server runs
-	// the request within it, and work not yet committed stops when it
-	// runs out. 0: the server's default.
-	DeadlineMs uint32 `protobuf:"varint,12,opt,name=deadline_ms,json=deadlineMs,proto3" json:"deadline_ms,omitempty"`
 	// Types that are valid to be assigned to Message:
 	//
 	//	*AgentDB_Wire_ClientMessage_Hello
@@ -782,13 +778,6 @@ func (*AgentDB_Wire_ClientMessage) Descriptor() ([]byte, []int) {
 func (x *AgentDB_Wire_ClientMessage) GetRequestId() uint32 {
 	if x != nil {
 		return x.RequestId
-	}
-	return 0
-}
-
-func (x *AgentDB_Wire_ClientMessage) GetDeadlineMs() uint32 {
-	if x != nil {
-		return x.DeadlineMs
 	}
 	return 0
 }
@@ -2167,7 +2156,7 @@ var File_livekit_agentdb_proto protoreflect.FileDescriptor
 
 const file_livekit_agentdb_proto_rawDesc = "" +
 	"\n" +
-	"\x15livekit_agentdb.proto\x12\alivekit\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x14logger/options.proto\"\x85\x1c\n" +
+	"\x15livekit_agentdb.proto\x12\alivekit\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x14logger/options.proto\"\xe4\x1b\n" +
 	"\aAgentDB\x1a<\n" +
 	"\rCreateRequest\x12+\n" +
 	"\x03ttl\x18\x01 \x01(\v2\x19.google.protobuf.DurationR\x03ttl\x1al\n" +
@@ -2207,13 +2196,11 @@ const file_livekit_agentdb_proto_rawDesc = "" +
 	"\fdownload_url\x18\x01 \x01(\tR\vdownloadUrl\x129\n" +
 	"\n" +
 	"expires_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\x12\x10\n" +
-	"\x03tip\x18\x03 \x01(\x03R\x03tip\x1a\x91\x15\n" +
-	"\x04Wire\x1a\x81\x05\n" +
+	"\x03tip\x18\x03 \x01(\x03R\x03tip\x1a\xf0\x14\n" +
+	"\x04Wire\x1a\xe0\x04\n" +
 	"\rClientMessage\x12\x1d\n" +
 	"\n" +
-	"request_id\x18\x01 \x01(\rR\trequestId\x12\x1f\n" +
-	"\vdeadline_ms\x18\f \x01(\rR\n" +
-	"deadlineMs\x123\n" +
+	"request_id\x18\x01 \x01(\rR\trequestId\x123\n" +
 	"\x05hello\x18\x02 \x01(\v2\x1b.livekit.AgentDB.Wire.HelloH\x00R\x05hello\x125\n" +
 	"\x04exec\x18\x03 \x01(\v2\x1f.livekit.AgentDB.Wire.StatementH\x00R\x04exec\x127\n" +
 	"\x05query\x18\x04 \x01(\v2\x1f.livekit.AgentDB.Wire.StatementH\x00R\x05query\x123\n" +
