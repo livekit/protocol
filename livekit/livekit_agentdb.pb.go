@@ -2167,7 +2167,7 @@ var File_livekit_agentdb_proto protoreflect.FileDescriptor
 
 const file_livekit_agentdb_proto_rawDesc = "" +
 	"\n" +
-	"\x15livekit_agentdb.proto\x12\alivekit\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x14logger/options.proto\"\xb9\x1c\n" +
+	"\x15livekit_agentdb.proto\x12\alivekit\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x14logger/options.proto\"\x85\x1c\n" +
 	"\aAgentDB\x1a<\n" +
 	"\rCreateRequest\x12+\n" +
 	"\x03ttl\x18\x01 \x01(\v2\x19.google.protobuf.DurationR\x03ttl\x1al\n" +
@@ -2207,7 +2207,7 @@ const file_livekit_agentdb_proto_rawDesc = "" +
 	"\fdownload_url\x18\x01 \x01(\tR\vdownloadUrl\x129\n" +
 	"\n" +
 	"expires_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\x12\x10\n" +
-	"\x03tip\x18\x03 \x01(\x03R\x03tip\x1a\xc5\x15\n" +
+	"\x03tip\x18\x03 \x01(\x03R\x03tip\x1a\x91\x15\n" +
 	"\x04Wire\x1a\x81\x05\n" +
 	"\rClientMessage\x12\x1d\n" +
 	"\n" +
@@ -2251,11 +2251,11 @@ const file_livekit_agentdb_proto_rawDesc = "" +
 	"\tStatement\x12\x10\n" +
 	"\x03sql\x18\x01 \x01(\tR\x03sql\x123\n" +
 	"\x06params\x18\x02 \x03(\v2\x1b.livekit.AgentDB.Wire.ValueR\x06params\x123\n" +
-	"\x04lang\x18\x03 \x01(\x0e2\x1f.livekit.AgentDB.Wire.QueryLangR\x04lang\x1aV\n" +
+	"\x04lang\x18\x03 \x01(\x0e2\x1f.livekit.AgentDB.Wire.QueryLangR\x04lang\x1aH\n" +
 	"\x05Batch\x12?\n" +
 	"\n" +
 	"statements\x18\x01 \x03(\v2\x1f.livekit.AgentDB.Wire.StatementR\n" +
-	"statementsJ\x04\b\x02\x10\x03R\x06if_tip\x1a\a\n" +
+	"statements\x1a\a\n" +
 	"\x05Begin\x1a\b\n" +
 	"\x06Commit\x1a\n" +
 	"\n" +
@@ -2267,16 +2267,16 @@ const file_livekit_agentdb_proto_rawDesc = "" +
 	"\ftimestamp_ms\x18\x01 \x01(\x03R\vtimestampMs\x1a^\n" +
 	"\x04Pong\x123\n" +
 	"\x16last_ping_timestamp_ms\x18\x01 \x01(\x03R\x13lastPingTimestampMs\x12!\n" +
-	"\ftimestamp_ms\x18\x02 \x01(\x03R\vtimestampMs\x1a{\n" +
+	"\ftimestamp_ms\x18\x02 \x01(\x03R\vtimestampMs\x1aj\n" +
 	"\x05Hello\x12\x19\n" +
 	"\x05token\x18\x01 \x01(\tB\x03\xc0P\x02R\x05token\x12\x1f\n" +
 	"\vdatabase_id\x18\x02 \x01(\tR\n" +
 	"databaseId\x12%\n" +
-	"\x0eclient_version\x18\x04 \x01(\tR\rclientVersionJ\x04\b\x05\x10\x06R\tmax_frame\x1a\x81\x01\n" +
+	"\x0eclient_version\x18\x04 \x01(\tR\rclientVersion\x1am\n" +
 	"\aHelloOk\x12\x10\n" +
 	"\x03tip\x18\x01 \x01(\x03R\x03tip\x12(\n" +
 	"\x10ping_interval_ms\x18\x02 \x01(\rR\x0epingIntervalMs\x12&\n" +
-	"\x0fping_timeout_ms\x18\x03 \x01(\rR\rpingTimeoutMsJ\x04\b\x04\x10\x05R\fcapabilities\x1a=\n" +
+	"\x0fping_timeout_ms\x18\x03 \x01(\rR\rpingTimeoutMs\x1a=\n" +
 	"\aColumns\x12\x14\n" +
 	"\x05names\x18\x01 \x03(\tR\x05names\x12\x1c\n" +
 	"\tstatement\x18\x02 \x01(\rR\tstatement\x1a\xc0\x01\n" +
