@@ -83,7 +83,8 @@ message AgentDB {
 
   // Data plane: one WebSocket per database, one message per frame, correlated
   // by a client-chosen request_id. Result batches are paced by Credit, so the
-  // server never sends more un-consumed batches than granted.
+  // server never sends more un-consumed batches than granted. A frame is at
+  // most 16 MiB, both ways.
   message Wire {
     message ClientMessage {
       uint32 request_id = 1;
@@ -146,6 +147,8 @@ message AgentDB {
       repeated Statement statements = 1;
     }
 
+    // Unsupported: a request is one transaction and none spans requests, so
+    // these are refused. Send the statements as one Batch.
     message Begin {}
     message Commit {}
     message Rollback {}
@@ -167,6 +170,7 @@ message AgentDB {
     message Hello {
       string token = 1 [(logger.sensitivity) = SENSITIVITY_SECRET];
       string database_id = 2;
+      string client_version = 4;
     }
 
     message HelloOk {
@@ -221,9 +225,13 @@ message AgentDB {
       uint64 total_rows = 2;
     }
 
+    // A failed request. The server's table of codes says, for each, whether
+    // the request may have applied and whether it may be sent again: a client
+    // branches on code alone. Name and description are for people.
     message Error {
-      string code = 1;             // stable, machine-readable
-      string message = 2;
+      uint32 code = 3;
+      string name = 1;
+      string description = 2;
     }
   }
 }
