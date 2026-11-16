@@ -94,3 +94,36 @@ func TestTimeoutQueue(t *testing.T) {
 		})
 	})
 }
+
+func TestTimeoutQueueOldest(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		var q TimeoutQueue[int]
+		_, ok := q.Oldest()
+		require.False(t, ok, "an empty queue has no oldest item")
+
+		a := &TimeoutQueueItem[int]{Value: 0}
+		b := &TimeoutQueueItem[int]{Value: 1}
+		t0 := time.Now()
+		q.Reset(a)
+		time.Sleep(time.Second)
+		q.Reset(b)
+
+		oldest, ok := q.Oldest()
+		require.True(t, ok)
+		require.True(t, oldest.Equal(t0), "oldest is a's reset")
+
+		time.Sleep(time.Second)
+		q.Reset(a)
+		oldest, _ = q.Oldest()
+		require.True(t, oldest.Equal(t0.Add(time.Second)), "a reset moves oldest to b")
+
+		q.Remove(b)
+		oldest, _ = q.Oldest()
+		require.True(t, oldest.Equal(t0.Add(2*time.Second)), "removing b leaves a")
+
+		for it := q.IterateRemoveAfter(0); it.Next(); {
+		}
+		_, ok = q.Oldest()
+		require.False(t, ok, "a drained queue has no oldest item")
+	})
+}
