@@ -55,6 +55,18 @@ func (q *TimeoutQueue[T]) Remove(i *TimeoutQueueItem[T]) {
 	q.remove(i)
 }
 
+// Oldest returns when the least recently reset item was reset, so a caller
+// can sleep until it times out instead of polling.
+func (q *TimeoutQueue[T]) Oldest() (time.Time, bool) {
+	q.mu.Lock()
+	defer q.mu.Unlock()
+
+	if q.head == nil {
+		return time.Time{}, false
+	}
+	return time.Unix(0, q.head.time), true
+}
+
 // popBefore pops the head if it was stamped at or before t and queued at or
 // before seq: an item reset after an iteration began is not visited by it,
 // even when the clock has not moved since.
