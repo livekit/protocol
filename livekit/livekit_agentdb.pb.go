@@ -85,53 +85,6 @@ func (AgentDB_Wire_QueryLang) EnumDescriptor() ([]byte, []int) {
 	return file_livekit_agentdb_proto_rawDescGZIP(), []int{0, 10, 0}
 }
 
-// What a server supports beyond the base protocol.
-type AgentDB_Wire_Capability int32
-
-const (
-	AgentDB_Wire_CAPABILITY_UNSPECIFIED AgentDB_Wire_Capability = 0
-	AgentDB_Wire_IF_TIP                 AgentDB_Wire_Capability = 1 // Batch.if_tip
-)
-
-// Enum value maps for AgentDB_Wire_Capability.
-var (
-	AgentDB_Wire_Capability_name = map[int32]string{
-		0: "CAPABILITY_UNSPECIFIED",
-		1: "IF_TIP",
-	}
-	AgentDB_Wire_Capability_value = map[string]int32{
-		"CAPABILITY_UNSPECIFIED": 0,
-		"IF_TIP":                 1,
-	}
-)
-
-func (x AgentDB_Wire_Capability) Enum() *AgentDB_Wire_Capability {
-	p := new(AgentDB_Wire_Capability)
-	*p = x
-	return p
-}
-
-func (x AgentDB_Wire_Capability) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (AgentDB_Wire_Capability) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_agentdb_proto_enumTypes[1].Descriptor()
-}
-
-func (AgentDB_Wire_Capability) Type() protoreflect.EnumType {
-	return &file_livekit_agentdb_proto_enumTypes[1]
-}
-
-func (x AgentDB_Wire_Capability) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use AgentDB_Wire_Capability.Descriptor instead.
-func (AgentDB_Wire_Capability) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_agentdb_proto_rawDescGZIP(), []int{0, 10, 1}
-}
-
 type AgentDB_Wire_ValueType int32
 
 const (
@@ -171,11 +124,11 @@ func (x AgentDB_Wire_ValueType) String() string {
 }
 
 func (AgentDB_Wire_ValueType) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_agentdb_proto_enumTypes[2].Descriptor()
+	return file_livekit_agentdb_proto_enumTypes[1].Descriptor()
 }
 
 func (AgentDB_Wire_ValueType) Type() protoreflect.EnumType {
-	return &file_livekit_agentdb_proto_enumTypes[2]
+	return &file_livekit_agentdb_proto_enumTypes[1]
 }
 
 func (x AgentDB_Wire_ValueType) Number() protoreflect.EnumNumber {
@@ -184,7 +137,7 @@ func (x AgentDB_Wire_ValueType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use AgentDB_Wire_ValueType.Descriptor instead.
 func (AgentDB_Wire_ValueType) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_agentdb_proto_rawDescGZIP(), []int{0, 10, 2}
+	return file_livekit_agentdb_proto_rawDescGZIP(), []int{0, 10, 1}
 }
 
 // Nested so that names like Value and Ping need not be unique across the
@@ -734,7 +687,8 @@ func (x *AgentDB_ExportResponse) GetTip() int64 {
 
 // Data plane: one WebSocket per database, one message per frame, correlated
 // by a client-chosen request_id. Result batches are paced by Credit, so the
-// server never sends more un-consumed batches than granted.
+// server never sends more un-consumed batches than granted. A frame is at
+// most 16 MiB, both ways.
 type AgentDB_Wire struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -1368,11 +1322,8 @@ func (x *AgentDB_Wire_Statement) GetLang() AgentDB_Wire_QueryLang {
 // batch. A statement that returns no rows still sends its Columns. Credit
 // paces the ColumnBatch frames of the batch as a whole.
 type AgentDB_Wire_Batch struct {
-	state      protoimpl.MessageState    `protogen:"open.v1"`
-	Statements []*AgentDB_Wire_Statement `protobuf:"bytes,1,rep,name=statements,proto3" json:"statements,omitempty"`
-	// Set: the batch applies only if the database's tip still equals
-	// if_tip when it runs.
-	IfTip         *int64 `protobuf:"varint,2,opt,name=if_tip,json=ifTip,proto3,oneof" json:"if_tip,omitempty"`
+	state         protoimpl.MessageState    `protogen:"open.v1"`
+	Statements    []*AgentDB_Wire_Statement `protobuf:"bytes,1,rep,name=statements,proto3" json:"statements,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1412,13 +1363,6 @@ func (x *AgentDB_Wire_Batch) GetStatements() []*AgentDB_Wire_Statement {
 		return x.Statements
 	}
 	return nil
-}
-
-func (x *AgentDB_Wire_Batch) GetIfTip() int64 {
-	if x != nil && x.IfTip != nil {
-		return *x.IfTip
-	}
-	return 0
 }
 
 // Unsupported: a request is one transaction and none spans requests, so
@@ -1712,9 +1656,6 @@ type AgentDB_Wire_Hello struct {
 	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
 	DatabaseId    string                 `protobuf:"bytes,2,opt,name=database_id,json=databaseId,proto3" json:"database_id,omitempty"`
 	ClientVersion string                 `protobuf:"bytes,4,opt,name=client_version,json=clientVersion,proto3" json:"client_version,omitempty"`
-	// The largest frame the client reads, in bytes; the server never sends
-	// a larger one. 0: the server's default.
-	MaxFrame      uint32 `protobuf:"varint,5,opt,name=max_frame,json=maxFrame,proto3" json:"max_frame,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1770,19 +1711,11 @@ func (x *AgentDB_Wire_Hello) GetClientVersion() string {
 	return ""
 }
 
-func (x *AgentDB_Wire_Hello) GetMaxFrame() uint32 {
-	if x != nil {
-		return x.MaxFrame
-	}
-	return 0
-}
-
 type AgentDB_Wire_HelloOk struct {
-	state          protoimpl.MessageState    `protogen:"open.v1"`
-	Tip            int64                     `protobuf:"varint,1,opt,name=tip,proto3" json:"tip,omitempty"`
-	PingIntervalMs uint32                    `protobuf:"varint,2,opt,name=ping_interval_ms,json=pingIntervalMs,proto3" json:"ping_interval_ms,omitempty"`
-	PingTimeoutMs  uint32                    `protobuf:"varint,3,opt,name=ping_timeout_ms,json=pingTimeoutMs,proto3" json:"ping_timeout_ms,omitempty"`
-	Capabilities   []AgentDB_Wire_Capability `protobuf:"varint,4,rep,packed,name=capabilities,proto3,enum=livekit.AgentDB_Wire_Capability" json:"capabilities,omitempty"`
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Tip            int64                  `protobuf:"varint,1,opt,name=tip,proto3" json:"tip,omitempty"`
+	PingIntervalMs uint32                 `protobuf:"varint,2,opt,name=ping_interval_ms,json=pingIntervalMs,proto3" json:"ping_interval_ms,omitempty"`
+	PingTimeoutMs  uint32                 `protobuf:"varint,3,opt,name=ping_timeout_ms,json=pingTimeoutMs,proto3" json:"ping_timeout_ms,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -1836,13 +1769,6 @@ func (x *AgentDB_Wire_HelloOk) GetPingTimeoutMs() uint32 {
 		return x.PingTimeoutMs
 	}
 	return 0
-}
-
-func (x *AgentDB_Wire_HelloOk) GetCapabilities() []AgentDB_Wire_Capability {
-	if x != nil {
-		return x.Capabilities
-	}
-	return nil
 }
 
 type AgentDB_Wire_Columns struct {
@@ -2241,7 +2167,7 @@ var File_livekit_agentdb_proto protoreflect.FileDescriptor
 
 const file_livekit_agentdb_proto_rawDesc = "" +
 	"\n" +
-	"\x15livekit_agentdb.proto\x12\alivekit\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x14logger/options.proto\"\xc7\x1d\n" +
+	"\x15livekit_agentdb.proto\x12\alivekit\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x14logger/options.proto\"\xb9\x1c\n" +
 	"\aAgentDB\x1a<\n" +
 	"\rCreateRequest\x12+\n" +
 	"\x03ttl\x18\x01 \x01(\v2\x19.google.protobuf.DurationR\x03ttl\x1al\n" +
@@ -2281,7 +2207,7 @@ const file_livekit_agentdb_proto_rawDesc = "" +
 	"\fdownload_url\x18\x01 \x01(\tR\vdownloadUrl\x129\n" +
 	"\n" +
 	"expires_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\x12\x10\n" +
-	"\x03tip\x18\x03 \x01(\x03R\x03tip\x1a\xd3\x16\n" +
+	"\x03tip\x18\x03 \x01(\x03R\x03tip\x1a\xc5\x15\n" +
 	"\x04Wire\x1a\x81\x05\n" +
 	"\rClientMessage\x12\x1d\n" +
 	"\n" +
@@ -2325,13 +2251,11 @@ const file_livekit_agentdb_proto_rawDesc = "" +
 	"\tStatement\x12\x10\n" +
 	"\x03sql\x18\x01 \x01(\tR\x03sql\x123\n" +
 	"\x06params\x18\x02 \x03(\v2\x1b.livekit.AgentDB.Wire.ValueR\x06params\x123\n" +
-	"\x04lang\x18\x03 \x01(\x0e2\x1f.livekit.AgentDB.Wire.QueryLangR\x04lang\x1ao\n" +
+	"\x04lang\x18\x03 \x01(\x0e2\x1f.livekit.AgentDB.Wire.QueryLangR\x04lang\x1aV\n" +
 	"\x05Batch\x12?\n" +
 	"\n" +
 	"statements\x18\x01 \x03(\v2\x1f.livekit.AgentDB.Wire.StatementR\n" +
-	"statements\x12\x1a\n" +
-	"\x06if_tip\x18\x02 \x01(\x03H\x00R\x05ifTip\x88\x01\x01B\t\n" +
-	"\a_if_tip\x1a\a\n" +
+	"statementsJ\x04\b\x02\x10\x03R\x06if_tip\x1a\a\n" +
 	"\x05Begin\x1a\b\n" +
 	"\x06Commit\x1a\n" +
 	"\n" +
@@ -2343,18 +2267,16 @@ const file_livekit_agentdb_proto_rawDesc = "" +
 	"\ftimestamp_ms\x18\x01 \x01(\x03R\vtimestampMs\x1a^\n" +
 	"\x04Pong\x123\n" +
 	"\x16last_ping_timestamp_ms\x18\x01 \x01(\x03R\x13lastPingTimestampMs\x12!\n" +
-	"\ftimestamp_ms\x18\x02 \x01(\x03R\vtimestampMs\x1a\x87\x01\n" +
+	"\ftimestamp_ms\x18\x02 \x01(\x03R\vtimestampMs\x1a{\n" +
 	"\x05Hello\x12\x19\n" +
 	"\x05token\x18\x01 \x01(\tB\x03\xc0P\x02R\x05token\x12\x1f\n" +
 	"\vdatabase_id\x18\x02 \x01(\tR\n" +
 	"databaseId\x12%\n" +
-	"\x0eclient_version\x18\x04 \x01(\tR\rclientVersion\x12\x1b\n" +
-	"\tmax_frame\x18\x05 \x01(\rR\bmaxFrame\x1a\xb3\x01\n" +
+	"\x0eclient_version\x18\x04 \x01(\tR\rclientVersionJ\x04\b\x05\x10\x06R\tmax_frame\x1a\x81\x01\n" +
 	"\aHelloOk\x12\x10\n" +
 	"\x03tip\x18\x01 \x01(\x03R\x03tip\x12(\n" +
 	"\x10ping_interval_ms\x18\x02 \x01(\rR\x0epingIntervalMs\x12&\n" +
-	"\x0fping_timeout_ms\x18\x03 \x01(\rR\rpingTimeoutMs\x12D\n" +
-	"\fcapabilities\x18\x04 \x03(\x0e2 .livekit.AgentDB.Wire.CapabilityR\fcapabilities\x1a=\n" +
+	"\x0fping_timeout_ms\x18\x03 \x01(\rR\rpingTimeoutMsJ\x04\b\x04\x10\x05R\fcapabilities\x1a=\n" +
 	"\aColumns\x12\x14\n" +
 	"\x05names\x18\x01 \x03(\tR\x05names\x12\x1c\n" +
 	"\tstatement\x18\x02 \x01(\rR\tstatement\x1a\xc0\x01\n" +
@@ -2385,12 +2307,7 @@ const file_livekit_agentdb_proto_rawDesc = "" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\"\x1a\n" +
 	"\tQueryLang\x12\a\n" +
-	"\x03SQL\x10\x00\"\x04\b\x01\x10\x01\"4\n" +
-	"\n" +
-	"Capability\x12\x1a\n" +
-	"\x16CAPABILITY_UNSPECIFIED\x10\x00\x12\n" +
-	"\n" +
-	"\x06IF_TIP\x10\x01\">\n" +
+	"\x03SQL\x10\x00\"\x04\b\x01\x10\x01\">\n" +
 	"\tValueType\x12\b\n" +
 	"\x04NULL\x10\x00\x12\a\n" +
 	"\x03INT\x10\x01\x12\n" +
@@ -2411,81 +2328,79 @@ func file_livekit_agentdb_proto_rawDescGZIP() []byte {
 	return file_livekit_agentdb_proto_rawDescData
 }
 
-var file_livekit_agentdb_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
+var file_livekit_agentdb_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_livekit_agentdb_proto_msgTypes = make([]protoimpl.MessageInfo, 32)
 var file_livekit_agentdb_proto_goTypes = []any{
 	(AgentDB_Wire_QueryLang)(0),        // 0: livekit.AgentDB.Wire.QueryLang
-	(AgentDB_Wire_Capability)(0),       // 1: livekit.AgentDB.Wire.Capability
-	(AgentDB_Wire_ValueType)(0),        // 2: livekit.AgentDB.Wire.ValueType
-	(*AgentDB)(nil),                    // 3: livekit.AgentDB
-	(*AgentDB_CreateRequest)(nil),      // 4: livekit.AgentDB.CreateRequest
-	(*AgentDB_CreateResponse)(nil),     // 5: livekit.AgentDB.CreateResponse
-	(*AgentDB_GetRequest)(nil),         // 6: livekit.AgentDB.GetRequest
-	(*AgentDB_ListRequest)(nil),        // 7: livekit.AgentDB.ListRequest
-	(*AgentDB_ListResponse)(nil),       // 8: livekit.AgentDB.ListResponse
-	(*AgentDB_AgentDatabase)(nil),      // 9: livekit.AgentDB.AgentDatabase
-	(*AgentDB_DeleteRequest)(nil),      // 10: livekit.AgentDB.DeleteRequest
-	(*AgentDB_DeleteResponse)(nil),     // 11: livekit.AgentDB.DeleteResponse
-	(*AgentDB_ExportRequest)(nil),      // 12: livekit.AgentDB.ExportRequest
-	(*AgentDB_ExportResponse)(nil),     // 13: livekit.AgentDB.ExportResponse
-	(*AgentDB_Wire)(nil),               // 14: livekit.AgentDB.Wire
-	(*AgentDB_Wire_ClientMessage)(nil), // 15: livekit.AgentDB.Wire.ClientMessage
-	(*AgentDB_Wire_ServerMessage)(nil), // 16: livekit.AgentDB.Wire.ServerMessage
-	(*AgentDB_Wire_Value)(nil),         // 17: livekit.AgentDB.Wire.Value
-	(*AgentDB_Wire_Statement)(nil),     // 18: livekit.AgentDB.Wire.Statement
-	(*AgentDB_Wire_Batch)(nil),         // 19: livekit.AgentDB.Wire.Batch
-	(*AgentDB_Wire_Begin)(nil),         // 20: livekit.AgentDB.Wire.Begin
-	(*AgentDB_Wire_Commit)(nil),        // 21: livekit.AgentDB.Wire.Commit
-	(*AgentDB_Wire_Rollback)(nil),      // 22: livekit.AgentDB.Wire.Rollback
-	(*AgentDB_Wire_Cancel)(nil),        // 23: livekit.AgentDB.Wire.Cancel
-	(*AgentDB_Wire_Credit)(nil),        // 24: livekit.AgentDB.Wire.Credit
-	(*AgentDB_Wire_Ping)(nil),          // 25: livekit.AgentDB.Wire.Ping
-	(*AgentDB_Wire_Pong)(nil),          // 26: livekit.AgentDB.Wire.Pong
-	(*AgentDB_Wire_Hello)(nil),         // 27: livekit.AgentDB.Wire.Hello
-	(*AgentDB_Wire_HelloOk)(nil),       // 28: livekit.AgentDB.Wire.HelloOk
-	(*AgentDB_Wire_Columns)(nil),       // 29: livekit.AgentDB.Wire.Columns
-	(*AgentDB_Wire_Column)(nil),        // 30: livekit.AgentDB.Wire.Column
-	(*AgentDB_Wire_ColumnBatch)(nil),   // 31: livekit.AgentDB.Wire.ColumnBatch
-	(*AgentDB_Wire_ExecResult)(nil),    // 32: livekit.AgentDB.Wire.ExecResult
-	(*AgentDB_Wire_Done)(nil),          // 33: livekit.AgentDB.Wire.Done
-	(*AgentDB_Wire_Error)(nil),         // 34: livekit.AgentDB.Wire.Error
-	(*durationpb.Duration)(nil),        // 35: google.protobuf.Duration
-	(*timestamppb.Timestamp)(nil),      // 36: google.protobuf.Timestamp
+	(AgentDB_Wire_ValueType)(0),        // 1: livekit.AgentDB.Wire.ValueType
+	(*AgentDB)(nil),                    // 2: livekit.AgentDB
+	(*AgentDB_CreateRequest)(nil),      // 3: livekit.AgentDB.CreateRequest
+	(*AgentDB_CreateResponse)(nil),     // 4: livekit.AgentDB.CreateResponse
+	(*AgentDB_GetRequest)(nil),         // 5: livekit.AgentDB.GetRequest
+	(*AgentDB_ListRequest)(nil),        // 6: livekit.AgentDB.ListRequest
+	(*AgentDB_ListResponse)(nil),       // 7: livekit.AgentDB.ListResponse
+	(*AgentDB_AgentDatabase)(nil),      // 8: livekit.AgentDB.AgentDatabase
+	(*AgentDB_DeleteRequest)(nil),      // 9: livekit.AgentDB.DeleteRequest
+	(*AgentDB_DeleteResponse)(nil),     // 10: livekit.AgentDB.DeleteResponse
+	(*AgentDB_ExportRequest)(nil),      // 11: livekit.AgentDB.ExportRequest
+	(*AgentDB_ExportResponse)(nil),     // 12: livekit.AgentDB.ExportResponse
+	(*AgentDB_Wire)(nil),               // 13: livekit.AgentDB.Wire
+	(*AgentDB_Wire_ClientMessage)(nil), // 14: livekit.AgentDB.Wire.ClientMessage
+	(*AgentDB_Wire_ServerMessage)(nil), // 15: livekit.AgentDB.Wire.ServerMessage
+	(*AgentDB_Wire_Value)(nil),         // 16: livekit.AgentDB.Wire.Value
+	(*AgentDB_Wire_Statement)(nil),     // 17: livekit.AgentDB.Wire.Statement
+	(*AgentDB_Wire_Batch)(nil),         // 18: livekit.AgentDB.Wire.Batch
+	(*AgentDB_Wire_Begin)(nil),         // 19: livekit.AgentDB.Wire.Begin
+	(*AgentDB_Wire_Commit)(nil),        // 20: livekit.AgentDB.Wire.Commit
+	(*AgentDB_Wire_Rollback)(nil),      // 21: livekit.AgentDB.Wire.Rollback
+	(*AgentDB_Wire_Cancel)(nil),        // 22: livekit.AgentDB.Wire.Cancel
+	(*AgentDB_Wire_Credit)(nil),        // 23: livekit.AgentDB.Wire.Credit
+	(*AgentDB_Wire_Ping)(nil),          // 24: livekit.AgentDB.Wire.Ping
+	(*AgentDB_Wire_Pong)(nil),          // 25: livekit.AgentDB.Wire.Pong
+	(*AgentDB_Wire_Hello)(nil),         // 26: livekit.AgentDB.Wire.Hello
+	(*AgentDB_Wire_HelloOk)(nil),       // 27: livekit.AgentDB.Wire.HelloOk
+	(*AgentDB_Wire_Columns)(nil),       // 28: livekit.AgentDB.Wire.Columns
+	(*AgentDB_Wire_Column)(nil),        // 29: livekit.AgentDB.Wire.Column
+	(*AgentDB_Wire_ColumnBatch)(nil),   // 30: livekit.AgentDB.Wire.ColumnBatch
+	(*AgentDB_Wire_ExecResult)(nil),    // 31: livekit.AgentDB.Wire.ExecResult
+	(*AgentDB_Wire_Done)(nil),          // 32: livekit.AgentDB.Wire.Done
+	(*AgentDB_Wire_Error)(nil),         // 33: livekit.AgentDB.Wire.Error
+	(*durationpb.Duration)(nil),        // 34: google.protobuf.Duration
+	(*timestamppb.Timestamp)(nil),      // 35: google.protobuf.Timestamp
 }
 var file_livekit_agentdb_proto_depIdxs = []int32{
-	35, // 0: livekit.AgentDB.CreateRequest.ttl:type_name -> google.protobuf.Duration
-	36, // 1: livekit.AgentDB.CreateResponse.expires_at:type_name -> google.protobuf.Timestamp
-	9,  // 2: livekit.AgentDB.ListResponse.databases:type_name -> livekit.AgentDB.AgentDatabase
-	36, // 3: livekit.AgentDB.AgentDatabase.created_at:type_name -> google.protobuf.Timestamp
-	36, // 4: livekit.AgentDB.AgentDatabase.expires_at:type_name -> google.protobuf.Timestamp
-	36, // 5: livekit.AgentDB.ExportResponse.expires_at:type_name -> google.protobuf.Timestamp
-	27, // 6: livekit.AgentDB.Wire.ClientMessage.hello:type_name -> livekit.AgentDB.Wire.Hello
-	18, // 7: livekit.AgentDB.Wire.ClientMessage.exec:type_name -> livekit.AgentDB.Wire.Statement
-	18, // 8: livekit.AgentDB.Wire.ClientMessage.query:type_name -> livekit.AgentDB.Wire.Statement
-	19, // 9: livekit.AgentDB.Wire.ClientMessage.batch:type_name -> livekit.AgentDB.Wire.Batch
-	20, // 10: livekit.AgentDB.Wire.ClientMessage.begin:type_name -> livekit.AgentDB.Wire.Begin
-	21, // 11: livekit.AgentDB.Wire.ClientMessage.commit:type_name -> livekit.AgentDB.Wire.Commit
-	22, // 12: livekit.AgentDB.Wire.ClientMessage.rollback:type_name -> livekit.AgentDB.Wire.Rollback
-	23, // 13: livekit.AgentDB.Wire.ClientMessage.cancel:type_name -> livekit.AgentDB.Wire.Cancel
-	24, // 14: livekit.AgentDB.Wire.ClientMessage.credit:type_name -> livekit.AgentDB.Wire.Credit
-	25, // 15: livekit.AgentDB.Wire.ClientMessage.ping:type_name -> livekit.AgentDB.Wire.Ping
-	28, // 16: livekit.AgentDB.Wire.ServerMessage.hello_ok:type_name -> livekit.AgentDB.Wire.HelloOk
-	29, // 17: livekit.AgentDB.Wire.ServerMessage.columns:type_name -> livekit.AgentDB.Wire.Columns
-	31, // 18: livekit.AgentDB.Wire.ServerMessage.column_batch:type_name -> livekit.AgentDB.Wire.ColumnBatch
-	32, // 19: livekit.AgentDB.Wire.ServerMessage.exec_result:type_name -> livekit.AgentDB.Wire.ExecResult
-	33, // 20: livekit.AgentDB.Wire.ServerMessage.done:type_name -> livekit.AgentDB.Wire.Done
-	34, // 21: livekit.AgentDB.Wire.ServerMessage.error:type_name -> livekit.AgentDB.Wire.Error
-	26, // 22: livekit.AgentDB.Wire.ServerMessage.pong:type_name -> livekit.AgentDB.Wire.Pong
-	17, // 23: livekit.AgentDB.Wire.Statement.params:type_name -> livekit.AgentDB.Wire.Value
+	34, // 0: livekit.AgentDB.CreateRequest.ttl:type_name -> google.protobuf.Duration
+	35, // 1: livekit.AgentDB.CreateResponse.expires_at:type_name -> google.protobuf.Timestamp
+	8,  // 2: livekit.AgentDB.ListResponse.databases:type_name -> livekit.AgentDB.AgentDatabase
+	35, // 3: livekit.AgentDB.AgentDatabase.created_at:type_name -> google.protobuf.Timestamp
+	35, // 4: livekit.AgentDB.AgentDatabase.expires_at:type_name -> google.protobuf.Timestamp
+	35, // 5: livekit.AgentDB.ExportResponse.expires_at:type_name -> google.protobuf.Timestamp
+	26, // 6: livekit.AgentDB.Wire.ClientMessage.hello:type_name -> livekit.AgentDB.Wire.Hello
+	17, // 7: livekit.AgentDB.Wire.ClientMessage.exec:type_name -> livekit.AgentDB.Wire.Statement
+	17, // 8: livekit.AgentDB.Wire.ClientMessage.query:type_name -> livekit.AgentDB.Wire.Statement
+	18, // 9: livekit.AgentDB.Wire.ClientMessage.batch:type_name -> livekit.AgentDB.Wire.Batch
+	19, // 10: livekit.AgentDB.Wire.ClientMessage.begin:type_name -> livekit.AgentDB.Wire.Begin
+	20, // 11: livekit.AgentDB.Wire.ClientMessage.commit:type_name -> livekit.AgentDB.Wire.Commit
+	21, // 12: livekit.AgentDB.Wire.ClientMessage.rollback:type_name -> livekit.AgentDB.Wire.Rollback
+	22, // 13: livekit.AgentDB.Wire.ClientMessage.cancel:type_name -> livekit.AgentDB.Wire.Cancel
+	23, // 14: livekit.AgentDB.Wire.ClientMessage.credit:type_name -> livekit.AgentDB.Wire.Credit
+	24, // 15: livekit.AgentDB.Wire.ClientMessage.ping:type_name -> livekit.AgentDB.Wire.Ping
+	27, // 16: livekit.AgentDB.Wire.ServerMessage.hello_ok:type_name -> livekit.AgentDB.Wire.HelloOk
+	28, // 17: livekit.AgentDB.Wire.ServerMessage.columns:type_name -> livekit.AgentDB.Wire.Columns
+	30, // 18: livekit.AgentDB.Wire.ServerMessage.column_batch:type_name -> livekit.AgentDB.Wire.ColumnBatch
+	31, // 19: livekit.AgentDB.Wire.ServerMessage.exec_result:type_name -> livekit.AgentDB.Wire.ExecResult
+	32, // 20: livekit.AgentDB.Wire.ServerMessage.done:type_name -> livekit.AgentDB.Wire.Done
+	33, // 21: livekit.AgentDB.Wire.ServerMessage.error:type_name -> livekit.AgentDB.Wire.Error
+	25, // 22: livekit.AgentDB.Wire.ServerMessage.pong:type_name -> livekit.AgentDB.Wire.Pong
+	16, // 23: livekit.AgentDB.Wire.Statement.params:type_name -> livekit.AgentDB.Wire.Value
 	0,  // 24: livekit.AgentDB.Wire.Statement.lang:type_name -> livekit.AgentDB.Wire.QueryLang
-	18, // 25: livekit.AgentDB.Wire.Batch.statements:type_name -> livekit.AgentDB.Wire.Statement
-	1,  // 26: livekit.AgentDB.Wire.HelloOk.capabilities:type_name -> livekit.AgentDB.Wire.Capability
-	30, // 27: livekit.AgentDB.Wire.ColumnBatch.columns:type_name -> livekit.AgentDB.Wire.Column
-	28, // [28:28] is the sub-list for method output_type
-	28, // [28:28] is the sub-list for method input_type
-	28, // [28:28] is the sub-list for extension type_name
-	28, // [28:28] is the sub-list for extension extendee
-	0,  // [0:28] is the sub-list for field type_name
+	17, // 25: livekit.AgentDB.Wire.Batch.statements:type_name -> livekit.AgentDB.Wire.Statement
+	29, // 26: livekit.AgentDB.Wire.ColumnBatch.columns:type_name -> livekit.AgentDB.Wire.Column
+	27, // [27:27] is the sub-list for method output_type
+	27, // [27:27] is the sub-list for method input_type
+	27, // [27:27] is the sub-list for extension type_name
+	27, // [27:27] is the sub-list for extension extendee
+	0,  // [0:27] is the sub-list for field type_name
 }
 
 func init() { file_livekit_agentdb_proto_init() }
@@ -2521,13 +2436,12 @@ func file_livekit_agentdb_proto_init() {
 		(*AgentDB_Wire_Value_TextValue)(nil),
 		(*AgentDB_Wire_Value_BlobValue)(nil),
 	}
-	file_livekit_agentdb_proto_msgTypes[16].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_agentdb_proto_rawDesc), len(file_livekit_agentdb_proto_rawDesc)),
-			NumEnums:      3,
+			NumEnums:      2,
 			NumMessages:   32,
 			NumExtensions: 0,
 			NumServices:   0,

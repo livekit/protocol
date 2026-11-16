@@ -83,7 +83,8 @@ message AgentDB {
 
   // Data plane: one WebSocket per database, one message per frame, correlated
   // by a client-chosen request_id. Result batches are paced by Credit, so the
-  // server never sends more un-consumed batches than granted.
+  // server never sends more un-consumed batches than granted. A frame is at
+  // most 16 MiB, both ways.
   message Wire {
     message ClientMessage {
       uint32 request_id = 1;
@@ -148,9 +149,8 @@ message AgentDB {
     // paces the ColumnBatch frames of the batch as a whole.
     message Batch {
       repeated Statement statements = 1;
-      // Set: the batch applies only if the database's tip still equals
-      // if_tip when it runs.
-      optional int64 if_tip = 2;
+      reserved 2;
+      reserved "if_tip";
     }
 
     // Unsupported: a request is one transaction and none spans requests, so
@@ -177,22 +177,16 @@ message AgentDB {
       string token = 1 [(logger.sensitivity) = SENSITIVITY_SECRET];
       string database_id = 2;
       string client_version = 4;
-      // The largest frame the client reads, in bytes; the server never sends
-      // a larger one. 0: the server's default.
-      uint32 max_frame = 5;
-    }
-
-    // What a server supports beyond the base protocol.
-    enum Capability {
-      CAPABILITY_UNSPECIFIED = 0;
-      IF_TIP = 1;                  // Batch.if_tip
+      reserved 5;
+      reserved "max_frame";
     }
 
     message HelloOk {
       int64 tip = 1;
       uint32 ping_interval_ms = 2;
       uint32 ping_timeout_ms = 3;
-      repeated Capability capabilities = 4;
+      reserved 4;
+      reserved "capabilities";
     }
 
     message Columns {
