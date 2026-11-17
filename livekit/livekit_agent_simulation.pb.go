@@ -320,7 +320,7 @@ func (SimulationRun_JobMetrics_EndReason) EnumDescriptor() ([]byte, []int) {
 type SimulatorNode_Speaker int32
 
 const (
-	// A person: the scenario's voice.
+	// A person: the scenario's voice. The default.
 	SimulatorNode_PERSON SimulatorNode_Speaker = 0
 	// A machine: a fixed voice, different from every person's.
 	SimulatorNode_MACHINE SimulatorNode_Speaker = 1
@@ -697,7 +697,7 @@ type Scenario struct {
 	Id string `protobuf:"bytes,6,opt,name=id,proto3" json:"id,omitempty"`
 	// The ScenarioGroup node the call starts at. The simulator then plays the far
 	// end of an outbound call by walking the nodes. Set this or instructions,
-	// not both.
+	// not both. A run with start needs SIMULATION_MODE_AUDIO and no sip_call_to.
 	Start         string `protobuf:"bytes,7,opt,name=start,proto3" json:"start,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -861,7 +861,8 @@ func (x *ScenarioGroup) GetNodes() map[string]*SimulatorNode {
 // voicemail box is the built-in livekit/voicemail: a beep, then the agent is
 // recorded in silence, then the call ends or a menu offers to send or re-record
 // the message. Each run picks the box's details, such as whether it beeps, how
-// long it waits for silence, and which of the two follows.
+// long it waits for silence, and which of the two follows. A node plays at
+// most three times in a call; the next visit ends the call.
 type SimulatorNode struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Spoken word for word when the node starts.
@@ -872,20 +873,17 @@ type SimulatorNode struct {
 	// agent's reply ends, if the agent starts one before timeout.after;
 	// otherwise timeout.to.
 	Then string `protobuf:"bytes,3,opt,name=then,proto3" json:"then,omitempty"`
-	// Named routes, not on: YAML 1.1 parsers, such as PyYAML, read an unquoted
-	// `on` key as true.
 	// Checked in order; the first match wins. A node whose routes each match
 	// one key matches every key at once. Otherwise keys collect until # or a
 	// 3-second pause, which ends the entry. Keys pressed during say count, and a
 	// match cuts say off.
-	// A node with routes, such as a menu, plays at most three times; the next
-	// visit ends the call.
 	Routes []*SimulatorNode_Route `protobuf:"bytes,4,rep,name=routes,proto3" json:"routes,omitempty"`
 	// Starts when say ends. With then, the agent starting a reply cancels it.
 	// Without then, on a machine node only a route cancels it; on a person node
 	// the agent's speech restarts it.
-	Timeout       *SimulatorNode_Timeout `protobuf:"bytes,5,opt,name=timeout,proto3" json:"timeout,omitempty"`
-	Speaker       SimulatorNode_Speaker  `protobuf:"varint,6,opt,name=speaker,proto3,enum=livekit.SimulatorNode_Speaker" json:"speaker,omitempty"`
+	Timeout *SimulatorNode_Timeout `protobuf:"bytes,5,opt,name=timeout,proto3" json:"timeout,omitempty"`
+	// The voice that speaks the node. Unset means PERSON.
+	Speaker       SimulatorNode_Speaker `protobuf:"varint,6,opt,name=speaker,proto3,enum=livekit.SimulatorNode_Speaker" json:"speaker,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -3873,8 +3871,10 @@ func (x *Scenario_CreateFromSession_Response) GetScenario() *Scenario {
 type SimulatorNode_Route struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Only DTMF characters (0-9, *, #): a literal. Anything else: a regex that
-	// must match the whole entry.
-	Match         string `protobuf:"bytes,1,opt,name=match,proto3" json:"match,omitempty"`
+	// must match the whole entry. The regex can use only literal keys (escape *
+	// as \*), ., \d, [...], (...), |, ?, *, +, {m}, and {m,n}.
+	Match string `protobuf:"bytes,1,opt,name=match,proto3" json:"match,omitempty"`
+	// The node to go to when match matches the entry.
 	To            string `protobuf:"bytes,2,opt,name=to,proto3" json:"to,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -3926,9 +3926,11 @@ func (x *SimulatorNode_Route) GetTo() string {
 
 type SimulatorNode_Timeout struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// At most 20 seconds.
-	After         *durationpb.Duration `protobuf:"bytes,1,opt,name=after,proto3" json:"after,omitempty"`
-	To            string               `protobuf:"bytes,2,opt,name=to,proto3" json:"to,omitempty"`
+	// At most 20 seconds. In JSON and YAML, seconds with an s suffix, such as
+	// 8s or 1.5s.
+	After *durationpb.Duration `protobuf:"bytes,1,opt,name=after,proto3" json:"after,omitempty"`
+	// The node to go to when after passes.
+	To            string `protobuf:"bytes,2,opt,name=to,proto3" json:"to,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

@@ -499,7 +499,7 @@ message Scenario {
   string id = 6;
   // The ScenarioGroup node the call starts at. The simulator then plays the far
   // end of an outbound call by walking the nodes. Set this or instructions,
-  // not both.
+  // not both. A run with start needs SIMULATION_MODE_AUDIO and no sip_call_to.
   string start = 7;
 }
 
@@ -521,10 +521,11 @@ message ScenarioGroup {
 // voicemail box is the built-in livekit/voicemail: a beep, then the agent is
 // recorded in silence, then the call ends or a menu offers to send or re-record
 // the message. Each run picks the box's details, such as whether it beeps, how
-// long it waits for silence, and which of the two follows.
+// long it waits for silence, and which of the two follows. A node plays at
+// most three times in a call; the next visit ends the call.
 message SimulatorNode {
   enum Speaker {
-    // A person: the scenario's voice.
+    // A person: the scenario's voice. The default.
     PERSON = 0;
     // A machine: a fixed voice, different from every person's.
     MACHINE = 1;
@@ -532,14 +533,18 @@ message SimulatorNode {
 
   message Route {
     // Only DTMF characters (0-9, *, #): a literal. Anything else: a regex that
-    // must match the whole entry.
+    // must match the whole entry. The regex can use only literal keys (escape *
+    // as \*), ., \d, [...], (...), |, ?, *, +, {m}, and {m,n}.
     string match = 1;
+    // The node to go to when match matches the entry.
     string to = 2;
   }
 
   message Timeout {
-    // At most 20 seconds.
+    // At most 20 seconds. In JSON and YAML, seconds with an s suffix, such as
+    // 8s or 1.5s.
     google.protobuf.Duration after = 1;
+    // The node to go to when after passes.
     string to = 2;
   }
 
@@ -551,19 +556,16 @@ message SimulatorNode {
   // agent's reply ends, if the agent starts one before timeout.after;
   // otherwise timeout.to.
   string then = 3;
-  // Named routes, not on: YAML 1.1 parsers, such as PyYAML, read an unquoted
-  // `on` key as true.
   // Checked in order; the first match wins. A node whose routes each match
   // one key matches every key at once. Otherwise keys collect until # or a
   // 3-second pause, which ends the entry. Keys pressed during say count, and a
   // match cuts say off.
-  // A node with routes, such as a menu, plays at most three times; the next
-  // visit ends the call.
   repeated Route routes = 4;
   // Starts when say ends. With then, the agent starting a reply cancels it.
   // Without then, on a machine node only a route cancels it; on a person node
   // the agent's speech restarts it.
   Timeout timeout = 5;
+  // The voice that speaks the node. Unset means PERSON.
   Speaker speaker = 6;
 }
 
