@@ -497,9 +497,10 @@ message Scenario {
   // SCN_-prefixed guid. Stable across edits to label, instructions, or
   // expectations, so runs of the same scenario can be correlated over time.
   string id = 6;
-  // The ScenarioGroup node the call starts at. The simulator then plays the far
-  // end of an outbound call by walking the nodes. Set this or instructions,
-  // not both. A run with start needs SIMULATION_MODE_AUDIO and no sip_call_to.
+  // The ScenarioGroup node the call starts at, or a built-in. The simulator
+  // then plays the far end of an outbound call by walking the nodes. Set this
+  // or instructions, not both. A run whose group has a scenario with start
+  // needs SIMULATION_MODE_AUDIO and no sip_call_to.
   string start = 7;
 }
 
@@ -510,24 +511,29 @@ message ScenarioGroup {
   // SCNG_-prefixed guid. Stable identity of the scenarios file, independent
   // of its name.
   string id = 3;
-  // Named nodes shared by every scenario in the group. A scenario's start
-  // names one of them. Nodes can also name built-ins: livekit/hangup,
-  // livekit/voicemail, and livekit/unavailable. The livekit/ prefix is reserved.
+  // Named nodes shared by every scenario in the group. Scenario.start, then,
+  // Route.to, and Timeout.to each name one of them or a built-in:
+  // livekit/hangup ends the call, livekit/voicemail is the voicemail box (see
+  // SimulatorNode), and livekit/unavailable says the number is not in service,
+  // then ends the call. A node name cannot start with livekit/.
   map<string, SimulatorNode> nodes = 4;
 }
 
-// One node of the far end of a simulated outbound call: a machine line, a
-// person, or silence. Nodes name each other in then, routes, and timeout. A
-// voicemail box is the built-in livekit/voicemail: a beep, then the agent is
+// One node of the far end of a simulated outbound call: a scripted line, an
+// LLM roleplay, or silence. Nodes name each other in then, routes, and timeout.
+// Every node, built-ins included, plays at most three times in a call; the
+// next visit ends the call with END_REASON_SIMULATOR_HUNG_UP. As in a run
+// without nodes, 30 seconds of silence from both sides ends the call.
+//
+// A voicemail box is the built-in livekit/voicemail: a beep, then the agent is
 // recorded in silence, then the call ends or a menu offers to send or re-record
 // the message. Each run picks the box's details, such as whether it beeps, how
-// long it waits for silence, and which of the two follows. A node plays at
-// most three times in a call; the next visit ends the call.
+// long it waits for silence, and which of the two follows.
 message SimulatorNode {
   enum Speaker {
     // A person: the scenario's voice. The default.
     PERSON = 0;
-    // A machine: a fixed voice, different from every person's.
+    // A machine: a voice different from the scenario's.
     MACHINE = 1;
   }
 
@@ -536,35 +542,39 @@ message SimulatorNode {
     // must match the whole entry. The regex can use only literal keys (escape *
     // as \*), ., \d, [...], (...), |, ?, *, +, {m}, and {m,n}.
     string match = 1;
-    // The node to go to when match matches the entry.
+    // Required. The node to go to when match matches the entry.
     string to = 2;
   }
 
   message Timeout {
-    // At most 20 seconds. In JSON and YAML, seconds with an s suffix, such as
-    // 8s or 1.5s.
+    // More than 0 and at most 20 seconds. In JSON and YAML, seconds with an s
+    // suffix, such as 8s or 1.5s.
     google.protobuf.Duration after = 1;
-    // The node to go to when after passes.
+    // Required. The node to go to when after passes.
     string to = 2;
   }
 
   // Spoken word for word when the node starts.
   string say = 1;
-  // LLM roleplay for every turn after say. Only these nodes answer the agent.
+  // LLM roleplay: the node answers the agent on every turn after say. Only
+  // these nodes answer the agent.
   string instructions = 2;
-  // The next node. Without timeout: when say ends. With timeout: when the
-  // agent's reply ends, if the agent starts one before timeout.after;
-  // otherwise timeout.to.
+  // The next node. Without timeout, it follows when say ends. With timeout, it
+  // follows when the agent's reply ends, if the agent starts one before
+  // timeout.after; a node with instructions answers that reply first. A node
+  // with instructions and then needs timeout.
   string then = 3;
-  // Checked in order; the first match wins. A node whose routes each match
-  // one key matches every key at once. Otherwise keys collect until # or a
-  // 3-second pause, which ends the entry. Keys pressed during say count, and a
-  // match cuts say off.
+  // Checked in order; the first match wins. If every route matches exactly one
+  // key, each key is an entry by itself. Otherwise keys collect into one entry
+  // until # or a 3-second pause, and # is not part of the entry. An entry that
+  // matches no route is dropped. Keys pressed during say count, and a match
+  // cuts say off. A match leaves the node, whatever then and timeout say.
   repeated Route routes = 4;
-  // Starts when say ends. With then, the agent starting a reply cancels it.
-  // Without then, on a node without instructions only a route cancels it; on a
-  // node with instructions, it counts from the end of the last speech on either
-  // side.
+  // Starts when say ends, or when the node starts if it has no say. Keys still
+  // being entered do not stop it. With then, the agent starting a reply
+  // cancels it. Without then, on a node without instructions only a route
+  // cancels it; on a node with instructions, it counts from the end of the last
+  // speech on either side.
   Timeout timeout = 5;
   // The voice that speaks the node. Unset means PERSON.
   Speaker speaker = 6;

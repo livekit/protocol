@@ -322,7 +322,7 @@ type SimulatorNode_Speaker int32
 const (
 	// A person: the scenario's voice. The default.
 	SimulatorNode_PERSON SimulatorNode_Speaker = 0
-	// A machine: a fixed voice, different from every person's.
+	// A machine: a voice different from the scenario's.
 	SimulatorNode_MACHINE SimulatorNode_Speaker = 1
 )
 
@@ -695,9 +695,10 @@ type Scenario struct {
 	// SCN_-prefixed guid. Stable across edits to label, instructions, or
 	// expectations, so runs of the same scenario can be correlated over time.
 	Id string `protobuf:"bytes,6,opt,name=id,proto3" json:"id,omitempty"`
-	// The ScenarioGroup node the call starts at. The simulator then plays the far
-	// end of an outbound call by walking the nodes. Set this or instructions,
-	// not both. A run with start needs SIMULATION_MODE_AUDIO and no sip_call_to.
+	// The ScenarioGroup node the call starts at, or a built-in. The simulator
+	// then plays the far end of an outbound call by walking the nodes. Set this
+	// or instructions, not both. A run whose group has a scenario with start
+	// needs SIMULATION_MODE_AUDIO and no sip_call_to.
 	Start         string `protobuf:"bytes,7,opt,name=start,proto3" json:"start,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -790,9 +791,11 @@ type ScenarioGroup struct {
 	// SCNG_-prefixed guid. Stable identity of the scenarios file, independent
 	// of its name.
 	Id string `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
-	// Named nodes shared by every scenario in the group. A scenario's start
-	// names one of them. Nodes can also name built-ins: livekit/hangup,
-	// livekit/voicemail, and livekit/unavailable. The livekit/ prefix is reserved.
+	// Named nodes shared by every scenario in the group. Scenario.start, then,
+	// Route.to, and Timeout.to each name one of them or a built-in:
+	// livekit/hangup ends the call, livekit/voicemail is the voicemail box (see
+	// SimulatorNode), and livekit/unavailable says the number is not in service,
+	// then ends the call. A node name cannot start with livekit/.
 	Nodes         map[string]*SimulatorNode `protobuf:"bytes,4,rep,name=nodes,proto3" json:"nodes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -856,32 +859,39 @@ func (x *ScenarioGroup) GetNodes() map[string]*SimulatorNode {
 	return nil
 }
 
-// One node of the far end of a simulated outbound call: a machine line, a
-// person, or silence. Nodes name each other in then, routes, and timeout. A
-// voicemail box is the built-in livekit/voicemail: a beep, then the agent is
+// One node of the far end of a simulated outbound call: a scripted line, an
+// LLM roleplay, or silence. Nodes name each other in then, routes, and timeout.
+// Every node, built-ins included, plays at most three times in a call; the
+// next visit ends the call with END_REASON_SIMULATOR_HUNG_UP. As in a run
+// without nodes, 30 seconds of silence from both sides ends the call.
+//
+// A voicemail box is the built-in livekit/voicemail: a beep, then the agent is
 // recorded in silence, then the call ends or a menu offers to send or re-record
 // the message. Each run picks the box's details, such as whether it beeps, how
-// long it waits for silence, and which of the two follows. A node plays at
-// most three times in a call; the next visit ends the call.
+// long it waits for silence, and which of the two follows.
 type SimulatorNode struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Spoken word for word when the node starts.
 	Say string `protobuf:"bytes,1,opt,name=say,proto3" json:"say,omitempty"`
-	// LLM roleplay for every turn after say. Only these nodes answer the agent.
+	// LLM roleplay: the node answers the agent on every turn after say. Only
+	// these nodes answer the agent.
 	Instructions string `protobuf:"bytes,2,opt,name=instructions,proto3" json:"instructions,omitempty"`
-	// The next node. Without timeout: when say ends. With timeout: when the
-	// agent's reply ends, if the agent starts one before timeout.after;
-	// otherwise timeout.to.
+	// The next node. Without timeout, it follows when say ends. With timeout, it
+	// follows when the agent's reply ends, if the agent starts one before
+	// timeout.after; a node with instructions answers that reply first. A node
+	// with instructions and then needs timeout.
 	Then string `protobuf:"bytes,3,opt,name=then,proto3" json:"then,omitempty"`
-	// Checked in order; the first match wins. A node whose routes each match
-	// one key matches every key at once. Otherwise keys collect until # or a
-	// 3-second pause, which ends the entry. Keys pressed during say count, and a
-	// match cuts say off.
+	// Checked in order; the first match wins. If every route matches exactly one
+	// key, each key is an entry by itself. Otherwise keys collect into one entry
+	// until # or a 3-second pause, and # is not part of the entry. An entry that
+	// matches no route is dropped. Keys pressed during say count, and a match
+	// cuts say off. A match leaves the node, whatever then and timeout say.
 	Routes []*SimulatorNode_Route `protobuf:"bytes,4,rep,name=routes,proto3" json:"routes,omitempty"`
-	// Starts when say ends. With then, the agent starting a reply cancels it.
-	// Without then, on a node without instructions only a route cancels it; on a
-	// node with instructions, it counts from the end of the last speech on either
-	// side.
+	// Starts when say ends, or when the node starts if it has no say. Keys still
+	// being entered do not stop it. With then, the agent starting a reply
+	// cancels it. Without then, on a node without instructions only a route
+	// cancels it; on a node with instructions, it counts from the end of the last
+	// speech on either side.
 	Timeout *SimulatorNode_Timeout `protobuf:"bytes,5,opt,name=timeout,proto3" json:"timeout,omitempty"`
 	// The voice that speaks the node. Unset means PERSON.
 	Speaker       SimulatorNode_Speaker `protobuf:"varint,6,opt,name=speaker,proto3,enum=livekit.SimulatorNode_Speaker" json:"speaker,omitempty"`
@@ -3875,7 +3885,7 @@ type SimulatorNode_Route struct {
 	// must match the whole entry. The regex can use only literal keys (escape *
 	// as \*), ., \d, [...], (...), |, ?, *, +, {m}, and {m,n}.
 	Match string `protobuf:"bytes,1,opt,name=match,proto3" json:"match,omitempty"`
-	// The node to go to when match matches the entry.
+	// Required. The node to go to when match matches the entry.
 	To            string `protobuf:"bytes,2,opt,name=to,proto3" json:"to,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -3927,10 +3937,10 @@ func (x *SimulatorNode_Route) GetTo() string {
 
 type SimulatorNode_Timeout struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// At most 20 seconds. In JSON and YAML, seconds with an s suffix, such as
-	// 8s or 1.5s.
+	// More than 0 and at most 20 seconds. In JSON and YAML, seconds with an s
+	// suffix, such as 8s or 1.5s.
 	After *durationpb.Duration `protobuf:"bytes,1,opt,name=after,proto3" json:"after,omitempty"`
-	// The node to go to when after passes.
+	// Required. The node to go to when after passes.
 	To            string `protobuf:"bytes,2,opt,name=to,proto3" json:"to,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
