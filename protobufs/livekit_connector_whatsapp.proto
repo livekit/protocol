@@ -35,7 +35,7 @@ message DialWhatsAppCallRequest {
   // Required - WhatsApp Cloud API version, eg: 23.0, 24.0, etc.
   string whatsapp_cloud_api_version = 12;
   // Optional - An arbitrary string you can pass in that is useful for tracking and logging purposes.
-  string whatsapp_biz_opaque_callback_data = 4;
+  string whatsapp_biz_opaque_callback_data = 4 [(logger.sensitivity) = SENSITIVITY_PII];
   // Optional - What LiveKit room should this participant be connected too
   string room_name = 5;
   // Optional - Agents to dispatch the call to
@@ -119,7 +119,7 @@ message AcceptWhatsAppCallRequest {
   // Required - Call ID sent by Meta
   string whatsapp_call_id = 3 [(logger.name) = "whatsappCallID"];
   // Optional - An arbitrary string you can pass in that is useful for tracking and logging purposes.
-  string whatsapp_biz_opaque_callback_data = 4;
+  string whatsapp_biz_opaque_callback_data = 4 [(logger.sensitivity) = SENSITIVITY_PII];
   // Required - The call accept webhook comes with SDP from Meta
   // It is the for a user initiated call
   SessionDescription sdp = 5;
