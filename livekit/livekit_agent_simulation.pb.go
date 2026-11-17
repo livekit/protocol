@@ -879,8 +879,9 @@ type SimulatorNode struct {
 	// match cuts say off.
 	Routes []*SimulatorNode_Route `protobuf:"bytes,4,rep,name=routes,proto3" json:"routes,omitempty"`
 	// Starts when say ends. With then, the agent starting a reply cancels it.
-	// Without then, on a machine node only a route cancels it; on a person node
-	// the agent's speech restarts it.
+	// Without then, on a node without instructions only a route cancels it; on a
+	// node with instructions, it counts from the end of the last speech on either
+	// side.
 	Timeout *SimulatorNode_Timeout `protobuf:"bytes,5,opt,name=timeout,proto3" json:"timeout,omitempty"`
 	// The voice that speaks the node. Unset means PERSON.
 	Speaker       SimulatorNode_Speaker `protobuf:"varint,6,opt,name=speaker,proto3,enum=livekit.SimulatorNode_Speaker" json:"speaker,omitempty"`
