@@ -662,7 +662,7 @@ message ClientInfo {
   string device_model = 6;
   string browser = 7;
   string browser_version = 8;
-  string address = 9;
+  string address = 9 [(logger.sensitivity) = SENSITIVITY_PII];
   // wifi, wired, cellular, vpn, empty if not known
   string network = 10;
   // comma separated list of additional LiveKit SDKs in use of this client, with versions

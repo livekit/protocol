@@ -7311,7 +7311,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x0eagent_protocol\x18\a \x01(\x05R\ragentProtocol\"\"\n" +
 	"\aEdition\x12\f\n" +
 	"\bStandard\x10\x00\x12\t\n" +
-	"\x05Cloud\x10\x01\"\xdb\x05\n" +
+	"\x05Cloud\x10\x01\"\xe0\x05\n" +
 	"\n" +
 	"ClientInfo\x12)\n" +
 	"\x03sdk\x18\x01 \x01(\x0e2\x17.livekit.ClientInfo.SDKR\x03sdk\x12\x18\n" +
@@ -7322,8 +7322,8 @@ const file_livekit_models_proto_rawDesc = "" +
 	"os_version\x18\x05 \x01(\tR\tosVersion\x12!\n" +
 	"\fdevice_model\x18\x06 \x01(\tR\vdeviceModel\x12\x18\n" +
 	"\abrowser\x18\a \x01(\tR\abrowser\x12'\n" +
-	"\x0fbrowser_version\x18\b \x01(\tR\x0ebrowserVersion\x12\x18\n" +
-	"\aaddress\x18\t \x01(\tR\aaddress\x12\x18\n" +
+	"\x0fbrowser_version\x18\b \x01(\tR\x0ebrowserVersion\x12\x1d\n" +
+	"\aaddress\x18\t \x01(\tB\x03\xc0P\x01R\aaddress\x12\x18\n" +
 	"\anetwork\x18\n" +
 	" \x01(\tR\anetwork\x12\x1d\n" +
 	"\n" +
