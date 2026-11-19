@@ -30,6 +30,9 @@ func derivationBenchCases() []loggerBenchCase {
 		{label: "json", conf: &Config{JSON: true}},
 		{label: "console tee", conf: &Config{}, opts: withDiscardTee()},
 		{label: "json tee", conf: &Config{JSON: true}, opts: withDiscardTee()},
+		{label: "slog console", conf: &Config{}, opts: []ZapLoggerOption{WithSlogBackend()}},
+		{label: "slog json", conf: &Config{JSON: true}, opts: []ZapLoggerOption{WithSlogBackend()}},
+		{label: "slog json tee", conf: &Config{JSON: true}, opts: append(withDiscardTee(), WithSlogBackend())},
 	}
 }
 
@@ -131,6 +134,10 @@ func BenchmarkLoggerWrite(b *testing.B) {
 		{label: "level disabled", conf: &Config{Level: "info"}},
 		{label: "console tee", conf: &Config{Level: "debug"}, opts: withDiscardTee()},
 		{label: "json tee", conf: &Config{JSON: true, Level: "debug"}, opts: withDiscardTee()},
+		{label: "slog console", conf: &Config{Level: "debug"}, opts: []ZapLoggerOption{WithSlogBackend()}},
+		{label: "slog json", conf: &Config{JSON: true, Level: "debug"}, opts: []ZapLoggerOption{WithSlogBackend()}},
+		{label: "slog level disabled", conf: &Config{Level: "info"}, opts: []ZapLoggerOption{WithSlogBackend()}},
+		{label: "slog json tee", conf: &Config{JSON: true, Level: "debug"}, opts: append(withDiscardTee(), WithSlogBackend())},
 	}
 
 	for _, c := range cases {

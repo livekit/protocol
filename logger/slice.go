@@ -18,17 +18,16 @@ import (
 	"time"
 
 	"go.uber.org/multierr"
-	"go.uber.org/zap/zapcore"
 	"google.golang.org/protobuf/proto"
 )
 
 type protoSlice[T proto.Message] []T
 
-func ProtoSlice[T proto.Message](s []T) zapcore.ArrayMarshaler {
+func ProtoSlice[T proto.Message](s []T) ArrayMarshaler {
 	return protoSlice[T](s)
 }
 
-func (s protoSlice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
+func (s protoSlice[T]) MarshalLogArray(e ArrayEncoder) error {
 	var err error
 	for _, v := range s {
 		err = multierr.Append(err, e.AppendObject(Proto(v)))
@@ -36,13 +35,13 @@ func (s protoSlice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
 	return err
 }
 
-type objectSlice[T zapcore.ObjectMarshaler] []T
+type objectSlice[T ObjectMarshaler] []T
 
-func ObjectSlice[T zapcore.ObjectMarshaler](s []T) zapcore.ArrayMarshaler {
+func ObjectSlice[T ObjectMarshaler](s []T) ArrayMarshaler {
 	return objectSlice[T](s)
 }
 
-func (s objectSlice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
+func (s objectSlice[T]) MarshalLogArray(e ArrayEncoder) error {
 	var err error
 	for _, v := range s {
 		err = multierr.Append(err, e.AppendObject(v))
@@ -52,11 +51,11 @@ func (s objectSlice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
 
 type timeSlice []time.Time
 
-func TimeSlice(s []time.Time) zapcore.ArrayMarshaler {
+func TimeSlice(s []time.Time) ArrayMarshaler {
 	return timeSlice(s)
 }
 
-func (s timeSlice) MarshalLogArray(e zapcore.ArrayEncoder) error {
+func (s timeSlice) MarshalLogArray(e ArrayEncoder) error {
 	for _, v := range s {
 		e.AppendTime(v)
 	}
@@ -65,11 +64,11 @@ func (s timeSlice) MarshalLogArray(e zapcore.ArrayEncoder) error {
 
 type durationSlice []time.Duration
 
-func DurationSlice(s []time.Duration) zapcore.ArrayMarshaler {
+func DurationSlice(s []time.Duration) ArrayMarshaler {
 	return durationSlice(s)
 }
 
-func (s durationSlice) MarshalLogArray(e zapcore.ArrayEncoder) error {
+func (s durationSlice) MarshalLogArray(e ArrayEncoder) error {
 	for _, v := range s {
 		e.AppendDuration(v)
 	}
@@ -78,11 +77,11 @@ func (s durationSlice) MarshalLogArray(e zapcore.ArrayEncoder) error {
 
 type boolSlice[T ~bool] []T
 
-func BoolSlice[T ~bool](s []T) zapcore.ArrayMarshaler {
+func BoolSlice[T ~bool](s []T) ArrayMarshaler {
 	return boolSlice[T](s)
 }
 
-func (s boolSlice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
+func (s boolSlice[T]) MarshalLogArray(e ArrayEncoder) error {
 	for _, v := range s {
 		e.AppendBool(bool(v))
 	}
@@ -91,11 +90,11 @@ func (s boolSlice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
 
 type byteStringSlice[T ~[]byte] []T
 
-func ByteStringSlice[T ~[]byte](s []T) zapcore.ArrayMarshaler {
+func ByteStringSlice[T ~[]byte](s []T) ArrayMarshaler {
 	return byteStringSlice[T](s)
 }
 
-func (s byteStringSlice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
+func (s byteStringSlice[T]) MarshalLogArray(e ArrayEncoder) error {
 	for _, v := range s {
 		e.AppendByteString([]byte(v))
 	}
@@ -104,11 +103,11 @@ func (s byteStringSlice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
 
 type complex128Slice[T ~complex128] []T
 
-func Complex128Slice[T ~complex128](s []T) zapcore.ArrayMarshaler {
+func Complex128Slice[T ~complex128](s []T) ArrayMarshaler {
 	return complex128Slice[T](s)
 }
 
-func (s complex128Slice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
+func (s complex128Slice[T]) MarshalLogArray(e ArrayEncoder) error {
 	for _, v := range s {
 		e.AppendComplex128(complex128(v))
 	}
@@ -117,11 +116,11 @@ func (s complex128Slice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
 
 type complex64Slice[T ~complex64] []T
 
-func Complex64Slice[T ~complex64](s []T) zapcore.ArrayMarshaler {
+func Complex64Slice[T ~complex64](s []T) ArrayMarshaler {
 	return complex64Slice[T](s)
 }
 
-func (s complex64Slice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
+func (s complex64Slice[T]) MarshalLogArray(e ArrayEncoder) error {
 	for _, v := range s {
 		e.AppendComplex64(complex64(v))
 	}
@@ -130,11 +129,11 @@ func (s complex64Slice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
 
 type float64Slice[T ~float64] []T
 
-func Float64Slice[T ~float64](s []T) zapcore.ArrayMarshaler {
+func Float64Slice[T ~float64](s []T) ArrayMarshaler {
 	return float64Slice[T](s)
 }
 
-func (s float64Slice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
+func (s float64Slice[T]) MarshalLogArray(e ArrayEncoder) error {
 	for _, v := range s {
 		e.AppendFloat64(float64(v))
 	}
@@ -143,11 +142,11 @@ func (s float64Slice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
 
 type float32Slice[T ~float32] []T
 
-func Float32Slice[T ~float32](s []T) zapcore.ArrayMarshaler {
+func Float32Slice[T ~float32](s []T) ArrayMarshaler {
 	return float32Slice[T](s)
 }
 
-func (s float32Slice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
+func (s float32Slice[T]) MarshalLogArray(e ArrayEncoder) error {
 	for _, v := range s {
 		e.AppendFloat32(float32(v))
 	}
@@ -156,11 +155,11 @@ func (s float32Slice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
 
 type intSlice[T ~int] []T
 
-func IntSlice[T ~int](s []T) zapcore.ArrayMarshaler {
+func IntSlice[T ~int](s []T) ArrayMarshaler {
 	return intSlice[T](s)
 }
 
-func (s intSlice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
+func (s intSlice[T]) MarshalLogArray(e ArrayEncoder) error {
 	for _, v := range s {
 		e.AppendInt(int(v))
 	}
@@ -169,11 +168,11 @@ func (s intSlice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
 
 type int64Slice[T ~int64] []T
 
-func Int64Slice[T ~int64](s []T) zapcore.ArrayMarshaler {
+func Int64Slice[T ~int64](s []T) ArrayMarshaler {
 	return int64Slice[T](s)
 }
 
-func (s int64Slice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
+func (s int64Slice[T]) MarshalLogArray(e ArrayEncoder) error {
 	for _, v := range s {
 		e.AppendInt64(int64(v))
 	}
@@ -182,11 +181,11 @@ func (s int64Slice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
 
 type int32Slice[T ~int32] []T
 
-func Int32Slice[T ~int32](s []T) zapcore.ArrayMarshaler {
+func Int32Slice[T ~int32](s []T) ArrayMarshaler {
 	return int32Slice[T](s)
 }
 
-func (s int32Slice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
+func (s int32Slice[T]) MarshalLogArray(e ArrayEncoder) error {
 	for _, v := range s {
 		e.AppendInt32(int32(v))
 	}
@@ -195,11 +194,11 @@ func (s int32Slice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
 
 type int16Slice[T ~int16] []T
 
-func Int16Slice[T ~int16](s []T) zapcore.ArrayMarshaler {
+func Int16Slice[T ~int16](s []T) ArrayMarshaler {
 	return int16Slice[T](s)
 }
 
-func (s int16Slice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
+func (s int16Slice[T]) MarshalLogArray(e ArrayEncoder) error {
 	for _, v := range s {
 		e.AppendInt16(int16(v))
 	}
@@ -208,11 +207,11 @@ func (s int16Slice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
 
 type int8Slice[T ~int8] []T
 
-func Int8Slice[T ~int8](s []T) zapcore.ArrayMarshaler {
+func Int8Slice[T ~int8](s []T) ArrayMarshaler {
 	return int8Slice[T](s)
 }
 
-func (s int8Slice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
+func (s int8Slice[T]) MarshalLogArray(e ArrayEncoder) error {
 	for _, v := range s {
 		e.AppendInt8(int8(v))
 	}
@@ -221,11 +220,11 @@ func (s int8Slice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
 
 type stringSlice[T ~string] []T
 
-func StringSlice[T ~string](s []T) zapcore.ArrayMarshaler {
+func StringSlice[T ~string](s []T) ArrayMarshaler {
 	return stringSlice[T](s)
 }
 
-func (s stringSlice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
+func (s stringSlice[T]) MarshalLogArray(e ArrayEncoder) error {
 	for _, v := range s {
 		e.AppendString(string(v))
 	}
@@ -234,11 +233,11 @@ func (s stringSlice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
 
 type uintSlice[T ~uint] []T
 
-func UintSlice[T ~uint](s []T) zapcore.ArrayMarshaler {
+func UintSlice[T ~uint](s []T) ArrayMarshaler {
 	return uintSlice[T](s)
 }
 
-func (s uintSlice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
+func (s uintSlice[T]) MarshalLogArray(e ArrayEncoder) error {
 	for _, v := range s {
 		e.AppendUint(uint(v))
 	}
@@ -247,11 +246,11 @@ func (s uintSlice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
 
 type uint64Slice[T ~uint64] []T
 
-func Uint64Slice[T ~uint64](s []T) zapcore.ArrayMarshaler {
+func Uint64Slice[T ~uint64](s []T) ArrayMarshaler {
 	return uint64Slice[T](s)
 }
 
-func (s uint64Slice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
+func (s uint64Slice[T]) MarshalLogArray(e ArrayEncoder) error {
 	for _, v := range s {
 		e.AppendUint64(uint64(v))
 	}
@@ -260,11 +259,11 @@ func (s uint64Slice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
 
 type uint32Slice[T ~uint32] []T
 
-func Uint32Slice[T ~uint32](s []T) zapcore.ArrayMarshaler {
+func Uint32Slice[T ~uint32](s []T) ArrayMarshaler {
 	return uint32Slice[T](s)
 }
 
-func (s uint32Slice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
+func (s uint32Slice[T]) MarshalLogArray(e ArrayEncoder) error {
 	for _, v := range s {
 		e.AppendUint32(uint32(v))
 	}
@@ -273,11 +272,11 @@ func (s uint32Slice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
 
 type uint16Slice[T ~uint16] []T
 
-func Uint16Slice[T ~uint16](s []T) zapcore.ArrayMarshaler {
+func Uint16Slice[T ~uint16](s []T) ArrayMarshaler {
 	return uint16Slice[T](s)
 }
 
-func (s uint16Slice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
+func (s uint16Slice[T]) MarshalLogArray(e ArrayEncoder) error {
 	for _, v := range s {
 		e.AppendUint16(uint16(v))
 	}
@@ -286,11 +285,11 @@ func (s uint16Slice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
 
 type uint8Slice[T ~uint8] []T
 
-func Uint8Slice[T ~uint8](s []T) zapcore.ArrayMarshaler {
+func Uint8Slice[T ~uint8](s []T) ArrayMarshaler {
 	return uint8Slice[T](s)
 }
 
-func (s uint8Slice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
+func (s uint8Slice[T]) MarshalLogArray(e ArrayEncoder) error {
 	for _, v := range s {
 		e.AppendUint8(uint8(v))
 	}
@@ -299,11 +298,11 @@ func (s uint8Slice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
 
 type uintptrSlice[T ~uintptr] []T
 
-func UintptrSlice[T ~uintptr](s []T) zapcore.ArrayMarshaler {
+func UintptrSlice[T ~uintptr](s []T) ArrayMarshaler {
 	return uintptrSlice[T](s)
 }
 
-func (s uintptrSlice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
+func (s uintptrSlice[T]) MarshalLogArray(e ArrayEncoder) error {
 	for _, v := range s {
 		e.AppendUintptr(uintptr(v))
 	}

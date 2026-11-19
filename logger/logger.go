@@ -15,6 +15,8 @@
 package logger
 
 import (
+	"errors"
+	"io"
 	"log/slog"
 	"os"
 	"slices"
@@ -146,6 +148,9 @@ type zapConfig struct {
 	conf *Config
 	root *ComponentLeveler
 	tee  zaputil.Tee
+	out  io.Writer
+	now  func() time.Time
+	slog bool
 }
 
 type ZapLoggerOption func(*zapConfig)
@@ -157,12 +162,38 @@ func WithTee(tee zaputil.Tee) ZapLoggerOption {
 	}
 }
 
+// WithSlogBackend selects the log/slog-based implementation. Its output is
+// byte-identical to the default zap-based one, and its handler is available
+// to slog via ToSlogHandler. It cannot wrap an existing *zap.Logger, so
+// FromZapLogger fails if both are given.
+func WithSlogBackend() ZapLoggerOption {
+	return func(zc *zapConfig) {
+		zc.slog = true
+	}
+}
+
+// withOutput replaces os.Stderr, for tests.
+func withOutput(w io.Writer) ZapLoggerOption {
+	return func(zc *zapConfig) {
+		zc.out = w
+	}
+}
+
+// withClock replaces time.Now for entry timestamps, for tests.
+func withClock(now func() time.Time) ZapLoggerOption {
+	return func(zc *zapConfig) {
+		zc.now = now
+	}
+}
+
 type ZapComponentLeveler interface {
 	ComponentLevel(component string) zapcore.LevelEnabler
 }
 
 type ZapLogger interface {
 	Logger
+	// Deprecated: ToZap exists for libraries that require a *zap.Logger. Use
+	// ToSlogHandler with slog.New where a *slog.Logger is accepted instead.
 	ToZap() *zap.SugaredLogger
 	// ComponentLeveler names components relative to this logger, unlike Leveler, which
 	// takes paths from the root.
@@ -185,22 +216,35 @@ type zapLogger struct {
 }
 
 func FromZapLogger(log *zap.Logger, conf *Config, opts ...ZapLoggerOption) (ZapLogger, error) {
+	zc := &zapConfig{
+		conf: conf,
+		out:  os.Stderr,
+	}
+	for _, opt := range opts {
+		opt(zc)
+	}
+
+	if zc.slog {
+		if log != nil {
+			return nil, errors.New("logger: WithSlogBackend cannot wrap a *zap.Logger")
+		}
+		return newSlogLogger(zc), nil
+	}
+
 	if log == nil {
-		log = zap.New(nil).WithOptions(zap.AddCaller(), zap.AddStacktrace(zap.ErrorLevel))
+		zopts := []zap.Option{zap.AddCaller(), zap.AddStacktrace(zap.ErrorLevel)}
+		if zc.now != nil {
+			zopts = append(zopts, zap.WithClock(clockFunc(zc.now)))
+		}
+		log = zap.New(nil).WithOptions(zopts...)
 	}
 	zap := log.WithOptions(zap.AddCallerSkip(1)).Sugar()
 
-	zc := &zapConfig{
-		conf: conf,
-		root: zaputil.NewRootComponentLeveler(os.Stderr, conf),
-	}
+	zc.root = zaputil.NewRootComponentLeveler(zapcore.AddSync(zc.out), conf)
 	conf.AddUpdateObserver(func(*Config) error {
 		zc.root.Refresh()
 		return nil
 	})
-	for _, opt := range opts {
-		opt(zc)
-	}
 
 	var sampler *zaputil.Sampler
 	if conf.Sample {
@@ -253,10 +297,6 @@ func (l *zapLogger) makeZap() *zap.SugaredLogger {
 	}
 
 	return l.zap.WithOptions(zap.WrapCore(func(zapcore.Core) zapcore.Core { return c }))
-}
-
-func (l *zapLogger) ToZap() *zap.SugaredLogger {
-	return l.zap.WithOptions(zap.AddCallerSkip(-1))
 }
 
 type zapLoggerComponentLeveler struct {

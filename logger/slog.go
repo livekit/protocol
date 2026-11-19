@@ -30,6 +30,8 @@ func NewSlogDiscard() slog.Handler {
 // ToSlogHandler converts Logger to slog.Handler.
 func ToSlogHandler(log Logger) slog.Handler {
 	switch log := log.(type) {
+	case *slogLogger:
+		return log.handler()
 	case ZapLogger:
 		zlog := log.ToZap().Desugar()
 		return zapslog.NewHandler(zlog.Core())

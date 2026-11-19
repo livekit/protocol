@@ -21,7 +21,6 @@ import (
 	"strconv"
 	"text/template"
 
-	"go.uber.org/zap/zapcore"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/dynamicpb"
@@ -32,10 +31,10 @@ import (
 	"github.com/livekit/protocol/utils/must"
 )
 
-// Proto returns a zapcore.ObjectMarshaler that records each field annotated
+// Proto returns a ObjectMarshaler that records each field annotated
 // with a (logger.sensitivity) under that sensitivity, and redacts it when the
 // sink cannot record that level. SECRET is never recordable.
-func Proto(val proto.Message) zapcore.ObjectMarshaler {
+func Proto(val proto.Message) ObjectMarshaler {
 	if val == nil {
 		return nil
 	}
@@ -48,16 +47,16 @@ func Proto(val proto.Message) zapcore.ObjectMarshaler {
 // sensitivity, long strings truncated), with repeated/map fields reduced to
 // counts and nested messages dropped. Use for messages of unbounded size, such
 // as RPC payloads.
-func ProtoWithLimit(val proto.Message, maxBytes int) zapcore.ObjectMarshaler {
+func ProtoWithLimit(val proto.Message, maxBytes int) ObjectMarshaler {
 	if val == nil {
 		return nil
 	}
 	return protoMarshaller{m: val.ProtoReflect(), maxSize: maxBytes}
 }
 
-var _ zapcore.ObjectMarshaler = protoMarshaller{}
-var _ zapcore.ObjectMarshaler = protoMapMarshaller{}
-var _ zapcore.ArrayMarshaler = protoListMarshaller{}
+var _ ObjectMarshaler = protoMarshaller{}
+var _ ObjectMarshaler = protoMapMarshaller{}
+var _ ArrayMarshaler = protoListMarshaller{}
 
 type protoMarshaller struct {
 	m protoreflect.Message
@@ -66,7 +65,7 @@ type protoMarshaller struct {
 	maxSize int
 }
 
-func (p protoMarshaller) MarshalLogObject(e zapcore.ObjectEncoder) error {
+func (p protoMarshaller) MarshalLogObject(e ObjectEncoder) error {
 	if !p.m.IsValid() {
 		return nil
 	}
@@ -124,7 +123,7 @@ func (p protoMarshaller) MarshalLogObject(e zapcore.ObjectEncoder) error {
 // marshalSummary keeps top-level scalar fields, which do not meaningfully
 // contribute to message size, and reduces lists, maps, and long strings to
 // counts and sizes.
-func (p protoMarshaller) marshalSummary(e zapcore.ObjectEncoder, size int) error {
+func (p protoMarshaller) marshalSummary(e ObjectEncoder, size int) error {
 	e.AddString("truncatedProto", string(p.m.Descriptor().FullName()))
 	e.AddInt("protoBytes", size)
 
@@ -185,7 +184,7 @@ type protoMapMarshaller struct {
 	m protoreflect.Map
 }
 
-func (p protoMapMarshaller) MarshalLogObject(e zapcore.ObjectEncoder) error {
+func (p protoMapMarshaller) MarshalLogObject(e ObjectEncoder) error {
 	p.m.Range(func(ki protoreflect.MapKey, vi protoreflect.Value) bool {
 		var k string
 		switch p.f.MapKey().Kind() {
@@ -209,7 +208,7 @@ type protoListMarshaller struct {
 	m protoreflect.List
 }
 
-func (p protoListMarshaller) MarshalLogArray(e zapcore.ArrayEncoder) error {
+func (p protoListMarshaller) MarshalLogArray(e ArrayEncoder) error {
 	for i := 0; i < p.m.Len(); i++ {
 		v := p.m.Get(i)
 		switch p.f.Kind() {
@@ -234,7 +233,7 @@ func (p protoListMarshaller) MarshalLogArray(e zapcore.ArrayEncoder) error {
 	return nil
 }
 
-func marshalProtoField(k string, f protoreflect.FieldDescriptor, v protoreflect.Value, e zapcore.ObjectEncoder) {
+func marshalProtoField(k string, f protoreflect.FieldDescriptor, v protoreflect.Value, e ObjectEncoder) {
 	switch f.Kind() {
 	case protoreflect.BoolKind:
 		e.AddBool(k, v.Bool())

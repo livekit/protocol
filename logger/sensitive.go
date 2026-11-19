@@ -15,8 +15,6 @@
 package logger
 
 import (
-	"go.uber.org/zap/zapcore"
-
 	"github.com/livekit/protocol/livekit/logger"
 )
 
@@ -30,11 +28,11 @@ const (
 	SensitivitySecret = logger.Sensitivity_SENSITIVITY_SECRET
 )
 
-// SensitiveObjectEncoder is a zapcore.ObjectEncoder that can record a value's
+// SensitiveObjectEncoder is a ObjectEncoder that can record a value's
 // sensitivity instead of having the value destroyed. An encoder that cannot
 // record sensitivity does not implement it, and marshalers redact instead.
 type SensitiveObjectEncoder interface {
-	zapcore.ObjectEncoder
+	ObjectEncoder
 
 	// SensitiveObjectEncoder returns an encoder that records every value
 	// written to it, and to encoders derived from it, at sensitivity s. It
@@ -44,21 +42,21 @@ type SensitiveObjectEncoder interface {
 	// Implementations must fail closed by returning nil for any level they do
 	// not explicitly recognize. The returned encoder may share buffers with the
 	// receiver and is only valid until the next write on the receiver.
-	SensitiveObjectEncoder(s Sensitivity) zapcore.ObjectEncoder
+	SensitiveObjectEncoder(s Sensitivity) ObjectEncoder
 }
 
-// SensitiveArrayEncoder is the zapcore.ArrayEncoder counterpart to
+// SensitiveArrayEncoder is the ArrayEncoder counterpart to
 // SensitiveObjectEncoder.
 type SensitiveArrayEncoder interface {
-	zapcore.ArrayEncoder
+	ArrayEncoder
 
-	SensitiveArrayEncoder(s Sensitivity) zapcore.ArrayEncoder
+	SensitiveArrayEncoder(s Sensitivity) ArrayEncoder
 }
 
 // ObjectEncoderFor returns an encoder that records values at sensitivity s, or
 // nil if e cannot record them. Hand-written marshalers that carry sensitivity
 // annotations should use this rather than asserting directly.
-func ObjectEncoderFor(e zapcore.ObjectEncoder, s Sensitivity) zapcore.ObjectEncoder {
+func ObjectEncoderFor(e ObjectEncoder, s Sensitivity) ObjectEncoder {
 	se, ok := e.(SensitiveObjectEncoder)
 	if !ok {
 		return nil
@@ -67,7 +65,7 @@ func ObjectEncoderFor(e zapcore.ObjectEncoder, s Sensitivity) zapcore.ObjectEnco
 }
 
 // ArrayEncoderFor is the ArrayEncoder counterpart to ObjectEncoderFor.
-func ArrayEncoderFor(e zapcore.ArrayEncoder, s Sensitivity) zapcore.ArrayEncoder {
+func ArrayEncoderFor(e ArrayEncoder, s Sensitivity) ArrayEncoder {
 	se, ok := e.(SensitiveArrayEncoder)
 	if !ok {
 		return nil
