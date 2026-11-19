@@ -344,6 +344,10 @@ message SimulationRun {
     message Response {
       string simulation_run_id = 1;
       PresignedPostRequest presigned_post_request = 2;
+      // The project's Agent Observability (user data recording) is off, so
+      // this run's sessions aren't recorded and it gets no summary. Never set
+      // for a SIP run, which records nothing either way.
+      bool observability_disabled = 3;
     }
   }
 
