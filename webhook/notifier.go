@@ -17,8 +17,6 @@ package webhook
 import (
 	"context"
 	"fmt"
-	"net"
-	"net/netip"
 	"sync"
 	"syscall"
 	"time"
@@ -88,7 +86,7 @@ func NewDefaultNotifier(config WebHookConfig, kp auth.KeyProvider) (QueuedNotifi
 
 	var httpParams HTTPClientParams
 	if config.BlockPrivateAddresses || len(config.BlockedCIDRs) > 0 {
-		control, err := newDialControl(config.BlockPrivateAddresses, config.BlockedCIDRs, config.AllowedCIDRs)
+		control, err := NewDialControl(config.BlockPrivateAddresses, config.BlockedCIDRs, config.AllowedCIDRs)
 		if err != nil {
 			return nil, err
 		}
@@ -120,54 +118,6 @@ func NewDefaultNotifier(config WebHookConfig, kp auth.KeyProvider) (QueuedNotifi
 	})
 
 	return n, nil
-}
-
-// newDialControl refuses addresses that are private, when blockPrivate is set,
-// or in blocked, unless they are also in allowed.
-func newDialControl(blockPrivate bool, blocked, allowed []string) (func(network, address string, c syscall.RawConn) error, error) {
-	blockedPrefixes, err := parseCIDRs("blocked_cidrs", blocked)
-	if err != nil {
-		return nil, err
-	}
-	allowedPrefixes, err := parseCIDRs("allowed_cidrs", allowed)
-	if err != nil {
-		return nil, err
-	}
-	return func(_, address string, _ syscall.RawConn) error {
-		ap, err := netip.ParseAddrPort(address)
-		if err != nil {
-			return err
-		}
-		addr := ap.Addr().Unmap()
-		if prefixesContain(allowedPrefixes, addr) {
-			return nil
-		}
-		if (blockPrivate && isBlockedIP(net.IP(addr.AsSlice()))) || prefixesContain(blockedPrefixes, addr) {
-			return fmt.Errorf("%w: %s", ErrBlockedAddress, addr)
-		}
-		return nil
-	}, nil
-}
-
-func parseCIDRs(key string, cidrs []string) ([]netip.Prefix, error) {
-	prefixes := make([]netip.Prefix, 0, len(cidrs))
-	for _, c := range cidrs {
-		p, err := netip.ParsePrefix(c)
-		if err != nil {
-			return nil, fmt.Errorf("invalid webhook %s entry %q: %w", key, c, err)
-		}
-		prefixes = append(prefixes, p.Masked())
-	}
-	return prefixes, nil
-}
-
-func prefixesContain(prefixes []netip.Prefix, addr netip.Addr) bool {
-	for _, p := range prefixes {
-		if p.Contains(addr) {
-			return true
-		}
-	}
-	return false
 }
 
 func (n *DefaultNotifier) Stop(force bool) {

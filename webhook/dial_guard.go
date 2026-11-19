@@ -18,6 +18,8 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"net/netip"
+	"slices"
 	"strings"
 	"syscall"
 )
@@ -70,19 +72,86 @@ func CheckWebhookHost(host string) error {
 	return nil
 }
 
-func BlockInternal(network, address string, _ syscall.RawConn) error {
-	host, _, err := net.SplitHostPort(address)
+func BlockInternal(_, address string, _ syscall.RawConn) error {
+	return checkDialAddress(address, true, nil, nil)
+}
+
+// Refuses addresses in blocked, and private ones when blockPrivate is set,
+// unless they are also in allowed.
+func NewDialControl(blockPrivate bool, blocked, allowed []string) (func(network, address string, c syscall.RawConn) error, error) {
+	blockedPrefixes, err := parseCIDRs("blocked_cidrs", blocked)
+	if err != nil {
+		return nil, err
+	}
+	allowedPrefixes, err := parseCIDRs("allowed_cidrs", allowed)
+	if err != nil {
+		return nil, err
+	}
+	return func(_, address string, _ syscall.RawConn) error {
+		return checkDialAddress(address, blockPrivate, blockedPrefixes, allowedPrefixes)
+	}, nil
+}
+
+func checkDialAddress(address string, blockPrivate bool, blocked, allowed []netip.Prefix) error {
+	ap, err := netip.ParseAddrPort(address)
 	if err != nil {
 		return err
 	}
-	ip := net.ParseIP(host)
-	if ip == nil {
-		return fmt.Errorf("cannot resolve %q", address)
+	addr := ap.Addr().WithZone("").Unmap()
+	if prefixesContain(allowed, addr) {
+		return nil
 	}
-	if isBlockedIP(ip) {
-		return fmt.Errorf("%w: %s", ErrBlockedAddress, ip)
+	// an allowed entry is an exception, so only refusal widens to the embedded IPv4 address
+	if ap.Addr().Zone() != "" ||
+		(blockPrivate && isBlockedIP(addr.AsSlice())) ||
+		prefixesContain(blocked, addr) ||
+		prefixesContain(blocked, embeddedIPv4(addr)) {
+		return fmt.Errorf("%w: %s", ErrBlockedAddress, ap.Addr())
 	}
 	return nil
+}
+
+func parseCIDRs(key string, cidrs []string) ([]netip.Prefix, error) {
+	prefixes := make([]netip.Prefix, 0, len(cidrs))
+	for _, c := range cidrs {
+		p, err := netip.ParsePrefix(c)
+		if err != nil {
+			return nil, fmt.Errorf("invalid webhook %s entry %q: %w", key, c, err)
+		}
+		// a dialed address is unmapped before matching, so a mapped prefix must be too
+		if p.Addr().Is4In6() {
+			if p.Bits() < 96 {
+				return nil, fmt.Errorf("invalid webhook %s entry %q: an IPv4-mapped prefix needs at least 96 bits", key, c)
+			}
+			p = netip.PrefixFrom(p.Addr().Unmap(), p.Bits()-96)
+		}
+		prefixes = append(prefixes, p)
+	}
+	return prefixes, nil
+}
+
+func prefixesContain(prefixes []netip.Prefix, addr netip.Addr) bool {
+	return slices.ContainsFunc(prefixes, func(p netip.Prefix) bool { return p.Contains(addr) })
+}
+
+var (
+	nat64Prefix    = netip.MustParsePrefix("64:ff9b::/96")
+	v4CompatPrefix = netip.MustParsePrefix("::/96")
+	sixToFour      = netip.MustParsePrefix("2002::/16")
+)
+
+// Returns the IPv4 address a NAT64, v4-compatible or 6to4 address carries, or
+// the zero Addr, which no prefix contains.
+func embeddedIPv4(addr netip.Addr) netip.Addr {
+	b := addr.As16()
+	switch {
+	case nat64Prefix.Contains(addr), v4CompatPrefix.Contains(addr):
+		return netip.AddrFrom4([4]byte(b[12:]))
+	case sixToFour.Contains(addr):
+		return netip.AddrFrom4([4]byte(b[2:6]))
+	default:
+		return netip.Addr{}
+	}
 }
 
 // Reports whether IP falls in a range the service must never dial:

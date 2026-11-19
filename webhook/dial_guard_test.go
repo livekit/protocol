@@ -16,6 +16,7 @@ package webhook
 
 import (
 	"net"
+	"syscall"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -78,5 +79,115 @@ func TestCheckWebhookHost(t *testing.T) {
 		"::1", "::ffff:10.0.0.1", "0.0.0.0",
 	} {
 		require.ErrorIs(t, CheckWebhookHost(host), ErrBlockedAddress, host)
+	}
+}
+
+func TestNewDialControl(t *testing.T) {
+	cases := []struct {
+		blockPrivate     bool
+		blocked, allowed []string
+		want             map[string]bool
+	}{
+		{
+			blockPrivate: true,
+			blocked:      []string{"8.8.8.0/24"},
+			allowed:      []string{"10.1.0.0/16"},
+			want: map[string]bool{
+				"8.8.8.8:443":             true,
+				"[::ffff:8.8.8.8]:443":    true,
+				"1.1.1.1:443":             false,
+				"10.1.2.3:443":            false,
+				"[::ffff:10.1.2.3]:80":    false,
+				"10.2.0.1:443":            true,
+				"[64:ff9b::a01:203]:80":   true,
+				"[::10.1.2.3]:80":         true,
+				"[2002:a01:203::]:80":     true,
+				"[64:ff9b::a02:1]:80":     true,
+				"[fe80::1%eth0]:443":      true,
+				"[2607:f8b0::1%eth0]:443": true,
+			},
+		},
+		{
+			blocked: []string{"10.0.0.0/8"},
+			want: map[string]bool{
+				"10.0.0.1:80":               true,
+				"[64:ff9b::a00:1]:80":       true,
+				"[::10.0.0.1]:80":           true,
+				"[2002:a00:1::]:80":         true,
+				"[64:ff9b::808:808]:80":     false,
+				"8.8.8.8:80":                false,
+				"[fe80::1%eth0]:443":        true,
+				"[2607:f8b0::1%eth0]:443":   true,
+				"[::ffff:8.8.8.8%eth0]:443": true,
+			},
+		},
+		{
+			blockPrivate: true,
+			allowed:      []string{"0.0.0.0/0"},
+			want: map[string]bool{
+				"10.0.0.1:80": false,
+				"[::1]:80":    true,
+				"[::]:80":     true,
+			},
+		},
+		{
+			blockPrivate: true,
+			allowed:      []string{"fe80::/10"},
+			want: map[string]bool{
+				"[fe80::1%eth0]:80":      false,
+				"[2607:f8b0::1%eth0]:80": true,
+			},
+		},
+		{
+			blocked: []string{"::ffff:8.8.8.0/120"},
+			want: map[string]bool{
+				"8.8.8.8:443":          true,
+				"[::ffff:8.8.8.8]:443": true,
+				"8.8.9.1:443":          false,
+			},
+		},
+		{
+			blockPrivate: true,
+			allowed:      []string{"::ffff:10.1.0.0/112"},
+			want: map[string]bool{
+				"10.1.2.3:443":          false,
+				"[::ffff:10.1.2.3]:443": false,
+				"10.2.0.1:443":          true,
+			},
+		},
+	}
+	for _, c := range cases {
+		control, err := NewDialControl(c.blockPrivate, c.blocked, c.allowed)
+		require.NoError(t, err)
+		for address, blocked := range c.want {
+			checkDial(t, control, address, blocked)
+		}
+	}
+
+	for key, entries := range map[string][2][]string{
+		"blocked_cidrs": {{"10.0.0.0/33"}, nil},
+		"allowed_cidrs": {nil, {"not-a-cidr"}},
+	} {
+		_, err := NewDialControl(false, entries[0], entries[1])
+		require.ErrorContains(t, err, key)
+	}
+	_, err := NewDialControl(false, []string{"::ffff:0:0/80"}, nil)
+	require.ErrorContains(t, err, "blocked_cidrs")
+}
+
+func TestBlockInternal(t *testing.T) {
+	checkDial(t, BlockInternal, "[fe80::1%eth0]:443", true)
+	checkDial(t, BlockInternal, "[2607:f8b0::1%eth0]:443", true)
+	checkDial(t, BlockInternal, "127.0.0.1:80", true)
+	checkDial(t, BlockInternal, "8.8.8.8:443", false)
+}
+
+func checkDial(t *testing.T, control func(string, string, syscall.RawConn) error, address string, blocked bool) {
+	t.Helper()
+	err := control("tcp", address, nil)
+	if blocked {
+		require.ErrorIs(t, err, ErrBlockedAddress, address)
+	} else {
+		require.NoError(t, err, address)
 	}
 }
