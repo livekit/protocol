@@ -123,6 +123,46 @@ message SimulationRun {
     optional bool redundant_statements = 17;
     optional bool poor_question_quality = 18;
     optional float conversation_progression = 19;  // 0-1, derived from the flags above
+    // The judge's account of each flag above that is set, so a reader can see what went wrong
+    // without opening the transcript. Empty when nothing was flagged or no judge ran.
+    repeated ProgressionFinding progression_findings = 25;
+
+    // One whole-call issue the progression judge flagged, in its words.
+    message ProgressionFinding {
+      Check check = 1;
+      Severity severity = 2;
+      string evidence = 3;              // 1-2 sentences; cites transcript items as [item_id]
+      repeated Citation citations = 4;  // the items evidence cites, in the order it first cites them
+
+      enum Check {
+        CHECK_UNSPECIFIED = 0;
+        CHECK_UNNECESSARY_TOOL_CALLS = 1;
+        CHECK_INFORMATION_LOSS = 2;
+        CHECK_REDUNDANT_STATEMENTS = 3;
+        CHECK_POOR_QUESTION_QUALITY = 4;
+      }
+
+      enum Severity {
+        SEVERITY_UNSPECIFIED = 0;
+        SEVERITY_MINOR = 1;  // a single isolated issue, or a borderline one
+        SEVERITY_CLEAR = 2;  // several of the same issue, or one that stalled the call
+      }
+
+      // One transcript item, as the simulator recorded it.
+      message Citation {
+        string item_id = 1;  // the stored transcript's item id; a tool call's is <message id>/fnc_N
+        Kind kind = 2;
+        string text = 3;     // what was said, the tool's name for a call, or the tool's output
+
+        enum Kind {
+          KIND_UNSPECIFIED = 0;
+          KIND_AGENT = 1;
+          KIND_CALLER = 2;
+          KIND_TOOL_CALL = 3;
+          KIND_TOOL_OUTPUT = 4;
+        }
+      }
+    }
 
     // How the call ended. A failing end also sets the job's error.
     EndReason end_reason = 21;
