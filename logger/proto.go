@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"fmt"
+	"log/slog"
 	"strconv"
 	"text/template"
 
@@ -64,6 +65,10 @@ type protoMarshaller struct {
 	// a summary instead of its full contents. 0 means no limit.
 	maxSize int
 }
+
+// LogValue renders the message for slog handlers outside this package; this
+// package's handlers stream it through MarshalLogObject instead.
+func (p protoMarshaller) LogValue() slog.Value { return marshalerSlogValue(p) }
 
 func (p protoMarshaller) MarshalLogObject(e ObjectEncoder) error {
 	if !p.m.IsValid() {

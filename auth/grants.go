@@ -19,8 +19,6 @@ import (
 	"maps"
 	"strings"
 
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 	"golang.org/x/exp/slices"
 
 	"github.com/livekit/protocol/livekit"
@@ -229,14 +227,14 @@ func (c *ClaimGrants) Clone() *ClaimGrants {
 	return &clone
 }
 
-func (c *ClaimGrants) MarshalLogObject(e zapcore.ObjectEncoder) error {
+func (c *ClaimGrants) MarshalLogObject(e logger.ObjectEncoder) error {
 	if c == nil {
 		return nil
 	}
 
 	e.AddString("Identity", c.Identity)
 	e.AddString("Kind", c.Kind)
-	zap.Strings("KindDetails", c.KindDetails).AddTo(e)
+	e.AddArray("KindDetails", logger.StringSlice(c.KindDetails))
 	e.AddObject("Video", c.Video)
 	e.AddObject("SIP", c.SIP)
 	e.AddObject("Agent", c.Agent)
@@ -512,7 +510,7 @@ func (v *VideoGrant) Clone() *VideoGrant {
 	return &clone
 }
 
-func (v *VideoGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
+func (v *VideoGrant) MarshalLogObject(e logger.ObjectEncoder) error {
 	if v == nil {
 		return nil
 	}
@@ -571,7 +569,7 @@ func (s *SIPGrant) Clone() *SIPGrant {
 	return &clone
 }
 
-func (s *SIPGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
+func (s *SIPGrant) MarshalLogObject(e logger.ObjectEncoder) error {
 	if s == nil {
 		return nil
 	}
@@ -604,7 +602,7 @@ func (s *AgentGrant) Clone() *AgentGrant {
 	return &clone
 }
 
-func (s *AgentGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
+func (s *AgentGrant) MarshalLogObject(e logger.ObjectEncoder) error {
 	if s == nil {
 		return nil
 	}
@@ -632,7 +630,7 @@ func (s *InferenceGrant) Clone() *InferenceGrant {
 	return &clone
 }
 
-func (s *InferenceGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
+func (s *InferenceGrant) MarshalLogObject(e logger.ObjectEncoder) error {
 	if s == nil {
 		return nil
 	}
@@ -658,7 +656,7 @@ func (s *ObservabilityGrant) Clone() *ObservabilityGrant {
 	return &clone
 }
 
-func (s *ObservabilityGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
+func (s *ObservabilityGrant) MarshalLogObject(e logger.ObjectEncoder) error {
 	if s == nil {
 		return nil
 	}
@@ -702,7 +700,7 @@ func (s *AgentEndpointGrant) Clone() *AgentEndpointGrant {
 	return &clone
 }
 
-func (s *AgentEndpointGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
+func (s *AgentEndpointGrant) MarshalLogObject(e logger.ObjectEncoder) error {
 	if s == nil {
 		return nil
 	}
@@ -791,14 +789,14 @@ func (s *AgentThreadGrant) Clone() *AgentThreadGrant {
 	return &clone
 }
 
-func (s *AgentThreadGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
+func (s *AgentThreadGrant) MarshalLogObject(e logger.ObjectEncoder) error {
 	if s == nil {
 		return nil
 	}
 
 	e.AddBool("All", s.All)
 	e.AddString("Scope", s.Scope)
-	zap.Strings("ThreadIDs", s.ThreadIDs).AddTo(e)
+	e.AddArray("ThreadIDs", logger.StringSlice(s.ThreadIDs))
 	e.AddBool("List", s.List)
 	e.AddBool("Create", s.Create)
 	e.AddBool("Write", s.Write)
@@ -865,12 +863,12 @@ func (s *AgentDatabaseGrant) Clone() *AgentDatabaseGrant {
 	return &clone
 }
 
-func (s *AgentDatabaseGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
+func (s *AgentDatabaseGrant) MarshalLogObject(e logger.ObjectEncoder) error {
 	if s == nil {
 		return nil
 	}
 
-	zap.Strings("DatabaseIDs", s.DatabaseIDs).AddTo(e)
+	e.AddArray("DatabaseIDs", logger.StringSlice(s.DatabaseIDs))
 	e.AddBool("Read", s.Read)
 	e.AddBool("Write", s.Write)
 	e.AddBool("Delete", s.Delete)

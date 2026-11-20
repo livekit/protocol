@@ -26,10 +26,10 @@ import (
 	"github.com/livekit/protocol/logger"
 )
 
-func marshalFields(t *testing.T, m zapcore.ObjectMarshaler) map[string]any {
+func marshalFields(t *testing.T, m logger.ObjectMarshaler) map[string]any {
 	t.Helper()
 	enc := zapcore.NewMapObjectEncoder()
-	require.NoError(t, m.MarshalLogObject(enc))
+	require.NoError(t, logger.ZapObjectMarshaler(m).MarshalLogObject(enc))
 	return enc.Fields
 }
 

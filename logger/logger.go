@@ -151,6 +151,8 @@ type zapConfig struct {
 	out  io.Writer
 	now  func() time.Time
 	slog bool
+
+	teeHandler slog.Handler
 }
 
 type ZapLoggerOption func(*zapConfig)
@@ -159,6 +161,23 @@ type ZapLoggerOption func(*zapConfig)
 func WithTee(tee zaputil.Tee) ZapLoggerOption {
 	return func(zc *zapConfig) {
 		zc.tee = tee
+	}
+}
+
+// WithTeeHandler duplicates every entry to h, gated by the level the logger
+// resolved for its component (h's own Enabled also applies). The logger name
+// and any stack trace are passed as the "logger" and "stacktrace" attributes,
+// and values are rendered as plain slog values.
+func WithTeeHandler(h slog.Handler) ZapLoggerOption {
+	return func(zc *zapConfig) {
+		zc.teeHandler = h
+	}
+}
+
+// WithZapBackend selects the zap-based implementation, currently the default.
+func WithZapBackend() ZapLoggerOption {
+	return func(zc *zapConfig) {
+		zc.slog = false
 	}
 }
 
@@ -229,6 +248,10 @@ func FromZapLogger(log *zap.Logger, conf *Config, opts ...ZapLoggerOption) (ZapL
 			return nil, errors.New("logger: WithSlogBackend cannot wrap a *zap.Logger")
 		}
 		return newSlogLogger(zc), nil
+	}
+
+	if zc.teeHandler != nil {
+		zc.tee = teeWithHandler(zc.tee, zc.teeHandler)
 	}
 
 	if log == nil {
@@ -316,7 +339,7 @@ func (l *zapLogger) ComponentLeveler() ZapComponentLeveler {
 }
 
 func (l *zapLogger) Debugw(msg string, keysAndValues ...any) {
-	l.zap.Debugw(msg, keysAndValues...)
+	l.zap.Debugw(msg, zapValues(keysAndValues)...)
 }
 
 func (l *zapLogger) Leveler() *ComponentLeveler {
@@ -334,25 +357,26 @@ func (l *zapLogger) WithComponentLeveler(lv *ComponentLeveler) Logger {
 }
 
 func (l *zapLogger) Infow(msg string, keysAndValues ...any) {
-	l.zap.Infow(msg, keysAndValues...)
+	l.zap.Infow(msg, zapValues(keysAndValues)...)
 }
 
 func (l *zapLogger) Warnw(msg string, err error, keysAndValues ...any) {
 	if err != nil {
 		keysAndValues = append(keysAndValues, "error", err)
 	}
-	l.zap.Warnw(msg, keysAndValues...)
+	l.zap.Warnw(msg, zapValues(keysAndValues)...)
 }
 
 func (l *zapLogger) Errorw(msg string, err error, keysAndValues ...any) {
 	if err != nil {
 		keysAndValues = append(keysAndValues, "error", err)
 	}
-	l.zap.Errorw(msg, keysAndValues...)
+	l.zap.Errorw(msg, zapValues(keysAndValues)...)
 }
 
 func (l *zapLogger) WithValues(keysAndValues ...any) Logger {
 	dup := *l
+	keysAndValues = zapValues(keysAndValues)
 	dup.enc = dup.enc.WithValues(keysAndValues...)
 	dup.tee = dup.tee.WithValues(keysAndValues...)
 	dup.zap = dup.makeZap()
@@ -413,7 +437,7 @@ func (l *zapLogger) WithDeferredValues() (Logger, DeferredFieldResolver) {
 	def := &zaputil.Deferrer{}
 	dup.deferred = append(dup.deferred[0:len(dup.deferred):len(dup.deferred)], def)
 	dup.zap = dup.makeZap()
-	return &dup, def
+	return &dup, zapDeferrer{def}
 }
 
 type LogRLogger logr.Logger

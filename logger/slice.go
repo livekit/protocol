@@ -15,6 +15,7 @@
 package logger
 
 import (
+	"log/slog"
 	"time"
 
 	"go.uber.org/multierr"
@@ -35,6 +36,9 @@ func (s protoSlice[T]) MarshalLogArray(e ArrayEncoder) error {
 	return err
 }
 
+// LogValue renders the slice for slog handlers outside this package.
+func (s protoSlice[T]) LogValue() slog.Value { return marshalerSlogValue(s) }
+
 type objectSlice[T ObjectMarshaler] []T
 
 func ObjectSlice[T ObjectMarshaler](s []T) ArrayMarshaler {
@@ -49,6 +53,9 @@ func (s objectSlice[T]) MarshalLogArray(e ArrayEncoder) error {
 	return err
 }
 
+// LogValue renders the slice for slog handlers outside this package.
+func (s objectSlice[T]) LogValue() slog.Value { return marshalerSlogValue(s) }
+
 type timeSlice []time.Time
 
 func TimeSlice(s []time.Time) ArrayMarshaler {
@@ -61,6 +68,9 @@ func (s timeSlice) MarshalLogArray(e ArrayEncoder) error {
 	}
 	return nil
 }
+
+// LogValue renders the slice for slog handlers outside this package.
+func (s timeSlice) LogValue() slog.Value { return marshalerSlogValue(s) }
 
 type durationSlice []time.Duration
 
@@ -75,6 +85,9 @@ func (s durationSlice) MarshalLogArray(e ArrayEncoder) error {
 	return nil
 }
 
+// LogValue renders the slice for slog handlers outside this package.
+func (s durationSlice) LogValue() slog.Value { return marshalerSlogValue(s) }
+
 type boolSlice[T ~bool] []T
 
 func BoolSlice[T ~bool](s []T) ArrayMarshaler {
@@ -87,6 +100,9 @@ func (s boolSlice[T]) MarshalLogArray(e ArrayEncoder) error {
 	}
 	return nil
 }
+
+// LogValue renders the slice for slog handlers outside this package.
+func (s boolSlice[T]) LogValue() slog.Value { return marshalerSlogValue(s) }
 
 type byteStringSlice[T ~[]byte] []T
 
@@ -101,6 +117,9 @@ func (s byteStringSlice[T]) MarshalLogArray(e ArrayEncoder) error {
 	return nil
 }
 
+// LogValue renders the slice for slog handlers outside this package.
+func (s byteStringSlice[T]) LogValue() slog.Value { return marshalerSlogValue(s) }
+
 type complex128Slice[T ~complex128] []T
 
 func Complex128Slice[T ~complex128](s []T) ArrayMarshaler {
@@ -113,6 +132,9 @@ func (s complex128Slice[T]) MarshalLogArray(e ArrayEncoder) error {
 	}
 	return nil
 }
+
+// LogValue renders the slice for slog handlers outside this package.
+func (s complex128Slice[T]) LogValue() slog.Value { return marshalerSlogValue(s) }
 
 type complex64Slice[T ~complex64] []T
 
@@ -127,6 +149,9 @@ func (s complex64Slice[T]) MarshalLogArray(e ArrayEncoder) error {
 	return nil
 }
 
+// LogValue renders the slice for slog handlers outside this package.
+func (s complex64Slice[T]) LogValue() slog.Value { return marshalerSlogValue(s) }
+
 type float64Slice[T ~float64] []T
 
 func Float64Slice[T ~float64](s []T) ArrayMarshaler {
@@ -139,6 +164,9 @@ func (s float64Slice[T]) MarshalLogArray(e ArrayEncoder) error {
 	}
 	return nil
 }
+
+// LogValue renders the slice for slog handlers outside this package.
+func (s float64Slice[T]) LogValue() slog.Value { return marshalerSlogValue(s) }
 
 type float32Slice[T ~float32] []T
 
@@ -153,6 +181,9 @@ func (s float32Slice[T]) MarshalLogArray(e ArrayEncoder) error {
 	return nil
 }
 
+// LogValue renders the slice for slog handlers outside this package.
+func (s float32Slice[T]) LogValue() slog.Value { return marshalerSlogValue(s) }
+
 type intSlice[T ~int] []T
 
 func IntSlice[T ~int](s []T) ArrayMarshaler {
@@ -165,6 +196,9 @@ func (s intSlice[T]) MarshalLogArray(e ArrayEncoder) error {
 	}
 	return nil
 }
+
+// LogValue renders the slice for slog handlers outside this package.
+func (s intSlice[T]) LogValue() slog.Value { return marshalerSlogValue(s) }
 
 type int64Slice[T ~int64] []T
 
@@ -179,6 +213,9 @@ func (s int64Slice[T]) MarshalLogArray(e ArrayEncoder) error {
 	return nil
 }
 
+// LogValue renders the slice for slog handlers outside this package.
+func (s int64Slice[T]) LogValue() slog.Value { return marshalerSlogValue(s) }
+
 type int32Slice[T ~int32] []T
 
 func Int32Slice[T ~int32](s []T) ArrayMarshaler {
@@ -191,6 +228,9 @@ func (s int32Slice[T]) MarshalLogArray(e ArrayEncoder) error {
 	}
 	return nil
 }
+
+// LogValue renders the slice for slog handlers outside this package.
+func (s int32Slice[T]) LogValue() slog.Value { return marshalerSlogValue(s) }
 
 type int16Slice[T ~int16] []T
 
@@ -205,6 +245,9 @@ func (s int16Slice[T]) MarshalLogArray(e ArrayEncoder) error {
 	return nil
 }
 
+// LogValue renders the slice for slog handlers outside this package.
+func (s int16Slice[T]) LogValue() slog.Value { return marshalerSlogValue(s) }
+
 type int8Slice[T ~int8] []T
 
 func Int8Slice[T ~int8](s []T) ArrayMarshaler {
@@ -217,6 +260,9 @@ func (s int8Slice[T]) MarshalLogArray(e ArrayEncoder) error {
 	}
 	return nil
 }
+
+// LogValue renders the slice for slog handlers outside this package.
+func (s int8Slice[T]) LogValue() slog.Value { return marshalerSlogValue(s) }
 
 type stringSlice[T ~string] []T
 
@@ -231,6 +277,9 @@ func (s stringSlice[T]) MarshalLogArray(e ArrayEncoder) error {
 	return nil
 }
 
+// LogValue renders the slice for slog handlers outside this package.
+func (s stringSlice[T]) LogValue() slog.Value { return marshalerSlogValue(s) }
+
 type uintSlice[T ~uint] []T
 
 func UintSlice[T ~uint](s []T) ArrayMarshaler {
@@ -243,6 +292,9 @@ func (s uintSlice[T]) MarshalLogArray(e ArrayEncoder) error {
 	}
 	return nil
 }
+
+// LogValue renders the slice for slog handlers outside this package.
+func (s uintSlice[T]) LogValue() slog.Value { return marshalerSlogValue(s) }
 
 type uint64Slice[T ~uint64] []T
 
@@ -257,6 +309,9 @@ func (s uint64Slice[T]) MarshalLogArray(e ArrayEncoder) error {
 	return nil
 }
 
+// LogValue renders the slice for slog handlers outside this package.
+func (s uint64Slice[T]) LogValue() slog.Value { return marshalerSlogValue(s) }
+
 type uint32Slice[T ~uint32] []T
 
 func Uint32Slice[T ~uint32](s []T) ArrayMarshaler {
@@ -269,6 +324,9 @@ func (s uint32Slice[T]) MarshalLogArray(e ArrayEncoder) error {
 	}
 	return nil
 }
+
+// LogValue renders the slice for slog handlers outside this package.
+func (s uint32Slice[T]) LogValue() slog.Value { return marshalerSlogValue(s) }
 
 type uint16Slice[T ~uint16] []T
 
@@ -283,6 +341,9 @@ func (s uint16Slice[T]) MarshalLogArray(e ArrayEncoder) error {
 	return nil
 }
 
+// LogValue renders the slice for slog handlers outside this package.
+func (s uint16Slice[T]) LogValue() slog.Value { return marshalerSlogValue(s) }
+
 type uint8Slice[T ~uint8] []T
 
 func Uint8Slice[T ~uint8](s []T) ArrayMarshaler {
@@ -296,6 +357,9 @@ func (s uint8Slice[T]) MarshalLogArray(e ArrayEncoder) error {
 	return nil
 }
 
+// LogValue renders the slice for slog handlers outside this package.
+func (s uint8Slice[T]) LogValue() slog.Value { return marshalerSlogValue(s) }
+
 type uintptrSlice[T ~uintptr] []T
 
 func UintptrSlice[T ~uintptr](s []T) ArrayMarshaler {
@@ -308,3 +372,6 @@ func (s uintptrSlice[T]) MarshalLogArray(e ArrayEncoder) error {
 	}
 	return nil
 }
+
+// LogValue renders the slice for slog handlers outside this package.
+func (s uintptrSlice[T]) LogValue() slog.Value { return marshalerSlogValue(s) }

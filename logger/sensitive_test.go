@@ -48,9 +48,12 @@ func newRecorder(t *testing.T, max logger.Sensitivity) (*recorder, *recEnc) {
 	return r, &recEnc{ObjectEncoder: zapcore.NewMapObjectEncoder(), r: r}
 }
 
-func (r *recorder) fields(t *testing.T, m zapcore.ObjectMarshaler, e *recEnc) map[string]recorded {
+// fields runs m against e, a zapcore encoder like the ones that tag sensitive
+// values in production, through the bridge zap encoders need for this
+// package's marshalers.
+func (r *recorder) fields(t *testing.T, m logger.ObjectMarshaler, e *recEnc) map[string]recorded {
 	t.Helper()
-	require.NoError(t, m.MarshalLogObject(e))
+	require.NoError(t, logger.ZapObjectMarshaler(m).MarshalLogObject(e))
 	return r.vals
 }
 
@@ -74,7 +77,12 @@ type recEnc struct {
 	sens   logger.Sensitivity
 }
 
-var _ logger.SensitiveObjectEncoder = (*recEnc)(nil)
+// recEnc has the shape of logger.SensitiveObjectEncoder in zapcore types, as
+// implemented by encoders that zap drives.
+var _ interface {
+	zapcore.ObjectEncoder
+	SensitiveObjectEncoder(logger.Sensitivity) zapcore.ObjectEncoder
+} = (*recEnc)(nil)
 
 func (e *recEnc) SensitiveObjectEncoder(s logger.Sensitivity) zapcore.ObjectEncoder {
 	if s > e.r.max {

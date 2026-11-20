@@ -45,28 +45,49 @@ type levelSource interface {
 
 const levelDisabled = math.MaxInt64
 
-// slogLeveler resolves component levels from a Config. Gates are memoized,
-// and refresh updates them in place so loggers already derived see new levels.
+// slogLeveler resolves component levels, from a Config at the root or from
+// a resolver for derived levelers, which can only widen their parent. Gates
+// are memoized, and refresh updates them in place so loggers already derived
+// see new levels.
 type slogLeveler struct {
 	conf    *Config
+	resolve func(component string) (slog.Level, bool)
+	parent  *slogLeveler
 	w       io.Writer
 	mu      sync.Mutex
 	entries *xsync.Map[string, *slogLevelEntry]
 }
 
 type slogLevelEntry struct {
-	level atomic.Int64
-	w     io.Writer
+	level  atomic.Int64
+	parent *slogLevelEntry
+	w      io.Writer
 }
 
-func (e *slogLevelEntry) enabled(l slog.Level) bool   { return int64(l) >= e.level.Load() }
+func (e *slogLevelEntry) enabled(l slog.Level) bool {
+	return int64(l) >= e.level.Load() || (e.parent != nil && e.parent.enabled(l))
+}
+
 func (e *slogLevelEntry) Write(p []byte) (int, error) { return e.w.Write(p) }
 
 func newSlogLeveler(w io.Writer, conf *Config) *slogLeveler {
 	return &slogLeveler{conf: conf, w: w, entries: xsync.NewMap[string, *slogLevelEntry]()}
 }
 
-func (l *slogLeveler) resolve(component string) int64 {
+// derive returns a leveler whose components are enabled at the level resolve
+// returns, or at l's level if that is lower; resolve returning false leaves
+// the component to l.
+func (l *slogLeveler) derive(resolve func(component string) (slog.Level, bool)) *slogLeveler {
+	return &slogLeveler{resolve: resolve, parent: l, w: l.w, entries: xsync.NewMap[string, *slogLevelEntry]()}
+}
+
+func (l *slogLeveler) level(component string) int64 {
+	if l.resolve != nil {
+		if lvl, ok := l.resolve(component); ok {
+			return int64(lvl)
+		}
+		return levelDisabled
+	}
 	lvl, ok := l.conf.ResolveComponentLevel(component)
 	if !ok {
 		return levelDisabled
@@ -85,7 +106,10 @@ func (l *slogLeveler) gate(component string) levelGate {
 		return e
 	}
 	e := &slogLevelEntry{w: l.w}
-	e.level.Store(l.resolve(component))
+	if l.parent != nil {
+		e.parent = l.parent.gate(component).(*slogLevelEntry)
+	}
+	e.level.Store(l.level(component))
 	l.entries.Store(component, e)
 	return e
 }
@@ -94,7 +118,7 @@ func (l *slogLeveler) refresh() {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	l.entries.Range(func(component string, e *slogLevelEntry) bool {
-		e.level.Store(l.resolve(component))
+		e.level.Store(l.level(component))
 		return true
 	})
 }
@@ -333,6 +357,10 @@ type deferredWrite struct {
 	r   slog.Record
 }
 
+// deferredHandler buffers records until the deferrer is resolved. Its inner
+// handler is a chainHandler for slogLogger, or any handler for slogAdapter;
+// the chainHandler methods are only used in the former case.
+
 // slogDeferrer implements DeferredFieldResolver with zaputil.Deferrer's
 // semantics, including its two field orderings.
 type slogDeferrer struct {
@@ -401,7 +429,7 @@ func (d *slogDeferrer) Reset() {
 }
 
 type deferredHandler struct {
-	inner chainHandler
+	inner slog.Handler
 	d     *slogDeferrer
 }
 
@@ -428,10 +456,11 @@ func (h *deferredHandler) Handle(ctx context.Context, r slog.Record) error {
 
 // capture resolves caller and stack while the call is still on the stack.
 func (h *deferredHandler) capture(ctx context.Context, r slog.Record) context.Context {
-	if _, ok := ctx.Value(entryMetaKey{}).(*entryMeta); ok || r.PC == 0 {
+	ch, isChain := h.inner.(chainHandler)
+	if _, ok := ctx.Value(entryMetaKey{}).(*entryMeta); ok || r.PC == 0 || !isChain {
 		return ctx
 	}
-	m := &entryMeta{caller: callerAt(r.PC), name: h.inner.loggerName()}
+	m := &entryMeta{caller: callerAt(r.PC), name: ch.loggerName()}
 	if normLevel(r.Level) >= slog.LevelError {
 		m.stack = stackFrom(r.PC)
 	}
@@ -439,26 +468,28 @@ func (h *deferredHandler) capture(ctx context.Context, r slog.Record) context.Co
 }
 
 func (h *deferredHandler) WithAttrs(as []slog.Attr) slog.Handler {
-	return &deferredHandler{h.inner.WithAttrs(as).(chainHandler), h.d}
+	return &deferredHandler{h.inner.WithAttrs(as), h.d}
 }
 
 func (h *deferredHandler) WithGroup(n string) slog.Handler {
-	return &deferredHandler{h.inner.WithGroup(n).(chainHandler), h.d}
+	return &deferredHandler{h.inner.WithGroup(n), h.d}
 }
 
+func (h *deferredHandler) chain() chainHandler { return h.inner.(chainHandler) }
+
 func (h *deferredHandler) withValues(kvs []any) chainHandler {
-	return &deferredHandler{h.inner.withValues(kvs), h.d}
+	return &deferredHandler{h.chain().withValues(kvs), h.d}
 }
 
 func (h *deferredHandler) withName(n string) chainHandler {
-	return &deferredHandler{h.inner.withName(n), h.d}
+	return &deferredHandler{h.chain().withName(n), h.d}
 }
 
 func (h *deferredHandler) withGate(g levelGate) chainHandler {
-	return &deferredHandler{h.inner.withGate(g), h.d}
+	return &deferredHandler{h.chain().withGate(g), h.d}
 }
 
-func (h *deferredHandler) loggerName() string { return h.inner.loggerName() }
+func (h *deferredHandler) loggerName() string { return h.chain().loggerName() }
 
 // ---------------------------------------------------------------- sampling
 

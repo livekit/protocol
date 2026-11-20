@@ -28,11 +28,24 @@ import (
 // encoder interfaces remain the contract for custom types.
 func addAny(enc ObjectEncoder, key string, v any) {
 	var err error
+	// Marshalers of either flavour come first, as in zap.Any. They are checked
+	// outside the switch because, while the interfaces are aliases, listing
+	// both flavours there would be a duplicate case.
+	if m, ok := asObjectMarshaler(v); ok {
+		err = enc.AddObject(key, m)
+	} else if m, ok := asArrayMarshaler(v); ok {
+		err = enc.AddArray(key, m)
+	} else {
+		err = addValue(enc, key, v)
+	}
+	if err != nil {
+		enc.AddString(key+"Error", err.Error())
+	}
+}
+
+// addValue is the rest of zap.Any's type switch.
+func addValue(enc ObjectEncoder, key string, v any) (err error) {
 	switch x := v.(type) {
-	case ObjectMarshaler:
-		err = enc.AddObject(key, x)
-	case ArrayMarshaler:
-		err = enc.AddArray(key, x)
 	case []zapcore.Field:
 		err = enc.AddObject(key, fieldsObject(x))
 	case bool:
@@ -158,9 +171,7 @@ func addAny(enc ObjectEncoder, key string, v any) {
 	default:
 		err = enc.AddReflected(key, x)
 	}
-	if err != nil {
-		enc.AddString(key+"Error", err.Error())
-	}
+	return err
 }
 
 // addPtr is zap's *T fields: a nil pointer is encoded as JSON null.
@@ -175,8 +186,9 @@ func addPtr[T any](enc ObjectEncoder, key string, p *T, add func(string, T)) err
 type fieldsObject []zapcore.Field
 
 func (fs fieldsObject) MarshalLogObject(enc ObjectEncoder) error {
+	z := toZapObjectEncoder(enc)
 	for _, f := range fs {
-		f.AddTo(enc)
+		f.AddTo(z)
 	}
 	return nil
 }
@@ -293,15 +305,16 @@ func addAttr(enc ObjectEncoder, a slog.Attr) {
 			enc.AddString(a.Key+"Error", err.Error())
 		}
 	case slog.KindLogValuer:
-		if om, ok := v.LogValuer().(ObjectMarshaler); ok {
-			addAny(enc, a.Key, om)
+		// Marshalers that are also LogValuers stream instead of resolving.
+		if lv := unwrapLogValuer(v.LogValuer()); isMarshaler(lv) {
+			addAny(enc, a.Key, lv)
 			return
 		}
 		addAttr(enc, slog.Attr{Key: a.Key, Value: v.Resolve()})
 	default:
 		switch x := v.Any().(type) {
 		case bareField:
-			zapcore.Field(x).AddTo(enc)
+			zapcore.Field(x).AddTo(toZapObjectEncoder(enc))
 		case float32Value:
 			enc.AddFloat32(a.Key, float32(x))
 		default:

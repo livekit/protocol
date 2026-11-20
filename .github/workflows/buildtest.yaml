@@ -68,6 +68,14 @@ jobs:
           set -euo pipefail
           MallocNanoZone=0 go test -race -json -v ./... 2>&1 | gotestfmt
 
+      # logger.ObjectEncoder & co. are aliases of zap's types today; this keeps
+      # the build that replaces them with logger's own interfaces working.
+      - name: Test logger with its own marshaler interfaces
+        run: |
+          set -euo pipefail
+          go build -tags logger_own_marshalers ./...
+          MallocNanoZone=0 go test -race -tags logger_own_marshalers ./logger/... ./auth/... ./utils/...
+
       # Only main writes. Pull requests read main's entry, which keeps ~1 GB
       # per PR run out of the repo's 10 GB cache budget.
       - name: Save Go caches

@@ -27,18 +27,21 @@ func NewSlogDiscard() slog.Handler {
 	return slogDiscard{}
 }
 
-// ToSlogHandler converts Logger to slog.Handler.
+// ToSlogHandler converts Logger to slog.Handler. FromSlog converts a
+// *slog.Logger using it back to log.
 func ToSlogHandler(log Logger) slog.Handler {
 	switch log := log.(type) {
 	case *slogLogger:
-		return log.handler()
+		return newLoggerHandler(log)
+	case *slogAdapter:
+		return &loggerHandler{log: log, h: log.handler()}
 	case ZapLogger:
 		zlog := log.ToZap().Desugar()
-		return zapslog.NewHandler(zlog.Core())
+		return &loggerHandler{log: log, h: zapslogHandler{zapslog.NewHandler(zlog.Core())}}
 	case LogRLogger:
-		return logr.ToSlogHandler(log.toLogr())
+		return &loggerHandler{log: log, h: logr.ToSlogHandler(log.toLogr())}
 	}
-	return slogHandler{log, ""}
+	return &loggerHandler{log: log, h: slogHandler{log, ""}}
 }
 
 type slogDiscard struct{}

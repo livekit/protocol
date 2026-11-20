@@ -21,11 +21,13 @@ package logger_test
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"log/slog"
 	"math"
 	"regexp"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -69,15 +71,18 @@ func (b *both) derive(fn func(l logger.Logger) logger.Logger) {
 	b.z, b.s = fn(b.z), fn(b.s)
 }
 
-type outputs struct{ z, s, zt, st bytes.Buffer }
+// outputs holds, per backend, the primary output, the zap-core tee
+// (WithTee) and the slog-handler tee (WithTeeHandler).
+type outputs struct{ z, s, zt, st, zh, sh bytes.Buffer }
 
 func newBoth(t *testing.T, conf *logger.Config, o *outputs) *both {
 	t.Helper()
-	newLogger := func(out, tee *bytes.Buffer, extra ...logger.ZapLoggerOption) logger.Logger {
+	newLogger := func(out, tee, teeHandler *bytes.Buffer, extra ...logger.ZapLoggerOption) logger.Logger {
 		opts := append([]logger.ZapLoggerOption{
 			logger.WithOutputForTest(out),
 			logger.WithClockForTest(fixedClock),
 			logger.WithTee(zaputil.NewTee(testutil.NewJSONCoreFactory(zapcore.AddSync(tee)))),
+			logger.WithTeeHandler(slog.NewJSONHandler(teeHandler, &slog.HandlerOptions{Level: slog.LevelDebug})),
 		}, extra...)
 		l, err := logger.NewZapLogger(conf, opts...)
 		require.NoError(t, err)
@@ -85,8 +90,8 @@ func newBoth(t *testing.T, conf *logger.Config, o *outputs) *both {
 	}
 	return &both{
 		conf: conf,
-		z:    newLogger(&o.z, &o.zt),
-		s:    newLogger(&o.s, &o.st, logger.WithSlogBackend()),
+		z:    newLogger(&o.z, &o.zt, &o.zh),
+		s:    newLogger(&o.s, &o.st, &o.sh, logger.WithSlogBackend()),
 	}
 }
 
@@ -130,6 +135,15 @@ func (o obj) MarshalLogObject(e logger.ObjectEncoder) error {
 	return nil
 }
 
+// zapObj implements the zapcore flavour of the marshaler interface, like
+// types written before logger.ObjectEncoder existed.
+type zapObj struct{ a string }
+
+func (o zapObj) MarshalLogObject(e zapcore.ObjectEncoder) error {
+	e.AddString("za", o.a)
+	return e.AddObject("inner", logger.ZapObjectMarshaler(obj{o.a}))
+}
+
 func pkgLog() {
 	logger.Infow("pkg info", "k", 1)
 	logger.Errorw("pkg err", errors.New("e"))
@@ -141,7 +155,7 @@ type tcase struct {
 	run  func(b *both)
 }
 
-func cases() []tcase {
+func cases(t *testing.T) []tcase {
 	p := participant()
 	str := "pointee"
 	var nilStr *string
@@ -192,12 +206,12 @@ func cases() []tcase {
 		{name: "proto/marshalers", run: func(b *both) {
 			b.log(func(l logger.Logger) {
 				l.Infow("proto", "p", logger.Proto(p), "lim", logger.ProtoWithLimit(p, 10), "tracks", logger.ProtoSlice(p.Tracks),
-					"ids", logger.StringSlice([]string{"x", "y"}), "obj", obj{"o"}, "after", 1)
+					"ids", logger.StringSlice([]string{"x", "y"}), "obj", obj{"o"}, "zobj", zapObj{"z"}, "after", 1)
 			})
 		}},
 		{name: "zap fields", run: func(b *both) {
 			b.log(func(l logger.Logger) {
-				l.Infow("fields", zap.String("zf", "v"), zap.Inline(obj{"in"}), zap.Skip(), "k", 1, zap.Namespace("ns"), "inner", 2)
+				l.Infow("fields", zap.String("zf", "v"), zap.Inline(zapObj{"in"}), zap.Skip(), "k", 1, zap.Namespace("ns"), "inner", 2)
 			})
 		}},
 		{name: "sweeten quirks", run: func(b *both) {
@@ -288,7 +302,7 @@ func cases() []tcase {
 			b.log(func(l logger.Logger) {
 				tz := l.(logger.ZapLogger).ToZap()
 				tz.Infow("bridge", "k", 1, "d", time.Second)
-				tz.Desugar().Info("desugared", zap.Int("n", 2), zap.Object("o", obj{"x"}))
+				tz.Desugar().Info("desugared", zap.Int("n", 2), zap.Object("o", zapObj{"x"}))
 				tz.Named("sub").With("w", 1).Warnw("named with", "e", errors.New("x"))
 				tz.Errorw("bridge err", "error", errors.New("boom"))
 				tz.Desugar().WithOptions(zap.WithCaller(false)).Info("nocaller")
@@ -348,6 +362,42 @@ func cases() []tcase {
 				o.WithValues("a", 1).Infow("override values")
 			})
 		}},
+		{name: "slog round trip", run: func(b *both) {
+			b.log(func(l logger.Logger) {
+				s := logger.ToSlog(l).With("k", 1, "p", logger.Proto(p.Tracks[0]))
+				logger.FromSlog(s).WithComponent("rtc").Infow("round trip", "x", 2)
+				require.Equal(t, l, logger.FromSlog(logger.ToSlog(l)))
+			})
+		}},
+		{name: "slog helpers", run: func(b *both) {
+			b.log(func(l logger.Logger) {
+				s := logger.WithComponent(logger.WithName(logger.ToSlog(l), "lk"), "rtc")
+				logger.FromSlog(s).Infow("named via slog")
+				d, r := logger.WithDeferredValues(s)
+				logger.FromSlog(d).Infow("deferred via slog")
+				r.Resolve("pID", "PA_1")
+				logger.FromSlog(logger.WithoutSampler(logger.WithItemSampler(s))).Infow("sampler via slog")
+			})
+		}},
+		{name: "component levels", run: func(b *both) {
+			levels := map[string]slog.Level{"quiet": slog.LevelDebug}
+			resolve := func(c string) (slog.Level, bool) {
+				l, ok := levels[c]
+				return l, ok
+			}
+			zc, sc := logger.NewComponentLevels(b.z, resolve), logger.NewComponentLevels(b.s, resolve)
+			z, s := logger.WithComponentLevels(b.z, zc).WithComponent("quiet"), logger.WithComponentLevels(b.s, sc).WithComponent("quiet")
+			for _, l := range []logger.Logger{z, s} {
+				l.Infow("widened")
+			}
+			delete(levels, "quiet")
+			zc.Refresh()
+			sc.Refresh()
+			for _, l := range []logger.Logger{z, s} {
+				l.Infow("back to warn")
+				l.Warnw("still warn", nil)
+			}
+		}},
 		{name: "pion", run: func(b *both) {
 			b.log(func(l logger.Logger) {
 				pl := pionlogger.NewLoggerFactory(l).NewLogger("ice")
@@ -384,7 +434,7 @@ func diffLines(t *testing.T, what, z, s string) {
 
 func TestSlogBackendMatchesZap(t *testing.T) {
 	for _, json := range []bool{true, false} {
-		for _, c := range cases() {
+		for _, c := range cases(t) {
 			t.Run(fmt.Sprintf("json=%v/%s", json, c.name), func(t *testing.T) {
 				conf := &logger.Config{JSON: json, Level: "debug", ComponentLevels: map[string]string{"quiet": "warn"}}
 				if c.conf != nil {
@@ -397,6 +447,7 @@ func TestSlogBackendMatchesZap(t *testing.T) {
 				require.NotZero(t, o.zt.Len(), "no tee output")
 				diffLines(t, "main", o.z.String(), o.s.String())
 				diffLines(t, "tee", o.zt.String(), o.st.String())
+				diffLines(t, "slog tee", o.zh.String(), o.sh.String())
 			})
 		}
 	}
@@ -432,4 +483,73 @@ func TestSlogBackendToSlogHandler(t *testing.T) {
 func TestSlogBackendRejectsZapLogger(t *testing.T) {
 	_, err := logger.FromZapLogger(zap.NewNop(), &logger.Config{}, logger.WithSlogBackend())
 	require.Error(t, err)
+}
+
+// The comparison tests above would pass if both backends rendered values the
+// same wrong way, so check the rendering itself, for both marshaler flavours.
+func TestSlogBackendMarshalerOutput(t *testing.T) {
+	var o outputs
+	b := newBoth(t, &logger.Config{JSON: true, Level: "debug"}, &o)
+	b.log(func(l logger.Logger) {
+		l.Infow("m", "p", logger.Proto(participant()), "obj", obj{"o"}, "zobj", zapObj{"z"}, "ids", logger.StringSlice([]string{"x"}))
+	})
+	for name, out := range map[string]string{"zap": o.z.String(), "slog": o.s.String(), "zap tee": o.zt.String(), "slog tee": o.st.String()} {
+		require.Contains(t, out, `"p":{"sid":"PA_abcdef","identity":"user-1","state":"ACTIVE","tracks":[{"sid":"TR_a","type":"AUDIO","name":"<redacted>"`, name)
+		require.Contains(t, out, `"obj":{"a":"o","ns":{"n":1}}`, name)
+		require.Contains(t, out, `"zobj":{"za":"z","inner":{"a":"z","ns":{"n":1}}}`, name)
+		require.Contains(t, out, `"ids":["x"]`, name)
+	}
+	for name, out := range map[string]string{"zap": o.zh.String(), "slog": o.sh.String()} {
+		require.Contains(t, out, `"p":{"sid":"PA_abcdef","identity":"user-1","state":"ACTIVE","tracks":[{`, name)
+		require.Contains(t, out, `"obj":{"a":"o","ns":{"n":1}}`, name)
+		require.Contains(t, out, `"zobj":{"za":"z","inner":{"a":"z","ns":{"n":1}}}`, name)
+		require.Contains(t, out, `"ids":["x"]`, name)
+	}
+}
+
+func TestFromSlogForeignHandler(t *testing.T) {
+	var buf bytes.Buffer
+	opts := &slog.HandlerOptions{Level: slog.LevelDebug, ReplaceAttr: func(_ []string, a slog.Attr) slog.Attr {
+		if a.Key == slog.TimeKey {
+			return slog.Attr{}
+		}
+		return a
+	}}
+	s := slog.New(slog.NewJSONHandler(&buf, opts))
+	l := logger.FromSlog(s).WithName("lk").WithValues("room", "RM_1")
+	require.Equal(t, l, logger.FromSlog(logger.ToSlog(l)))
+
+	l.Infow("values", "p", logger.Proto(participant()), "err", verboseErr{"v"}, "ss", []string{"a"},
+		"f32", float32(0.1), "zobj", zapObj{"z"}, zap.Namespace("ns"), "inner", 1)
+	d, r := l.WithDeferredValues()
+	d.Infow("buffered", "k", 1)
+	r.Resolve("pID", "PA_1")
+	s.Info("direct slog", "p", logger.Proto(participant().Tracks[0]))
+
+	lines := strings.Split(strings.TrimSpace(buf.String()), "\n")
+	require.Len(t, lines, 3)
+	// Objects inside arrays become maps for foreign handlers, so their keys are sorted.
+	require.Contains(t, lines[0], `{"level":"INFO","msg":"values","room":"RM_1","logger":"lk","p":{"sid":"PA_abcdef","identity":"user-1","state":"ACTIVE","tracks":[{"backupCodecPolicy":"PREFER_REGRESSION"`)
+	require.Contains(t, lines[0], `"joinedAt":1795000000,"name":"<redacted>"`)
+	require.Contains(t, lines[0], `"err":"v","errVerbose":"v\nstack:\n\tmain.go:1","ss":["a"],"f32":0.1,"zobj":{"za":"z","inner":{"a":"z","ns":{"n":1}}},"ns":{"inner":1}}`)
+	require.Equal(t, `{"level":"INFO","msg":"buffered","room":"RM_1","pID":"PA_1","logger":"lk","k":1}`, lines[1])
+	require.Contains(t, lines[2], `"msg":"direct slog","p":{"sid":"TR_a","type":"AUDIO","name":"<redacted>"`)
+}
+
+func logDepthHelper(l *slog.Logger) {
+	logger.LogDepth(context.Background(), l, 1, slog.LevelInfo, "depth", "k", 1)
+}
+
+func TestLogDepth(t *testing.T) {
+	var o outputs
+	b := newBoth(t, &logger.Config{JSON: true, Level: "debug"}, &o)
+	_, _, line, _ := runtime.Caller(0)
+	logDepthHelper(logger.ToSlog(b.s))
+	require.Contains(t, o.s.String(), fmt.Sprintf(`"caller":"logger/slog_compat_test.go:%d","msg":"depth","k":1`, line+1))
+}
+
+func TestBackendOptions(t *testing.T) {
+	_, err := logger.FromZapLogger(zap.NewNop(), &logger.Config{}, logger.WithSlogBackend(), logger.WithZapBackend())
+	require.NoError(t, err)
+	require.NotNil(t, logger.FromSlog(nil))
 }

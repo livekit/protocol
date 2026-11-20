@@ -61,7 +61,7 @@ func newSlogLogger(zc *zapConfig) *slogLogger {
 	gate := root.gate("")
 	l := &slogLogger{
 		slogShared: &slogShared{conf: conf, out: zc.out, now: now},
-		h:          newCoreHandler(conf.JSON, gate, newZapTee(zc.tee, gate)),
+		h:          newCoreHandler(conf.JSON, gate, newMultiTee(newZapTee(zc.tee, gate), newSlogTee(zc.teeHandler))),
 		levels:     root,
 	}
 	if conf.Sample {
@@ -178,6 +178,27 @@ func (l *slogLogger) WithItemSampler() Logger {
 func (l *slogLogger) WithoutSampler() Logger {
 	c := l.dup()
 	c.sampler = nil
+	return c
+}
+
+// withAttrs and withGroup apply slog.Handler semantics, for the slog view of
+// the logger.
+func (l *slogLogger) withAttrs(as []slog.Attr) *slogLogger {
+	c := l.dup()
+	c.h = l.h.WithAttrs(as).(chainHandler)
+	return c
+}
+
+func (l *slogLogger) withGroup(name string) *slogLogger {
+	c := l.dup()
+	c.h = l.h.WithGroup(name).(chainHandler)
+	return c
+}
+
+func (l *slogLogger) withLevels(src levelSource) *slogLogger {
+	c := l.dup()
+	c.levels = src
+	c.h = l.h.withGate(src.gate(l.comp))
 	return c
 }
 

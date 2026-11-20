@@ -17,7 +17,7 @@ package utils
 import (
 	"time"
 
-	"go.uber.org/zap/zapcore"
+	"github.com/livekit/protocol/logger"
 )
 
 // a ring buffer of welford mean/var summaries used to aggregate jitter and rtt.
@@ -84,7 +84,7 @@ func (a *LatencyAggregate) SummarizeLast(d time.Duration) Welford {
 	)
 }
 
-func (a *LatencyAggregate) MarshalLogObject(e zapcore.ObjectEncoder) error {
+func (a *LatencyAggregate) MarshalLogObject(e logger.ObjectEncoder) error {
 	summary := a.Summarize()
 	e.AddFloat64("count", summary.Count())
 	e.AddFloat64("mean", summary.Mean())
