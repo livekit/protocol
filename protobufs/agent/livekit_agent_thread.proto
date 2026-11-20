@@ -50,18 +50,19 @@ message AgentThread {
     string thread_id = 1 [(logger.name) = "threadID"];
   }
 
-  // Threads by creation, newest first unless sort_order says otherwise.
+  // Threads in an unspecified order, stable across pages. A project-wide list
+  // is spread over 64 hash buckets and one call reads at most 4 of them, so a
+  // page may be short or empty while next_page_token is set; a scope's list
+  // is one bucket, so a page is one read.
   message ListRequest {
     // Empty lists every thread of the project under a project-wide grant, and
     // the grant's own scope under a scoped one.
     string scope = 1 [(logger.sensitivity) = SENSITIVITY_PII];
     // next_page_token of the previous ListResponse; empty for the first page.
-    // A token is bound to its sort_order.
+    // A token continues only the list (scope) that issued it.
     string page_token = 2;
     // Unset is 50; larger is clamped to 100.
     int32 limit = 3;
-    // Unset or DESC is newest first; ASC is oldest first.
-    SortOrder sort_order = 4;
   }
 
   message ListResponse {

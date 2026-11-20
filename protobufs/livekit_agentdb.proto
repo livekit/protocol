@@ -31,13 +31,6 @@ import "logger/options.proto";
 // Nested so that names like Value and Ping need not be unique across the
 // livekit package. `tip` throughout is the latest durable commit sequence.
 message AgentDB {
-  // Direction of a listing. Each request documents what unset means.
-  enum SortOrder {
-    SORT_ORDER_UNSPECIFIED = 0;
-    SORT_ORDER_ASC = 1;
-    SORT_ORDER_DESC = 2;
-  }
-
   message CreateRequest {
     // Unset: never expires, and expires_at is then unset everywhere.
     // Otherwise clamped to the server cap, and never extended.
@@ -53,12 +46,12 @@ message AgentDB {
     string database_id = 1;
   }
 
-  // The project's databases by creation, newest first unless sort_order says otherwise.
+  // The project's databases in an unspecified order, stable across pages.
+  // The list is spread over 64 hash buckets and one call reads at most 4 of
+  // them, so a page may be short or empty while next_page_token is set.
   message ListRequest {
     int32 page_size = 1;         // unset is 50; larger is clamped to 100
-    string page_token = 2;       // bound to its sort_order
-    // Unset or DESC is newest first; ASC is oldest first.
-    SortOrder sort_order = 3;
+    string page_token = 2;
   }
 
   message ListResponse {
