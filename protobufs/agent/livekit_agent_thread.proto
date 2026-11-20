@@ -50,15 +50,22 @@ message AgentThread {
     string thread_id = 1 [(logger.name) = "threadID"];
   }
 
-  // The threads of one scope, newest first.
+  // Threads by creation, newest first unless sort_order says otherwise.
   message ListRequest {
+    // Empty lists every thread of the project under a project-wide grant, and
+    // the grant's own scope under a scoped one.
     string scope = 1 [(logger.sensitivity) = SENSITIVITY_PII];
     // next_page_token of the previous ListResponse; empty for the first page.
+    // A token is bound to its sort_order.
     string page_token = 2;
+    // Unset is 50; larger is clamped to 100.
     int32 limit = 3;
+    // Unset or DESC is newest first; ASC is oldest first.
+    SortOrder sort_order = 4;
   }
 
   message ListResponse {
+    // last_active and expires_at are unset: GetRequest answers them.
     repeated Thread threads = 1;
     // Empty when exhausted.
     string next_page_token = 2;
