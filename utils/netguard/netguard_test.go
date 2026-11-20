@@ -62,6 +62,9 @@ func TestIsBlockedIP(t *testing.T) {
 		{"3fff::1", true},                  // 3fff::/20 documentation
 		{"5f00::1", true},                  // 5f00::/16 SRv6 SIDs
 		{"2001:200::1", false},             // just past 2001::/23 (WIDE, public)
+		{"::ffff:169.254.169.254", true},   // IPv4-mapped cloud metadata
+		{"::ffff:0:a9fe:a9fe", true},       // ::ffff:0:0:0/96 IPv4-translated (embeds 169.254.169.254)
+		{"::ffff:8.8.8.8", false},          // IPv4-mapped public address
 		// public addresses that must remain reachable
 		{"8.8.8.8", false},
 		{"1.1.1.1", false},
@@ -80,7 +83,9 @@ func TestIsBlockedIP(t *testing.T) {
 }
 
 func TestCheckHost(t *testing.T) {
-	for _, host := range []string{"example.com", "93.184.215.14", "2606:4700::1111", "[2606:4700::1111]"} {
+	for _, host := range []string{"example.com", "93.184.215.14", "2606:4700::1111", "[2606:4700::1111]",
+		"example.com:443", "[2606:4700::1111]:443",
+	} {
 		require.NoError(t, CheckHost(host), host)
 	}
 	for _, host := range []string{
@@ -89,6 +94,7 @@ func TestCheckHost(t *testing.T) {
 		"::1", "::ffff:10.0.0.1", "0.0.0.0",
 		"[::1]", "[::ffff:10.0.0.1]",
 		"fe80::1%eth0", "2606:4700::1111%eth0", "[2606:4700::1111%eth0]",
+		"127.0.0.1:80", "[::1]:80", "localhost:8080", "[fe80::1%eth0]:443",
 	} {
 		require.ErrorIs(t, CheckHost(host), ErrBlockedAddress, host)
 	}
@@ -138,9 +144,11 @@ func TestNewDialControl(t *testing.T) {
 			blockPrivate: true,
 			allowed:      []string{"0.0.0.0/0"},
 			want: map[string]bool{
-				"10.0.0.1:80": false,
-				"[::1]:80":    true,
-				"[::]:80":     true,
+				"10.0.0.1:80":        false,
+				"127.0.0.1:80":       false,
+				"169.254.169.254:80": false,
+				"[::1]:80":           true,
+				"[::]:80":            true,
 			},
 		},
 		{
@@ -212,6 +220,7 @@ func TestBlockInternal(t *testing.T) {
 	checkDial(t, BlockInternal, "[fe80::1%eth0]:443", true)
 	checkDial(t, BlockInternal, "[2607:f8b0::1%eth0]:443", true)
 	checkDial(t, BlockInternal, "127.0.0.1:80", true)
+	checkDial(t, BlockInternal, "169.254.169.254:80", true)
 	checkDial(t, BlockInternal, "8.8.8.8:443", false)
 	checkDial(t, BlockInternal, "[64:ff9b::a9fe:a9fe]:80", true)
 	checkDial(t, BlockInternal, "[64:ff9b::808:808]:443", false)

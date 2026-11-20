@@ -14,6 +14,9 @@
 
 // Package netguard refuses connections to internal and reserved addresses, so
 // a destination a caller does not trust cannot reach the host's own network.
+//
+// A dial guard sees the address being connected to, which is the proxy's when
+// the client uses one, so a guarded http.Transport should set Proxy to nil.
 package netguard
 
 import (
@@ -26,13 +29,13 @@ import (
 	"syscall"
 )
 
-// Marks a destination the guard refuses. It threads through a transport's url.Error,
-// so callers can classify it as permanent.
+// ErrBlockedAddress marks a destination the guard refuses. It threads through a
+// transport's url.Error, so callers can classify it as permanent.
 var ErrBlockedAddress = errors.New("blocked destination address")
 
 var errShortMappedPrefix = errors.New("an IPv4-mapped prefix needs at least 96 bits")
 
-var blockedNets = func() []*net.IPNet {
+var blockedPrefixes = func() []netip.Prefix {
 	cidrs := []string{
 		"100.64.0.0/10",   // RFC 6598 CGNAT (carrier-grade NAT)
 		"0.0.0.0/8",       // "this network" (RFC 1122)
@@ -45,6 +48,7 @@ var blockedNets = func() []*net.IPNet {
 		"203.0.113.0/24",  // TEST-NET-3 documentation (RFC 5737)
 		"64:ff9b:1::/48",  // NAT64 local-use prefix (RFC 8215)
 		"::/96",           // IPv4-compatible IPv6 (RFC 4291, deprecated; embeds a v4 address)
+		"::ffff:0:0:0/96", // IPv4-translated (RFC 2765; embeds a v4 address)
 		"2002::/16",       // 6to4 (RFC 3056; embeds a v4 address)
 		"2001::/23",       // IETF protocol assignments (RFC 2928), includes Teredo 2001::/32 (RFC 4380; embeds a v4 address)
 		"fec0::/10",       // IPv6 site-local (deprecated, RFC 3879)
@@ -53,19 +57,22 @@ var blockedNets = func() []*net.IPNet {
 		"3fff::/20",       // IPv6 documentation (RFC 9637)
 		"5f00::/16",       // SRv6 SIDs (RFC 9602)
 	}
-	nets := make([]*net.IPNet, 0, len(cidrs))
+	prefixes := make([]netip.Prefix, 0, len(cidrs))
 	for _, c := range cidrs {
-		_, n, _ := net.ParseCIDR(c)
-		nets = append(nets, n)
+		prefixes = append(prefixes, netip.MustParsePrefix(c))
 	}
-	return nets
+	return prefixes
 }()
 
 // CheckHost rejects a URL host that is localhost, a blocked IP literal, or an
-// IP literal with a zone, so the mistake surfaces when the destination is
-// configured. Brackets around an IPv6 literal are accepted. Hostnames are only
-// resolved, and checked, when a connection dials them.
+// IP literal with a zone. A port, and brackets around an IPv6 literal, are
+// accepted. It only catches configuration mistakes early: host names, and IPv4
+// spellings netip.ParseAddr rejects such as 127.1, pass here and are checked by
+// a dial guard once resolved.
 func CheckHost(host string) error {
+	if h, _, err := net.SplitHostPort(host); err == nil {
+		host = h
+	}
 	host = strings.TrimSuffix(strings.ToLower(host), ".")
 	if host == "localhost" || strings.HasSuffix(host, ".localhost") {
 		return ErrBlockedAddress
@@ -104,7 +111,9 @@ func ReportOnly(
 
 // NewDialControl returns a net.Dialer Control function that refuses addresses
 // in blocked, and private ones when blockPrivate is set, unless they are also
-// in allowed. Prefixes should come from ParseCIDR.
+// in allowed. An allowed address is never refused, so a broad allowed range
+// such as 0.0.0.0/0 also lets loopback and the cloud metadata address through.
+// Prefixes should come from ParseCIDR.
 func NewDialControl(blockPrivate bool, blocked, allowed []netip.Prefix) func(network, address string, c syscall.RawConn) error {
 	return func(_, address string, _ syscall.RawConn) error {
 		return checkDialAddress(address, blockPrivate, blocked, allowed)
@@ -138,7 +147,7 @@ func checkDialAddress(address string, blockPrivate bool, blocked, allowed []neti
 	}
 	// an allowed entry is an exception, so only refusal widens to the embedded IPv4 address
 	if ap.Addr().Zone() != "" ||
-		(blockPrivate && IsBlockedIP(addr.AsSlice())) ||
+		(blockPrivate && isBlocked(addr)) ||
 		prefixesContain(blocked, addr) ||
 		prefixesContain(blocked, embeddedIPv4(addr)) {
 		return fmt.Errorf("%w: %s", ErrBlockedAddress, ap.Addr())
@@ -174,28 +183,27 @@ func embeddedIPv4(addr netip.Addr) netip.Addr {
 // dial: loopback, RFC1918 private and IPv6 ULA (fc00::/7), link-local unicast
 // (including the 169.254.169.254 cloud-metadata IP and fe80::/10), link-local
 // multicast, the unspecified address, any multicast, and the reserved ranges
-// listed in blockedNets. An address in the NAT64 well-known prefix is judged by
-// the IPv4 address it carries. A nil or malformed ip is reported as blocked.
+// listed in blockedPrefixes. An address in the NAT64 well-known prefix is
+// judged by the IPv4 address it carries. A nil or malformed ip is reported as
+// blocked.
 func IsBlockedIP(ip net.IP) bool {
-	if len(ip) != net.IPv4len && len(ip) != net.IPv6len {
+	addr, ok := netip.AddrFromSlice(ip)
+	if !ok {
 		return true
 	}
-	if a, ok := netip.AddrFromSlice(ip); ok && nat64Prefix.Contains(a) {
-		b := a.As16()
-		return IsBlockedIP(net.IP(b[12:]))
+	return isBlocked(addr.Unmap())
+}
+
+// addr must be unmapped.
+func isBlocked(addr netip.Addr) bool {
+	if nat64Prefix.Contains(addr) {
+		return isBlocked(embeddedIPv4(addr))
 	}
-	if ip.IsLoopback() ||
-		ip.IsPrivate() ||
-		ip.IsLinkLocalUnicast() ||
-		ip.IsLinkLocalMulticast() ||
-		ip.IsUnspecified() ||
-		ip.IsMulticast() {
-		return true
-	}
-	for _, n := range blockedNets {
-		if n.Contains(ip) {
-			return true
-		}
-	}
-	return false
+	return addr.IsLoopback() ||
+		addr.IsPrivate() ||
+		addr.IsLinkLocalUnicast() ||
+		addr.IsLinkLocalMulticast() ||
+		addr.IsUnspecified() ||
+		addr.IsMulticast() ||
+		prefixesContain(blockedPrefixes, addr)
 }
