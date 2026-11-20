@@ -2875,8 +2875,12 @@ type SimulationRun_Create_Response struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
 	SimulationRunId      string                 `protobuf:"bytes,1,opt,name=simulation_run_id,json=simulationRunId,proto3" json:"simulation_run_id,omitempty"`
 	PresignedPostRequest *PresignedPostRequest  `protobuf:"bytes,2,opt,name=presigned_post_request,json=presignedPostRequest,proto3" json:"presigned_post_request,omitempty"`
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
+	// The project's Agent Observability (user data recording) is off, so
+	// this run's sessions aren't recorded and it gets no summary. Never set
+	// for a SIP run, which records nothing either way.
+	ObservabilityDisabled bool `protobuf:"varint,3,opt,name=observability_disabled,json=observabilityDisabled,proto3" json:"observability_disabled,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *SimulationRun_Create_Response) Reset() {
@@ -2921,6 +2925,13 @@ func (x *SimulationRun_Create_Response) GetPresignedPostRequest() *PresignedPost
 		return x.PresignedPostRequest
 	}
 	return nil
+}
+
+func (x *SimulationRun_Create_Response) GetObservabilityDisabled() bool {
+	if x != nil {
+		return x.ObservabilityDisabled
+	}
+	return false
 }
 
 type SimulationRun_ConfirmSourceUpload_Request struct {
@@ -3713,7 +3724,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\x83W\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\xbaW\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -3993,7 +4004,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x05actor\x18\x06 \x01(\tR\x05actor\x1aH\n" +
 	"\x0fSamplingOptions\x12\x18\n" +
 	"\asamples\x18\x01 \x01(\x05R\asamples\x12\x1b\n" +
-	"\tpass_rate\x18\x02 \x01(\x01R\bpassRate\x1a\xaa\a\n" +
+	"\tpass_rate\x18\x02 \x01(\x01R\bpassRate\x1a\xe1\a\n" +
 	"\x06Create\x1a\x91\x06\n" +
 	"\aRequest\x12\x1d\n" +
 	"\n" +
@@ -4024,10 +4035,11 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x0f_scenario_groupB\x0e\n" +
 	"\f_concurrencyB\x05\n" +
 	"\x03_ciB\v\n" +
-	"\t_samplingJ\x04\b\x03\x10\x04R\x11agent_description\x1a\x8b\x01\n" +
+	"\t_samplingJ\x04\b\x03\x10\x04R\x11agent_description\x1a\xc2\x01\n" +
 	"\bResponse\x12*\n" +
 	"\x11simulation_run_id\x18\x01 \x01(\tR\x0fsimulationRunId\x12S\n" +
-	"\x16presigned_post_request\x18\x02 \x01(\v2\x1d.livekit.PresignedPostRequestR\x14presignedPostRequest\x1a\xa0\x01\n" +
+	"\x16presigned_post_request\x18\x02 \x01(\v2\x1d.livekit.PresignedPostRequestR\x14presignedPostRequest\x125\n" +
+	"\x16observability_disabled\x18\x03 \x01(\bR\x15observabilityDisabled\x1a\xa0\x01\n" +
 	"\x13ConfirmSourceUpload\x1a}\n" +
 	"\aRequest\x12\x1d\n" +
 	"\n" +
