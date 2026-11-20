@@ -341,19 +341,18 @@ func (x *AgentThread_GetRequest) GetThreadId() string {
 	return ""
 }
 
-// Threads by creation, newest first unless sort_order says otherwise.
+// Threads in an unspecified order, stable across pages. A page may be short
+// or empty while next_page_token is set.
 type AgentThread_ListRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Empty lists every thread of the project under a project-wide grant, and
 	// the grant's own scope under a scoped one.
 	Scope string `protobuf:"bytes,1,opt,name=scope,proto3" json:"scope,omitempty"`
-	// next_page_token of the previous ListResponse; empty for the first page.
-	// A token is bound to its sort_order.
+	// next_page_token of the previous ListResponse, to get the next page;
+	// empty for the first page. A token from another scope is refused.
 	PageToken string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	// Unset is 50; larger is clamped to 100.
-	Limit int32 `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
-	// Unset or DESC is newest first; ASC is oldest first.
-	SortOrder     AgentThread_SortOrder `protobuf:"varint,4,opt,name=sort_order,json=sortOrder,proto3,enum=livekit.agent.AgentThread_SortOrder" json:"sort_order,omitempty"`
+	Limit         int32 `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -409,18 +408,11 @@ func (x *AgentThread_ListRequest) GetLimit() int32 {
 	return 0
 }
 
-func (x *AgentThread_ListRequest) GetSortOrder() AgentThread_SortOrder {
-	if x != nil {
-		return x.SortOrder
-	}
-	return AgentThread_SORT_ORDER_UNSPECIFIED
-}
-
 type AgentThread_ListResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// last_active and expires_at are unset: GetRequest answers them.
 	Threads []*AgentThread_Thread `protobuf:"bytes,1,rep,name=threads,proto3" json:"threads,omitempty"`
-	// Empty when exhausted.
+	// Pass it back as page_token to get the next page; empty means the end.
 	NextPageToken string `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1118,7 +1110,7 @@ var File_agent_livekit_agent_thread_proto protoreflect.FileDescriptor
 
 const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\n" +
-	" agent/livekit_agent_thread.proto\x12\rlivekit.agent\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a!agent/livekit_agent_session.proto\x1a\x14logger/options.proto\"\xae\x0f\n" +
+	" agent/livekit_agent_thread.proto\x12\rlivekit.agent\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a!agent/livekit_agent_session.proto\x1a\x14logger/options.proto\"\xe8\x0e\n" +
 	"\vAgentThread\x1a\xfe\x01\n" +
 	"\rCreateRequest\x12\x19\n" +
 	"\x05scope\x18\x01 \x01(\tB\x03\xc0P\x01R\x05scope\x12]\n" +
@@ -1131,14 +1123,12 @@ const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a6\n" +
 	"\n" +
 	"GetRequest\x12(\n" +
-	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x1a\xa2\x01\n" +
+	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x1a]\n" +
 	"\vListRequest\x12\x19\n" +
 	"\x05scope\x18\x01 \x01(\tB\x03\xc0P\x01R\x05scope\x12\x1d\n" +
 	"\n" +
 	"page_token\x18\x02 \x01(\tR\tpageToken\x12\x14\n" +
-	"\x05limit\x18\x03 \x01(\x05R\x05limit\x12C\n" +
-	"\n" +
-	"sort_order\x18\x04 \x01(\x0e2$.livekit.agent.AgentThread.SortOrderR\tsortOrder\x1as\n" +
+	"\x05limit\x18\x03 \x01(\x05R\x05limit\x1as\n" +
 	"\fListResponse\x12;\n" +
 	"\athreads\x18\x01 \x03(\v2!.livekit.agent.AgentThread.ThreadR\athreads\x12&\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\x1a\x8d\x02\n" +
@@ -1264,27 +1254,26 @@ var file_agent_livekit_agent_thread_proto_goTypes = []any{
 var file_agent_livekit_agent_thread_proto_depIdxs = []int32{
 	15, // 0: livekit.agent.AgentThread.CreateRequest.attributes:type_name -> livekit.agent.AgentThread.CreateRequest.AttributesEntry
 	21, // 1: livekit.agent.AgentThread.CreateRequest.idle_ttl:type_name -> google.protobuf.Duration
-	0,  // 2: livekit.agent.AgentThread.ListRequest.sort_order:type_name -> livekit.agent.AgentThread.SortOrder
-	14, // 3: livekit.agent.AgentThread.ListResponse.threads:type_name -> livekit.agent.AgentThread.Thread
-	16, // 4: livekit.agent.AgentThread.UpdateRequest.attributes:type_name -> livekit.agent.AgentThread.UpdateRequest.AttributesEntry
-	21, // 5: livekit.agent.AgentThread.UpdateRequest.idle_ttl:type_name -> google.protobuf.Duration
-	0,  // 6: livekit.agent.AgentThread.GetItemsRequest.sort_order:type_name -> livekit.agent.AgentThread.SortOrder
-	13, // 7: livekit.agent.AgentThread.GetItemsResponse.items:type_name -> livekit.agent.AgentThread.Item
-	22, // 8: livekit.agent.AgentThread.Item.item:type_name -> livekit.agent.ChatContext.ChatItem
-	17, // 9: livekit.agent.AgentThread.Thread.attributes:type_name -> livekit.agent.AgentThread.Thread.AttributesEntry
-	23, // 10: livekit.agent.AgentThread.Thread.created_at:type_name -> google.protobuf.Timestamp
-	23, // 11: livekit.agent.AgentThread.Thread.last_active:type_name -> google.protobuf.Timestamp
-	23, // 12: livekit.agent.AgentThread.Thread.expires_at:type_name -> google.protobuf.Timestamp
-	21, // 13: livekit.agent.AgentThread.Thread.idle_ttl:type_name -> google.protobuf.Duration
-	1,  // 14: livekit.agent.AgentTask.GetTasksRequest.status:type_name -> livekit.agent.AgentTask.Status
-	20, // 15: livekit.agent.AgentTask.GetTasksResponse.tasks:type_name -> livekit.agent.AgentTask.Task
-	1,  // 16: livekit.agent.AgentTask.Task.status:type_name -> livekit.agent.AgentTask.Status
-	23, // 17: livekit.agent.AgentTask.Task.updated_at:type_name -> google.protobuf.Timestamp
-	18, // [18:18] is the sub-list for method output_type
-	18, // [18:18] is the sub-list for method input_type
-	18, // [18:18] is the sub-list for extension type_name
-	18, // [18:18] is the sub-list for extension extendee
-	0,  // [0:18] is the sub-list for field type_name
+	14, // 2: livekit.agent.AgentThread.ListResponse.threads:type_name -> livekit.agent.AgentThread.Thread
+	16, // 3: livekit.agent.AgentThread.UpdateRequest.attributes:type_name -> livekit.agent.AgentThread.UpdateRequest.AttributesEntry
+	21, // 4: livekit.agent.AgentThread.UpdateRequest.idle_ttl:type_name -> google.protobuf.Duration
+	0,  // 5: livekit.agent.AgentThread.GetItemsRequest.sort_order:type_name -> livekit.agent.AgentThread.SortOrder
+	13, // 6: livekit.agent.AgentThread.GetItemsResponse.items:type_name -> livekit.agent.AgentThread.Item
+	22, // 7: livekit.agent.AgentThread.Item.item:type_name -> livekit.agent.ChatContext.ChatItem
+	17, // 8: livekit.agent.AgentThread.Thread.attributes:type_name -> livekit.agent.AgentThread.Thread.AttributesEntry
+	23, // 9: livekit.agent.AgentThread.Thread.created_at:type_name -> google.protobuf.Timestamp
+	23, // 10: livekit.agent.AgentThread.Thread.last_active:type_name -> google.protobuf.Timestamp
+	23, // 11: livekit.agent.AgentThread.Thread.expires_at:type_name -> google.protobuf.Timestamp
+	21, // 12: livekit.agent.AgentThread.Thread.idle_ttl:type_name -> google.protobuf.Duration
+	1,  // 13: livekit.agent.AgentTask.GetTasksRequest.status:type_name -> livekit.agent.AgentTask.Status
+	20, // 14: livekit.agent.AgentTask.GetTasksResponse.tasks:type_name -> livekit.agent.AgentTask.Task
+	1,  // 15: livekit.agent.AgentTask.Task.status:type_name -> livekit.agent.AgentTask.Status
+	23, // 16: livekit.agent.AgentTask.Task.updated_at:type_name -> google.protobuf.Timestamp
+	17, // [17:17] is the sub-list for method output_type
+	17, // [17:17] is the sub-list for method input_type
+	17, // [17:17] is the sub-list for extension type_name
+	17, // [17:17] is the sub-list for extension extendee
+	0,  // [0:17] is the sub-list for field type_name
 }
 
 func init() { file_agent_livekit_agent_thread_proto_init() }
