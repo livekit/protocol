@@ -471,7 +471,19 @@ message DataPacket {
   // sid of the user that sent the message
   string participant_sid = 17;
 
-  // NEXT_ID: 19
+  // The participant that actually sent this packet, when `participant_identity` names a different
+  // participant (an agent sending a text stream or chat message on behalf of another participant).
+  // Set only by the SFU, which clears any value a client sends; unset when `participant_identity` is
+  // the real sender. Available from server protocol 20.
+  oneof sender {
+    // identity of the participant that actually sent this packet
+    string sender_identity = 19;
+    // the participant that actually sent this packet is hidden, so its identity is withheld; only
+    // ever true
+    bool sender_hidden = 20;
+  }
+
+  // NEXT_ID: 21
 }
 
 message EncryptedPacket {
