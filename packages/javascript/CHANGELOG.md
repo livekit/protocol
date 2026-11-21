@@ -1,5 +1,24 @@
 # @livekit/protocol
 
+## 1.54.2
+
+### Patch Changes
+
+- Update the v1 thread schema for shared partitions, ordered history, and millisecond timestamps. - [#1885](https://github.com/livekit/protocol/pull/1885) ([@theomonnom](https://github.com/theomonnom))
+
+- AgentDB.Wire.Error: a numeric code, its name and a description; what each code means is agent-db's. - [#1983](https://github.com/livekit/protocol/pull/1983) ([@theomonnom](https://github.com/theomonnom))
+  AgentDB.Wire: Hello carries client_version; a frame is at most 16 MiB, both ways.
+
+- Dynacast support for data tracks. - [#1662](https://github.com/livekit/protocol/pull/1662) ([@ladvoc](https://github.com/ladvoc))
+
+- Restore function-call metadata on field 7 for approval identities, resumable tool and delegation state, and provider metadata, keeping incompatible legacy field 6 reserved. - [#1885](https://github.com/livekit/protocol/pull/1885) ([@theomonnom](https://github.com/theomonnom))
+
+- Add the `DataChannelRpcConnectionClosed` (1506, "Connection closed") data channel RPC error code, used by the client SDKs when the caller's own room disconnects while a call is in flight - [#1973](https://github.com/livekit/protocol/pull/1973) ([@1egoman](https://github.com/1egoman))
+
+- Raise the SIP header value cap from 1 KB to 4 KB so carrier headers like Twilio's `X-Twilio-CallToken` (Immutable Call Forwarding token with SHAKEN/STIR PASSporTs, >1 KB) pass `CreateSIPParticipant` validation - [#1750](https://github.com/livekit/protocol/pull/1750) ([@rkfshakti](https://github.com/rkfshakti))
+
+- Preserve exact framework A2A task states and optional task labels in thread listings. - [#1885](https://github.com/livekit/protocol/pull/1885) ([@theomonnom](https://github.com/theomonnom))
+
 ## 1.54.1
 
 ### Patch Changes
