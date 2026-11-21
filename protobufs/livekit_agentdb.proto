@@ -46,14 +46,18 @@ message AgentDB {
     string database_id = 1;
   }
 
+  // The project's databases in an unspecified order, stable across pages. A
+  // page may be short or empty while next_page_token is set.
   message ListRequest {
-    int32 page_size = 1;         // server-clamped
-    string page_token = 2;
+    int32 page_size = 1;         // unset is 50; larger is clamped to 100
+    string page_token = 2;       // the previous response's next_page_token
   }
 
   message ListResponse {
+    // tip and expires_at are unset: GetRequest answers them.
     repeated AgentDatabase databases = 1;
-    string next_page_token = 2;  // empty when exhausted
+    // Pass it back as page_token to get the next page; empty means the end.
+    string next_page_token = 2;
   }
 
   // One database, as get and list both report it.

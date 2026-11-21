@@ -341,13 +341,18 @@ func (x *AgentThread_GetRequest) GetThreadId() string {
 	return ""
 }
 
-// The threads of one scope, newest first.
+// Threads in an unspecified order, stable across pages. A page may be short
+// or empty while next_page_token is set.
 type AgentThread_ListRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	Scope string                 `protobuf:"bytes,1,opt,name=scope,proto3" json:"scope,omitempty"`
-	// next_page_token of the previous ListResponse; empty for the first page.
-	PageToken     string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
-	Limit         int32  `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
+	// Empty lists every thread of the project under a project-wide grant, and
+	// the grant's own scope under a scoped one.
+	Scope string `protobuf:"bytes,1,opt,name=scope,proto3" json:"scope,omitempty"`
+	// next_page_token of the previous ListResponse, to get the next page;
+	// empty for the first page. A token from another scope is refused.
+	PageToken string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	// Unset is 50; larger is clamped to 100.
+	Limit         int32 `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -404,9 +409,10 @@ func (x *AgentThread_ListRequest) GetLimit() int32 {
 }
 
 type AgentThread_ListResponse struct {
-	state   protoimpl.MessageState `protogen:"open.v1"`
-	Threads []*AgentThread_Thread  `protobuf:"bytes,1,rep,name=threads,proto3" json:"threads,omitempty"`
-	// Empty when exhausted.
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// last_active and expires_at are unset: GetRequest answers them.
+	Threads []*AgentThread_Thread `protobuf:"bytes,1,rep,name=threads,proto3" json:"threads,omitempty"`
+	// Pass it back as page_token to get the next page; empty means the end.
 	NextPageToken string `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
