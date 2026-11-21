@@ -20,6 +20,7 @@
 package netguard
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net"
@@ -103,6 +104,24 @@ func ReportOnly(
 		err := control(network, address, c)
 		if errors.Is(err, ErrBlockedAddress) {
 			report(address, err)
+			return nil
+		}
+		return err
+	}
+}
+
+// ReportOnlyContext is ReportOnly for net.Dialer.ControlContext, passing the
+// dial context to report. Under http.Transport that context carries the values
+// of the request that started the dial; a request that reuses a pooled
+// connection does not dial, so it is not reported.
+func ReportOnlyContext(
+	control func(network, address string, c syscall.RawConn) error,
+	report func(ctx context.Context, address string, err error),
+) func(ctx context.Context, network, address string, c syscall.RawConn) error {
+	return func(ctx context.Context, network, address string, c syscall.RawConn) error {
+		err := control(network, address, c)
+		if errors.Is(err, ErrBlockedAddress) {
+			report(ctx, address, err)
 			return nil
 		}
 		return err

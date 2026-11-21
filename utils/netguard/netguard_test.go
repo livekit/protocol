@@ -15,7 +15,10 @@
 package netguard
 
 import (
+	"context"
 	"net"
+	"net/http"
+	"net/http/httptest"
 	"net/netip"
 	"syscall"
 	"testing"
@@ -214,6 +217,45 @@ func TestReportOnly(t *testing.T) {
 	require.NoError(t, control("tcp", "8.8.8.8:443", nil))
 	require.Error(t, control("tcp", "not-an-address", nil))
 	require.Len(t, got, 1, "only refused addresses are reported")
+}
+
+func TestReportOnlyContext(t *testing.T) {
+	type destKey struct{}
+	type reported struct {
+		dest, address string
+		err           error
+	}
+	var got []reported
+	control := ReportOnlyContext(BlockInternal, func(ctx context.Context, address string, err error) {
+		dest, _ := ctx.Value(destKey{}).(string)
+		got = append(got, reported{dest, address, err})
+	})
+
+	ctx := context.WithValue(context.Background(), destKey{}, "a")
+	require.NoError(t, control(ctx, "tcp", "169.254.169.254:80", nil))
+	require.NoError(t, control(ctx, "tcp", "8.8.8.8:443", nil))
+	require.Error(t, control(ctx, "tcp", "not-an-address", nil))
+	require.Len(t, got, 1, "only refused addresses are reported")
+	require.Equal(t, "a", got[0].dest)
+	require.Equal(t, "169.254.169.254:80", got[0].address)
+	require.ErrorIs(t, got[0].err, ErrBlockedAddress)
+
+	// http.Transport passes the request's context values to the dial.
+	srv := httptest.NewServer(http.HandlerFunc(func(http.ResponseWriter, *http.Request) {}))
+	defer srv.Close()
+	dialer := &net.Dialer{ControlContext: control}
+	client := &http.Client{Transport: &http.Transport{DialContext: dialer.DialContext}}
+	defer client.CloseIdleConnections()
+
+	got = nil
+	req, err := http.NewRequestWithContext(context.WithValue(ctx, destKey{}, "b"), http.MethodGet, srv.URL, nil)
+	require.NoError(t, err)
+	resp, err := client.Do(req)
+	require.NoError(t, err, "a report-only refusal must not fail the request")
+	require.NoError(t, resp.Body.Close())
+	require.Len(t, got, 1)
+	require.Equal(t, "b", got[0].dest)
+	require.Equal(t, srv.Listener.Addr().String(), got[0].address)
 }
 
 func TestBlockInternal(t *testing.T) {
