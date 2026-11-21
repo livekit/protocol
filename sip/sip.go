@@ -452,6 +452,7 @@ func matchAddrMasks(addr string, host string, masks []string) bool {
 	if err != nil {
 		return true
 	}
+	ip = ip.Unmap()
 	masks = filterInvalidAddrMasks(masks)
 	if len(masks) == 0 {
 		return true
