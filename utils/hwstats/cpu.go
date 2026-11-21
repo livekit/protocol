@@ -246,8 +246,21 @@ func (c *CPUStats) sampleCPUIdle() {
 		return
 	}
 
+	// The platform measures idle against its own CPU count: the cgroup quota, or
+	// runtime.NumCPU() with no limit or no cgroup (then usage is host-wide, so other
+	// processes count against the request too). When NumCPU is a CPU request below that
+	// count, express idle against the request: request minus used, clamped at 0
+	// (monitorProcesses uses the same formula but doesn't clamp).
+	// With a Kubernetes limit, a request above the quota comes from the Downward API
+	// rounding requests.cpu up, so it is under one CPU above it. Idle is left as
+	// measured there, so a saturated cgroup still reads as full load.
+	if platformCPU, nCPU := c.platform.numCPU(), c.NumCPU(); nCPU < platformCPU {
+		used := platformCPU - idle
+		idle = max(0, nCPU-used)
+	}
+
 	c.storeIdle(idle)
-	idleRatio := idle / c.platform.numCPU()
+	idleRatio := idle / c.NumCPU()
 
 	if idleRatio < 0.1 {
 		c.warningThrottle(func() { logger.Infow("high cpu load", "load", 1-idleRatio) })
