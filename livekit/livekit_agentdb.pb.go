@@ -626,10 +626,14 @@ func (x *AgentDB_ExportRequest) GetDatabaseId() string {
 }
 
 type AgentDB_ExportResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	DownloadUrl   string                 `protobuf:"bytes,1,opt,name=download_url,json=downloadUrl,proto3" json:"download_url,omitempty"` // pre-authenticated object-storage URL
-	ExpiresAt     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`       // of the URL, not the database
-	Tip           int64                  `protobuf:"varint,3,opt,name=tip,proto3" json:"tip,omitempty"`                                   // what the export is consistent at
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// A link to agent-db that streams the SQLite image; holding it is enough
+	// to download, so treat it as a secret. Start the download before
+	// expires_at; a started download runs to its end, and a Range resume is
+	// served until expires_at.
+	DownloadUrl   string                 `protobuf:"bytes,1,opt,name=download_url,json=downloadUrl,proto3" json:"download_url,omitempty"`
+	ExpiresAt     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"` // of the link, not the database
+	Tip           int64                  `protobuf:"varint,3,opt,name=tip,proto3" json:"tip,omitempty"`                             // what the export is consistent at
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

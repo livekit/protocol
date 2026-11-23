@@ -609,6 +609,24 @@ func TestAgentDatabaseGrantChecks(t *testing.T) {
 	require.Equal(t, "DB_1", grants.AgentDatabase.DatabaseIDs[0])
 }
 
+func TestAgentDatabaseExportGrantRoundTrips(t *testing.T) {
+	t.Parallel()
+
+	g := &AgentDatabaseExportGrant{Project: "p_1", DatabaseID: "DB_1", Life: "l1", Base: "base-1.db", ExpiresAt: 1700000300}
+	token, err := NewAccessToken("key", "secret-that-is-long-enough-for-hs256").SetAgentDatabaseExportGrant(g).ToJWT()
+	require.NoError(t, err)
+	v, err := ParseAPIToken(token)
+	require.NoError(t, err)
+	_, grants, err := v.Verify("secret-that-is-long-enough-for-hs256")
+	require.NoError(t, err)
+	require.Equal(t, g, grants.AgentDatabaseExport)
+
+	clone := grants.Clone()
+	require.NotSame(t, grants.AgentDatabaseExport, clone.AgentDatabaseExport)
+	clone.AgentDatabaseExport.Base = "base-2.db"
+	require.Equal(t, "base-1.db", grants.AgentDatabaseExport.Base)
+}
+
 func TestAgentThreadGrantCloneIndependent(t *testing.T) {
 	t.Parallel()
 

@@ -76,8 +76,12 @@ message AgentDB {
   }
 
   message ExportResponse {
-    string download_url = 1;     // pre-authenticated object-storage URL
-    google.protobuf.Timestamp expires_at = 2;  // of the URL, not the database
+    // A link to agent-db that streams the SQLite image; holding it is enough
+    // to download, so treat it as a secret. Start the download before
+    // expires_at; a started download runs to its end, and a Range resume is
+    // served until expires_at.
+    string download_url = 1;
+    google.protobuf.Timestamp expires_at = 2;  // of the link, not the database
     int64 tip = 3;               // what the export is consistent at
   }
 

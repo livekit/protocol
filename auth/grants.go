@@ -171,6 +171,9 @@ type ClaimGrants struct {
 	AgentEndpoint *AgentEndpointGrant `json:"agentEndpoint,omitempty"`
 	AgentThread   *AgentThreadGrant   `json:"agentThread,omitempty"`
 	AgentDatabase *AgentDatabaseGrant `json:"agentDatabase,omitempty"`
+	// AgentDatabaseExport makes the token a link to one export of an agent
+	// database; agent-db signs it and serves it.
+	AgentDatabaseExport *AgentDatabaseExportGrant `json:"agentDatabaseExport,omitempty"`
 	// Room configuration to use if this participant initiates the room
 	RoomConfig *RoomConfiguration `json:"roomConfig,omitempty"`
 	// Cloud-only, config preset to use
@@ -220,6 +223,7 @@ func (c *ClaimGrants) Clone() *ClaimGrants {
 	clone.AgentEndpoint = c.AgentEndpoint.Clone()
 	clone.AgentThread = c.AgentThread.Clone()
 	clone.AgentDatabase = c.AgentDatabase.Clone()
+	clone.AgentDatabaseExport = c.AgentDatabaseExport.Clone()
 	clone.Attributes = maps.Clone(c.Attributes)
 	clone.RoomConfig = c.RoomConfig.Clone()
 	if len(c.KindDetails) > 0 {
@@ -245,6 +249,7 @@ func (c *ClaimGrants) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	e.AddObject("AgentEndpoint", c.AgentEndpoint)
 	e.AddObject("AgentThread", c.AgentThread)
 	e.AddObject("AgentDatabase", c.AgentDatabase)
+	e.AddObject("AgentDatabaseExport", c.AgentDatabaseExport)
 	e.AddObject("RoomConfig", logger.Proto((*livekit.RoomConfiguration)(c.RoomConfig)))
 	e.AddString("RoomPreset", c.RoomPreset)
 	return nil
@@ -876,6 +881,44 @@ func (s *AgentDatabaseGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	e.AddBool("Delete", s.Delete)
 	e.AddBool("Create", s.Create)
 	e.AddBool("List", s.List)
+	return nil
+}
+
+// ------------------------------------------------------------------
+
+// AgentDatabaseExportGrant is a link to the image of one base of one agent
+// database life: holding the token is enough to download it until ExpiresAt.
+// agent-db mints it, signed with the key of the call that asked for the
+// export, and refuses it once the key, the database or that life is gone.
+type AgentDatabaseExportGrant struct {
+	Project    string `json:"project"`
+	DatabaseID string `json:"databaseId"`
+	Life       string `json:"life"`
+	// Base is the base's name in the life's folder.
+	Base string `json:"base"`
+	// ExpiresAt is when the link stops being served, in Unix seconds,
+	// checked without the token verifier's leeway.
+	ExpiresAt int64 `json:"expiresAt"`
+}
+
+func (s *AgentDatabaseExportGrant) Clone() *AgentDatabaseExportGrant {
+	if s == nil {
+		return nil
+	}
+	clone := *s
+	return &clone
+}
+
+func (s *AgentDatabaseExportGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
+	if s == nil {
+		return nil
+	}
+
+	e.AddString("Project", s.Project)
+	e.AddString("DatabaseID", s.DatabaseID)
+	e.AddString("Life", s.Life)
+	e.AddString("Base", s.Base)
+	e.AddInt64("ExpiresAt", s.ExpiresAt)
 	return nil
 }
 
