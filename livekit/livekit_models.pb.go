@@ -3497,15 +3497,14 @@ type DataPacket struct {
 	// from the same participant. Only the SFU sets these three fields, and it overwrites all of them
 	// on every packet it forwards, replacing any values a client sent:
 	//   - data_stream_actual_sender_overwritten false: the SFU predates these fields, ignore the other two
-	//   - overwritten true, data_stream_actual_sender_different false: participant_identity is the real
-	//     sender
-	//   - overwritten true, data_stream_actual_sender_different true: an agent sent this packet on behalf
+	//   - overwritten true, data_stream_sending_on_behalf false: participant_identity is the real sender
+	//   - overwritten true, data_stream_sending_on_behalf true: an agent sent this packet on behalf
 	//     of participant_identity, and data_stream_actual_sender_identity is the agent ("" if hidden).
 	//     The SFU only allows this for text stream headers and encrypted packets.
 	//
-	// actual_sender_different without overwritten is invalid and must be treated as if neither were set.
+	// sending_on_behalf without overwritten is invalid and must be treated as if neither were set.
 	DataStreamActualSenderOverwritten bool   `protobuf:"varint,19,opt,name=data_stream_actual_sender_overwritten,json=dataStreamActualSenderOverwritten,proto3" json:"data_stream_actual_sender_overwritten,omitempty"`
-	DataStreamActualSenderDifferent   bool   `protobuf:"varint,20,opt,name=data_stream_actual_sender_different,json=dataStreamActualSenderDifferent,proto3" json:"data_stream_actual_sender_different,omitempty"`
+	DataStreamSendingOnBehalf         bool   `protobuf:"varint,20,opt,name=data_stream_sending_on_behalf,json=dataStreamSendingOnBehalf,proto3" json:"data_stream_sending_on_behalf,omitempty"`
 	DataStreamActualSenderIdentity    string `protobuf:"bytes,21,opt,name=data_stream_actual_sender_identity,json=dataStreamActualSenderIdentity,proto3" json:"data_stream_actual_sender_identity,omitempty"`
 	unknownFields                     protoimpl.UnknownFields
 	sizeCache                         protoimpl.SizeCache
@@ -3709,9 +3708,9 @@ func (x *DataPacket) GetDataStreamActualSenderOverwritten() bool {
 	return false
 }
 
-func (x *DataPacket) GetDataStreamActualSenderDifferent() bool {
+func (x *DataPacket) GetDataStreamSendingOnBehalf() bool {
 	if x != nil {
-		return x.DataStreamActualSenderDifferent
+		return x.DataStreamSendingOnBehalf
 	}
 	return false
 }
@@ -7217,7 +7216,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\vMODE_UNUSED\x10\x00\x12 \n" +
 	"\x1cONE_SPATIAL_LAYER_PER_STREAM\x10\x01\x12&\n" +
 	"\"MULTIPLE_SPATIAL_LAYERS_PER_STREAM\x10\x02\x123\n" +
-	"/ONE_SPATIAL_LAYER_PER_STREAM_INCOMPLETE_RTCP_SR\x10\x03\"\xf8\t\n" +
+	"/ONE_SPATIAL_LAYER_PER_STREAM_INCOMPLETE_RTCP_SR\x10\x03\"\xec\t\n" +
 	"\n" +
 	"DataPacket\x120\n" +
 	"\x04kind\x18\x01 \x01(\x0e2\x18.livekit.DataPacket.KindB\x02\x18\x01R\x04kind\x121\n" +
@@ -7240,8 +7239,8 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x10encrypted_packet\x18\x12 \x01(\v2\x18.livekit.EncryptedPacketH\x00R\x0fencryptedPacket\x12\x1a\n" +
 	"\bsequence\x18\x10 \x01(\rR\bsequence\x12'\n" +
 	"\x0fparticipant_sid\x18\x11 \x01(\tR\x0eparticipantSid\x12P\n" +
-	"%data_stream_actual_sender_overwritten\x18\x13 \x01(\bR!dataStreamActualSenderOverwritten\x12L\n" +
-	"#data_stream_actual_sender_different\x18\x14 \x01(\bR\x1fdataStreamActualSenderDifferent\x12J\n" +
+	"%data_stream_actual_sender_overwritten\x18\x13 \x01(\bR!dataStreamActualSenderOverwritten\x12@\n" +
+	"\x1ddata_stream_sending_on_behalf\x18\x14 \x01(\bR\x19dataStreamSendingOnBehalf\x12J\n" +
 	"\"data_stream_actual_sender_identity\x18\x15 \x01(\tR\x1edataStreamActualSenderIdentity\"\x1f\n" +
 	"\x04Kind\x12\f\n" +
 	"\bRELIABLE\x10\x00\x12\t\n" +
