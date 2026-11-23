@@ -475,12 +475,14 @@ message DataPacket {
   // from the same participant. Only the SFU sets these three fields, and it overwrites all of them
   // on every packet it forwards, replacing any values a client sent:
   //  - data_stream_actual_sender_overwritten false: the SFU predates these fields, ignore the other two
-  //  - overwritten true, data_stream_sending_on_behalf false: participant_identity is the real sender
-  //  - overwritten true, data_stream_sending_on_behalf true: an agent sent this packet on behalf of
-  //    participant_identity, and data_stream_actual_sender_identity is the agent ("" if hidden)
-  // sending_on_behalf without overwritten is invalid and must be treated as if neither were set.
+  //  - overwritten true, data_stream_actual_sender_different false: participant_identity is the real
+  //    sender
+  //  - overwritten true, data_stream_actual_sender_different true: an agent sent this packet on behalf
+  //    of participant_identity, and data_stream_actual_sender_identity is the agent ("" if hidden).
+  //    The SFU only allows this for text stream headers and encrypted packets.
+  // actual_sender_different without overwritten is invalid and must be treated as if neither were set.
   bool data_stream_actual_sender_overwritten = 19;
-  bool data_stream_sending_on_behalf = 20;
+  bool data_stream_actual_sender_different = 20;
   string data_stream_actual_sender_identity = 21;
 
   // NEXT_ID: 22
