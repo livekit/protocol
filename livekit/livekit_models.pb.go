@@ -3493,18 +3493,20 @@ type DataPacket struct {
 	Sequence uint32 `protobuf:"varint,16,opt,name=sequence,proto3" json:"sequence,omitempty"`
 	// sid of the user that sent the message
 	ParticipantSid string `protobuf:"bytes,17,opt,name=participant_sid,json=participantSid,proto3" json:"participant_sid,omitempty"`
-	// The participant that actually sent this packet, when `participant_identity` names a different
-	// participant (an agent sending a text stream or chat message on behalf of another participant).
-	// Set only by the SFU, which clears any value a client sends; unset when `participant_identity` is
-	// the real sender. Available from server protocol 20.
+	// Who actually sent this packet, so receivers can check that every packet of a data stream comes
+	// from the same participant. Only the SFU sets these three fields, and it overwrites all of them
+	// on every packet it forwards, replacing any values a client sent:
+	//   - data_stream_actual_sender_overwritten false: the SFU predates these fields, ignore the other two
+	//   - overwritten true, data_stream_sending_on_behalf false: participant_identity is the real sender
+	//   - overwritten true, data_stream_sending_on_behalf true: an agent sent this packet on behalf of
+	//     participant_identity, and data_stream_actual_sender_identity is the agent ("" if hidden)
 	//
-	// Types that are valid to be assigned to Sender:
-	//
-	//	*DataPacket_SenderIdentity
-	//	*DataPacket_SenderHidden
-	Sender        isDataPacket_Sender `protobuf_oneof:"sender"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	// sending_on_behalf without overwritten is invalid and must be treated as if neither were set.
+	DataStreamActualSenderOverwritten bool   `protobuf:"varint,19,opt,name=data_stream_actual_sender_overwritten,json=dataStreamActualSenderOverwritten,proto3" json:"data_stream_actual_sender_overwritten,omitempty"`
+	DataStreamSendingOnBehalf         bool   `protobuf:"varint,20,opt,name=data_stream_sending_on_behalf,json=dataStreamSendingOnBehalf,proto3" json:"data_stream_sending_on_behalf,omitempty"`
+	DataStreamActualSenderIdentity    string `protobuf:"bytes,21,opt,name=data_stream_actual_sender_identity,json=dataStreamActualSenderIdentity,proto3" json:"data_stream_actual_sender_identity,omitempty"`
+	unknownFields                     protoimpl.UnknownFields
+	sizeCache                         protoimpl.SizeCache
 }
 
 func (x *DataPacket) Reset() {
@@ -3698,29 +3700,25 @@ func (x *DataPacket) GetParticipantSid() string {
 	return ""
 }
 
-func (x *DataPacket) GetSender() isDataPacket_Sender {
+func (x *DataPacket) GetDataStreamActualSenderOverwritten() bool {
 	if x != nil {
-		return x.Sender
-	}
-	return nil
-}
-
-func (x *DataPacket) GetSenderIdentity() string {
-	if x != nil {
-		if x, ok := x.Sender.(*DataPacket_SenderIdentity); ok {
-			return x.SenderIdentity
-		}
-	}
-	return ""
-}
-
-func (x *DataPacket) GetSenderHidden() bool {
-	if x != nil {
-		if x, ok := x.Sender.(*DataPacket_SenderHidden); ok {
-			return x.SenderHidden
-		}
+		return x.DataStreamActualSenderOverwritten
 	}
 	return false
+}
+
+func (x *DataPacket) GetDataStreamSendingOnBehalf() bool {
+	if x != nil {
+		return x.DataStreamSendingOnBehalf
+	}
+	return false
+}
+
+func (x *DataPacket) GetDataStreamActualSenderIdentity() string {
+	if x != nil {
+		return x.DataStreamActualSenderIdentity
+	}
+	return ""
 }
 
 type isDataPacket_Value interface {
@@ -3805,25 +3803,6 @@ func (*DataPacket_StreamChunk) isDataPacket_Value() {}
 func (*DataPacket_StreamTrailer) isDataPacket_Value() {}
 
 func (*DataPacket_EncryptedPacket) isDataPacket_Value() {}
-
-type isDataPacket_Sender interface {
-	isDataPacket_Sender()
-}
-
-type DataPacket_SenderIdentity struct {
-	// identity of the participant that actually sent this packet
-	SenderIdentity string `protobuf:"bytes,19,opt,name=sender_identity,json=senderIdentity,proto3,oneof"`
-}
-
-type DataPacket_SenderHidden struct {
-	// the participant that actually sent this packet is hidden, so its identity is withheld; only
-	// ever true
-	SenderHidden bool `protobuf:"varint,20,opt,name=sender_hidden,json=senderHidden,proto3,oneof"`
-}
-
-func (*DataPacket_SenderIdentity) isDataPacket_Sender() {}
-
-func (*DataPacket_SenderHidden) isDataPacket_Sender() {}
 
 type EncryptedPacket struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
@@ -7236,7 +7215,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\vMODE_UNUSED\x10\x00\x12 \n" +
 	"\x1cONE_SPATIAL_LAYER_PER_STREAM\x10\x01\x12&\n" +
 	"\"MULTIPLE_SPATIAL_LAYERS_PER_STREAM\x10\x02\x123\n" +
-	"/ONE_SPATIAL_LAYER_PER_STREAM_INCOMPLETE_RTCP_SR\x10\x03\"\xe8\b\n" +
+	"/ONE_SPATIAL_LAYER_PER_STREAM_INCOMPLETE_RTCP_SR\x10\x03\"\xec\t\n" +
 	"\n" +
 	"DataPacket\x120\n" +
 	"\x04kind\x18\x01 \x01(\x0e2\x18.livekit.DataPacket.KindB\x02\x18\x01R\x04kind\x121\n" +
@@ -7258,14 +7237,14 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x0estream_trailer\x18\x0f \x01(\v2\x1b.livekit.DataStream.TrailerH\x00R\rstreamTrailer\x12E\n" +
 	"\x10encrypted_packet\x18\x12 \x01(\v2\x18.livekit.EncryptedPacketH\x00R\x0fencryptedPacket\x12\x1a\n" +
 	"\bsequence\x18\x10 \x01(\rR\bsequence\x12'\n" +
-	"\x0fparticipant_sid\x18\x11 \x01(\tR\x0eparticipantSid\x12)\n" +
-	"\x0fsender_identity\x18\x13 \x01(\tH\x01R\x0esenderIdentity\x12%\n" +
-	"\rsender_hidden\x18\x14 \x01(\bH\x01R\fsenderHidden\"\x1f\n" +
+	"\x0fparticipant_sid\x18\x11 \x01(\tR\x0eparticipantSid\x12P\n" +
+	"%data_stream_actual_sender_overwritten\x18\x13 \x01(\bR!dataStreamActualSenderOverwritten\x12@\n" +
+	"\x1ddata_stream_sending_on_behalf\x18\x14 \x01(\bR\x19dataStreamSendingOnBehalf\x12J\n" +
+	"\"data_stream_actual_sender_identity\x18\x15 \x01(\tR\x1edataStreamActualSenderIdentity\"\x1f\n" +
 	"\x04Kind\x12\f\n" +
 	"\bRELIABLE\x10\x00\x12\t\n" +
 	"\x05LOSSY\x10\x01B\a\n" +
-	"\x05valueB\b\n" +
-	"\x06sender\"\xaa\x01\n" +
+	"\x05value\"\xaa\x01\n" +
 	"\x0fEncryptedPacket\x12A\n" +
 	"\x0fencryption_type\x18\x01 \x01(\x0e2\x18.livekit.Encryption.TypeR\x0eencryptionType\x12\x0e\n" +
 	"\x02iv\x18\x02 \x01(\fR\x02iv\x12\x1b\n" +
@@ -7974,8 +7953,6 @@ func file_livekit_models_proto_init() {
 		(*DataPacket_StreamChunk)(nil),
 		(*DataPacket_StreamTrailer)(nil),
 		(*DataPacket_EncryptedPacket)(nil),
-		(*DataPacket_SenderIdentity)(nil),
-		(*DataPacket_SenderHidden)(nil),
 	}
 	file_livekit_models_proto_msgTypes[22].OneofWrappers = []any{
 		(*EncryptedPacketPayload_User)(nil),

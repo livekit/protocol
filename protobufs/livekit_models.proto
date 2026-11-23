@@ -471,19 +471,19 @@ message DataPacket {
   // sid of the user that sent the message
   string participant_sid = 17;
 
-  // The participant that actually sent this packet, when `participant_identity` names a different
-  // participant (an agent sending a text stream or chat message on behalf of another participant).
-  // Set only by the SFU, which clears any value a client sends; unset when `participant_identity` is
-  // the real sender. Available from server protocol 20.
-  oneof sender {
-    // identity of the participant that actually sent this packet
-    string sender_identity = 19;
-    // the participant that actually sent this packet is hidden, so its identity is withheld; only
-    // ever true
-    bool sender_hidden = 20;
-  }
+  // Who actually sent this packet, so receivers can check that every packet of a data stream comes
+  // from the same participant. Only the SFU sets these three fields, and it overwrites all of them
+  // on every packet it forwards, replacing any values a client sent:
+  //  - data_stream_actual_sender_overwritten false: the SFU predates these fields, ignore the other two
+  //  - overwritten true, data_stream_sending_on_behalf false: participant_identity is the real sender
+  //  - overwritten true, data_stream_sending_on_behalf true: an agent sent this packet on behalf of
+  //    participant_identity, and data_stream_actual_sender_identity is the agent ("" if hidden)
+  // sending_on_behalf without overwritten is invalid and must be treated as if neither were set.
+  bool data_stream_actual_sender_overwritten = 19;
+  bool data_stream_sending_on_behalf = 20;
+  string data_stream_actual_sender_identity = 21;
 
-  // NEXT_ID: 21
+  // NEXT_ID: 22
 }
 
 message EncryptedPacket {

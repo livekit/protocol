@@ -3,4 +3,4 @@
 "@livekit/protocol": patch
 ---
 
-Add a `sender` oneof (`sender_identity` / `sender_hidden`) to `DataPacket`, which the SFU sets to the real sender when an agent sends a packet on behalf of another participant
+Add `data_stream_actual_sender_overwritten`, `data_stream_sending_on_behalf` and `data_stream_actual_sender_identity` to `DataPacket`, which the SFU sets so receivers know the real sender of a packet an agent sent on behalf of another participant
