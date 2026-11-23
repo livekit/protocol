@@ -612,7 +612,7 @@ func TestAgentDatabaseGrantChecks(t *testing.T) {
 func TestAgentDatabaseExportGrantRoundTrips(t *testing.T) {
 	t.Parallel()
 
-	g := &AgentDatabaseExportGrant{Project: "p_1", DatabaseID: "DB_1", Life: "l1", Base: "base-1.db", ExpiresAt: 1700000300}
+	g := &AgentDatabaseExportGrant{Project: "p_1", DatabaseID: "DB_1", Life: "l1", Base: "base-1.db", BaseBytes: 4096, ExpiresAt: 1700000300}
 	token, err := NewAccessToken("key", "secret-that-is-long-enough-for-hs256").SetAgentDatabaseExportGrant(g).ToJWT()
 	require.NoError(t, err)
 	v, err := ParseAPIToken(token)
