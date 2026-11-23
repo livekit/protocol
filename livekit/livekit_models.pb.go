@@ -3500,7 +3500,8 @@ type DataPacket struct {
 	//   - overwritten true, data_stream_sending_on_behalf false: participant_identity is the real sender
 	//   - overwritten true, data_stream_sending_on_behalf true: an agent sent this packet on behalf
 	//     of participant_identity, and data_stream_actual_sender_identity is the agent ("" if hidden).
-	//     The SFU only allows this for text stream headers and encrypted packets.
+	//     The SFU only allows this for text stream headers, encrypted packets and (for backwards
+	//     compatibility) chat messages.
 	//
 	// sending_on_behalf without overwritten is invalid and must be treated as if neither were set.
 	DataStreamActualSenderOverwritten bool   `protobuf:"varint,19,opt,name=data_stream_actual_sender_overwritten,json=dataStreamActualSenderOverwritten,proto3" json:"data_stream_actual_sender_overwritten,omitempty"`
