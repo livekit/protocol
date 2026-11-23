@@ -1,5 +1,34 @@
 # github.com/livekit/protocol
 
+## 1.54.2
+
+### Patch Changes
+
+- Update the v1 thread schema for shared partitions, ordered history, and millisecond timestamps. - [#1885](https://github.com/livekit/protocol/pull/1885) ([@theomonnom](https://github.com/theomonnom))
+
+- AgentDB.Wire.Error: a numeric code, its name and a description; what each code means is agent-db's. - [#1983](https://github.com/livekit/protocol/pull/1983) ([@theomonnom](https://github.com/theomonnom))
+  AgentDB.Wire: Hello carries client_version; a frame is at most 16 MiB, both ways.
+
+- auth: `VerifyWithKey` verifies a token with the algorithm its key picks, HS256 for a version 1 key and EdDSA for a version 2 key, and `NewAccessTokenWithPrivateKey` signs a token with EdDSA. `ParseAPIToken` accepts EdDSA tokens; `Verify` stays HS256 only. A version 2 token names its API key in the `kid` header and has the `typ` header `livekit-v2+jwt`, and `VerifyWithKey` refuses one that does not. Version 2 keys are not supported by any server yet, so do not use them - [#1985](https://github.com/livekit/protocol/pull/1985) ([@davidzhao](https://github.com/davidzhao))
+
+- Tag `address` on `ClientInfo` as PII, so `logger.Proto` redacts the client IP - [#1999](https://github.com/livekit/protocol/pull/1999) ([@anunaym14](https://github.com/anunaym14))
+
+- Dynacast support for data tracks. - [#1662](https://github.com/livekit/protocol/pull/1662) ([@ladvoc](https://github.com/ladvoc))
+
+- Restore function-call metadata on field 7 for approval identities, resumable tool and delegation state, and provider metadata, keeping incompatible legacy field 6 reserved. - [#1885](https://github.com/livekit/protocol/pull/1885) ([@theomonnom](https://github.com/theomonnom))
+
+- Add `utils/netguard`, a check that refuses internal and reserved addresses, for clients that connect to destinations a caller supplies: `IsBlockedIP`, `CheckHost`, `BlockInternal`, `NewDialControl`, `ParseCIDR`, and `ReportOnly` and `ReportOnlyContext`, which report what a check would refuse and let the connection go ahead. Existing packages are unchanged. - [#2004](https://github.com/livekit/protocol/pull/2004) ([@pksgit](https://github.com/pksgit))
+
+- Raise the SIP header value cap from 1 KB to 4 KB so carrier headers like Twilio's `X-Twilio-CallToken` (Immutable Call Forwarding token with SHAKEN/STIR PASSporTs, >1 KB) pass `CreateSIPParticipant` validation - [#1750](https://github.com/livekit/protocol/pull/1750) ([@rkfshakti](https://github.com/rkfshakti))
+
+- Preserve exact framework A2A task states and optional task labels in thread listings. - [#1885](https://github.com/livekit/protocol/pull/1885) ([@theomonnom](https://github.com/theomonnom))
+
+- Add `TimeoutQueue.Oldest`, when the least recently reset item was reset, so a caller can sleep until it times out instead of polling - [#1988](https://github.com/livekit/protocol/pull/1988) ([@paulwe](https://github.com/paulwe))
+
+- webhook: export `RedactSendError` for a host whose webhook owners are tenants. It gives the same text for a destination the dial guard refuses and one that does not resolve, and in any other error replaces each address in the private and reserved ranges that `BlockInternal` refuses. `SendError` itself is unchanged. `NewDialControl` is exported so a caller can add blocked and allowed ranges. The dial guard refuses any zoned address that is not explicitly allowed. An IPv4-mapped range in `blocked_cidrs` or `allowed_cidrs` matches as its IPv4 range, and one shorter than 96 bits is rejected. A blocked range also catches the IPv4 address that a NAT64, v4-compatible or 6to4 address embeds - [#2000](https://github.com/livekit/protocol/pull/2000) ([@anunaym14](https://github.com/anunaym14))
+
+- Tag `whatsapp_biz_opaque_callback_data` on `DialWhatsAppCallRequest` and `AcceptWhatsAppCallRequest` as PII, so `logger.Proto` redacts it - [#1990](https://github.com/livekit/protocol/pull/1990) ([@anunaym14](https://github.com/anunaym14))
+
 ## 1.54.1
 
 ### Patch Changes
