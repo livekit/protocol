@@ -894,9 +894,13 @@ type AgentDatabaseExportGrant struct {
 	Project    string `json:"project"`
 	DatabaseID string `json:"databaseId"`
 	Life       string `json:"life"`
-	// Base is the base's name in the life's folder, BaseBytes its length.
-	Base      string `json:"base"`
-	BaseBytes int64  `json:"baseBytes"`
+	// Base is the base's name in the life's folder. BaseObjectBytes is the
+	// stored length of that object (not of the image, which its footer
+	// holds): a read of a base starts at its trailer, at the object's end,
+	// and object storage offers no size lookup or suffix range on every
+	// backend.
+	Base            string `json:"base"`
+	BaseObjectBytes int64  `json:"baseObjectBytes"`
 	// ExpiresAt is when the link stops being served, in Unix seconds,
 	// checked without the token verifier's leeway.
 	ExpiresAt int64 `json:"expiresAt"`
@@ -919,7 +923,7 @@ func (s *AgentDatabaseExportGrant) MarshalLogObject(e zapcore.ObjectEncoder) err
 	e.AddString("DatabaseID", s.DatabaseID)
 	e.AddString("Life", s.Life)
 	e.AddString("Base", s.Base)
-	e.AddInt64("BaseBytes", s.BaseBytes)
+	e.AddInt64("BaseObjectBytes", s.BaseObjectBytes)
 	e.AddInt64("ExpiresAt", s.ExpiresAt)
 	return nil
 }
