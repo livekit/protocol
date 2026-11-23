@@ -29,10 +29,8 @@ import (
 // Receive reads and verifies incoming webhook is signed with key/secret pair
 // closes body after reading
 func Receive(r *http.Request, provider auth.KeyProvider) ([]byte, error) {
-	defer r.Body.Close()
-	data, err := io.ReadAll(r.Body)
-	if err != nil {
-		return nil, err
+	if r.Body != nil {
+		defer r.Body.Close()
 	}
 
 	authToken := r.Header.Get(authHeader)
@@ -53,6 +51,14 @@ func Receive(r *http.Request, provider auth.KeyProvider) ([]byte, error) {
 	_, claims, err := v.Verify(secret)
 	if err != nil {
 		return nil, err
+	}
+
+	var data []byte
+	if r.Body != nil {
+		data, err = io.ReadAll(r.Body)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// verify checksum

@@ -16,9 +16,13 @@ package webhook
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/base64"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
+	"net/http/httptest"
 	"strings"
 	"sync"
 	"testing"
@@ -1164,4 +1168,92 @@ func TestDeliveryLogs(t *testing.T) {
 			check(t, log.String())
 		})
 	}
+}
+
+type trackingBody struct {
+	data   []byte
+	offset int
+	read   bool
+	closed bool
+}
+
+func (b *trackingBody) Read(p []byte) (int, error) {
+	b.read = true
+	if b.offset >= len(b.data) {
+		return 0, io.EOF
+	}
+	n := copy(p, b.data[b.offset:])
+	b.offset += n
+	return n, nil
+}
+
+func (b *trackingBody) Close() error {
+	b.closed = true
+	return nil
+}
+
+func TestReceiveVerifiesAuthBeforeReadingBody(t *testing.T) {
+	t.Run("missing auth header does not read body", func(t *testing.T) {
+		body := &trackingBody{data: []byte(`{"event":"room_started"}`)}
+		req := httptest.NewRequest(http.MethodPost, "/webhook", body)
+
+		_, err := Receive(req, authProvider)
+		require.ErrorIs(t, err, ErrNoAuthHeader)
+		require.False(t, body.read)
+		require.True(t, body.closed)
+	})
+
+	t.Run("invalid signature does not read body", func(t *testing.T) {
+		token, err := auth.NewAccessToken(testAPIKey, "wrongsecret").
+			SetValidFor(time.Minute).
+			SetSha256("unused").
+			ToJWT()
+		require.NoError(t, err)
+
+		body := &trackingBody{data: []byte(`{"event":"room_started"}`)}
+		req := httptest.NewRequest(http.MethodPost, "/webhook", body)
+		req.Header.Set(authHeader, token)
+
+		_, err = Receive(req, authProvider)
+		require.Error(t, err)
+		require.False(t, body.read)
+		require.True(t, body.closed)
+	})
+
+	t.Run("nil body with valid signature returns empty slice", func(t *testing.T) {
+		sum := sha256.Sum256(nil)
+		token, err := auth.NewAccessToken(testAPIKey, testAPISecret).
+			SetValidFor(time.Minute).
+			SetSha256(base64.StdEncoding.EncodeToString(sum[:])).
+			ToJWT()
+		require.NoError(t, err)
+
+		req := httptest.NewRequest(http.MethodPost, "/webhook", nil)
+		req.Body = nil
+		req.Header.Set(authHeader, token)
+
+		data, err := Receive(req, authProvider)
+		require.NoError(t, err)
+		require.Empty(t, data)
+	})
+
+	t.Run("valid signature reads body and verifies checksum", func(t *testing.T) {
+		payload := []byte(`{"event":"room_started"}`)
+		sum := sha256.Sum256(payload)
+		token, err := auth.NewAccessToken(testAPIKey, testAPISecret).
+			SetValidFor(time.Minute).
+			SetSha256(base64.StdEncoding.EncodeToString(sum[:])).
+			ToJWT()
+		require.NoError(t, err)
+
+		body := &trackingBody{data: payload}
+		req := httptest.NewRequest(http.MethodPost, "/webhook", body)
+		req.Header.Set(authHeader, token)
+
+		data, err := Receive(req, authProvider)
+		require.NoError(t, err)
+		require.Equal(t, payload, data)
+		require.True(t, body.read)
+		require.True(t, body.closed)
+	})
 }
