@@ -1316,17 +1316,19 @@ func (x *StartSession) GetTokenExpiresAt() int64 {
 
 // room info that should not be returned to clients
 type RoomInternal struct {
-	state             protoimpl.MessageState `protogen:"open.v1"`
-	TrackEgress       *AutoTrackEgress       `protobuf:"bytes,1,opt,name=track_egress,json=trackEgress,proto3" json:"track_egress,omitempty"`
-	ParticipantEgress *AutoParticipantEgress `protobuf:"bytes,2,opt,name=participant_egress,json=participantEgress,proto3" json:"participant_egress,omitempty"`
-	PlayoutDelay      *PlayoutDelay          `protobuf:"bytes,3,opt,name=playout_delay,json=playoutDelay,proto3" json:"playout_delay,omitempty"`
-	AgentDispatches   []*RoomAgentDispatch   `protobuf:"bytes,5,rep,name=agent_dispatches,json=agentDispatches,proto3" json:"agent_dispatches,omitempty"`
-	SyncStreams       bool                   `protobuf:"varint,4,opt,name=sync_streams,json=syncStreams,proto3" json:"sync_streams,omitempty"`
-	ReplayEnabled     bool                   `protobuf:"varint,6,opt,name=replay_enabled,json=replayEnabled,proto3" json:"replay_enabled,omitempty"`
-	ExportRoom        bool                   `protobuf:"varint,7,opt,name=export_room,json=exportRoom,proto3" json:"export_room,omitempty"`
-	Tags              map[string]string      `protobuf:"bytes,8,rep,name=tags,proto3" json:"tags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	state                   protoimpl.MessageState   `protogen:"open.v1"`
+	TrackEgress             *AutoTrackEgress         `protobuf:"bytes,1,opt,name=track_egress,json=trackEgress,proto3" json:"track_egress,omitempty"`
+	ParticipantEgress       *AutoParticipantEgress   `protobuf:"bytes,2,opt,name=participant_egress,json=participantEgress,proto3" json:"participant_egress,omitempty"`
+	PlayoutDelay            *PlayoutDelay            `protobuf:"bytes,3,opt,name=playout_delay,json=playoutDelay,proto3" json:"playout_delay,omitempty"`
+	AgentDispatches         []*RoomAgentDispatch     `protobuf:"bytes,5,rep,name=agent_dispatches,json=agentDispatches,proto3" json:"agent_dispatches,omitempty"`
+	SyncStreams             bool                     `protobuf:"varint,4,opt,name=sync_streams,json=syncStreams,proto3" json:"sync_streams,omitempty"`
+	ReplayEnabled           bool                     `protobuf:"varint,6,opt,name=replay_enabled,json=replayEnabled,proto3" json:"replay_enabled,omitempty"`
+	ExportRoom              bool                     `protobuf:"varint,7,opt,name=export_room,json=exportRoom,proto3" json:"export_room,omitempty"`
+	Tags                    map[string]string        `protobuf:"bytes,8,rep,name=tags,proto3" json:"tags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	ParticipantEgressConfig *ParticipantEgressConfig `protobuf:"bytes,9,opt,name=participant_egress_config,json=participantEgressConfig,proto3" json:"participant_egress_config,omitempty"`
+	TrackEgressConfig       *TrackEgressConfig       `protobuf:"bytes,10,opt,name=track_egress_config,json=trackEgressConfig,proto3" json:"track_egress_config,omitempty"`
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
 }
 
 func (x *RoomInternal) Reset() {
@@ -1411,6 +1413,20 @@ func (x *RoomInternal) GetExportRoom() bool {
 func (x *RoomInternal) GetTags() map[string]string {
 	if x != nil {
 		return x.Tags
+	}
+	return nil
+}
+
+func (x *RoomInternal) GetParticipantEgressConfig() *ParticipantEgressConfig {
+	if x != nil {
+		return x.ParticipantEgressConfig
+	}
+	return nil
+}
+
+func (x *RoomInternal) GetTrackEgressConfig() *TrackEgressConfig {
+	if x != nil {
+		return x.TrackEgressConfig
 	}
 	return nil
 }
@@ -1613,7 +1629,7 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"\x1ause_single_peer_connection\x18\x18 \x01(\bR\x17useSinglePeerConnection\x12(\n" +
 	"\x10token_expires_at\x18\x1a \x01(\x03R\x0etokenExpiresAtB\x1c\n" +
 	"\x1a_auto_subscribe_data_trackB\x19\n" +
-	"\x17_subscriber_allow_pause\"\xf6\x03\n" +
+	"\x17_subscriber_allow_pause\"\xa0\x05\n" +
 	"\fRoomInternal\x12;\n" +
 	"\ftrack_egress\x18\x01 \x01(\v2\x18.livekit.AutoTrackEgressR\vtrackEgress\x12M\n" +
 	"\x12participant_egress\x18\x02 \x01(\v2\x1e.livekit.AutoParticipantEgressR\x11participantEgress\x12:\n" +
@@ -1623,7 +1639,10 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"\x0ereplay_enabled\x18\x06 \x01(\bR\rreplayEnabled\x12\x1f\n" +
 	"\vexport_room\x18\a \x01(\bR\n" +
 	"exportRoom\x123\n" +
-	"\x04tags\x18\b \x03(\v2\x1f.livekit.RoomInternal.TagsEntryR\x04tags\x1a7\n" +
+	"\x04tags\x18\b \x03(\v2\x1f.livekit.RoomInternal.TagsEntryR\x04tags\x12\\\n" +
+	"\x19participant_egress_config\x18\t \x01(\v2 .livekit.ParticipantEgressConfigR\x17participantEgressConfig\x12J\n" +
+	"\x13track_egress_config\x18\n" +
+	" \x01(\v2\x1a.livekit.TrackEgressConfigR\x11trackEgressConfig\x1a7\n" +
 	"\tTagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xa9\x01\n" +
@@ -1666,26 +1685,28 @@ func file_livekit_internal_proto_rawDescGZIP() []byte {
 var file_livekit_internal_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
 var file_livekit_internal_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_livekit_internal_proto_goTypes = []any{
-	(NodeType)(0),                 // 0: livekit.NodeType
-	(NodeState)(0),                // 1: livekit.NodeState
-	(ICECandidateType)(0),         // 2: livekit.ICECandidateType
-	(*Node)(nil),                  // 3: livekit.Node
-	(*NodeStats)(nil),             // 4: livekit.NodeStats
-	(*NodeStatsRate)(nil),         // 5: livekit.NodeStatsRate
-	(*StartSession)(nil),          // 6: livekit.StartSession
-	(*RoomInternal)(nil),          // 7: livekit.RoomInternal
-	(*ICEConfig)(nil),             // 8: livekit.ICEConfig
-	nil,                           // 9: livekit.RoomInternal.TagsEntry
-	(*ClientInfo)(nil),            // 10: livekit.ClientInfo
-	(ReconnectReason)(0),          // 11: livekit.ReconnectReason
-	(*CreateRoomRequest)(nil),     // 12: livekit.CreateRoomRequest
-	(*AddTrackRequest)(nil),       // 13: livekit.AddTrackRequest
-	(*SessionDescription)(nil),    // 14: livekit.SessionDescription
-	(*SyncState)(nil),             // 15: livekit.SyncState
-	(*AutoTrackEgress)(nil),       // 16: livekit.AutoTrackEgress
-	(*AutoParticipantEgress)(nil), // 17: livekit.AutoParticipantEgress
-	(*PlayoutDelay)(nil),          // 18: livekit.PlayoutDelay
-	(*RoomAgentDispatch)(nil),     // 19: livekit.RoomAgentDispatch
+	(NodeType)(0),                   // 0: livekit.NodeType
+	(NodeState)(0),                  // 1: livekit.NodeState
+	(ICECandidateType)(0),           // 2: livekit.ICECandidateType
+	(*Node)(nil),                    // 3: livekit.Node
+	(*NodeStats)(nil),               // 4: livekit.NodeStats
+	(*NodeStatsRate)(nil),           // 5: livekit.NodeStatsRate
+	(*StartSession)(nil),            // 6: livekit.StartSession
+	(*RoomInternal)(nil),            // 7: livekit.RoomInternal
+	(*ICEConfig)(nil),               // 8: livekit.ICEConfig
+	nil,                             // 9: livekit.RoomInternal.TagsEntry
+	(*ClientInfo)(nil),              // 10: livekit.ClientInfo
+	(ReconnectReason)(0),            // 11: livekit.ReconnectReason
+	(*CreateRoomRequest)(nil),       // 12: livekit.CreateRoomRequest
+	(*AddTrackRequest)(nil),         // 13: livekit.AddTrackRequest
+	(*SessionDescription)(nil),      // 14: livekit.SessionDescription
+	(*SyncState)(nil),               // 15: livekit.SyncState
+	(*AutoTrackEgress)(nil),         // 16: livekit.AutoTrackEgress
+	(*AutoParticipantEgress)(nil),   // 17: livekit.AutoParticipantEgress
+	(*PlayoutDelay)(nil),            // 18: livekit.PlayoutDelay
+	(*RoomAgentDispatch)(nil),       // 19: livekit.RoomAgentDispatch
+	(*ParticipantEgressConfig)(nil), // 20: livekit.ParticipantEgressConfig
+	(*TrackEgressConfig)(nil),       // 21: livekit.TrackEgressConfig
 }
 var file_livekit_internal_proto_depIdxs = []int32{
 	4,  // 0: livekit.Node.stats:type_name -> livekit.NodeStats
@@ -1703,13 +1724,15 @@ var file_livekit_internal_proto_depIdxs = []int32{
 	18, // 12: livekit.RoomInternal.playout_delay:type_name -> livekit.PlayoutDelay
 	19, // 13: livekit.RoomInternal.agent_dispatches:type_name -> livekit.RoomAgentDispatch
 	9,  // 14: livekit.RoomInternal.tags:type_name -> livekit.RoomInternal.TagsEntry
-	2,  // 15: livekit.ICEConfig.preference_subscriber:type_name -> livekit.ICECandidateType
-	2,  // 16: livekit.ICEConfig.preference_publisher:type_name -> livekit.ICECandidateType
-	17, // [17:17] is the sub-list for method output_type
-	17, // [17:17] is the sub-list for method input_type
-	17, // [17:17] is the sub-list for extension type_name
-	17, // [17:17] is the sub-list for extension extendee
-	0,  // [0:17] is the sub-list for field type_name
+	20, // 15: livekit.RoomInternal.participant_egress_config:type_name -> livekit.ParticipantEgressConfig
+	21, // 16: livekit.RoomInternal.track_egress_config:type_name -> livekit.TrackEgressConfig
+	2,  // 17: livekit.ICEConfig.preference_subscriber:type_name -> livekit.ICECandidateType
+	2,  // 18: livekit.ICEConfig.preference_publisher:type_name -> livekit.ICECandidateType
+	19, // [19:19] is the sub-list for method output_type
+	19, // [19:19] is the sub-list for method input_type
+	19, // [19:19] is the sub-list for extension type_name
+	19, // [19:19] is the sub-list for extension extendee
+	0,  // [0:19] is the sub-list for field type_name
 }
 
 func init() { file_livekit_internal_proto_init() }
