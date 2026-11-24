@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap/zapcore"
 
 	"github.com/livekit/protocol/livekit"
 )
@@ -622,6 +623,20 @@ func TestAgentThreadGrantCloneIndependent(t *testing.T) {
 	clone.AgentThread.ThreadIDs = append(clone.AgentThread.ThreadIDs, "AT_3")
 	require.True(t, grants.AgentThread.Write)
 	require.Equal(t, []string{"AT_1"}, grants.AgentThread.ThreadIDs)
+}
+
+func TestObservabilityGrantCloneAndLog(t *testing.T) {
+	t.Parallel()
+
+	grants := &ClaimGrants{Observability: &ObservabilityGrant{ClientWrite: true}}
+	clone := grants.Clone()
+	require.NotSame(t, grants.Observability, clone.Observability)
+	clone.Observability.ClientWrite = false
+	require.True(t, grants.Observability.ClientWrite)
+
+	enc := zapcore.NewMapObjectEncoder()
+	require.NoError(t, grants.Observability.MarshalLogObject(enc))
+	require.Equal(t, map[string]any{"Write": false, "ClientWrite": true}, enc.Fields)
 }
 
 func TestUpdateFromPermissionKeepsAgent(t *testing.T) {
