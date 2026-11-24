@@ -67,6 +67,8 @@ message SignalRequest {
     StoreDataBlobRequest store_data_blob_request = 22;
     // Retrieve a stored data blob.
     GetDataBlobRequest get_data_blob_request = 23;
+    // Explicit publication removal for media transports without SDP.
+    UnpublishTrackRequest unpublish_track = 24;
   }
 }
 
@@ -264,6 +266,8 @@ message JoinResponse {
   repeated Codec enabled_publish_codecs = 14;
   // when set, client should attempt to establish publish peer connection when joining room to speed up publishing
   bool fast_publish = 15;
+  // Present only when MoQ was explicitly selected during WebSocket join.
+  MoQTransportInfo moq = 16;
 }
 
 message ReconnectResponse {
@@ -273,6 +277,8 @@ message ReconnectResponse {
 
   // last sequence number of reliable message received before resuming
   uint32 last_message_seq = 4;
+  // Fresh attachment credential; an existing healthy MoQ connection stays attached.
+  MoQTransportInfo moq = 5;
 }
 
 message TrackPublishedResponse {
@@ -679,4 +685,20 @@ message WrappedJoinRequest {
 message MediaSectionsRequirement {
   uint32 num_audios = 1;
   uint32 num_videos = 2;
+}
+
+message UnpublishTrackRequest {
+  string track_sid = 1;
+}
+
+// Binds the MoQ data plane to the participant that joined over WebSocket.
+message MoQTransportInfo {
+  string endpoint = 1;
+  // Short-lived bearer credential; never log or persist this value.
+  string attachment_token = 2 [(logger.sensitivity) = SENSITIVITY_SECRET];
+  string profile = 3;
+  string participant_sid = 4;
+  uint64 generation = 5;
+  int64 expires_at = 6; // Unix seconds
+  string namespace_prefix = 7;
 }

@@ -206,7 +206,9 @@ message StartSession {
   // API key that issued the join token, for correlating sessions with the key
   string api_key = 27;
 
-  // NEXT ID: 28
+  bool use_moq_transport = 28;
+
+  // NEXT ID: 29
 }
 
 // room info that should not be returned to clients
