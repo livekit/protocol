@@ -198,6 +198,7 @@ func FromZapLogger(log *zap.Logger, conf *Config, opts ...ZapLoggerOption) (ZapL
 		zc.root.Refresh()
 		return nil
 	})
+	startConfigWatchFromEnv(conf)
 	for _, opt := range opts {
 		opt(zc)
 	}
