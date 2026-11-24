@@ -650,6 +650,8 @@ message ConnectionSettings {
   optional bool subscriber_allow_pause = 3;
   bool disable_ice_lite = 4;
   optional bool auto_subscribe_data_track = 5;
+  // preferred ICE candidate protocol, UDP means no preference
+  CandidateProtocol candidate_protocol = 6;
 }
 
 message JoinRequest {

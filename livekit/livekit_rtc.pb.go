@@ -5038,8 +5038,10 @@ type ConnectionSettings struct {
 	SubscriberAllowPause   *bool                  `protobuf:"varint,3,opt,name=subscriber_allow_pause,json=subscriberAllowPause,proto3,oneof" json:"subscriber_allow_pause,omitempty"`
 	DisableIceLite         bool                   `protobuf:"varint,4,opt,name=disable_ice_lite,json=disableIceLite,proto3" json:"disable_ice_lite,omitempty"`
 	AutoSubscribeDataTrack *bool                  `protobuf:"varint,5,opt,name=auto_subscribe_data_track,json=autoSubscribeDataTrack,proto3,oneof" json:"auto_subscribe_data_track,omitempty"`
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
+	// preferred ICE candidate protocol, UDP means no preference
+	CandidateProtocol CandidateProtocol `protobuf:"varint,6,opt,name=candidate_protocol,json=candidateProtocol,proto3,enum=livekit.CandidateProtocol" json:"candidate_protocol,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *ConnectionSettings) Reset() {
@@ -5105,6 +5107,13 @@ func (x *ConnectionSettings) GetAutoSubscribeDataTrack() bool {
 		return *x.AutoSubscribeDataTrack
 	}
 	return false
+}
+
+func (x *ConnectionSettings) GetCandidateProtocol() CandidateProtocol {
+	if x != nil {
+		return x.CandidateProtocol
+	}
+	return CandidateProtocol_UDP
 }
 
 type JoinRequest struct {
@@ -5829,13 +5838,14 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x0fINVALID_REQUEST\x10\vB\t\n" +
 	"\arequest\".\n" +
 	"\x0fTrackSubscribed\x12\x1b\n" +
-	"\ttrack_sid\x18\x01 \x01(\tR\btrackSid\"\xc2\x02\n" +
+	"\ttrack_sid\x18\x01 \x01(\tR\btrackSid\"\x8d\x03\n" +
 	"\x12ConnectionSettings\x12%\n" +
 	"\x0eauto_subscribe\x18\x01 \x01(\bR\rautoSubscribe\x12'\n" +
 	"\x0fadaptive_stream\x18\x02 \x01(\bR\x0eadaptiveStream\x129\n" +
 	"\x16subscriber_allow_pause\x18\x03 \x01(\bH\x00R\x14subscriberAllowPause\x88\x01\x01\x12(\n" +
 	"\x10disable_ice_lite\x18\x04 \x01(\bR\x0edisableIceLite\x12>\n" +
-	"\x19auto_subscribe_data_track\x18\x05 \x01(\bH\x01R\x16autoSubscribeDataTrack\x88\x01\x01B\x19\n" +
+	"\x19auto_subscribe_data_track\x18\x05 \x01(\bH\x01R\x16autoSubscribeDataTrack\x88\x01\x01\x12I\n" +
+	"\x12candidate_protocol\x18\x06 \x01(\x0e2\x1a.livekit.CandidateProtocolR\x11candidateProtocolB\x19\n" +
 	"\x17_subscriber_allow_pauseB\x1c\n" +
 	"\x1a_auto_subscribe_data_track\"\xf9\x05\n" +
 	"\vJoinRequest\x124\n" +
@@ -6134,21 +6144,22 @@ var file_livekit_rtc_proto_depIdxs = []int32{
 	33,  // 126: livekit.RequestResponse.update_video_track:type_name -> livekit.UpdateLocalVideoTrack
 	11,  // 127: livekit.RequestResponse.publish_data_track:type_name -> livekit.PublishDataTrackRequest
 	13,  // 128: livekit.RequestResponse.unpublish_data_track:type_name -> livekit.UnpublishDataTrackRequest
-	99,  // 129: livekit.JoinRequest.client_info:type_name -> livekit.ClientInfo
-	63,  // 130: livekit.JoinRequest.connection_settings:type_name -> livekit.ConnectionSettings
-	72,  // 131: livekit.JoinRequest.participant_attributes:type_name -> livekit.JoinRequest.ParticipantAttributesEntry
-	10,  // 132: livekit.JoinRequest.add_track_requests:type_name -> livekit.AddTrackRequest
-	23,  // 133: livekit.JoinRequest.publisher_offer:type_name -> livekit.SessionDescription
-	100, // 134: livekit.JoinRequest.reconnect_reason:type_name -> livekit.ReconnectReason
-	52,  // 135: livekit.JoinRequest.sync_state:type_name -> livekit.SyncState
-	6,   // 136: livekit.WrappedJoinRequest.compression:type_name -> livekit.WrappedJoinRequest.Compression
-	67,  // 137: livekit.DataTrackSubscriberHandles.SubHandlesEntry.value:type_name -> livekit.DataTrackSubscriberHandles.PublishedDataTrack
-	101, // 138: livekit.UpdateDataSubscription.Update.options:type_name -> livekit.DataTrackSubscriptionOptions
-	139, // [139:139] is the sub-list for method output_type
-	139, // [139:139] is the sub-list for method input_type
-	139, // [139:139] is the sub-list for extension type_name
-	139, // [139:139] is the sub-list for extension extendee
-	0,   // [0:139] is the sub-list for field type_name
+	3,   // 129: livekit.ConnectionSettings.candidate_protocol:type_name -> livekit.CandidateProtocol
+	99,  // 130: livekit.JoinRequest.client_info:type_name -> livekit.ClientInfo
+	63,  // 131: livekit.JoinRequest.connection_settings:type_name -> livekit.ConnectionSettings
+	72,  // 132: livekit.JoinRequest.participant_attributes:type_name -> livekit.JoinRequest.ParticipantAttributesEntry
+	10,  // 133: livekit.JoinRequest.add_track_requests:type_name -> livekit.AddTrackRequest
+	23,  // 134: livekit.JoinRequest.publisher_offer:type_name -> livekit.SessionDescription
+	100, // 135: livekit.JoinRequest.reconnect_reason:type_name -> livekit.ReconnectReason
+	52,  // 136: livekit.JoinRequest.sync_state:type_name -> livekit.SyncState
+	6,   // 137: livekit.WrappedJoinRequest.compression:type_name -> livekit.WrappedJoinRequest.Compression
+	67,  // 138: livekit.DataTrackSubscriberHandles.SubHandlesEntry.value:type_name -> livekit.DataTrackSubscriberHandles.PublishedDataTrack
+	101, // 139: livekit.UpdateDataSubscription.Update.options:type_name -> livekit.DataTrackSubscriptionOptions
+	140, // [140:140] is the sub-list for method output_type
+	140, // [140:140] is the sub-list for method input_type
+	140, // [140:140] is the sub-list for extension type_name
+	140, // [140:140] is the sub-list for extension extendee
+	0,   // [0:140] is the sub-list for field type_name
 }
 
 func init() { file_livekit_rtc_proto_init() }
