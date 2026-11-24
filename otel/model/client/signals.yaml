@@ -1,0 +1,453 @@
+# Client signals, under the names the client cores emit today (rust-sdks livekit-telemetry
+# SPEC.md, and the JS port in client-sdk-js). Events are OTLP log records with `event_name`; spans
+# are one attempt each.
+#
+# Event annotations (`annotations.livekit`):
+#   severity: OTLP severity_text values the event is sent with
+#   body:     what the log body carries (an event without a body of its own sends its name)
+# Span annotations:
+#   checkpoints:        span events, in order: {name, requirement: required|best_effort, brief}
+#   checkpoint_pattern: a dynamic checkpoint name, as {name, pattern (regex), brief}
+#   limits:             caps per span; what goes past them is counted in the OTLP
+#                       dropped_events_count / dropped_attributes_count fields
+groups:
+  # --- Log events -------------------------------------------------------------------------
+  - id: event.lk.ping
+    type: event
+    name: lk.ping
+    stability: development
+    brief: Pipeline smoke test.
+    note: Never emitted in production paths. Not sent by the JS port.
+    annotations:
+      livekit: {severity: [INFO], body: The event name.}
+    attributes:
+      - ref: lk.ping.seq
+        requirement_level: recommended
+
+  - id: event.lk.telemetry.report
+    type: event
+    name: lk.telemetry.report
+    stability: development
+    brief: Self-telemetry; counts since the previous report.
+    note: >
+      Sent after a loss, failure, refusal, capped hold or disk error, and once at shutdown as the
+      session summary, so fleet-wide success rates have denominators. A record of the process, not
+      of a room session. Losses by policy (a project that receives nothing, the opt-out) are never
+      reported.
+    annotations:
+      livekit:
+        severity: [INFO]
+        body: >
+          Rust core: a one-line summary, e.g. `telemetry: 4 batches sent (20480 B), 0 failed,
+          0 dropped, 0 cached`. JS port: the event name.
+    attributes:
+      - ref: lk.telemetry.uploads.sent
+        requirement_level: required
+      - ref: lk.telemetry.uploads.bytes
+        requirement_level: required
+      - ref: lk.telemetry.uploads.failed
+        requirement_level: required
+      - ref: lk.telemetry.cache.batches
+        requirement_level: required
+      - ref: lk.telemetry.uploads.timeouts
+        requirement_level: {conditionally_required: When non-zero.}
+      - ref: lk.telemetry.uploads.unauthorized
+        requirement_level: {conditionally_required: When non-zero.}
+      - ref: lk.telemetry.holds.capped
+        requirement_level: {conditionally_required: When non-zero.}
+      - ref: lk.telemetry.cache.write_errors
+        requirement_level: {conditionally_required: When non-zero.}
+      - ref: lk.telemetry.dropped.queue_full
+        requirement_level: {conditionally_required: When non-zero.}
+      - ref: lk.telemetry.dropped.cache_error
+        requirement_level: {conditionally_required: When non-zero.}
+      - ref: lk.telemetry.dropped.cache_full
+        requirement_level: {conditionally_required: When non-zero.}
+      - ref: lk.telemetry.dropped.expired
+        requirement_level: {conditionally_required: When non-zero.}
+      - ref: lk.telemetry.dropped.corrupt
+        requirement_level: {conditionally_required: When non-zero.}
+      - ref: lk.telemetry.dropped.invalid
+        requirement_level: {conditionally_required: When non-zero.}
+      - ref: lk.telemetry.dropped.rejected
+        requirement_level: {conditionally_required: When non-zero.}
+      - ref: lk.telemetry.dropped.oversized
+        requirement_level: {conditionally_required: When non-zero.}
+      - ref: lk.telemetry.dropped.throttled
+        requirement_level: {conditionally_required: When non-zero (Rust core only).}
+      - ref: lk.telemetry.dropped.rate_limited
+        requirement_level: {conditionally_required: When non-zero.}
+      - ref: lk.telemetry.cache.list_errors
+        requirement_level: {conditionally_required: When non-zero (JS port only).}
+      - ref: lk.telemetry.cache.read_errors
+        requirement_level: {conditionally_required: When non-zero (JS port only).}
+      - ref: lk.telemetry.cache.delete_errors
+        requirement_level: {conditionally_required: When non-zero (JS port only).}
+      - ref: lk.telemetry.dropped.unattributed
+        requirement_level: {conditionally_required: When non-zero (JS port only).}
+
+  - id: event.lk.device.thermal.changed
+    type: event
+    name: lk.device.thermal.changed
+    stability: development
+    brief: Thermal state changed.
+    note: >
+      Sent once with the initial reading, then on each change. A platform without a thermal
+      source sends none. A device event: a record of the process, not of a room session.
+    annotations:
+      livekit: {severity: [INFO], body: "Display line, e.g. `thermal: serious` (Rust core); the event name (JS port)."}
+    attributes:
+      - ref: lk.device.thermal.state
+        requirement_level: required
+
+  - id: event.lk.device.low_power.changed
+    type: event
+    name: lk.device.low_power.changed
+    stability: development
+    brief: Low Power Mode changed.
+    note: Sent once with the initial reading, then on each change; never where the platform has no source.
+    annotations:
+      livekit: {severity: [INFO], body: "Display line, e.g. `low power mode: on` (Rust core); the event name (JS port)."}
+    attributes:
+      - ref: lk.device.low_power.enabled
+        requirement_level: required
+
+  - id: event.lk.device.app_state.changed
+    type: event
+    name: lk.device.app_state.changed
+    stability: development
+    brief: The app moved to the foreground or background.
+    note: Sent once with the initial state, then on each change. All platforms.
+    annotations:
+      livekit: {severity: [INFO], body: "Display line, e.g. `app: background` (Rust core); the event name (JS port)."}
+    attributes:
+      - ref: lk.device.app_state
+        requirement_level: required
+
+  - id: event.lk.device.memory.changed
+    type: event
+    name: lk.device.memory.changed
+    stability: development
+    brief: Memory pressure changed.
+    note: Sent once with the initial reading, then on each change.
+    annotations:
+      livekit: {severity: [INFO], body: "Display line, e.g. `memory pressure: warning` (Rust core); the event name (JS port)."}
+    attributes:
+      - ref: lk.device.memory.pressure
+        requirement_level: required
+
+  - id: event.lk.device.network.changed
+    type: event
+    name: lk.device.network.changed
+    stability: development
+    brief: The network path changed.
+    note: >
+      Sent once with the initial state, then when any of its attributes changes. All platforms. A
+      platform that cannot read the connection's details (a browser without the Network
+      Information API) sends only `network.connection.type`, as `unknown` or `unavailable`.
+    annotations:
+      livekit: {severity: [INFO], body: "Display line, e.g. `network: cell, expensive` (Rust core); the event name (JS port)."}
+    attributes:
+      - ref: network.connection.type
+        requirement_level: required
+        note: >
+          Clients also send `vpn`, `bluetooth` and `other`, which are not OTel members; `unknown`
+          when the platform cannot tell, `unavailable` when offline.
+        examples: ["wifi", "cell"]
+      - ref: lk.device.network.expensive
+        requirement_level: {conditionally_required: When the platform reports it.}
+      - ref: lk.device.network.constrained
+        requirement_level: {conditionally_required: When the platform reports it.}
+
+  - id: event.lk.device.battery.changed
+    type: event
+    name: lk.device.battery.changed
+    stability: development
+    brief: Charging changed, or the level crossed 20 % or 10 % unplugged.
+    note: Never per percent; silent where the level is unknown. iOS and Android; not sent by the JS port.
+    annotations:
+      livekit: {severity: [INFO], body: "Display line, e.g. `battery: 18%` or `battery: 64%, charging`."}
+    attributes:
+      - ref: lk.device.battery.level
+        requirement_level: required
+      - ref: lk.device.battery.charging
+        requirement_level: required
+
+  - id: event.lk.device.audio_route.changed
+    type: event
+    name: lk.device.audio_route.changed
+    stability: development
+    brief: The audio route changed.
+    note: iOS; Android from its audio device callbacks; optional elsewhere. Not sent by the JS port.
+    annotations:
+      livekit: {severity: [INFO], body: "Display line, e.g. `audio route: speaker (old_device_unavailable)`."}
+    attributes:
+      - ref: lk.device.audio_route.outputs
+        requirement_level: required
+      - ref: lk.device.audio_route.reason
+        requirement_level: required
+
+  - id: event.lk.device.audio.interruption
+    type: event
+    name: lk.device.audio.interruption
+    stability: development
+    brief: An audio session interruption began or ended.
+    note: iOS; Android from audio focus loss and gain. Not sent by the JS port.
+    annotations:
+      livekit: {severity: [INFO], body: "Display line, e.g. `audio interruption began`."}
+    attributes:
+      - ref: lk.device.audio.interruption
+        requirement_level: required
+
+  - id: event.lk.device.capture.failed
+    type: event
+    name: lk.device.capture.failed
+    stability: development
+    brief: A capture device failed.
+    note: All platforms.
+    annotations:
+      livekit: {severity: [WARN], body: "Display line, e.g. `capture failed: camera (permission_denied)` (Rust core); the event name (JS port)."}
+    attributes:
+      - ref: lk.device.capture.device
+        requirement_level: required
+      - ref: lk.device.capture.reason
+        requirement_level: required
+
+  - id: event.lk.rtc.stats.sample
+    type: event
+    name: lk.rtc.stats.sample
+    stability: development
+    brief: One RTC stats window for one track and direction.
+    note: >
+      One per track and direction per window, timestamped at the window's end, also closed early
+      when the track ends, at disconnect and at shutdown. Keyed by session and track: two rooms
+      receiving the same track send two windows. Only the track, kind, direction, window and sample
+      count are always present; counters and gauges a platform or direction lacks are omitted.
+    annotations:
+      livekit:
+        severity: [INFO]
+        body: "Display summary, e.g. `video inbound: 33 kbps, loss 0.0%, rtt 0 ms, 10 fps` (Rust core); the event name (JS port)."
+    attributes:
+      - ref: lk.track_id
+        requirement_level: required
+      - ref: lk.track.kind
+        requirement_level: required
+      - ref: lk.track.direction
+        requirement_level: required
+      - ref: lk.rtc.codec
+        requirement_level: {conditionally_required: When known.}
+      - ref: lk.rtc.window_ms
+        requirement_level: required
+      - ref: lk.rtc.samples
+        requirement_level: required
+      - ref: lk.rtc.bytes
+        requirement_level: {conditionally_required: When the stats report it.}
+      - ref: lk.rtc.packets
+        requirement_level: {conditionally_required: When the stats report it.}
+      - ref: lk.rtc.packets_lost
+        requirement_level: {conditionally_required: Inbound.}
+      - ref: lk.rtc.freeze_count
+        requirement_level: {conditionally_required: Inbound video.}
+      - ref: lk.rtc.freezes_duration_ms
+        requirement_level: {conditionally_required: Inbound video.}
+      - ref: lk.rtc.pause_count
+        requirement_level: {conditionally_required: Inbound video.}
+      - ref: lk.rtc.pauses_duration_ms
+        requirement_level: {conditionally_required: Inbound video.}
+      - ref: lk.rtc.concealed_samples
+        requirement_level: {conditionally_required: Inbound audio.}
+      - ref: lk.rtc.silent_concealed_samples
+        requirement_level: {conditionally_required: Inbound audio.}
+      - ref: lk.rtc.concealment_events
+        requirement_level: {conditionally_required: Inbound audio.}
+      - ref: lk.rtc.interruption_count
+        requirement_level: {conditionally_required: Inbound audio.}
+      - ref: lk.rtc.interruptions_duration_ms
+        requirement_level: {conditionally_required: Inbound audio.}
+      - ref: lk.rtc.jitter_buffer_delay_ms
+        requirement_level: {conditionally_required: Inbound.}
+      - ref: lk.rtc.jitter_buffer_emitted_count
+        requirement_level: {conditionally_required: Inbound.}
+      - ref: lk.rtc.quality_limitation.bandwidth_ms
+        requirement_level: {conditionally_required: Outbound video.}
+      - ref: lk.rtc.quality_limitation.cpu_ms
+        requirement_level: {conditionally_required: Outbound video.}
+      - ref: lk.rtc.quality_limitation.other_ms
+        requirement_level: {conditionally_required: Outbound video.}
+      - ref: lk.rtc.jitter_ms.min
+        requirement_level: {conditionally_required: Inbound.}
+      - ref: lk.rtc.jitter_ms.max
+        requirement_level: {conditionally_required: Inbound.}
+      - ref: lk.rtc.jitter_ms.avg
+        requirement_level: {conditionally_required: Inbound.}
+      - ref: lk.rtc.rtt_ms.min
+        requirement_level: {conditionally_required: When the window has readings.}
+      - ref: lk.rtc.rtt_ms.max
+        requirement_level: {conditionally_required: When the window has readings.}
+      - ref: lk.rtc.rtt_ms.avg
+        requirement_level: {conditionally_required: When the window has readings.}
+      - ref: lk.rtc.fps.min
+        requirement_level: {conditionally_required: Video.}
+      - ref: lk.rtc.fps.max
+        requirement_level: {conditionally_required: Video.}
+      - ref: lk.rtc.fps.avg
+        requirement_level: {conditionally_required: Video.}
+      - ref: lk.rtc.audio_level.min
+        requirement_level: {conditionally_required: Inbound audio.}
+      - ref: lk.rtc.audio_level.max
+        requirement_level: {conditionally_required: Inbound audio.}
+      - ref: lk.rtc.audio_level.avg
+        requirement_level: {conditionally_required: Inbound audio.}
+
+  - id: event.lk.room.disconnected
+    type: event
+    name: lk.room.disconnected
+    stability: development
+    brief: The Room left connected for good.
+    note: Once per session, never on a reconnect. INFO when the client hung up (`CLIENT_INITIATED`), WARN otherwise.
+    annotations:
+      livekit: {severity: [INFO, WARN], body: "Display line, e.g. `disconnected: client_initiated` (Rust core); the event name (JS port)."}
+    attributes:
+      - ref: lk.disconnect_reason
+        requirement_level: required
+
+  - id: event.custom
+    type: event
+    name: custom
+    stability: development
+    brief: Namespace of app-defined events, named `custom.<name>` and carrying the app's own attributes.
+    note: >
+      The `custom.` prefix keeps app events from colliding with or spoofing `lk.*` events. An app's
+      attributes, on its events and on the session (correlation attributes such as `app.call_id`),
+      must not use the reserved keys and must stay within the limits; a producer must reject an
+      attribute that breaks either rule, never truncate it, and count it in
+      `lk.telemetry.dropped.invalid`. An event's own attributes override the session's.
+    annotations:
+      livekit:
+        severity: [INFO]
+        body: The event name (`custom.<name>`).
+        reserved: {prefixes: ["lk.", "otel.", "code."], keys: [session.id, error.type]}
+        limits: {name_bytes: 128, key_bytes: 128, string_value_bytes: 1024, attributes_per_event: 64, attributes_per_session: 64}
+
+  # --- Spans: one attempt at an operation; checkpoints are span events without attributes ---
+  - id: span.lk.connect
+    type: span
+    span_kind: client
+    stability: development
+    brief: One connect attempt.
+    note: >
+      Dashboards compute connect phases only from the required checkpoints, which every platform
+      sends in this order; best-effort ones refine a platform's own view and may be missing or
+      ordered differently.
+    annotations:
+      livekit:
+        checkpoints:
+          - {name: ws_open, requirement: required, brief: The signaling WebSocket opened.}
+          - {name: signal, requirement: required, brief: Signaling is up (stamped with ws_open on the web and with join_recv on Swift).}
+          - {name: join_recv, requirement: required, brief: The join response arrived.}
+          - {name: pc_created, requirement: required, brief: The peer connections exist (stamped once the join is adopted).}
+          - {name: early_pc_created, requirement: best_effort, brief: A peer connection was created before the join response (JS port only).}
+          - {name: offer_sent, requirement: best_effort, brief: The publisher's SDP offer went out.}
+          - {name: answer_sent, requirement: best_effort, brief: The subscriber's SDP answer went out.}
+          - {name: engine, requirement: best_effort, brief: The RTC engine is ready (Swift stamps it with pc_connected).}
+          - {name: pc_connected, requirement: best_effort, brief: The primary peer connection connected.}
+          - {name: room_connected, requirement: best_effort, brief: The Room reached the connected state.}
+        limits: {span_events: 128, attributes: 128}
+    attributes:
+      - ref: lk.connect.attempt
+        requirement_level: required
+      - ref: lk.outcome
+        requirement_level: required
+      - ref: error.type
+        requirement_level: {conditionally_required: Only when `lk.outcome` is `error` and the failure has a type.}
+        note: >
+          A type name, never a message, at most 128 bytes, platform-defined: Swift sends
+          `LiveKitError.<numeric code>`, `CancellationError` or the Swift error type. Dashboards
+          group by it per `service.name`. Set only by the SDK, at most once.
+        examples: ["LiveKitError.12", "signal_close"]
+
+  - id: span.lk.reconnect
+    type: span
+    span_kind: client
+    stability: development
+    brief: One reconnect cycle.
+    note: >
+      `cancelled` when `disconnect()` or a newer reconnect wins. Each attempt is a checkpoint
+      named `attempt <n> <mode>`, mirrored by `lk.reconnect.attempts` and `lk.reconnect.mode`.
+    annotations:
+      livekit:
+        checkpoints: []
+        checkpoint_pattern: {name: "attempt <n> <mode>", pattern: "^attempt [1-9][0-9]* (quick|full)$", brief: One reconnect attempt; n counts from 1.}
+        limits: {span_events: 128, attributes: 128}
+    attributes:
+      - ref: lk.reconnect.reason
+        requirement_level: required
+      - ref: lk.reconnect.mode
+        requirement_level: {conditionally_required: After the first attempt.}
+      - ref: lk.reconnect.attempts
+        requirement_level: {conditionally_required: After the first attempt.}
+      - ref: lk.outcome
+        requirement_level: required
+      - ref: error.type
+        requirement_level: {conditionally_required: Only when `lk.outcome` is `error` and the failure has a type.}
+        note: A type name, never a message, at most 128 bytes. Set only by the SDK, at most once.
+        examples: ["reconnect_failed"]
+
+  - id: span.lk.publish
+    type: span
+    span_kind: internal
+    stability: development
+    brief: One track publish.
+    note: >
+      A child of the ambient span when there is one; a publish before the connect completes (a
+      microphone published early) is its own span in the session's trace.
+    annotations:
+      livekit:
+        checkpoints: []
+        limits: {span_events: 128, attributes: 128}
+    attributes:
+      - ref: lk.track.kind
+        requirement_level: required
+      - ref: lk.track_source
+        requirement_level: required
+      - ref: lk.track_id
+        requirement_level: {conditionally_required: On success; the server assigns it.}
+      - ref: lk.outcome
+        requirement_level: required
+      - ref: error.type
+        requirement_level: {conditionally_required: Only when `lk.outcome` is `error` and the failure has a type.}
+        note: A type name, never a message, at most 128 bytes. Set only by the SDK, at most once.
+        examples: ["LiveKitError.12"]
+
+  - id: span.lk.subscribe
+    type: span
+    span_kind: internal
+    stability: development
+    brief: One subscription, from the intent to subscribe to the first media.
+    note: >
+      Starts when the intent exists: a remote publish under autoSubscribe, a manual subscribe, or,
+      for tracks already in the room, the join. Ends `ok` at the first inbound stats reading with
+      bytes; `cancelled` on unsubscribe or unpublish before media; `error` on a subscription
+      failure, or with `error.type = timed_out` when no media came within 30 s, also through a
+      later disconnect. The core owns the span; an SDK only reports the remote track's lifecycle.
+    annotations:
+      livekit:
+        checkpoints:
+          - {name: subscribed, requirement: required, brief: The platform reported the remote track subscribed.}
+          - {name: first_media, requirement: required, brief: The first inbound stats reading with bytes; the span ends ok here.}
+        limits: {span_events: 128, attributes: 128}
+    attributes:
+      - ref: lk.track_id
+        requirement_level: required
+      - ref: lk.track.kind
+        requirement_level: required
+      - ref: lk.track_source
+        requirement_level: required
+      - ref: lk.pii.remote_participant_identity
+        requirement_level: recommended
+      - ref: lk.outcome
+        requirement_level: required
+      - ref: error.type
+        requirement_level: {conditionally_required: Only when `lk.outcome` is `error` and the failure has a type.}
+        note: A type name, never a message, at most 128 bytes. `timed_out` when no media came within 30 s.
+        examples: ["timed_out"]

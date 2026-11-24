@@ -1,0 +1,12 @@
+# expect: livekit_owner
+# The attribute rules cover every definition, not only lk.* keys.
+groups:
+  - id: registry.negative.unprefixed
+    type: attribute_group
+    brief: Negative fixture.
+    attributes:
+      - id: retry_reason
+        type: string
+        stability: development
+        brief: An unprefixed key with no owner.
+        annotations: {livekit: {sensitivity: none}}

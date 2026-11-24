@@ -1,0 +1,12 @@
+# expect: livekit_ref_override
+# A ref that empties chat.item's annotations.
+groups:
+  - id: span.lk.review.ref-empty-annotations
+    type: span
+    span_kind: internal
+    stability: development
+    brief: Review ref override probe.
+    attributes:
+      - ref: chat.item
+        requirement_level: recommended
+        annotations: {}

@@ -52,8 +52,8 @@ jobs:
             go-${{ runner.os }}-${{ hashFiles('go.sum') }}-
             go-${{ runner.os }}-
 
-      - name: Set up gotestfmt
-        run: go install github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@9eae5abc81d6d08f73268741ef4a8b97f29b60d8 # v2.4.1
+      - name: Set up tparse
+        run: go install github.com/mfridman/tparse@ba2512e7be150bfcbd6f6220d517d3741f8f2f75 # v0.18.0
 
       - name: Download Go modules
         run: go mod download
@@ -61,12 +61,14 @@ jobs:
       - name: Lint
         uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9.3.0
         with:
-          version: v2.12.2
+          version: v2.15.0
 
       - name: Test
         run: |
           set -euo pipefail
-          MallocNanoZone=0 go test -race -json -v ./... 2>&1 | gotestfmt
+          # stderr stays out of the pipe: tparse rejects the whole stream if a
+          # non-JSON line follows the first JSON event.
+          MallocNanoZone=0 go test -race -json ./... | tparse -progress
 
       # Only main writes. Pull requests read main's entry, which keeps ~1 GB
       # per PR run out of the repo's 10 GB cache budget.
@@ -78,3 +80,39 @@ jobs:
             ~/.cache/go-build
             ~/go/pkg/mod
           key: ${{ steps.go-cache.outputs.cache-primary-key }}
+
+  javascript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # Same protoc release as generate.yaml and release.yaml, so this builds what a release publishes.
+      - name: Install Protoc
+        uses: arduino/setup-protoc@c65c819552d16ad3c9b72d9dfd5ba5237b9c906b # v3.0.0
+        with:
+          version: "35.1"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # src/gen is not committed, so the release is the first place the JS package is
+      # otherwise built. Building here fails a dependency bump that breaks it on its PR.
+      - name: Build
+        run: pnpm --filter @livekit/protocol run build
+
+      # The bundle leaves its dependencies external, so a missing export from
+      # @bufbuild/protobuf only fails when the published entry points are loaded.
+      - name: Load the built package
+        working-directory: packages/javascript
+        run: |
+          node --input-type=module -e "await import('./dist/index.mjs')"
+          node -e "require('./dist/index.cjs')"

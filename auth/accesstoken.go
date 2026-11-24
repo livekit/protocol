@@ -15,6 +15,7 @@
 package auth
 
 import (
+	"crypto/ed25519"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -37,6 +38,7 @@ const (
 type AccessToken struct {
 	apiKey                    string
 	secret                    string
+	privateKey                ed25519.PrivateKey
 	grant                     ClaimGrants
 	validFor                  time.Duration
 	allowSensitiveCredentials bool
@@ -46,6 +48,17 @@ func NewAccessToken(key string, secret string) *AccessToken {
 	return &AccessToken{
 		apiKey: key,
 		secret: secret,
+	}
+}
+
+// NewAccessTokenWithPrivateKey returns a token that ToJWT signs with EdDSA,
+// for a version 2 key.
+//
+// Do not use it yet: no LiveKit server or SDK supports version 2 keys.
+func NewAccessTokenWithPrivateKey(key string, privateKey ed25519.PrivateKey) *AccessToken {
+	return &AccessToken{
+		apiKey:     key,
+		privateKey: privateKey,
 	}
 }
 
@@ -119,6 +132,11 @@ func (t *AccessToken) SetAgentThreadGrant(grant *AgentThreadGrant) *AccessToken 
 	return t
 }
 
+func (t *AccessToken) SetAgentDatabaseGrant(grant *AgentDatabaseGrant) *AccessToken {
+	t.grant.AgentDatabase = grant
+	return t
+}
+
 func (t *AccessToken) SetMetadata(md string) *AccessToken {
 	t.grant.Metadata = md
 	return t
@@ -180,7 +198,7 @@ func (t *AccessToken) GetGrants() *ClaimGrants {
 }
 
 func (t *AccessToken) ToJWT() (string, error) {
-	if t.apiKey == "" || t.secret == "" {
+	if t.apiKey == "" || (t.secret == "" && len(t.privateKey) != ed25519.PrivateKeySize) {
 		return "", ErrKeysMissing
 	}
 
@@ -205,6 +223,12 @@ func (t *AccessToken) ToJWT() (string, error) {
 			ExpiresAt: jwt.NewNumericDate(now.Add(validFor)),
 		},
 		ClaimGrants: t.grant,
+	}
+	if t.privateKey != nil {
+		token := jwt.NewWithClaims(jwt.SigningMethodEdDSA, claims)
+		token.Header["kid"] = t.apiKey
+		token.Header["typ"] = TokenTypeV2
+		return token.SignedString(t.privateKey)
 	}
 	return jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(t.secret))
 }

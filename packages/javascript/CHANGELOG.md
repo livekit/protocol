@@ -1,5 +1,143 @@
 # @livekit/protocol
 
+## 1.54.2
+
+### Patch Changes
+
+- Update the v1 thread schema for shared partitions, ordered history, and millisecond timestamps. - [#1885](https://github.com/livekit/protocol/pull/1885) ([@theomonnom](https://github.com/theomonnom))
+
+- AgentDB.Wire.Error: a numeric code, its name and a description; what each code means is agent-db's. - [#1983](https://github.com/livekit/protocol/pull/1983) ([@theomonnom](https://github.com/theomonnom))
+  AgentDB.Wire: Hello carries client_version; a frame is at most 16 MiB, both ways.
+
+- Dynacast support for data tracks. - [#1662](https://github.com/livekit/protocol/pull/1662) ([@ladvoc](https://github.com/ladvoc))
+
+- Restore function-call metadata on field 7 for approval identities, resumable tool and delegation state, and provider metadata, keeping incompatible legacy field 6 reserved. - [#1885](https://github.com/livekit/protocol/pull/1885) ([@theomonnom](https://github.com/theomonnom))
+
+- Add the `DataChannelRpcConnectionClosed` (1506, "Connection closed") data channel RPC error code, used by the client SDKs when the caller's own room disconnects while a call is in flight - [#1973](https://github.com/livekit/protocol/pull/1973) ([@1egoman](https://github.com/1egoman))
+
+- Raise the SIP header value cap from 1 KB to 4 KB so carrier headers like Twilio's `X-Twilio-CallToken` (Immutable Call Forwarding token with SHAKEN/STIR PASSporTs, >1 KB) pass `CreateSIPParticipant` validation - [#1750](https://github.com/livekit/protocol/pull/1750) ([@rkfshakti](https://github.com/rkfshakti))
+
+- Preserve exact framework A2A task states and optional task labels in thread listings. - [#1885](https://github.com/livekit/protocol/pull/1885) ([@theomonnom](https://github.com/theomonnom))
+
+## 1.54.1
+
+### Patch Changes
+
+- Scope agent database access: `agentThread.sql` opens a covered thread's database, whose id is the thread's; `agentDatabase` reads, writes or deletes the standalone databases it lists, and creates or lists the project's. Remove `agent.databaseAdmin` and `AgentThread.Thread.database_id` - [#1969](https://github.com/livekit/protocol/pull/1969) ([@theomonnom](https://github.com/theomonnom))
+
+- Remove `FunctionCall.extra`: livekit-agents 1.7.0 to 1.8.8 fill it from their own `FunctionCall.extra` and fail to encode the session history. - [#1978](https://github.com/livekit/protocol/pull/1978) ([@theomonnom](https://github.com/theomonnom))
+
+- Add SIGNAL node type - [#1979](https://github.com/livekit/protocol/pull/1979) ([@paulwe](https://github.com/paulwe))
+
+- agent_simulation: choose the persona's model per run - [#1968](https://github.com/livekit/protocol/pull/1968) ([@u9g](https://github.com/u9g))
+
+- Remove unused full_snapshot from ParticipantUpdate - [#1971](https://github.com/livekit/protocol/pull/1971) ([@lukasIO](https://github.com/lukasIO))
+
+## 1.54.0
+
+### Minor Changes
+
+- SIP inbound trunks: add validation of allowed_addresses and a new strict validation mode for MatchTrunkIter. - [#1961](https://github.com/livekit/protocol/pull/1961) ([@alexfish8](https://github.com/alexfish8))
+
+### Patch Changes
+
+- Add self-hosted join counts and per-job join values (`origin`, dispatch trigger, worker kind, outcome, scope, latency) to the agents observability schema - [#1966](https://github.com/livekit/protocol/pull/1966) ([@boks1971](https://github.com/boks1971))
+
+- Add `lk.connector.requestTime` and `lk.connector.answerTime` connector participant attributes, with helpers to set and parse them - [#1956](https://github.com/livekit/protocol/pull/1956) ([@boks1971](https://github.com/boks1971))
+
+- Add `CreateJobTokenRequest` and `CreateJobTokenResponse` to the agent worker protocol, for a job to ask the server for an access token - [#1970](https://github.com/livekit/protocol/pull/1970) ([@davidzhao](https://github.com/davidzhao))
+  
+  Add `agent.ParseJobTokenClaims` and `agent.BuildJobToken`, which read the claims a job asks for strictly and sign a 10-minute job token; neither accepts `sha256` or `video.agent`
+
+- Add `thread_id` to `CreateAgentDispatchRequest`, `RoomAgentDispatch`, `AgentDispatch` and `Job`, the agent thread a dispatched job's call reads and writes - [#1958](https://github.com/livekit/protocol/pull/1958) ([@theomonnom](https://github.com/theomonnom))
+  
+  Add `guid.IsValidWithPrefix`, a strict check that an id is a prefix followed by exactly `guid.Size` characters of `guid.IDAlphabet`
+
+- Add `attempts`, `first_started_at` and `agent_failed_attempts_ns` to `JobState`, so every node that syncs a job sees how many attempts it took, when the first one started, and how long the attempts the agent's own code failed took - [#1949](https://github.com/livekit/protocol/pull/1949) ([@boks1971](https://github.com/boks1971))
+
+- Add `workers_asked` to `JobState`: how many workers were asked to take the current attempt, the one that took it included - [#1953](https://github.com/livekit/protocol/pull/1953) ([@boks1971](https://github.com/boks1971))
+
+- Add the `no_user` latency scope to the agents observability schema, for an agent join that no user waited for - [#1953](https://github.com/livekit/protocol/pull/1953) ([@boks1971](https://github.com/boks1971))
+
+- Add `full_snapshot` to `ParticipantUpdate`, set when the message lists every visible participant so clients can drop remote participants that are missing from it - [#1967](https://github.com/livekit/protocol/pull/1967) ([@lukasIO](https://github.com/lukasIO))
+
+- `SimulationRun.JobMetrics.Turn.entities`: each key-entity saying in the turn, with what the listener heard and whether it was recognized. - [#1894](https://github.com/livekit/protocol/pull/1894) ([@u9g](https://github.com/u9g))
+  `SimulationRun.JobMetrics.Turn.item_id`: the agent's chat item id for the turn's first message, so a turn can link to its place in the stored transcript.
+
+- Add `sip_source_call_id` to `CreateSIPParticipantRequest`, to forward the caller ID of a live inbound call (cloud only) - [#1960](https://github.com/livekit/protocol/pull/1960) ([@genseric-ghiro](https://github.com/genseric-ghiro))
+
+- Add the telemetry semantic-conventions registry under `otel/` - [#1866](https://github.com/livekit/protocol/pull/1866) ([@pblazej](https://github.com/pblazej))
+
+- Group generated Python telemetry attribute values in plain classes while preserving string values. - [#1881](https://github.com/livekit/protocol/pull/1881) ([@pblazej](https://github.com/pblazej))
+
+- Group generated TypeScript telemetry attribute values in const objects with matching union types. - [#1872](https://github.com/livekit/protocol/pull/1872) ([@lukasIO](https://github.com/lukasIO))
+
+## 1.53.4
+
+### Patch Changes
+
+- Add `AgentSessionEvent.SessionClosed`, sent when an agent session ends while its host keeps serving requests - [#1888](https://github.com/livekit/protocol/pull/1888) ([@u9g](https://github.com/u9g))
+
+## 1.53.3
+
+### Patch Changes
+
+- AMD v2 in agent session events (`livekit_agent_session.proto`): `AmdCategory` adds `AMD_MACHINE_SCREENING` and `AMD_WAIT`, `AmdPrediction` adds the turn ID, the stage, and the inference time, and a new `AmdCompleted` event reports the final result and the last prediction once per AMD run. - [#1880](https://github.com/livekit/protocol/pull/1880) ([@chenghao-mou](https://github.com/chenghao-mou))
+
+- add the user turn length in samples to the eot inference start - [#1937](https://github.com/livekit/protocol/pull/1937) ([@chenghao-mou](https://github.com/chenghao-mou))
+
+- `MediaSource.videos` and `MediaSource.data` with `track_name` and `exclude` selector matching, and `EncodedFileType.MCAP`, for multi-track MCAP egress - [#1882](https://github.com/livekit/protocol/pull/1882) ([@frostbyte73](https://github.com/frostbyte73))
+
+- agent_simulation: dispatch a simulation run to a named agent deployment - [#1932](https://github.com/livekit/protocol/pull/1932) ([@u9g](https://github.com/u9g))
+
+## 1.53.2
+
+### Patch Changes
+
+- Add `Job.created_at`, `JobState.accepted_at`, `JobState.assigned_at` and `AgentDispatchState.trigger`, and the `lk.rtc.joinRequestTime` participant attribute - [#1929](https://github.com/livekit/protocol/pull/1929) ([@boks1971](https://github.com/boks1971))
+
+- Add `UpdateJobStatus.join_timing`, the instants of an agent join on the worker's monotonic clock - [#1900](https://github.com/livekit/protocol/pull/1900) ([@boks1971](https://github.com/boks1971))
+
+- `agentsobs` and `agentsv3obs` report agent join latency per job: the user arrival time, the join outcome, whether the join counts toward the latency figures, the attempts, and the total and attributable latency - [#1927](https://github.com/livekit/protocol/pull/1927) ([@boks1971](https://github.com/boks1971))
+
+- Replace `NodeStats.forward_scheduling_delay` with `NodeStats.forward_processing_per_write`, the mean forwarding work per write to a subscriber - [#1895](https://github.com/livekit/protocol/pull/1895) ([@boks1971](https://github.com/boks1971))
+
+- webhook: `ResourceURLNotifier.Stop(false)` waits for queued events to be sent, as `URLNotifier.Stop(false)` does - [#1901](https://github.com/livekit/protocol/pull/1901) ([@mnjalale](https://github.com/mnjalale))
+
+- sdp: add CodecsFromSessionDescription and ParseFmtp helpers - [#1899](https://github.com/livekit/protocol/pull/1899) ([@anunaym14](https://github.com/anunaym14))
+
+- agent_simulation: dial a phone number over SIP instead of dispatching an agent - [#1858](https://github.com/livekit/protocol/pull/1858) ([@u9g](https://github.com/u9g))
+
+- Add `SIPDialtone` to select a regional dial tone on CreateSIPParticipant and TransferSIPParticipant; deprecate `play_dialtone` - [#1892](https://github.com/livekit/protocol/pull/1892) ([@dennwc](https://github.com/dennwc))
+
+- sip: add `SIPMediaConfig.drop_audio_during_dtmf` to stop sending audio RTP while DTMF is sent - [#1907](https://github.com/livekit/protocol/pull/1907) ([@alexlivekit](https://github.com/alexlivekit))
+
+- Add `lk.sip.pinEnteredTime` and `lk.sip.answerTime` SIP participant attributes, with helpers to set and parse them - [#1928](https://github.com/livekit/protocol/pull/1928) ([@boks1971](https://github.com/boks1971))
+
+- SIP authentication: compare IP masks against remote address rather than From header. - [#1889](https://github.com/livekit/protocol/pull/1889) ([@alexfish8](https://github.com/alexfish8))
+
+## 1.53.1
+
+### Patch Changes
+
+- Add `agent_job_pending` webhook event, `JS_CANCELLED` job status, and `JobState.reason` (including `JSR_RETRYING`) - [#1860](https://github.com/livekit/protocol/pull/1860) ([@erikhortsch](https://github.com/erikhortsch))
+
+- Add `MigrateJobRequest.jobs`, the jobs a reconnecting agent worker still runs, as they were assigned - [#1893](https://github.com/livekit/protocol/pull/1893) ([@davidzhao](https://github.com/davidzhao))
+
+- Add `livekit.agent.CloseReason`, the agent session close reasons, for agent evals. - [#1887](https://github.com/livekit/protocol/pull/1887) ([@jmcclanahan](https://github.com/jmcclanahan))
+
+- Add `NodeStats.forward_scheduling_delay`, the p90 time from arrival to dequeue for packets that found their forwarder idle - [#1891](https://github.com/livekit/protocol/pull/1891) ([@boks1971](https://github.com/boks1971))
+
+- Add session_summary to MetricsRecordingHeader, for agent evals. - [#1884](https://github.com/livekit/protocol/pull/1884) ([@jmcclanahan](https://github.com/jmcclanahan))
+
+- `SimulationRun.JobMetrics`: how the call ended (`end_reason`), the simulated caller's languages (`caller_language`, `caller_listen_language`), the audio impairments applied to it (`impairments`), and `conversation.backchannel_count`. - [#1867](https://github.com/livekit/protocol/pull/1867) ([@u9g](https://github.com/u9g))
+
+- `SimulationRun.Job.failure_reason`: a machine-readable cause for a failed simulation job, such as the agent never joining the room. - [#1867](https://github.com/livekit/protocol/pull/1867) ([@u9g](https://github.com/u9g))
+
+- `SimulationRun.JobMetrics.Turn.text`: the words of each turn as the simulation's judges read them. - [#1867](https://github.com/livekit/protocol/pull/1867) ([@u9g](https://github.com/u9g))
+
+- `StreamDestination` (`id`, `url`) on `StreamOutput.destinations` and `UpdateStreamRequest.add_destinations`, echoed as `StreamInfo.id`, so a client can tell its streams apart; `RedactStreamKeys` redacts destination URLs - [#1873](https://github.com/livekit/protocol/pull/1873) ([@frostbyte73](https://github.com/frostbyte73))
+
 ## 1.53.0
 
 ### Minor Changes

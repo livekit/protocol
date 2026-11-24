@@ -47,6 +47,7 @@ const (
 	NodeType_DIRECTOR     NodeType = 6
 	NodeType_HOSTED_AGENT NodeType = 7
 	NodeType_SETTINGS     NodeType = 8
+	NodeType_SIGNAL       NodeType = 9
 )
 
 // Enum value maps for NodeType.
@@ -60,6 +61,7 @@ var (
 		6: "DIRECTOR",
 		7: "HOSTED_AGENT",
 		8: "SETTINGS",
+		9: "SIGNAL",
 	}
 	NodeType_value = map[string]int32{
 		"SERVER":       0,
@@ -70,6 +72,7 @@ var (
 		"DIRECTOR":     6,
 		"HOSTED_AGENT": 7,
 		"SETTINGS":     8,
+		"SIGNAL":       9,
 	}
 )
 
@@ -377,10 +380,12 @@ type NodeStats struct {
 	// forward metrics
 	ForwardLatency uint32 `protobuf:"varint,48,opt,name=forward_latency,json=forwardLatency,proto3" json:"forward_latency,omitempty"`
 	// Deprecated: Marked as deprecated in livekit_internal.proto.
-	ForwardJitter uint32           `protobuf:"varint,49,opt,name=forward_jitter,json=forwardJitter,proto3" json:"forward_jitter,omitempty"`
-	Rates         []*NodeStatsRate `protobuf:"bytes,50,rep,name=rates,proto3" json:"rates,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	ForwardJitter uint32 `protobuf:"varint,49,opt,name=forward_jitter,json=forwardJitter,proto3" json:"forward_jitter,omitempty"`
+	// mean forwarding work per write to a subscriber, in ns: (end of fan-out - dequeue) / writes
+	ForwardProcessingPerWrite uint32           `protobuf:"varint,57,opt,name=forward_processing_per_write,json=forwardProcessingPerWrite,proto3" json:"forward_processing_per_write,omitempty"`
+	Rates                     []*NodeStatsRate `protobuf:"bytes,50,rep,name=rates,proto3" json:"rates,omitempty"`
+	unknownFields             protoimpl.UnknownFields
+	sizeCache                 protoimpl.SizeCache
 }
 
 func (x *NodeStats) Reset() {
@@ -818,6 +823,13 @@ func (x *NodeStats) GetForwardJitter() uint32 {
 	return 0
 }
 
+func (x *NodeStats) GetForwardProcessingPerWrite() uint32 {
+	if x != nil {
+		return x.ForwardProcessingPerWrite
+	}
+	return 0
+}
+
 func (x *NodeStats) GetRates() []*NodeStatsRate {
 	if x != nil {
 		return x.Rates
@@ -1124,8 +1136,12 @@ type StartSession struct {
 	SyncState               *SyncState          `protobuf:"bytes,23,opt,name=sync_state,json=syncState,proto3" json:"sync_state,omitempty"`
 	UseSinglePeerConnection bool                `protobuf:"varint,24,opt,name=use_single_peer_connection,json=useSinglePeerConnection,proto3" json:"use_single_peer_connection,omitempty"`
 	TokenExpiresAt          int64               `protobuf:"varint,26,opt,name=token_expires_at,json=tokenExpiresAt,proto3" json:"token_expires_at,omitempty"`
-	unknownFields           protoimpl.UnknownFields
-	sizeCache               protoimpl.SizeCache
+	// API key that issued the join token, for correlating sessions with the key
+	ApiKey string `protobuf:"bytes,27,opt,name=api_key,json=apiKey,proto3" json:"api_key,omitempty"`
+	// client preferred ICE candidate protocol, UDP means no preference
+	CandidateProtocol CandidateProtocol `protobuf:"varint,28,opt,name=candidate_protocol,json=candidateProtocol,proto3,enum=livekit.CandidateProtocol" json:"candidate_protocol,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *StartSession) Reset() {
@@ -1314,6 +1330,20 @@ func (x *StartSession) GetTokenExpiresAt() int64 {
 	return 0
 }
 
+func (x *StartSession) GetApiKey() string {
+	if x != nil {
+		return x.ApiKey
+	}
+	return ""
+}
+
+func (x *StartSession) GetCandidateProtocol() CandidateProtocol {
+	if x != nil {
+		return x.CandidateProtocol
+	}
+	return CandidateProtocol_UDP
+}
+
 // room info that should not be returned to clients
 type RoomInternal struct {
 	state                   protoimpl.MessageState   `protogen:"open.v1"`
@@ -1495,7 +1525,7 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"\x05stats\x18\x04 \x01(\v2\x12.livekit.NodeStatsR\x05stats\x12%\n" +
 	"\x04type\x18\x05 \x01(\x0e2\x11.livekit.NodeTypeR\x04type\x12(\n" +
 	"\x05state\x18\x06 \x01(\x0e2\x12.livekit.NodeStateR\x05state\x12\x16\n" +
-	"\x06region\x18\a \x01(\tR\x06region\"\xb3\x16\n" +
+	"\x06region\x18\a \x01(\tR\x06region\"\xf4\x16\n" +
 	"\tNodeStats\x12\x1d\n" +
 	"\n" +
 	"started_at\x18\x01 \x01(\x03R\tstartedAt\x12\x1d\n" +
@@ -1561,7 +1591,8 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"\x18participant_rtc_canceled\x185 \x01(\x04R\x16participantRtcCanceled\x124\n" +
 	"\x16participant_rtc_active\x186 \x01(\x04R\x14participantRtcActive\x12'\n" +
 	"\x0fforward_latency\x180 \x01(\rR\x0eforwardLatency\x12)\n" +
-	"\x0eforward_jitter\x181 \x01(\rB\x02\x18\x01R\rforwardJitter\x12,\n" +
+	"\x0eforward_jitter\x181 \x01(\rB\x02\x18\x01R\rforwardJitter\x12?\n" +
+	"\x1cforward_processing_per_write\x189 \x01(\rR\x19forwardProcessingPerWrite\x12,\n" +
 	"\x05rates\x182 \x03(\v2\x16.livekit.NodeStatsRateR\x05rates\"\xb1\n" +
 	"\n" +
 	"\rNodeStatsRate\x12\x1d\n" +
@@ -1600,7 +1631,7 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"memoryLoad\x12\x1f\n" +
 	"\vmemory_used\x18\x16 \x01(\x02R\n" +
 	"memoryUsed\x12!\n" +
-	"\fmemory_total\x18\x17 \x01(\x02R\vmemoryTotal\"\xca\b\n" +
+	"\fmemory_total\x18\x17 \x01(\x02R\vmemoryTotal\"\xae\t\n" +
 	"\fStartSession\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x12\x1a\n" +
 	"\bidentity\x18\x02 \x01(\tR\bidentity\x124\n" +
@@ -1627,7 +1658,9 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"\n" +
 	"sync_state\x18\x17 \x01(\v2\x12.livekit.SyncStateR\tsyncState\x12;\n" +
 	"\x1ause_single_peer_connection\x18\x18 \x01(\bR\x17useSinglePeerConnection\x12(\n" +
-	"\x10token_expires_at\x18\x1a \x01(\x03R\x0etokenExpiresAtB\x1c\n" +
+	"\x10token_expires_at\x18\x1a \x01(\x03R\x0etokenExpiresAt\x12\x17\n" +
+	"\aapi_key\x18\x1b \x01(\tR\x06apiKey\x12I\n" +
+	"\x12candidate_protocol\x18\x1c \x01(\x0e2\x1a.livekit.CandidateProtocolR\x11candidateProtocolB\x1c\n" +
 	"\x1a_auto_subscribe_data_trackB\x19\n" +
 	"\x17_subscriber_allow_pause\"\xa0\x05\n" +
 	"\fRoomInternal\x12;\n" +
@@ -1648,7 +1681,7 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xa9\x01\n" +
 	"\tICEConfig\x12N\n" +
 	"\x15preference_subscriber\x18\x01 \x01(\x0e2\x19.livekit.ICECandidateTypeR\x14preferenceSubscriber\x12L\n" +
-	"\x14preference_publisher\x18\x02 \x01(\x0e2\x19.livekit.ICECandidateTypeR\x13preferencePublisher*v\n" +
+	"\x14preference_publisher\x18\x02 \x01(\x0e2\x19.livekit.ICECandidateTypeR\x13preferencePublisher*\x82\x01\n" +
 	"\bNodeType\x12\n" +
 	"\n" +
 	"\x06SERVER\x10\x00\x12\x0e\n" +
@@ -1659,7 +1692,9 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"\aSWEEPER\x10\x05\x12\f\n" +
 	"\bDIRECTOR\x10\x06\x12\x10\n" +
 	"\fHOSTED_AGENT\x10\a\x12\f\n" +
-	"\bSETTINGS\x10\b*K\n" +
+	"\bSETTINGS\x10\b\x12\n" +
+	"\n" +
+	"\x06SIGNAL\x10\t*K\n" +
 	"\tNodeState\x12\x0f\n" +
 	"\vSTARTING_UP\x10\x00\x12\v\n" +
 	"\aSERVING\x10\x01\x12\x11\n" +
@@ -1701,12 +1736,13 @@ var file_livekit_internal_proto_goTypes = []any{
 	(*AddTrackRequest)(nil),         // 13: livekit.AddTrackRequest
 	(*SessionDescription)(nil),      // 14: livekit.SessionDescription
 	(*SyncState)(nil),               // 15: livekit.SyncState
-	(*AutoTrackEgress)(nil),         // 16: livekit.AutoTrackEgress
-	(*AutoParticipantEgress)(nil),   // 17: livekit.AutoParticipantEgress
-	(*PlayoutDelay)(nil),            // 18: livekit.PlayoutDelay
-	(*RoomAgentDispatch)(nil),       // 19: livekit.RoomAgentDispatch
-	(*ParticipantEgressConfig)(nil), // 20: livekit.ParticipantEgressConfig
-	(*TrackEgressConfig)(nil),       // 21: livekit.TrackEgressConfig
+	(CandidateProtocol)(0),          // 16: livekit.CandidateProtocol
+	(*AutoTrackEgress)(nil),         // 17: livekit.AutoTrackEgress
+	(*AutoParticipantEgress)(nil),   // 18: livekit.AutoParticipantEgress
+	(*PlayoutDelay)(nil),            // 19: livekit.PlayoutDelay
+	(*RoomAgentDispatch)(nil),       // 20: livekit.RoomAgentDispatch
+	(*ParticipantEgressConfig)(nil), // 21: livekit.ParticipantEgressConfig
+	(*TrackEgressConfig)(nil),       // 22: livekit.TrackEgressConfig
 }
 var file_livekit_internal_proto_depIdxs = []int32{
 	4,  // 0: livekit.Node.stats:type_name -> livekit.NodeStats
@@ -1719,20 +1755,21 @@ var file_livekit_internal_proto_depIdxs = []int32{
 	13, // 7: livekit.StartSession.add_track_requests:type_name -> livekit.AddTrackRequest
 	14, // 8: livekit.StartSession.publisher_offer:type_name -> livekit.SessionDescription
 	15, // 9: livekit.StartSession.sync_state:type_name -> livekit.SyncState
-	16, // 10: livekit.RoomInternal.track_egress:type_name -> livekit.AutoTrackEgress
-	17, // 11: livekit.RoomInternal.participant_egress:type_name -> livekit.AutoParticipantEgress
-	18, // 12: livekit.RoomInternal.playout_delay:type_name -> livekit.PlayoutDelay
-	19, // 13: livekit.RoomInternal.agent_dispatches:type_name -> livekit.RoomAgentDispatch
-	9,  // 14: livekit.RoomInternal.tags:type_name -> livekit.RoomInternal.TagsEntry
-	20, // 15: livekit.RoomInternal.participant_egress_config:type_name -> livekit.ParticipantEgressConfig
-	21, // 16: livekit.RoomInternal.track_egress_config:type_name -> livekit.TrackEgressConfig
-	2,  // 17: livekit.ICEConfig.preference_subscriber:type_name -> livekit.ICECandidateType
-	2,  // 18: livekit.ICEConfig.preference_publisher:type_name -> livekit.ICECandidateType
-	19, // [19:19] is the sub-list for method output_type
-	19, // [19:19] is the sub-list for method input_type
-	19, // [19:19] is the sub-list for extension type_name
-	19, // [19:19] is the sub-list for extension extendee
-	0,  // [0:19] is the sub-list for field type_name
+	16, // 10: livekit.StartSession.candidate_protocol:type_name -> livekit.CandidateProtocol
+	17, // 11: livekit.RoomInternal.track_egress:type_name -> livekit.AutoTrackEgress
+	18, // 12: livekit.RoomInternal.participant_egress:type_name -> livekit.AutoParticipantEgress
+	19, // 13: livekit.RoomInternal.playout_delay:type_name -> livekit.PlayoutDelay
+	20, // 14: livekit.RoomInternal.agent_dispatches:type_name -> livekit.RoomAgentDispatch
+	9,  // 15: livekit.RoomInternal.tags:type_name -> livekit.RoomInternal.TagsEntry
+	21, // 16: livekit.RoomInternal.participant_egress_config:type_name -> livekit.ParticipantEgressConfig
+	22, // 17: livekit.RoomInternal.track_egress_config:type_name -> livekit.TrackEgressConfig
+	2,  // 18: livekit.ICEConfig.preference_subscriber:type_name -> livekit.ICECandidateType
+	2,  // 19: livekit.ICEConfig.preference_publisher:type_name -> livekit.ICECandidateType
+	20, // [20:20] is the sub-list for method output_type
+	20, // [20:20] is the sub-list for method input_type
+	20, // [20:20] is the sub-list for extension type_name
+	20, // [20:20] is the sub-list for extension extendee
+	0,  // [0:20] is the sub-list for field type_name
 }
 
 func init() { file_livekit_internal_proto_init() }

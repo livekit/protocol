@@ -1,0 +1,22 @@
+# expect: livekit_shared_rename
+# Codex round 5: a deprecated old spelling, referenced by a span, slipped past the rule.
+groups:
+  - id: registry.lk.negative
+    type: attribute_group
+    brief: Negative fixture.
+    attributes:
+      - id: lk.track.source
+        type: string
+        stability: development
+        brief: The client spelling of the shared key lk.track_source, defined again as deprecated.
+        examples: ["camera"]
+        deprecated: {reason: uncategorized, note: Legacy key still accepted.}
+        annotations: {livekit: {owner: client, sensitivity: none}}
+  - id: span.lk.probe
+    type: span
+    span_kind: internal
+    stability: development
+    brief: A span that requires the deprecated old spelling.
+    attributes:
+      - ref: lk.track.source
+        requirement_level: required

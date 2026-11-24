@@ -1,0 +1,12 @@
+# expect: unexpected properties: bogus_field
+groups:
+  - id: registry.lk.negative
+    type: attribute_group
+    brief: Negative fixture.
+    attributes:
+      - id: lk.client.retry_reason
+        type: string
+        stability: development
+        brief: Typo in a field name.
+        bogus_field: 1
+        annotations: {livekit: {owner: client, sensitivity: none}}

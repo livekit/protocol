@@ -16,6 +16,7 @@ package utils
 
 import (
 	"testing"
+	"testing/synctest"
 	"time"
 
 	"github.com/stretchr/testify/require"
@@ -66,9 +67,63 @@ func TestTimeoutQueue(t *testing.T) {
 		}
 
 		ts := time.Now().UnixNano()
-		q.popBefore(ts, true)
+		q.popBefore(ts, q.seq, true)
 		require.EqualValues(t, []int{1, 2, 3, 4}, debugTimeoutQueueItems(&q))
-		q.popBefore(ts, true)
+		q.popBefore(ts, q.seq, true)
 		require.EqualValues(t, []int{2, 3, 4}, debugTimeoutQueueItems(&q))
+	})
+
+	t.Run("an iteration does not revisit items reset during it", func(t *testing.T) {
+		t.Parallel()
+		// The clock does not move inside a synctest bubble, so a reset stamps
+		// the item with the iteration's own cutoff.
+		synctest.Test(t, func(t *testing.T) {
+			var q TimeoutQueue[int]
+			for i := 0; i < 3; i++ {
+				q.Reset(&TimeoutQueueItem[int]{Value: i})
+			}
+
+			visited := 0
+			for it := q.IterateAfter(0); it.Next(); {
+				visited++
+				require.Less(t, visited, 100, "the iteration keeps revisiting reset items")
+				q.Reset(it.Item())
+			}
+			require.Equal(t, 3, visited)
+			require.EqualValues(t, []int{0, 1, 2}, debugTimeoutQueueItems(&q))
+		})
+	})
+}
+
+func TestTimeoutQueueOldest(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		var q TimeoutQueue[int]
+		_, ok := q.Oldest()
+		require.False(t, ok, "an empty queue has no oldest item")
+
+		a := &TimeoutQueueItem[int]{Value: 0}
+		b := &TimeoutQueueItem[int]{Value: 1}
+		t0 := time.Now()
+		q.Reset(a)
+		time.Sleep(time.Second)
+		q.Reset(b)
+
+		oldest, ok := q.Oldest()
+		require.True(t, ok)
+		require.True(t, oldest.Equal(t0), "oldest is a's reset")
+
+		time.Sleep(time.Second)
+		q.Reset(a)
+		oldest, _ = q.Oldest()
+		require.True(t, oldest.Equal(t0.Add(time.Second)), "a reset moves oldest to b")
+
+		q.Remove(b)
+		oldest, _ = q.Oldest()
+		require.True(t, oldest.Equal(t0.Add(2*time.Second)), "removing b leaves a")
+
+		for it := q.IterateRemoveAfter(0); it.Next(); {
+		}
+		_, ok = q.Oldest()
+		require.False(t, ok, "a drained queue has no oldest item")
 	})
 }

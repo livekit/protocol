@@ -1,0 +1,12 @@
+# expect: livekit_pii_metric
+# chat.item, which the collector drops by name instead of a `pii` segment, on a definition/2 metric.
+file_format: definition/2
+metrics:
+  - name: client.negative.count
+    instrument: counter
+    unit: "{event}"
+    stability: development
+    brief: A definition/2 metric with a PII dimension.
+    attributes:
+      - ref: chat.item
+        requirement_level: recommended

@@ -1,0 +1,3 @@
+[
+ {"log": {"event_name": "lk.device.app_state.changed", "severity_number": 9, "body": "app: foreground", "attributes": [{"name": "lk.device.app_state", "value": "foreground"}, {"name": "session.id", "value": "4bf92f3577b34da6a3ce929d0e0e4736"}, {"name": "otel.event.name", "value": "lk.device.app_state.changed"}]}}
+]

@@ -1,0 +1,15 @@
+# expect: livekit_pii_metric
+file_format: definition/2
+metrics:
+  - name: client.negative.count
+    instrument: counter
+    unit: "{event}"
+    stability: development
+    brief: A base metric without PII dimensions.
+metric_refinements:
+  - id: client.negative.count.by_identity
+    ref: client.negative.count
+    brief: A refinement that adds a PII dimension.
+    attributes:
+      - ref: lk.pii.participant_identity
+        requirement_level: recommended

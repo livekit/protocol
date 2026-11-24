@@ -14,7 +14,7 @@
 
 // AgentThread: the durable conversation between an agent and a person, across
 // channels and over time. Identified by an "AT_" id. Holds a scope, attributes,
-// an idle TTL and the AgentDB database created with it. Served by
+// an idle TTL and the AgentDB database created with it, whose id is the thread's. Served by
 // cloud-protocol's AgentThreads. The conversation inside follows thread_schema_v1.sql, shared
 // by the agents framework, which writes it, and the platform, which reads it.
 
@@ -94,32 +94,42 @@ func (AgentThread_SortOrder) EnumDescriptor() ([]byte, []int) {
 	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 0}
 }
 
-// A task is never UNSPECIFIED.
+// The framework's A2A task state. A task is never UNSPECIFIED.
+// Keep the existing completed, failed and canceled wire numbers.
 type AgentTask_Status int32
 
 const (
-	AgentTask_UNSPECIFIED AgentTask_Status = 0
-	AgentTask_RUNNING     AgentTask_Status = 1
-	AgentTask_COMPLETED   AgentTask_Status = 2
-	AgentTask_FAILED      AgentTask_Status = 3
-	AgentTask_CANCELED    AgentTask_Status = 4
+	AgentTask_UNSPECIFIED    AgentTask_Status = 0
+	AgentTask_WORKING        AgentTask_Status = 1
+	AgentTask_COMPLETED      AgentTask_Status = 2
+	AgentTask_FAILED         AgentTask_Status = 3
+	AgentTask_CANCELED       AgentTask_Status = 4
+	AgentTask_SUBMITTED      AgentTask_Status = 5
+	AgentTask_INPUT_REQUIRED AgentTask_Status = 6
+	AgentTask_REJECTED       AgentTask_Status = 7
 )
 
 // Enum value maps for AgentTask_Status.
 var (
 	AgentTask_Status_name = map[int32]string{
 		0: "UNSPECIFIED",
-		1: "RUNNING",
+		1: "WORKING",
 		2: "COMPLETED",
 		3: "FAILED",
 		4: "CANCELED",
+		5: "SUBMITTED",
+		6: "INPUT_REQUIRED",
+		7: "REJECTED",
 	}
 	AgentTask_Status_value = map[string]int32{
-		"UNSPECIFIED": 0,
-		"RUNNING":     1,
-		"COMPLETED":   2,
-		"FAILED":      3,
-		"CANCELED":    4,
+		"UNSPECIFIED":    0,
+		"WORKING":        1,
+		"COMPLETED":      2,
+		"FAILED":         3,
+		"CANCELED":       4,
+		"SUBMITTED":      5,
+		"INPUT_REQUIRED": 6,
+		"REJECTED":       7,
 	}
 )
 
@@ -186,8 +196,8 @@ func (*AgentThread) Descriptor() ([]byte, []int) {
 	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0}
 }
 
-// AgentTask: background work an agent runs within a thread, such as a booking
-// that takes minutes.
+// AgentTask: a framework task in a thread, including an incoming message's task.
+// The application may label it with an optional name.
 type AgentTask struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -802,10 +812,8 @@ type AgentThread_Thread struct {
 	LastActive *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=last_active,json=lastActive,proto3" json:"last_active,omitempty"`
 	// last_active + idle_ttl; every update pushes it out. The thread and its
 	// database are deleted once it passes.
-	ExpiresAt *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
-	IdleTtl   *durationpb.Duration   `protobuf:"bytes,7,opt,name=idle_ttl,json=idleTtl,proto3" json:"idle_ttl,omitempty"`
-	// The thread's database ("DB_..."), created with the thread.
-	DatabaseId    string `protobuf:"bytes,8,opt,name=database_id,json=databaseId,proto3" json:"database_id,omitempty"`
+	ExpiresAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	IdleTtl       *durationpb.Duration   `protobuf:"bytes,7,opt,name=idle_ttl,json=idleTtl,proto3" json:"idle_ttl,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -887,13 +895,6 @@ func (x *AgentThread_Thread) GetIdleTtl() *durationpb.Duration {
 		return x.IdleTtl
 	}
 	return nil
-}
-
-func (x *AgentThread_Thread) GetDatabaseId() string {
-	if x != nil {
-		return x.DatabaseId
-	}
-	return ""
 }
 
 // A thread's tasks, oldest first.
@@ -1025,7 +1026,9 @@ type AgentTask_Task struct {
 	TaskId   string                 `protobuf:"bytes,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
 	ThreadId string                 `protobuf:"bytes,2,opt,name=thread_id,json=threadId,proto3" json:"thread_id,omitempty"`
 	// The task's name, as the agent defines it.
-	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Name *string `protobuf:"bytes,3,opt,name=name,proto3,oneof" json:"name,omitempty"`
+	// The framework's A2A state: submitted, working, input-required, completed, failed,
+	// canceled or rejected.
 	Status        AgentTask_Status       `protobuf:"varint,4,opt,name=status,proto3,enum=livekit.agent.AgentTask_Status" json:"status,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1077,8 +1080,8 @@ func (x *AgentTask_Task) GetThreadId() string {
 }
 
 func (x *AgentTask_Task) GetName() string {
-	if x != nil {
-		return x.Name
+	if x != nil && x.Name != nil {
+		return *x.Name
 	}
 	return ""
 }
@@ -1101,7 +1104,7 @@ var File_agent_livekit_agent_thread_proto protoreflect.FileDescriptor
 
 const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\n" +
-	" agent/livekit_agent_thread.proto\x12\rlivekit.agent\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a!agent/livekit_agent_session.proto\x1a\x14logger/options.proto\"\x89\x0f\n" +
+	" agent/livekit_agent_thread.proto\x12\rlivekit.agent\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a!agent/livekit_agent_session.proto\x1a\x14logger/options.proto\"\xe8\x0e\n" +
 	"\vAgentThread\x1a\xfe\x01\n" +
 	"\rCreateRequest\x12\x19\n" +
 	"\x05scope\x18\x01 \x01(\tB\x03\xc0P\x01R\x05scope\x12]\n" +
@@ -1151,7 +1154,7 @@ const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\x03seq\x18\x02 \x01(\x03R\x03seq\x12\x1d\n" +
 	"\n" +
 	"message_id\x18\x03 \x01(\tR\tmessageId\x12<\n" +
-	"\x04item\x18\x04 \x01(\v2#.livekit.agent.ChatContext.ChatItemB\x03\xc0P\x01R\x04item\x1a\xee\x03\n" +
+	"\x04item\x18\x04 \x01(\v2#.livekit.agent.ChatContext.ChatItemB\x03\xc0P\x01R\x04item\x1a\xcd\x03\n" +
 	"\x06Thread\x12(\n" +
 	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x12\x19\n" +
 	"\x05scope\x18\x02 \x01(\tB\x03\xc0P\x01R\x05scope\x12V\n" +
@@ -1164,16 +1167,14 @@ const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"lastActive\x129\n" +
 	"\n" +
 	"expires_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\x124\n" +
-	"\bidle_ttl\x18\a \x01(\v2\x19.google.protobuf.DurationR\aidleTtl\x12\x1f\n" +
-	"\vdatabase_id\x18\b \x01(\tR\n" +
-	"databaseId\x1a=\n" +
+	"\bidle_ttl\x18\a \x01(\v2\x19.google.protobuf.DurationR\aidleTtl\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"P\n" +
 	"\tSortOrder\x12\x1a\n" +
 	"\x16SORT_ORDER_UNSPECIFIED\x10\x00\x12\x12\n" +
 	"\x0eSORT_ORDER_ASC\x10\x01\x12\x13\n" +
-	"\x0fSORT_ORDER_DESC\x10\x02\"\xdd\x04\n" +
+	"\x0fSORT_ORDER_DESC\x10\x02\"\x9d\x05\n" +
 	"\tAgentTask\x1a\xb9\x01\n" +
 	"\x0fGetTasksRequest\x12(\n" +
 	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x12<\n" +
@@ -1184,21 +1185,25 @@ const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\a_status\x1ao\n" +
 	"\x10GetTasksResponse\x123\n" +
 	"\x05tasks\x18\x01 \x03(\v2\x1d.livekit.agent.AgentTask.TaskR\x05tasks\x12&\n" +
-	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\x1a\xd1\x01\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\x1a\xdf\x01\n" +
 	"\x04Task\x12\x17\n" +
 	"\atask_id\x18\x01 \x01(\tR\x06taskId\x12(\n" +
-	"\tthread_id\x18\x02 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x12\x12\n" +
-	"\x04name\x18\x03 \x01(\tR\x04name\x127\n" +
+	"\tthread_id\x18\x02 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x12\x17\n" +
+	"\x04name\x18\x03 \x01(\tH\x00R\x04name\x88\x01\x01\x127\n" +
 	"\x06status\x18\x04 \x01(\x0e2\x1f.livekit.agent.AgentTask.StatusR\x06status\x129\n" +
 	"\n" +
-	"updated_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"O\n" +
+	"updated_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAtB\a\n" +
+	"\x05_name\"\x80\x01\n" +
 	"\x06Status\x12\x0f\n" +
 	"\vUNSPECIFIED\x10\x00\x12\v\n" +
-	"\aRUNNING\x10\x01\x12\r\n" +
+	"\aWORKING\x10\x01\x12\r\n" +
 	"\tCOMPLETED\x10\x02\x12\n" +
 	"\n" +
 	"\x06FAILED\x10\x03\x12\f\n" +
-	"\bCANCELED\x10\x04B+Z)github.com/livekit/protocol/livekit/agentb\x06proto3"
+	"\bCANCELED\x10\x04\x12\r\n" +
+	"\tSUBMITTED\x10\x05\x12\x12\n" +
+	"\x0eINPUT_REQUIRED\x10\x06\x12\f\n" +
+	"\bREJECTED\x10\aB+Z)github.com/livekit/protocol/livekit/agentb\x06proto3"
 
 var (
 	file_agent_livekit_agent_thread_proto_rawDescOnce sync.Once
@@ -1272,6 +1277,7 @@ func file_agent_livekit_agent_thread_proto_init() {
 	}
 	file_agent_livekit_agent_session_proto_init()
 	file_agent_livekit_agent_thread_proto_msgTypes[16].OneofWrappers = []any{}
+	file_agent_livekit_agent_thread_proto_msgTypes[18].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

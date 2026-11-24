@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/livekit/protocol/auth"
@@ -27,11 +28,14 @@ import (
 )
 
 type WebHookConfig struct {
-	URLs                []string                  `yaml:"urls,omitempty"`
-	APIKey              string                    `yaml:"api_key,omitempty"`
-	URLNotifier         URLNotifierConfig         `yaml:"url_notifier,omitempty"`
-	ResourceURLNotifier ResourceURLNotifierConfig `yaml:"resource_url_notifier,omitempty"`
-	FilterParams        FilterParams              `yaml:"filter_params,omitempty"`
+	URLs                  []string                  `yaml:"urls,omitempty"`
+	APIKey                string                    `yaml:"api_key,omitempty"`
+	URLNotifier           URLNotifierConfig         `yaml:"url_notifier,omitempty"`
+	ResourceURLNotifier   ResourceURLNotifierConfig `yaml:"resource_url_notifier,omitempty"`
+	FilterParams          FilterParams              `yaml:"filter_params,omitempty"`
+	BlockPrivateAddresses bool                      `yaml:"block_private_addresses,omitempty"`
+	BlockedCIDRs          []string                  `yaml:"blocked_cidrs,omitempty"`
+	AllowedCIDRs          []string                  `yaml:"allowed_cidrs,omitempty"`
 }
 
 var DefaultWebHookConfig = WebHookConfig{
@@ -80,26 +84,37 @@ func NewDefaultNotifier(config WebHookConfig, kp auth.KeyProvider) (QueuedNotifi
 		return nil, fmt.Errorf("unknown api key in webhook config")
 	}
 
+	var httpParams HTTPClientParams
+	if config.BlockPrivateAddresses || len(config.BlockedCIDRs) > 0 {
+		control, err := NewDialControl(config.BlockPrivateAddresses, config.BlockedCIDRs, config.AllowedCIDRs)
+		if err != nil {
+			return nil, err
+		}
+		httpParams.DialControl = control
+	}
+
 	n := &DefaultNotifier{
 		kp: kp,
 	}
 	for _, url := range config.URLs {
 		u := NewResourceURLNotifier(ResourceURLNotifierParams{
-			URL:          url,
-			Logger:       logger.GetLogger().WithComponent("webhook"),
-			APIKey:       config.APIKey,
-			APISecret:    apiSecret,
-			Config:       config.ResourceURLNotifier,
-			FilterParams: config.FilterParams,
+			URL:              url,
+			Logger:           logger.GetLogger().WithComponent("webhook"),
+			APIKey:           config.APIKey,
+			APISecret:        apiSecret,
+			Config:           config.ResourceURLNotifier,
+			HTTPClientParams: httpParams,
+			FilterParams:     config.FilterParams,
 		})
 		n.notifiers = append(n.notifiers, u)
 	}
 
 	n.extraWebhookNotifier = NewResourceURLNotifier(ResourceURLNotifierParams{
-		Logger:    logger.GetLogger().WithComponent("webhook"),
-		APIKey:    config.APIKey,
-		APISecret: apiSecret,
-		Config:    config.ResourceURLNotifier,
+		Logger:           logger.GetLogger().WithComponent("webhook"),
+		APIKey:           config.APIKey,
+		APISecret:        apiSecret,
+		Config:           config.ResourceURLNotifier,
+		HTTPClientParams: httpParams,
 	})
 
 	return n, nil
@@ -186,6 +201,7 @@ type HTTPClientParams struct {
 	MaxRetries    int
 	ClientTimeout time.Duration
 	ForceIPv4     bool
+	DialControl   func(network, address string, c syscall.RawConn) error
 	// receivers pin WAF rules to this, so it must stay stable across releases
 	// defaults to DefaultUserAgent
 	UserAgent string
@@ -230,7 +246,7 @@ func logFields(event *livekit.WebhookEvent, url string) []interface{} {
 		"event", event.Event,
 		"id", event.Id,
 		"webhookTime", event.CreatedAt,
-		"url", url,
+		"url", redactURL(url),
 	)
 
 	if event.Room != nil {

@@ -36,6 +36,11 @@ message Job {
   string deployment = 11;
   map<string, string> attributes = 12 [(logger.sensitivity) = SENSITIVITY_PII];
   bool enable_redaction = 13;
+  // when the server created the job, in Unix nanoseconds
+  int64 created_at = 14;
+  // The agent thread (an AT_ id, see agent/livekit_agent_thread.proto) the dispatched job's
+  // call reads and writes. Empty means the call keeps no durable thread.
+  string thread_id = 15;
 }
 
 message JobState {
@@ -49,6 +54,20 @@ message JobState {
   string agent_id = 8 [(logger.name) = "agentID"];
   // why the job has no agent, for JS_PENDING and JS_CANCELLED jobs
   JobStateReason reason = 9;
+  // when the server received the worker's accept for this attempt, in Unix nanoseconds
+  int64 accepted_at = 10;
+  // when the server sent the assignment for this attempt, in Unix nanoseconds
+  int64 assigned_at = 11;
+  // attempts assigned to a worker so far, the current one included
+  uint32 attempts = 12;
+  // started_at of the first attempt assigned to a worker, in Unix nanoseconds
+  int64 first_started_at = 13;
+  // time spent in attempts the agent's own code failed before the agent
+  // joined, as an entrypoint that fails before it connects: from each such
+  // attempt's start to the next attempt's start, in nanoseconds
+  int64 agent_failed_attempts_ns = 14;
+  // workers asked to take this attempt, the one that took it included
+  uint32 workers_asked = 15;
 }
 
 // from Worker to Server
@@ -67,6 +86,8 @@ message WorkerMessage {
     WorkerPing ping = 5;
     SimulateJobRequest simulate_job = 6;
     MigrateJobRequest migrate_job = 7;
+    // a running job asks the server to sign an access token for it
+    CreateJobTokenRequest create_job_token = 8;
   };
 }
 
@@ -84,6 +105,7 @@ message ServerMessage {
     // the server is draining this control connection: re-register elsewhere,
     // in-flight agent HTTP streams run to completion
     AgentHttp.GoAway go_away = 6;
+    CreateJobTokenResponse create_job_token = 7;
   }
 }
 
@@ -165,6 +187,9 @@ message RegisterWorkerResponse {
 message MigrateJobRequest {
   // string job_id = 1 [deprecated = true];
   repeated string job_ids = 2;
+  // the jobs in job_ids as they were assigned, with state.participant_identity
+  // set to the identity the worker accepted them with
+  repeated Job jobs = 3;
 }
 
 message AvailabilityRequest {
@@ -196,6 +221,23 @@ message UpdateJobStatus {
 
   // metadata shown on the dashboard, useful for debugging
   string error = 3;
+
+  // set once the agent has connected to the room
+  JobJoinTiming join_timing = 4;
+}
+
+// Instants of one agent join on the worker host's monotonic clock, in microseconds. The
+// clock origin is arbitrary, so only differences between these values carry meaning on
+// their own. The worker and its job processes share this clock.
+message JobJoinTiming {
+  int64 offer_received_us = 1;       // availability request received
+  int64 accepted_us = 2;             // request handler accepted the job
+  int64 assignment_received_us = 3;  // job assignment received
+  int64 launched_us = 4;             // a job process was handed the job
+  bool launch_warm = 5;              // an idle process took the job; false means one was spawned
+  int64 entrypoint_started_us = 6;   // the agent's entrypoint started
+  int64 connect_called_us = 7;       // the agent called room connect
+  int64 connected_us = 8;            // the agent's primary transport connected
 }
 
 message UpdateWorkerStatus {
@@ -219,6 +261,24 @@ message JobAssignment {
 
 message JobTermination {
   string job_id = 1 [(logger.name) = "jobID"];
+}
+
+message CreateJobTokenRequest {
+  // echoed in the response
+  string request_id = 1 [(logger.name) = "requestID"];
+  string job_id = 2 [(logger.name) = "jobID"];
+  // The claims of the token the job wants, as JSON, in the same shape as an
+  // access token's payload: identity, name, attributes, video, sip, and so on.
+  string claims = 3;
+}
+
+message CreateJobTokenResponse {
+  string request_id = 1 [(logger.name) = "requestID"];
+  string token = 2 [(logger.sensitivity) = SENSITIVITY_SECRET];
+  // Unix seconds
+  int64 expires_at = 3;
+  // empty on success; otherwise why the token was refused, naming any refused claim
+  string error = 4;
 }
 
 // ----- agent HTTP endpoints data plane -----

@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -29,6 +30,7 @@ import (
 
 	"github.com/livekit/protocol/auth"
 	"github.com/livekit/protocol/livekit"
+	"github.com/livekit/protocol/logger"
 )
 
 const (
@@ -186,6 +188,42 @@ func TestURLNotifierLifecycle(t *testing.T) {
 		urlNotifier.Stop(true)
 		time.Sleep(time.Second)
 		require.Greater(t, int32(20), numCalled.Load())
+	})
+
+	t.Run("bounds each attempt by default", func(t *testing.T) {
+		n := NewURLNotifier(URLNotifierParams{URL: testUrl})
+		defer n.Stop(true)
+		require.NotZero(t, n.client.HTTPClient.Timeout)
+	})
+
+	t.Run("bounds Retry-After by RetryWaitMax", func(t *testing.T) {
+		n := NewURLNotifier(URLNotifierParams{
+			URL:       testUrl,
+			APIKey:    testAPIKey,
+			APISecret: testAPISecret,
+			HTTPClientParams: HTTPClientParams{
+				RetryWaitMax: time.Millisecond,
+				MaxRetries:   1,
+			},
+		})
+		defer n.Stop(true)
+
+		s.handler = func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Retry-After", "315360000")
+			w.WriteHeader(http.StatusTooManyRequests)
+		}
+
+		done := make(chan error, 1)
+		go func() {
+			_, err := n.send(&livekit.WebhookEvent{Event: EventRoomStarted}, &n.params)
+			done <- err
+		}()
+		select {
+		case err := <-done:
+			require.Error(t, err)
+		case <-time.After(2 * time.Second):
+			t.Fatal("delivery still waiting on Retry-After")
+		}
 	})
 
 	t.Run("times out after accepting connection", func(t *testing.T) {
@@ -668,17 +706,28 @@ func TestResourceURLNotifierLifecycle(t *testing.T) {
 	})
 
 	t.Run("stop allowing to drain", func(t *testing.T) {
-		resourceURLNotifier := newTestResourceNotifier(time.Minute, 200*time.Millisecond, 50)
+		resourceURLNotifier := newTestResourceNotifier(time.Minute, time.Minute, 50)
 		numCalled := atomic.Int32{}
 		s.handler = func(w http.ResponseWriter, r *http.Request) {
+			time.Sleep(10 * time.Millisecond)
 			numCalled.Inc()
 		}
-		for i := 0; i < 10; i++ {
+		// half the events in one resource queue, half spread over others
+		for i := 0; i < 5; i++ {
 			_ = resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted})
 			_ = resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomFinished})
 		}
+		for i := 0; i < 5; i++ {
+			room := &livekit.Room{Name: fmt.Sprintf("room%d", i)}
+			_ = resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted, Room: room})
+			_ = resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomFinished, Room: room})
+		}
+		resourceURLNotifier.mu.RLock()
+		require.Equal(t, 6, len(resourceURLNotifier.resourceQueues))
+		resourceURLNotifier.mu.RUnlock()
+		// returns once the queued events in every resource queue have been sent
 		resourceURLNotifier.Stop(false)
-		require.Eventually(t, func() bool { return numCalled.Load() == 20 }, 5*time.Second, webhookCheckInterval)
+		require.Equal(t, int32(20), numCalled.Load())
 	})
 
 	t.Run("force stop", func(t *testing.T) {
@@ -694,6 +743,42 @@ func TestResourceURLNotifierLifecycle(t *testing.T) {
 		resourceURLNotifier.Stop(true)
 		time.Sleep(time.Second)
 		require.Greater(t, int32(20), numCalled.Load())
+	})
+
+	t.Run("bounds each attempt by default", func(t *testing.T) {
+		n := NewResourceURLNotifier(ResourceURLNotifierParams{URL: testUrl})
+		defer n.Stop(true)
+		require.NotZero(t, n.client.HTTPClient.Timeout)
+	})
+
+	t.Run("bounds Retry-After by RetryWaitMax", func(t *testing.T) {
+		n := NewResourceURLNotifier(ResourceURLNotifierParams{
+			URL:       testUrl,
+			APIKey:    testAPIKey,
+			APISecret: testAPISecret,
+			HTTPClientParams: HTTPClientParams{
+				RetryWaitMax: time.Millisecond,
+				MaxRetries:   1,
+			},
+		})
+		defer n.Stop(true)
+
+		s.handler = func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Retry-After", "315360000")
+			w.WriteHeader(http.StatusTooManyRequests)
+		}
+
+		done := make(chan error, 1)
+		go func() {
+			_, err := n.send(&livekit.WebhookEvent{Event: EventRoomStarted}, &n.params)
+			done <- err
+		}()
+		select {
+		case err := <-done:
+			require.Error(t, err)
+		case <-time.After(2 * time.Second):
+			t.Fatal("delivery still waiting on Retry-After")
+		}
 	})
 
 	t.Run("times out after accepting connection", func(t *testing.T) {
@@ -981,4 +1066,102 @@ func (s *testServer) Start() error {
 
 func (s *testServer) Stop() {
 	_ = s.server.Shutdown(context.Background())
+}
+
+func TestRedactURL(t *testing.T) {
+	for in, out := range map[string]string{
+		"http://localhost:8765":                    "http://localhost:8765",
+		"https://example.com/hook?code=SECRET&x=":  "https://example.com/hook?code={...}&x=",
+		"https://lk:PASSWORD@example.com/hook?k=S": "https://{...}@example.com/hook?k={...}",
+		"http://TOKEN@example.com:x/hook":          "http://{...}@example.com:x/hook",
+		"https://example.com/users/a@b?token=S":    "https://example.com/users/a@b?token={...}",
+	} {
+		require.Equal(t, out, redactURL(in), in)
+	}
+}
+
+type logRecorder struct {
+	mu  sync.Mutex
+	buf strings.Builder
+}
+
+func (r *logRecorder) Logf(format string, args ...any) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	fmt.Fprintf(&r.buf, format, args...)
+}
+func (r *logRecorder) Log(args ...any) { r.Logf("%s", fmt.Sprint(args...)) }
+func (r *logRecorder) Cleanup(func())  {}
+func (r *logRecorder) String() string {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	return r.buf.String()
+}
+
+// rawStatusEndpoint answers every request with a status text of statusLen bytes, which net/http servers cannot send
+func rawStatusEndpoint(t *testing.T, statusLen int) string {
+	l, err := net.Listen("tcp", "127.0.0.1:0")
+	require.NoError(t, err)
+	t.Cleanup(func() { _ = l.Close() })
+	go func() {
+		for {
+			conn, err := l.Accept()
+			if err != nil {
+				return
+			}
+			go func() {
+				defer conn.Close()
+				_, _ = conn.Read(make([]byte, 64<<10))
+				_, _ = conn.Write([]byte("HTTP/1.1 200 " + strings.Repeat("x", statusLen) + "\r\nContent-Length: 0\r\n\r\n"))
+			}()
+		}
+	}()
+	return l.Addr().String()
+}
+
+// delivery logs must not carry receiver credentials from the URL or text chosen by the endpoint
+func TestDeliveryLogs(t *testing.T) {
+	InitWebhookStats(prometheus.Labels{})
+
+	clientParams := HTTPClientParams{MaxRetries: 1, RetryWaitMin: time.Millisecond, RetryWaitMax: time.Millisecond}
+	event := &livekit.WebhookEvent{Event: EventRoomStarted, Room: &livekit.Room{Name: "room"}}
+
+	// under the response head limit the delivery succeeds, over it the delivery fails
+	for msg, statusLen := range map[string]int{"sent webhook": 32 << 10, "failed to send webhook": 1 << 20} {
+		url := "http://lk:PASSWORD@" + rawStatusEndpoint(t, statusLen) + "/hook?code=SECRET"
+		check := func(t *testing.T, log string) {
+			require.Contains(t, log, msg)
+			require.NotContains(t, log, "PASSWORD")
+			require.NotContains(t, log, "SECRET")
+			require.Less(t, len(log), 10_000)
+		}
+
+		t.Run(msg+"/URLNotifier", func(t *testing.T) {
+			log := &logRecorder{}
+			n := NewURLNotifier(URLNotifierParams{
+				HTTPClientParams: clientParams,
+				Logger:           logger.NewTestLogger(log),
+				URL:              url,
+				APIKey:           testAPIKey,
+				APISecret:        testAPISecret,
+			})
+			require.NoError(t, n.QueueNotify(context.Background(), event))
+			n.Stop(false)
+			check(t, log.String())
+		})
+
+		t.Run(msg+"/ResourceURLNotifier", func(t *testing.T) {
+			log := &logRecorder{}
+			n := NewResourceURLNotifier(ResourceURLNotifierParams{
+				HTTPClientParams: clientParams,
+				Logger:           logger.NewTestLogger(log),
+				URL:              url,
+				APIKey:           testAPIKey,
+				APISecret:        testAPISecret,
+			})
+			require.NoError(t, n.QueueNotify(context.Background(), event))
+			n.Stop(false)
+			check(t, log.String())
+		})
+	}
 }

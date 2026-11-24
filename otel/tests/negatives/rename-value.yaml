@@ -1,0 +1,17 @@
+# expect: livekit_rename_value
+groups:
+  - id: registry.lk.negative
+    type: attribute_group
+    brief: Negative fixture.
+    attributes:
+      - id: lk.negative_mode
+        stability: development
+        brief: A rename whose value map points outside the enum.
+        type:
+          members:
+            - {id: source_on, value: SOURCE_ON, brief: On., stability: development}
+        annotations:
+          livekit:
+            owner: shared
+            sensitivity: none
+            renamed_from: {key: lk.negative.mode, values: {on: SOURCE_ON, off: SOURCE_OFF}}

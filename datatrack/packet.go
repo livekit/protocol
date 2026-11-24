@@ -18,6 +18,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"math"
 )
 
 var (
@@ -28,6 +29,7 @@ var (
 	ErrExtensionSizeTooBig       = errors.New("extension size is too big")
 	ErrExtensionInvalidID        = errors.New("invalid extension ID")
 	ErrExtensionDataTooShort     = errors.New("extension data too short")
+	ErrExtensionDuplicateID      = errors.New("duplicate extension ID")
 )
 
 const (
@@ -124,6 +126,9 @@ type Header struct {
 */
 
 func (h *Header) Unmarshal(buf []byte) (int, error) {
+	// nil, not [:0]: by-value copies of an earlier header may still share the backing array
+	h.Extensions = nil
+	h.ExtensionsSize = 0
 	if len(buf) < headerLength {
 		return 0, fmt.Errorf("%w: %d < %d", ErrHeaderSizeInsufficient, len(buf), headerLength)
 	}
@@ -149,6 +154,7 @@ func (h *Header) Unmarshal(buf []byte) (int, error) {
 		extensionHeaderSize := extensionIDLength + extensionSizeLength
 		remainingSize := extensionsSize
 		idx := extensionsSizeOffset + extensionsSizeLength
+		var seenIDs [256]bool
 		for remainingSize != 0 {
 			// read extension header
 			if len(buf[idx:]) < extensionIDLength || remainingSize < extensionIDLength {
@@ -163,6 +169,11 @@ func (h *Header) Unmarshal(buf []byte) (int, error) {
 				hdrSize += remainingSize
 				break
 			}
+			// GetExtension/AddExtension address one entry per ID, this also bounds a packet to 255 extensions
+			if seenIDs[id] {
+				return 0, fmt.Errorf("%w: %d", ErrExtensionDuplicateID, id)
+			}
+			seenIDs[id] = true
 
 			if len(buf[idx+1:]) < extensionSizeLength || remainingSize < extensionSizeLength {
 				return 0, fmt.Errorf("%w: %d/%d < %d", ErrExtensionSizeInsufficient, remainingSize, len(buf[idx:]), extensionSizeLength)
@@ -202,11 +213,11 @@ func (h *Header) MarshalSize() int {
 }
 
 func (h *Header) MarshalTo(buf []byte) (int, error) {
-	if len(buf) < headerLength {
-		return 0, fmt.Errorf("%w: %d < %d", ErrHeaderSizeInsufficient, len(buf), headerLength)
+	hdrSize := h.MarshalSize()
+	if len(buf) < hdrSize {
+		return 0, fmt.Errorf("%w: %d < %d", ErrHeaderSizeInsufficient, len(buf), hdrSize)
 	}
 
-	hdrSize := headerLength
 	buf[0] = h.Version << versionShift
 	if h.IsStartOfFrame {
 		buf[0] |= (1 << startOfFrameShift)
@@ -224,32 +235,24 @@ func (h *Header) MarshalTo(buf []byte) (int, error) {
 	binary.BigEndian.PutUint32(buf[timestampOffset:timestampOffset+timestampLength], h.Timestamp)
 
 	if h.HasExtensions {
-		extensionsSize := (extensionsSizeLength + h.ExtensionsSize + 3) / 4 * 4
-		binary.BigEndian.PutUint16(buf[extensionsSizeOffset:extensionsSizeOffset+extensionsSizeLength], (extensionsSize/4)-1)
-		hdrSize += extensionsSizeLength
+		// sized from Extensions like MarshalSize, ExtensionsSize is not kept in sync by copies or callers
+		extensionsSize := hdrSize - headerLength
+		if extensionsSize/4-1 > math.MaxUint16 {
+			return 0, fmt.Errorf("%w: %d", ErrExtensionSizeTooBig, extensionsSize)
+		}
+		binary.BigEndian.PutUint16(buf[extensionsSizeOffset:extensionsSizeOffset+extensionsSizeLength], uint16(extensionsSize/4-1))
 
-		addedSize := 0
 		idx := extensionsSizeOffset + extensionsSizeLength
 		for _, ext := range h.Extensions {
-			buf[idx] = ext.id
 			if len(ext.data) > 255 {
 				return 0, fmt.Errorf("%w: %d > 255", ErrExtensionSizeTooBig, len(ext.data))
 			}
+			buf[idx] = ext.id
 			buf[idx+extensionIDLength] = byte(len(ext.data))
 			copy(buf[idx+extensionIDLength+extensionSizeLength:], ext.data)
-
-			extSize := len(ext.data) + extensionIDLength + extensionSizeLength
-			idx += extSize
-			hdrSize += extSize
-			addedSize += extSize
+			idx += len(ext.data) + extensionIDLength + extensionSizeLength
 		}
-
-		paddingSize := extensionsSize - extensionsSizeLength - uint16(addedSize)
-		for i := range paddingSize {
-			buf[idx+int(i)] = 0
-		}
-		idx += int(paddingSize)
-		hdrSize += int(paddingSize)
+		clear(buf[idx:hdrSize])
 	}
 
 	return hdrSize, nil

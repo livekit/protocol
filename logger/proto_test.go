@@ -58,6 +58,23 @@ func TestProtoRedactsPIIAndSecret(t *testing.T) {
 	require.Equal(t, "<redacted>", fields["assumeRoleExternalID"])
 }
 
+func TestProtoRedactsWhatsAppOpaqueCallbackData(t *testing.T) {
+	const opaque = "customer-order-42"
+	for _, msg := range []proto.Message{
+		&livekit.DialWhatsAppCallRequest{WhatsappBizOpaqueCallbackData: opaque},
+		&livekit.AcceptWhatsAppCallRequest{WhatsappBizOpaqueCallbackData: opaque},
+	} {
+		fields := marshalFields(t, logger.Proto(msg))
+		require.Equal(t, "<redacted>", fields["whatsappBizOpaqueCallbackData"], "%T", msg)
+	}
+}
+
+func TestProtoRedactsClientAddress(t *testing.T) {
+	fields := marshalFields(t, logger.Proto(&livekit.ClientInfo{Address: "203.0.113.7", Os: "linux"}))
+	require.Equal(t, "<redacted>", fields["address"])
+	require.Equal(t, "linux", fields["os"], "untagged fields still log")
+}
+
 func TestProtoRedactFormatUsedForPII(t *testing.T) {
 	// ParticipantInfo.metadata is PII with a size-showing redact_format.
 	msg := &livekit.ParticipantInfo{

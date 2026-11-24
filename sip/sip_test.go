@@ -1163,27 +1163,37 @@ func TestEvaluateDispatchRule_RespectsRuleMediaTimeout(t *testing.T) {
 	require.Equal(t, 5*time.Minute, res.Media.MediaTimeout.AsDuration())
 }
 
-func TestMatchIP(t *testing.T) {
+func TestParseIPMask(t *testing.T) {
 	cases := []struct {
-		addr  string
-		mask  string
-		valid bool
-		exp   bool
+		mask string
+		exp  string // empty if not an IP mask
 	}{
-		{addr: "192.168.0.10", mask: "192.168.0.10", valid: true, exp: true},
-		{addr: "192.168.0.10", mask: "192.168.0.11", valid: true, exp: false},
-		{addr: "192.168.0.10", mask: "192.168.0.0/24", valid: true, exp: true},
-		{addr: "192.168.0.10", mask: "192.168.0.10/0", valid: true, exp: true},
-		{addr: "192.168.0.10", mask: "192.170.0.0/24", valid: true, exp: false},
+		{mask: "192.168.0.10", exp: "192.168.0.10/32"},
+		{mask: "192.168.0.0/24", exp: "192.168.0.0/24"},
+		{mask: "2001:db8::1", exp: "2001:db8::1/128"},
+		{mask: "[2001:db8::1]", exp: "2001:db8::1/128"},
+		{mask: "[2001:db8::]/32", exp: "2001:db8::/32"},
+		{mask: "[::]", exp: "::/128"},
+		{mask: "[::]/0", exp: "::/0"},
+
+		// Not IP masks: treated as hostnames.
+		{mask: "sip.example.com"},
+		{mask: "sip.example.com/24"},
+		{mask: "192.168.0.10/33"},
+		{mask: "192.168.0.10/"},
+		{mask: "[192.168.0.10"},
+		{mask: "[2001:db8::1]:5060"},
+		{mask: "[[2001:db8::1]]"},
 	}
 	for _, c := range cases {
 		t.Run(c.mask, func(t *testing.T) {
-			ip, err := netip.ParseAddr(c.addr)
-			require.NoError(t, err)
-			got := isValidMask(c.mask)
-			require.Equal(t, c.valid, got)
-			got = matchAddrMask(ip, c.mask)
-			require.Equal(t, c.exp, got)
+			pref, ok := parseIPMask(c.mask)
+			if c.exp == "" {
+				require.False(t, ok)
+				return
+			}
+			require.True(t, ok)
+			require.Equal(t, netip.MustParsePrefix(c.exp), pref)
 		})
 	}
 }
@@ -1281,11 +1291,152 @@ func TestMatchMasks(t *testing.T) {
 			},
 			exp: true,
 		},
+		{
+			name: "ip spoofed in from host",
+			addr: "203.0.113.5",
+			host: "192.168.0.10",
+			masks: []string{
+				"192.168.0.10",
+			},
+			exp: false,
+		},
+		{
+			name: "ip range spoofed in from host",
+			addr: "203.0.113.5",
+			host: "192.168.0.0/24",
+			masks: []string{
+				"192.168.0.0/24",
+			},
+			exp: false,
+		},
+		{
+			name: "ipv6 spoofed in from host",
+			addr: "203.0.113.5",
+			host: "[2001:db8::1]",
+			masks: []string{
+				"[2001:db8::1]",
+			},
+			exp: false,
+		},
+		{
+			name: "ipv6 bracketed",
+			addr: "2001:db8::1",
+			host: "sip.example.com",
+			masks: []string{
+				"[2001:db8::1]",
+			},
+			exp: true,
+		},
+		{
+			name: "ipv6 bracketed range",
+			addr: "2001:db8::1",
+			masks: []string{
+				"[2001:db8::]/32",
+			},
+			exp: true,
+		},
+		{
+			name: "ip matches source, from host differs",
+			addr: "192.168.0.10",
+			host: "sip.example.com",
+			masks: []string{
+				"192.168.0.10",
+			},
+			exp: true,
+		},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			got := matchAddrMasks(c.addr, c.host, c.masks)
 			require.Equal(t, c.exp, got)
+		})
+	}
+}
+
+func TestMatchMasksStrict(t *testing.T) {
+	cases := []struct {
+		name  string
+		addr  string
+		masks []string
+		exp   bool
+	}{
+		{name: "no masks", addr: "192.168.0.10", masks: nil, exp: true},
+		{name: "empty masks", addr: "192.168.0.10", masks: []string{}, exp: true},
+		{name: "no masks, invalid source", addr: "", masks: nil, exp: true},
+		{name: "single ip", addr: "192.168.0.10", masks: []string{"192.168.0.10"}, exp: true},
+		{name: "wrong ip", addr: "192.168.0.10", masks: []string{"192.168.0.11"}, exp: false},
+		{name: "ip mask", addr: "192.168.0.10", masks: []string{"192.168.0.0/24"}, exp: true},
+		{name: "unmasked cidr", addr: "192.168.0.10", masks: []string{"192.168.0.1/24"}, exp: true},
+		{name: "wrong mask", addr: "192.168.0.10", masks: []string{"192.168.1.0/24"}, exp: false},
+		{name: "ipv6", addr: "2001:db8::1", masks: []string{"2001:db8::1"}, exp: true},
+		{name: "ipv6 mask", addr: "2001:db8::1", masks: []string{"2001:db8::/32"}, exp: true},
+		{name: "ipv4 mapped source", addr: "::ffff:192.168.0.10", masks: []string{"192.168.0.0/24"}, exp: true},
+		{name: "ipv4 source, ipv6 mask", addr: "192.168.0.10", masks: []string{"::/0"}, exp: false},
+		{name: "invalid source", addr: "", masks: []string{"0.0.0.0/0"}, exp: false},
+		{name: "unparseable source", addr: "sip.example.com", masks: []string{"0.0.0.0/0"}, exp: false},
+		{name: "valid after invalid", addr: "192.168.0.10", masks: []string{"sip.example.com", "192.168.0.0/24"}, exp: true},
+
+		// Entries that fail inbound trunk validation never match.
+		{name: "hostname", addr: "192.168.0.10", masks: []string{"sip.example.com"}, exp: false},
+		{name: "wildcard", addr: "192.168.0.10", masks: []string{"*"}, exp: false},
+		{name: "wildcard domain", addr: "192.168.0.10", masks: []string{"*.example.com"}, exp: false},
+		{name: "empty entry", addr: "192.168.0.10", masks: []string{""}, exp: false},
+		{name: "comma separated", addr: "192.168.0.10", masks: []string{"192.168.0.10,192.168.0.11"}, exp: false},
+		{name: "space separated", addr: "192.168.0.10", masks: []string{"192.168.0.10 192.168.0.11"}, exp: false},
+		{name: "with port", addr: "192.168.0.10", masks: []string{"192.168.0.10:5060"}, exp: false},
+		{name: "truncated ip", addr: "192.168.0.10", masks: []string{"192.168.0"}, exp: false},
+		{name: "url", addr: "192.168.0.10", masks: []string{"sip://192.168.0.10"}, exp: false},
+		{name: "ipv6 bracketed", addr: "2001:db8::1", masks: []string{"[2001:db8::1]"}, exp: false},
+		{name: "ipv6 bracketed range", addr: "2001:db8::1", masks: []string{"[2001:db8::]/32"}, exp: false},
+		{name: "ipv6 zone", addr: "fe80::1", masks: []string{"fe80::1%eth0"}, exp: false},
+		{name: "ipv4 mapped entry", addr: "192.168.0.10", masks: []string{"::ffff:192.168.0.10"}, exp: false},
+		{name: "ipv4 mapped entry range", addr: "::ffff:192.168.0.10", masks: []string{"::ffff:192.168.0.0/120"}, exp: false},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			got := matchAddrMasksStrict(c.addr, c.masks)
+			require.Equal(t, c.exp, got)
+		})
+	}
+}
+
+func TestMatchTrunkStrictAddresses(t *testing.T) {
+	call := &rpc.SIPCall{
+		SourceIp: "203.0.113.5",
+		From:     &livekit.SIPUri{User: sipNumber1, Host: "sip.example.com"},
+		To:       &livekit.SIPUri{User: sipNumber2},
+	}
+	for _, c := range []struct {
+		name    string
+		allowed []string
+		exp     bool
+	}{
+		{name: "no list", allowed: nil, exp: true},
+		{name: "source ip", allowed: []string{"203.0.113.5"}, exp: true},
+		{name: "source range", allowed: []string{"203.0.113.0/24"}, exp: true},
+		{name: "other ip", allowed: []string{"198.51.100.1"}, exp: false},
+		{name: "from host", allowed: []string{"sip.example.com"}, exp: false},
+		{name: "only invalid entries", allowed: []string{"*", "*.example.com"}, exp: false},
+		{name: "ip with port", allowed: []string{"203.0.113.5:5060"}, exp: false},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			trunk := &livekit.SIPInboundTrunkInfo{SipTrunkId: "aaa", Numbers: []string{sipNumber2}, AllowedAddresses: c.allowed}
+
+			var filtered []TrunkFilteredReason
+			got, err := MatchTrunkIter(iters.Slice([]*livekit.SIPInboundTrunkInfo{trunk}), call,
+				WithStrictAddressMatching(),
+				WithTrunkFiltered(func(_ *livekit.SIPInboundTrunkInfo, reason TrunkFilteredReason) bool {
+					filtered = append(filtered, reason)
+					return false
+				}),
+			)
+			require.NoError(t, err)
+			require.Equal(t, c.exp, got != nil)
+			if c.exp {
+				require.Empty(t, filtered)
+			} else {
+				require.Equal(t, []TrunkFilteredReason{TrunkFilteredSourceAddressDisallowed}, filtered)
+			}
 		})
 	}
 }

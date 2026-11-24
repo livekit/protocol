@@ -44,6 +44,48 @@ const (
 	JobStatusFailed    JobStatus = "failed"
 )
 
+type JoinOutcome string
+
+const (
+	JoinOutcomeUndefined     JoinOutcome = ""
+	JoinOutcomeConnected     JoinOutcome = "connected"
+	JoinOutcomeAbandoned     JoinOutcome = "abandoned"
+	JoinOutcomeCancelled     JoinOutcome = "cancelled"
+	JoinOutcomeCustomerError JoinOutcome = "customer_error"
+	JoinOutcomeFailed        JoinOutcome = "failed"
+)
+
+type LatencyScope string
+
+const (
+	LatencyScopeUndefined LatencyScope = ""
+	LatencyScopeCounted   LatencyScope = "counted"
+	LatencyScopeExcluded  LatencyScope = "excluded"
+	LatencyScopeNoUser    LatencyScope = "no_user"
+)
+
+type JoinOrigin string
+
+const (
+	JoinOriginUndefined        JoinOrigin = ""
+	JoinOriginWebrtc           JoinOrigin = "webrtc"
+	JoinOriginSIPInbound       JoinOrigin = "sip_inbound"
+	JoinOriginSIPOutbound      JoinOrigin = "sip_outbound"
+	JoinOriginWhatsappInbound  JoinOrigin = "whatsapp_inbound"
+	JoinOriginWhatsappOutbound JoinOrigin = "whatsapp_outbound"
+	JoinOriginTwilioInbound    JoinOrigin = "twilio_inbound"
+	JoinOriginTwilioOutbound   JoinOrigin = "twilio_outbound"
+)
+
+type DispatchTrigger string
+
+const (
+	DispatchTriggerUndefined   DispatchTrigger = ""
+	DispatchTriggerJoin        DispatchTrigger = "join"
+	DispatchTriggerRoomAPI     DispatchTrigger = "room_api"
+	DispatchTriggerDispatchAPI DispatchTrigger = "dispatch_api"
+)
+
 type Rollup string
 
 const (

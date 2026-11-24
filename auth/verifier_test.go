@@ -15,6 +15,8 @@
 package auth_test
 
 import (
+	"crypto/ed25519"
+	"crypto/rand"
 	"encoding/json"
 	"testing"
 	"time"
@@ -174,5 +176,136 @@ func TestVerifier(t *testing.T) {
 		require.Nil(t, decoded.Video.CanSubscribe)
 		require.Nil(t, decoded.Video.CanPublish)
 		require.False(t, *decoded.Video.CanPublishData)
+	})
+}
+
+func TestVerifyWithKey(t *testing.T) {
+	apiKey := "APID3B67uxk4Nj2GKiRPibAZ9"
+	secret := "YHC-CUhbQhGeVCaYgn1BNA++"
+	pub, priv, err := ed25519.GenerateKey(rand.Reader)
+	require.NoError(t, err)
+	v1Key := auth.VerificationKey{Version: 1, Secret: secret}
+	v2Key := auth.VerificationKey{Version: 2, PublicKey: pub}
+
+	grant := &auth.VideoGrant{RoomJoin: true, Room: "myroom"}
+	hsToken, err := auth.NewAccessToken(apiKey, secret).SetVideoGrant(grant).SetIdentity("me").ToJWT()
+	require.NoError(t, err)
+	edToken, err := auth.NewAccessTokenWithPrivateKey(apiKey, priv).SetVideoGrant(grant).SetIdentity("me").ToJWT()
+	require.NoError(t, err)
+
+	parse := func(t *testing.T, token string) *auth.APIKeyTokenVerifier {
+		v, err := auth.ParseAPIToken(token)
+		require.NoError(t, err)
+		require.Equal(t, apiKey, v.APIKey())
+		require.Equal(t, "me", v.Identity())
+		return v
+	}
+
+	t.Run("v1 key verifies HS256", func(t *testing.T) {
+		_, decoded, err := parse(t, hsToken).VerifyWithKey(v1Key)
+		require.NoError(t, err)
+		require.Equal(t, grant, decoded.Video)
+	})
+
+	t.Run("v2 key verifies EdDSA", func(t *testing.T) {
+		_, decoded, err := parse(t, edToken).VerifyWithKey(v2Key)
+		require.NoError(t, err)
+		require.Equal(t, grant, decoded.Video)
+	})
+
+	t.Run("v2 key refuses HS256", func(t *testing.T) {
+		_, _, err := parse(t, hsToken).VerifyWithKey(v2Key)
+		require.ErrorIs(t, err, auth.ErrKeyAlgorithmMismatch)
+	})
+
+	t.Run("v1 key refuses EdDSA", func(t *testing.T) {
+		_, _, err := parse(t, edToken).VerifyWithKey(v1Key)
+		require.ErrorIs(t, err, auth.ErrKeyAlgorithmMismatch)
+	})
+
+	t.Run("v2 key refuses HS256 signed with the public key as secret", func(t *testing.T) {
+		// algorithm confusion: the attacker knows the public key and uses it as an HMAC secret
+		token, err := auth.NewAccessToken(apiKey, string(pub)).SetVideoGrant(grant).SetIdentity("me").ToJWT()
+		require.NoError(t, err)
+		_, _, err = parse(t, token).VerifyWithKey(v2Key)
+		require.ErrorIs(t, err, auth.ErrKeyAlgorithmMismatch)
+	})
+
+	t.Run("v2 key refuses EdDSA signed with another key", func(t *testing.T) {
+		_, otherPriv, err := ed25519.GenerateKey(rand.Reader)
+		require.NoError(t, err)
+		token, err := auth.NewAccessTokenWithPrivateKey(apiKey, otherPriv).SetIdentity("me").ToJWT()
+		require.NoError(t, err)
+		_, _, err = parse(t, token).VerifyWithKey(v2Key)
+		require.Error(t, err)
+	})
+
+	t.Run("v2 key refuses a token with no kid or a kid that is not the issuer", func(t *testing.T) {
+		for _, kid := range []string{"", "APIother"} {
+			tok := jwt.NewWithClaims(jwt.SigningMethodEdDSA, jwt.MapClaims{
+				"iss": apiKey,
+				"sub": "me",
+				"exp": jwt.NewNumericDate(time.Now().Add(time.Hour)),
+			})
+			if kid != "" {
+				tok.Header["kid"] = kid
+			}
+			token, err := tok.SignedString(priv)
+			require.NoError(t, err)
+			_, _, err = parse(t, token).VerifyWithKey(v2Key)
+			require.ErrorIs(t, err, auth.ErrKeyIDMismatch)
+		}
+	})
+
+	t.Run("v2 key refuses a token that is not of the v2 type", func(t *testing.T) {
+		// jwt sets typ to JWT by default
+		tok := jwt.NewWithClaims(jwt.SigningMethodEdDSA, jwt.MapClaims{
+			"iss": apiKey,
+			"sub": "me",
+			"exp": jwt.NewNumericDate(time.Now().Add(time.Hour)),
+		})
+		tok.Header["kid"] = apiKey
+		token, err := tok.SignedString(priv)
+		require.NoError(t, err)
+		_, _, err = parse(t, token).VerifyWithKey(v2Key)
+		require.ErrorIs(t, err, auth.ErrTokenTypeMismatch)
+	})
+
+	t.Run("expired EdDSA token is refused", func(t *testing.T) {
+		token, err := jwt.NewWithClaims(jwt.SigningMethodEdDSA, jwt.MapClaims{
+			"iss": apiKey,
+			"sub": "me",
+			"exp": jwt.NewNumericDate(time.Now().Add(-time.Hour)),
+		}).SignedString(priv)
+		require.NoError(t, err)
+		_, _, err = parse(t, token).VerifyWithKey(v2Key)
+		require.ErrorIs(t, err, jwt.ErrTokenExpired)
+	})
+
+	t.Run("v1 key with empty secret is refused", func(t *testing.T) {
+		_, _, err := parse(t, hsToken).VerifyWithKey(auth.VerificationKey{Version: 1})
+		require.ErrorIs(t, err, auth.ErrKeysMissing)
+	})
+
+	t.Run("v2 key with empty or wrong-size public key is refused", func(t *testing.T) {
+		_, _, err := parse(t, edToken).VerifyWithKey(auth.VerificationKey{Version: 2})
+		require.ErrorIs(t, err, auth.ErrKeysMissing)
+		_, _, err = parse(t, edToken).VerifyWithKey(auth.VerificationKey{Version: 2, PublicKey: pub[:16]})
+		require.ErrorIs(t, err, auth.ErrInvalidPublicKey)
+	})
+
+	t.Run("unknown version is refused", func(t *testing.T) {
+		for _, version := range []int{0, 3} {
+			_, _, err := parse(t, hsToken).VerifyWithKey(auth.VerificationKey{Version: version, Secret: secret, PublicKey: pub})
+			require.ErrorIs(t, err, auth.ErrUnsupportedKeyVersion)
+		}
+	})
+
+	t.Run("Verify refuses EdDSA", func(t *testing.T) {
+		v := parse(t, edToken)
+		_, _, err := v.Verify(secret)
+		require.ErrorIs(t, err, auth.ErrKeyAlgorithmMismatch)
+		_, _, err = v.Verify(pub)
+		require.ErrorIs(t, err, auth.ErrKeyAlgorithmMismatch)
 	})
 }

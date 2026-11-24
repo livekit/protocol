@@ -15,6 +15,7 @@
 package auth
 
 import (
+	"crypto/ed25519"
 	"encoding/base64"
 	"encoding/json"
 	"strings"
@@ -35,6 +36,26 @@ func TestAccessToken(t *testing.T) {
 		token := NewAccessToken("", "")
 		_, err := token.ToJWT()
 		require.Equal(t, ErrKeysMissing, err)
+
+		apiKey, _ := apiKeypair()
+		_, err = NewAccessTokenWithPrivateKey(apiKey, nil).ToJWT()
+		require.Equal(t, ErrKeysMissing, err)
+		_, err = NewAccessTokenWithPrivateKey(apiKey, make(ed25519.PrivateKey, 16)).ToJWT()
+		require.Equal(t, ErrKeysMissing, err)
+	})
+
+	t.Run("private key signs with EdDSA", func(t *testing.T) {
+		apiKey, _ := apiKeypair()
+		_, priv, err := ed25519.GenerateKey(nil)
+		require.NoError(t, err)
+		value, err := NewAccessTokenWithPrivateKey(apiKey, priv).SetIdentity("user").ToJWT()
+		require.NoError(t, err)
+
+		decoded := tokenClaims{}
+		token, _, err := unverifiedParser.ParseUnverified(value, &decoded)
+		require.NoError(t, err)
+		require.Equal(t, "EdDSA", token.Method.Alg())
+		require.Equal(t, apiKey, decoded.Issuer)
 	})
 
 	t.Run("generates a decode-able key", func(t *testing.T) {
@@ -276,4 +297,26 @@ func decodeClaims(t *testing.T, raw string) string {
 	body, err := base64.RawURLEncoding.DecodeString(parts[1])
 	require.NoError(t, err)
 	return string(body)
+}
+
+func TestObservabilityGrantRoundTrip(t *testing.T) {
+	t.Parallel()
+
+	apiKey, secret := apiKeypair()
+	grant := &ObservabilityGrant{ClientWrite: true}
+	raw, err := NewAccessToken(apiKey, secret).
+		SetObservabilityGrant(grant).
+		SetValidFor(time.Minute).
+		ToJWT()
+	require.NoError(t, err)
+
+	// the claim key is camelCase, and an unset write is omitted
+	claims := decodeClaims(t, raw)
+	require.Contains(t, claims, `"observability":{"clientWrite":true}`)
+
+	v, err := ParseAPIToken(raw)
+	require.NoError(t, err)
+	_, decoded, err := v.Verify(secret)
+	require.NoError(t, err)
+	require.Equal(t, grant, decoded.Observability)
 }

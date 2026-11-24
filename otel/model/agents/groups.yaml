@@ -1,0 +1,37 @@
+# Agents' use of upstream GenAI definitions that a plain `ref` cannot express: metrics imported
+# from the GenAI registry, and values Agents sends for upstream keys that the upstream definition
+# does not list. Definition/2, because only a public attribute group reaches the generated code.
+file_format: definition/2
+imports:
+  # Generated in the `upstream` section of the Rust and Python output. gen_ai.client.operation.duration
+  # cannot be imported (see the comment on it in signals.yaml).
+  metrics:
+    - gen_ai.invoke_agent.duration
+    - gen_ai.execute_tool.duration
+attribute_groups:
+  - id: livekit.agents.upstream_values
+    visibility: public
+    stability: development
+    brief: Values Agents sends for upstream GenAI keys that the upstream definitions do not list.
+    note: >
+      Each `annotations.livekit.shipped_values` entry is a value Agents emits for the referenced
+      upstream key. The generated code gives it a constant next to the upstream values. The policy
+      livekit_shipped_value rejects an entry that repeats an upstream value.
+    attributes:
+      - ref: gen_ai.provider.name
+        requirement_level: recommended
+        annotations:
+          livekit:
+            shipped_values:
+              - {id: mistral_ai, value: mistral_ai, brief: "Mistral, as Agents sends it. The upstream member is `mistral`."}
+      - ref: gen_ai.response.finish_reasons
+        requirement_level: recommended
+        annotations:
+          livekit:
+            shipped_values:
+              - {id: stop, value: stop, brief: The generation finished normally.}
+              - {id: length, value: length, brief: The output reached the token limit.}
+              - {id: content_filter, value: content_filter, brief: A content filter stopped the output.}
+              - {id: tool_call, value: tool_call, brief: The generation ended with a tool call.}
+              - {id: compaction, value: compaction, brief: "Declared in Agents' `GenAIFinishReason`. No Agents code path sends it today."}
+              - {id: error, value: error, brief: "The generation ended abnormally. The upstream note names this value."}

@@ -190,3 +190,10 @@ func TestAggregateMemoryStats(t *testing.T) {
 		require.Empty(t, groups)
 	})
 }
+
+func TestNewCPUStatsWithHostCPU(t *testing.T) {
+	c, err := NewCPUStats(nil, WithHostCPU())
+	require.NoError(t, err)
+	defer c.Stop()
+	require.IsType(t, &osStatCPUMonitor{}, c.platform)
+}

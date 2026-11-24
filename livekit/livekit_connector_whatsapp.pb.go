@@ -820,13 +820,13 @@ var File_livekit_connector_whatsapp_proto protoreflect.FileDescriptor
 
 const file_livekit_connector_whatsapp_proto_rawDesc = "" +
 	"\n" +
-	" livekit_connector_whatsapp.proto\x12\alivekit\x1a\x1egoogle/protobuf/duration.proto\x1a\x1clivekit_agent_dispatch.proto\x1a\x11livekit_rtc.proto\x1a\x14logger/options.proto\"\xe8\a\n" +
+	" livekit_connector_whatsapp.proto\x12\alivekit\x1a\x1egoogle/protobuf/duration.proto\x1a\x1clivekit_agent_dispatch.proto\x1a\x11livekit_rtc.proto\x1a\x14logger/options.proto\"\xed\a\n" +
 	"\x17DialWhatsAppCallRequest\x12Q\n" +
 	"\x18whatsapp_phone_number_id\x18\x01 \x01(\tB\x18\xbaP\x15whatsappPhoneNumberIDR\x15whatsappPhoneNumberId\x12<\n" +
 	"\x18whatsapp_to_phone_number\x18\x02 \x01(\tB\x03\xc0P\x01R\x15whatsappToPhoneNumber\x12-\n" +
 	"\x10whatsapp_api_key\x18\x03 \x01(\tB\x03\xc0P\x02R\x0ewhatsappApiKey\x12;\n" +
-	"\x1awhatsapp_cloud_api_version\x18\f \x01(\tR\x17whatsappCloudApiVersion\x12H\n" +
-	"!whatsapp_biz_opaque_callback_data\x18\x04 \x01(\tR\x1dwhatsappBizOpaqueCallbackData\x12\x1b\n" +
+	"\x1awhatsapp_cloud_api_version\x18\f \x01(\tR\x17whatsappCloudApiVersion\x12M\n" +
+	"!whatsapp_biz_opaque_callback_data\x18\x04 \x01(\tB\x03\xc0P\x01R\x1dwhatsappBizOpaqueCallbackData\x12\x1b\n" +
 	"\troom_name\x18\x05 \x01(\tR\broomName\x122\n" +
 	"\x06agents\x18\x06 \x03(\v2\x1a.livekit.RoomAgentDispatchR\x06agents\x121\n" +
 	"\x14participant_identity\x18\a \x01(\tR\x13participantIdentity\x12O\n" +
@@ -854,13 +854,13 @@ const file_livekit_connector_whatsapp_proto_rawDesc = "" +
 	"\x10whatsapp_call_id\x18\x01 \x01(\tB\x11\xbaP\x0ewhatsappCallIDR\x0ewhatsappCallId\x12-\n" +
 	"\x03sdp\x18\x02 \x01(\v2\x1b.livekit.SessionDescriptionR\x03sdp\x12.\n" +
 	"\x13wait_until_answered\x18\x03 \x01(\bR\x11waitUntilAnswered\"\x1d\n" +
-	"\x1bConnectWhatsAppCallResponse\"\xca\b\n" +
+	"\x1bConnectWhatsAppCallResponse\"\xcf\b\n" +
 	"\x19AcceptWhatsAppCallRequest\x12Q\n" +
 	"\x18whatsapp_phone_number_id\x18\x01 \x01(\tB\x18\xbaP\x15whatsappPhoneNumberIDR\x15whatsappPhoneNumberId\x12-\n" +
 	"\x10whatsapp_api_key\x18\x02 \x01(\tB\x03\xc0P\x02R\x0ewhatsappApiKey\x12;\n" +
 	"\x1awhatsapp_cloud_api_version\x18\r \x01(\tR\x17whatsappCloudApiVersion\x12;\n" +
-	"\x10whatsapp_call_id\x18\x03 \x01(\tB\x11\xbaP\x0ewhatsappCallIDR\x0ewhatsappCallId\x12H\n" +
-	"!whatsapp_biz_opaque_callback_data\x18\x04 \x01(\tR\x1dwhatsappBizOpaqueCallbackData\x12-\n" +
+	"\x10whatsapp_call_id\x18\x03 \x01(\tB\x11\xbaP\x0ewhatsappCallIDR\x0ewhatsappCallId\x12M\n" +
+	"!whatsapp_biz_opaque_callback_data\x18\x04 \x01(\tB\x03\xc0P\x01R\x1dwhatsappBizOpaqueCallbackData\x12-\n" +
 	"\x03sdp\x18\x05 \x01(\v2\x1b.livekit.SessionDescriptionR\x03sdp\x12\x1b\n" +
 	"\troom_name\x18\x06 \x01(\tR\broomName\x122\n" +
 	"\x06agents\x18\a \x03(\v2\x1a.livekit.RoomAgentDispatchR\x06agents\x121\n" +

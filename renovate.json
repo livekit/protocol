@@ -58,6 +58,22 @@
     {
       "matchManagers": ["npm"],
       "groupName": "npm deps"
+    },
+    {
+      "description": "protobuf-es stays on v1: v2 replaces the generated message classes with schemas, which changes the published @livekit/protocol API for every SDK that consumes it. Moving to v2 is a coordinated migration, not a dependency bump.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": [
+        "@bufbuild/protobuf",
+        "@bufbuild/protoc-gen-es"
+      ],
+      "allowedVersions": "<2"
+    },
+    {
+      "description": "TypeScript majors get their own PR: TypeScript 7 no longer exposes the JS compiler API that unbuild's declaration bundling depends on, so a major can block every other npm bump until the build tooling catches up.",
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["typescript"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "typescript major"
     }
   ],
   "postUpdateOptions": [

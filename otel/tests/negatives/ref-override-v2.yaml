@@ -1,0 +1,11 @@
+# expect: livekit_ref_override
+file_format: definition/2
+attribute_groups:
+  - id: livekit.negative
+    visibility: public
+    stability: development
+    brief: A definition/2 ref that overrides the referenced key's classification.
+    attributes:
+      - ref: lk.pii.room_name
+        requirement_level: recommended
+        annotations: {livekit: {owner: shared, sensitivity: none}}

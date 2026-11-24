@@ -1,0 +1,12 @@
+# expect: livekit_cardinality
+groups:
+  - id: metric.client.reconnect.count
+    type: metric
+    metric_name: client.reconnect.count
+    instrument: counter
+    unit: "{reconnect}"
+    stability: development
+    brief: A high-cardinality metric dimension.
+    attributes:
+      - ref: lk.room_id
+        requirement_level: required

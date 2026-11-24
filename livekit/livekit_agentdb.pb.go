@@ -226,7 +226,7 @@ func (x *AgentDB_CreateRequest) GetTtl() *durationpb.Duration {
 
 type AgentDB_CreateResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	DatabaseId    string                 `protobuf:"bytes,1,opt,name=database_id,json=databaseId,proto3" json:"database_id,omitempty"` // "DB_..."
+	DatabaseId    string                 `protobuf:"bytes,1,opt,name=database_id,json=databaseId,proto3" json:"database_id,omitempty"` // "DB_..." for a standalone database, the thread id ("AT_...") for a thread's
 	ExpiresAt     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -687,7 +687,8 @@ func (x *AgentDB_ExportResponse) GetTip() int64 {
 
 // Data plane: one WebSocket per database, one message per frame, correlated
 // by a client-chosen request_id. Result batches are paced by Credit, so the
-// server never sends more un-consumed batches than granted.
+// server never sends more un-consumed batches than granted. A frame is at
+// most 16 MiB, both ways.
 type AgentDB_Wire struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -1353,6 +1354,8 @@ func (x *AgentDB_Wire_Batch) GetStatements() []*AgentDB_Wire_Statement {
 	return nil
 }
 
+// Unsupported: a request is one transaction and none spans requests, so
+// these are refused. Send the statements as one Batch.
 type AgentDB_Wire_Begin struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -1641,6 +1644,7 @@ type AgentDB_Wire_Hello struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
 	DatabaseId    string                 `protobuf:"bytes,2,opt,name=database_id,json=databaseId,proto3" json:"database_id,omitempty"`
+	ClientVersion string                 `protobuf:"bytes,4,opt,name=client_version,json=clientVersion,proto3" json:"client_version,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1685,6 +1689,13 @@ func (x *AgentDB_Wire_Hello) GetToken() string {
 func (x *AgentDB_Wire_Hello) GetDatabaseId() string {
 	if x != nil {
 		return x.DatabaseId
+	}
+	return ""
+}
+
+func (x *AgentDB_Wire_Hello) GetClientVersion() string {
+	if x != nil {
+		return x.ClientVersion
 	}
 	return ""
 }
@@ -2078,10 +2089,14 @@ func (x *AgentDB_Wire_Done) GetTotalRows() uint64 {
 	return 0
 }
 
+// A failed request. The server's table of codes says, for each, whether
+// the request may have applied and whether it may be sent again: a client
+// branches on code alone. Name and description are for people.
 type AgentDB_Wire_Error struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Code          string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"` // stable, machine-readable
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Code          uint32                 `protobuf:"varint,3,opt,name=code,proto3" json:"code,omitempty"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2116,16 +2131,23 @@ func (*AgentDB_Wire_Error) Descriptor() ([]byte, []int) {
 	return file_livekit_agentdb_proto_rawDescGZIP(), []int{0, 10, 19}
 }
 
-func (x *AgentDB_Wire_Error) GetCode() string {
+func (x *AgentDB_Wire_Error) GetCode() uint32 {
 	if x != nil {
 		return x.Code
+	}
+	return 0
+}
+
+func (x *AgentDB_Wire_Error) GetName() string {
+	if x != nil {
+		return x.Name
 	}
 	return ""
 }
 
-func (x *AgentDB_Wire_Error) GetMessage() string {
+func (x *AgentDB_Wire_Error) GetDescription() string {
 	if x != nil {
-		return x.Message
+		return x.Description
 	}
 	return ""
 }
@@ -2134,7 +2156,7 @@ var File_livekit_agentdb_proto protoreflect.FileDescriptor
 
 const file_livekit_agentdb_proto_rawDesc = "" +
 	"\n" +
-	"\x15livekit_agentdb.proto\x12\alivekit\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x14logger/options.proto\"\xa1\x1b\n" +
+	"\x15livekit_agentdb.proto\x12\alivekit\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x14logger/options.proto\"\xe4\x1b\n" +
 	"\aAgentDB\x1a<\n" +
 	"\rCreateRequest\x12+\n" +
 	"\x03ttl\x18\x01 \x01(\v2\x19.google.protobuf.DurationR\x03ttl\x1al\n" +
@@ -2174,7 +2196,7 @@ const file_livekit_agentdb_proto_rawDesc = "" +
 	"\fdownload_url\x18\x01 \x01(\tR\vdownloadUrl\x129\n" +
 	"\n" +
 	"expires_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\x12\x10\n" +
-	"\x03tip\x18\x03 \x01(\x03R\x03tip\x1a\xad\x14\n" +
+	"\x03tip\x18\x03 \x01(\x03R\x03tip\x1a\xf0\x14\n" +
 	"\x04Wire\x1a\xe0\x04\n" +
 	"\rClientMessage\x12\x1d\n" +
 	"\n" +
@@ -2232,11 +2254,12 @@ const file_livekit_agentdb_proto_rawDesc = "" +
 	"\ftimestamp_ms\x18\x01 \x01(\x03R\vtimestampMs\x1a^\n" +
 	"\x04Pong\x123\n" +
 	"\x16last_ping_timestamp_ms\x18\x01 \x01(\x03R\x13lastPingTimestampMs\x12!\n" +
-	"\ftimestamp_ms\x18\x02 \x01(\x03R\vtimestampMs\x1aC\n" +
+	"\ftimestamp_ms\x18\x02 \x01(\x03R\vtimestampMs\x1aj\n" +
 	"\x05Hello\x12\x19\n" +
 	"\x05token\x18\x01 \x01(\tB\x03\xc0P\x02R\x05token\x12\x1f\n" +
 	"\vdatabase_id\x18\x02 \x01(\tR\n" +
-	"databaseId\x1am\n" +
+	"databaseId\x12%\n" +
+	"\x0eclient_version\x18\x04 \x01(\tR\rclientVersion\x1am\n" +
 	"\aHelloOk\x12\x10\n" +
 	"\x03tip\x18\x01 \x01(\x03R\x03tip\x12(\n" +
 	"\x10ping_interval_ms\x18\x02 \x01(\rR\x0epingIntervalMs\x12&\n" +
@@ -2265,10 +2288,11 @@ const file_livekit_agentdb_proto_rawDesc = "" +
 	"\x04Done\x12\x10\n" +
 	"\x03tip\x18\x01 \x01(\x03R\x03tip\x12\x1d\n" +
 	"\n" +
-	"total_rows\x18\x02 \x01(\x04R\ttotalRows\x1a5\n" +
+	"total_rows\x18\x02 \x01(\x04R\ttotalRows\x1aQ\n" +
 	"\x05Error\x12\x12\n" +
-	"\x04code\x18\x01 \x01(\tR\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"\x1a\n" +
+	"\x04code\x18\x03 \x01(\rR\x04code\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\"\x1a\n" +
 	"\tQueryLang\x12\a\n" +
 	"\x03SQL\x10\x00\"\x04\b\x01\x10\x01\">\n" +
 	"\tValueType\x12\b\n" +

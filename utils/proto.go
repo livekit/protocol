@@ -15,9 +15,10 @@
 package utils
 
 import (
-	"github.com/livekit/protocol/livekit/logger"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
+
+	"github.com/livekit/protocol/livekit/logger"
 )
 
 func CloneProto[T proto.Message](m T) T {
@@ -46,29 +47,31 @@ func CloneProtoRedacted[T proto.Message](m T) T {
 			if proto.HasExtension(fd.Options(), logger.E_Sensitivity) {
 				if proto.GetExtension(fd.Options(), logger.E_Sensitivity).(logger.Sensitivity) >= logger.Sensitivity_SENSITIVITY_PII {
 					reflected.Clear(fd)
+					return true
 				}
 			}
 
-			if fd.Kind() == protoreflect.MessageKind {
-				switch {
-				case fd.IsList():
-					src := v.List()
-					for i := 0; i < src.Len(); i++ {
-						elem := src.Get(i).Message().Interface()
-						redact(elem)
-					}
-
-				case fd.IsMap():
-					src := v.Map()
-					src.Range(func(key protoreflect.MapKey, val protoreflect.Value) bool {
-						elem := val.Message().Interface()
-						redact(elem)
-						return true
-					})
-
-				default:
-					redact(v.Message().Interface())
+			switch {
+			case fd.IsMap():
+				// fd.Kind() is MessageKind for every map (synthetic entry type), so check the value type.
+				if fd.MapValue().Message() == nil {
+					break
 				}
+				v.Map().Range(func(_ protoreflect.MapKey, val protoreflect.Value) bool {
+					redact(val.Message().Interface())
+					return true
+				})
+
+			case fd.Message() == nil:
+
+			case fd.IsList():
+				src := v.List()
+				for i := 0; i < src.Len(); i++ {
+					redact(src.Get(i).Message().Interface())
+				}
+
+			default:
+				redact(v.Message().Interface())
 			}
 
 			return true

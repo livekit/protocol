@@ -13,6 +13,7 @@ message AgentDevMessage {
     GetRunningAgentJobsRequest get_running_jobs_request = 1;
     GetRunningAgentJobsResponse get_running_jobs_response = 2;
     ServerInfo server_info = 3;
+    Credentials credentials = 4;
   }
 }
 
@@ -20,6 +21,18 @@ message AgentDevMessage {
 message ServerInfo {
   string agent_name = 1;
   string url = 2;
+  // set by an agent SDK that runs on LIVEKIT_TOKEN without an API key and secret
+  // (token mode) and accepts Credentials
+  bool supports_token_mode = 3;
+}
+
+// Credentials is sent by the CLI to an agent in token mode: a new worker token that
+// replaces the one the agent runs with.
+message Credentials {
+  string url = 1;
+  string token = 2 [(logger.sensitivity) = SENSITIVITY_SECRET];
+  // Unix seconds
+  int64 expires_at = 3;
 }
 
 message GetRunningAgentJobsRequest {}
