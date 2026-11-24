@@ -205,8 +205,10 @@ message StartSession {
   int64 token_expires_at = 26;
   // API key that issued the join token, for correlating sessions with the key
   string api_key = 27;
+  // client preferred ICE candidate protocol, UDP means no preference
+  CandidateProtocol candidate_protocol = 28;
 
-  // NEXT ID: 28
+  // NEXT ID: 29
 }
 
 // room info that should not be returned to clients

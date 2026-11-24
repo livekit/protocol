@@ -1137,9 +1137,11 @@ type StartSession struct {
 	UseSinglePeerConnection bool                `protobuf:"varint,24,opt,name=use_single_peer_connection,json=useSinglePeerConnection,proto3" json:"use_single_peer_connection,omitempty"`
 	TokenExpiresAt          int64               `protobuf:"varint,26,opt,name=token_expires_at,json=tokenExpiresAt,proto3" json:"token_expires_at,omitempty"`
 	// API key that issued the join token, for correlating sessions with the key
-	ApiKey        string `protobuf:"bytes,27,opt,name=api_key,json=apiKey,proto3" json:"api_key,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	ApiKey string `protobuf:"bytes,27,opt,name=api_key,json=apiKey,proto3" json:"api_key,omitempty"`
+	// client preferred ICE candidate protocol, UDP means no preference
+	CandidateProtocol CandidateProtocol `protobuf:"varint,28,opt,name=candidate_protocol,json=candidateProtocol,proto3,enum=livekit.CandidateProtocol" json:"candidate_protocol,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *StartSession) Reset() {
@@ -1333,6 +1335,13 @@ func (x *StartSession) GetApiKey() string {
 		return x.ApiKey
 	}
 	return ""
+}
+
+func (x *StartSession) GetCandidateProtocol() CandidateProtocol {
+	if x != nil {
+		return x.CandidateProtocol
+	}
+	return CandidateProtocol_UDP
 }
 
 // room info that should not be returned to clients
@@ -1606,7 +1615,7 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"memoryLoad\x12\x1f\n" +
 	"\vmemory_used\x18\x16 \x01(\x02R\n" +
 	"memoryUsed\x12!\n" +
-	"\fmemory_total\x18\x17 \x01(\x02R\vmemoryTotal\"\xe3\b\n" +
+	"\fmemory_total\x18\x17 \x01(\x02R\vmemoryTotal\"\xae\t\n" +
 	"\fStartSession\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x12\x1a\n" +
 	"\bidentity\x18\x02 \x01(\tR\bidentity\x124\n" +
@@ -1634,7 +1643,8 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"sync_state\x18\x17 \x01(\v2\x12.livekit.SyncStateR\tsyncState\x12;\n" +
 	"\x1ause_single_peer_connection\x18\x18 \x01(\bR\x17useSinglePeerConnection\x12(\n" +
 	"\x10token_expires_at\x18\x1a \x01(\x03R\x0etokenExpiresAt\x12\x17\n" +
-	"\aapi_key\x18\x1b \x01(\tR\x06apiKeyB\x1c\n" +
+	"\aapi_key\x18\x1b \x01(\tR\x06apiKey\x12I\n" +
+	"\x12candidate_protocol\x18\x1c \x01(\x0e2\x1a.livekit.CandidateProtocolR\x11candidateProtocolB\x1c\n" +
 	"\x1a_auto_subscribe_data_trackB\x19\n" +
 	"\x17_subscriber_allow_pause\"\xf6\x03\n" +
 	"\fRoomInternal\x12;\n" +
@@ -1707,10 +1717,11 @@ var file_livekit_internal_proto_goTypes = []any{
 	(*AddTrackRequest)(nil),       // 13: livekit.AddTrackRequest
 	(*SessionDescription)(nil),    // 14: livekit.SessionDescription
 	(*SyncState)(nil),             // 15: livekit.SyncState
-	(*AutoTrackEgress)(nil),       // 16: livekit.AutoTrackEgress
-	(*AutoParticipantEgress)(nil), // 17: livekit.AutoParticipantEgress
-	(*PlayoutDelay)(nil),          // 18: livekit.PlayoutDelay
-	(*RoomAgentDispatch)(nil),     // 19: livekit.RoomAgentDispatch
+	(CandidateProtocol)(0),        // 16: livekit.CandidateProtocol
+	(*AutoTrackEgress)(nil),       // 17: livekit.AutoTrackEgress
+	(*AutoParticipantEgress)(nil), // 18: livekit.AutoParticipantEgress
+	(*PlayoutDelay)(nil),          // 19: livekit.PlayoutDelay
+	(*RoomAgentDispatch)(nil),     // 20: livekit.RoomAgentDispatch
 }
 var file_livekit_internal_proto_depIdxs = []int32{
 	4,  // 0: livekit.Node.stats:type_name -> livekit.NodeStats
@@ -1723,18 +1734,19 @@ var file_livekit_internal_proto_depIdxs = []int32{
 	13, // 7: livekit.StartSession.add_track_requests:type_name -> livekit.AddTrackRequest
 	14, // 8: livekit.StartSession.publisher_offer:type_name -> livekit.SessionDescription
 	15, // 9: livekit.StartSession.sync_state:type_name -> livekit.SyncState
-	16, // 10: livekit.RoomInternal.track_egress:type_name -> livekit.AutoTrackEgress
-	17, // 11: livekit.RoomInternal.participant_egress:type_name -> livekit.AutoParticipantEgress
-	18, // 12: livekit.RoomInternal.playout_delay:type_name -> livekit.PlayoutDelay
-	19, // 13: livekit.RoomInternal.agent_dispatches:type_name -> livekit.RoomAgentDispatch
-	9,  // 14: livekit.RoomInternal.tags:type_name -> livekit.RoomInternal.TagsEntry
-	2,  // 15: livekit.ICEConfig.preference_subscriber:type_name -> livekit.ICECandidateType
-	2,  // 16: livekit.ICEConfig.preference_publisher:type_name -> livekit.ICECandidateType
-	17, // [17:17] is the sub-list for method output_type
-	17, // [17:17] is the sub-list for method input_type
-	17, // [17:17] is the sub-list for extension type_name
-	17, // [17:17] is the sub-list for extension extendee
-	0,  // [0:17] is the sub-list for field type_name
+	16, // 10: livekit.StartSession.candidate_protocol:type_name -> livekit.CandidateProtocol
+	17, // 11: livekit.RoomInternal.track_egress:type_name -> livekit.AutoTrackEgress
+	18, // 12: livekit.RoomInternal.participant_egress:type_name -> livekit.AutoParticipantEgress
+	19, // 13: livekit.RoomInternal.playout_delay:type_name -> livekit.PlayoutDelay
+	20, // 14: livekit.RoomInternal.agent_dispatches:type_name -> livekit.RoomAgentDispatch
+	9,  // 15: livekit.RoomInternal.tags:type_name -> livekit.RoomInternal.TagsEntry
+	2,  // 16: livekit.ICEConfig.preference_subscriber:type_name -> livekit.ICECandidateType
+	2,  // 17: livekit.ICEConfig.preference_publisher:type_name -> livekit.ICECandidateType
+	18, // [18:18] is the sub-list for method output_type
+	18, // [18:18] is the sub-list for method input_type
+	18, // [18:18] is the sub-list for extension type_name
+	18, // [18:18] is the sub-list for extension extendee
+	0,  // [0:18] is the sub-list for field type_name
 }
 
 func init() { file_livekit_internal_proto_init() }
