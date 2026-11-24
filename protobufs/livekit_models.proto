@@ -273,6 +273,10 @@ message TrackInfo {
   BackupCodecPolicy backup_codec_policy = 20;
 
   repeated PacketTrailerFeature packet_trailer_features = 21;
+
+  // Priority of the track over the network, from `AddTrackRequest.priority`: 0 is the
+  // most important. Unset when the publisher did not set one.
+  optional uint32 priority = 22;
 }
 
 message DataTrackInfo {
@@ -293,6 +297,10 @@ message DataTrackInfo {
 
   // ID of the schema used by frames on this track if the track is typed.
   optional DataTrackSchemaId schema = 6;
+
+  // Priority of the track over the network, from `PublishDataTrackRequest.priority`: 0 is
+  // the most important. Unset when the publisher did not set one.
+  optional uint32 priority = 7;
 }
 
 // Encoding for frame payloads.

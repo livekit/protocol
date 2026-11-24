@@ -1502,8 +1502,13 @@ type AddTrackRequest struct {
 	BackupCodecPolicy     BackupCodecPolicy      `protobuf:"varint,16,opt,name=backup_codec_policy,json=backupCodecPolicy,proto3,enum=livekit.BackupCodecPolicy" json:"backup_codec_policy,omitempty"`
 	AudioFeatures         []AudioTrackFeature    `protobuf:"varint,17,rep,packed,name=audio_features,json=audioFeatures,proto3,enum=livekit.AudioTrackFeature" json:"audio_features,omitempty"`
 	PacketTrailerFeatures []PacketTrailerFeature `protobuf:"varint,18,rep,packed,name=packet_trailer_features,json=packetTrailerFeatures,proto3,enum=livekit.PacketTrailerFeature" json:"packet_trailer_features,omitempty"`
-	unknownFields         protoimpl.UnknownFields
-	sizeCache             protoimpl.SizeCache
+	// Priority of the track over the network, ordered the way firewall rules are: 0 is the
+	// most important and a larger value is less important. Unset leaves the choice to the
+	// server. The server may raise a value that is too important (it keeps the lowest values
+	// for its own traffic).
+	Priority      *uint32 `protobuf:"varint,19,opt,name=priority,proto3,oneof" json:"priority,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *AddTrackRequest) Reset() {
@@ -1664,6 +1669,13 @@ func (x *AddTrackRequest) GetPacketTrailerFeatures() []PacketTrailerFeature {
 	return nil
 }
 
+func (x *AddTrackRequest) GetPriority() uint32 {
+	if x != nil && x.Priority != nil {
+		return *x.Priority
+	}
+	return 0
+}
+
 type PublishDataTrackRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Client-assigned, 16-bit identifier that will be attached to packets sent by the publisher.
@@ -1678,7 +1690,9 @@ type PublishDataTrackRequest struct {
 	FrameEncoding *DataTrackFrameEncoding `protobuf:"bytes,4,opt,name=frame_encoding,json=frameEncoding,proto3,oneof" json:"frame_encoding,omitempty"`
 	// ID of the schema used by frames on this track if the track is typed.
 	// If set, the associated schema must be stored with `StoreDataBlobRequest`.
-	Schema        *DataTrackSchemaId `protobuf:"bytes,5,opt,name=schema,proto3,oneof" json:"schema,omitempty"`
+	Schema *DataTrackSchemaId `protobuf:"bytes,5,opt,name=schema,proto3,oneof" json:"schema,omitempty"`
+	// Priority of the track over the network, as in `AddTrackRequest.priority`.
+	Priority      *uint32 `protobuf:"varint,6,opt,name=priority,proto3,oneof" json:"priority,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1746,6 +1760,13 @@ func (x *PublishDataTrackRequest) GetSchema() *DataTrackSchemaId {
 		return x.Schema
 	}
 	return nil
+}
+
+func (x *PublishDataTrackRequest) GetPriority() uint32 {
+	if x != nil && x.Priority != nil {
+		return *x.Priority
+	}
+	return 0
 }
 
 type PublishDataTrackResponse struct {
@@ -5532,7 +5553,7 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x05codec\x18\x01 \x01(\tR\x05codec\x12\x10\n" +
 	"\x03cid\x18\x02 \x01(\tR\x03cid\x12+\n" +
 	"\x06layers\x18\x04 \x03(\v2\x13.livekit.VideoLayerR\x06layers\x12B\n" +
-	"\x10video_layer_mode\x18\x05 \x01(\x0e2\x18.livekit.VideoLayer.ModeR\x0evideoLayerMode\"\xee\x05\n" +
+	"\x10video_layer_mode\x18\x05 \x01(\x0e2\x18.livekit.VideoLayer.ModeR\x0evideoLayerMode\"\x9c\x06\n" +
 	"\x0fAddTrackRequest\x12\x10\n" +
 	"\x03cid\x18\x01 \x01(\tR\x03cid\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12&\n" +
@@ -5556,7 +5577,9 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x06stream\x18\x0f \x01(\tR\x06stream\x12J\n" +
 	"\x13backup_codec_policy\x18\x10 \x01(\x0e2\x1a.livekit.BackupCodecPolicyR\x11backupCodecPolicy\x12A\n" +
 	"\x0eaudio_features\x18\x11 \x03(\x0e2\x1a.livekit.AudioTrackFeatureR\raudioFeatures\x12U\n" +
-	"\x17packet_trailer_features\x18\x12 \x03(\x0e2\x1d.livekit.PacketTrailerFeatureR\x15packetTrailerFeatures\"\xaa\x02\n" +
+	"\x17packet_trailer_features\x18\x12 \x03(\x0e2\x1d.livekit.PacketTrailerFeatureR\x15packetTrailerFeatures\x12\x1f\n" +
+	"\bpriority\x18\x13 \x01(\rH\x00R\bpriority\x88\x01\x01B\v\n" +
+	"\t_priority\"\xd8\x02\n" +
 	"\x17PublishDataTrackRequest\x12\x1d\n" +
 	"\n" +
 	"pub_handle\x18\x01 \x01(\rR\tpubHandle\x12\x12\n" +
@@ -5565,9 +5588,11 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"encryption\x18\x03 \x01(\x0e2\x18.livekit.Encryption.TypeR\n" +
 	"encryption\x12K\n" +
 	"\x0eframe_encoding\x18\x04 \x01(\v2\x1f.livekit.DataTrackFrameEncodingH\x00R\rframeEncoding\x88\x01\x01\x127\n" +
-	"\x06schema\x18\x05 \x01(\v2\x1a.livekit.DataTrackSchemaIdH\x01R\x06schema\x88\x01\x01B\x11\n" +
+	"\x06schema\x18\x05 \x01(\v2\x1a.livekit.DataTrackSchemaIdH\x01R\x06schema\x88\x01\x01\x12\x1f\n" +
+	"\bpriority\x18\x06 \x01(\rH\x02R\bpriority\x88\x01\x01B\x11\n" +
 	"\x0f_frame_encodingB\t\n" +
-	"\a_schema\"F\n" +
+	"\a_schemaB\v\n" +
+	"\t_priority\"F\n" +
 	"\x18PublishDataTrackResponse\x12*\n" +
 	"\x04info\x18\x01 \x01(\v2\x16.livekit.DataTrackInfoR\x04info\":\n" +
 	"\x19UnpublishDataTrackRequest\x12\x1d\n" +
@@ -6225,6 +6250,7 @@ func file_livekit_rtc_proto_init() {
 		(*SignalResponse_StoreDataBlobResponse)(nil),
 		(*SignalResponse_GetDataBlobResponse)(nil),
 	}
+	file_livekit_rtc_proto_msgTypes[3].OneofWrappers = []any{}
 	file_livekit_rtc_proto_msgTypes[4].OneofWrappers = []any{}
 	file_livekit_rtc_proto_msgTypes[48].OneofWrappers = []any{
 		(*SimulateScenario_SpeakerUpdate)(nil),
