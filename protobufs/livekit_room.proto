@@ -119,6 +119,10 @@ message RoomEgress {
   RoomCompositeEgressRequest room = 1;
   AutoParticipantEgress participant = 3;
   AutoTrackEgress tracks = 2;
+
+  StartEgressRequest room_egress = 4;  // room_name is replaced with the room's name
+  ParticipantEgressConfig participant_egress = 5;
+  TrackEgressConfig track_egress = 6;
 }
 
 message RoomAgent {

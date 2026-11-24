@@ -214,6 +214,8 @@ message RoomInternal {
   bool replay_enabled = 6;
   bool export_room = 7;
   map<string, string> tags = 8;
+  ParticipantEgressConfig participant_egress_config = 9;
+  TrackEgressConfig track_egress_config = 10;
 }
 
 enum ICECandidateType {

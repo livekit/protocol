@@ -490,6 +490,28 @@ message AutoTrackEgress {
   }
 }
 
+message ParticipantEgressConfig {
+  bool prefer_screen_share = 1;
+  bool capture_data = 2;  // also record the participant's data tracks
+  oneof encoding {
+    EncodingOptionsPreset preset = 3;
+    EncodingOptions advanced = 4;
+  }
+  repeated Output outputs = 5;
+  StorageConfig storage = 6;
+  repeated WebhookConfig webhooks = 7;
+}
+
+message TrackEgressConfig {
+  oneof encoding {
+    EncodingOptionsPreset preset = 1;
+    EncodingOptions advanced = 2;
+  }
+  repeated Output outputs = 3;
+  StorageConfig storage = 4;
+  repeated WebhookConfig webhooks = 5;
+}
+
 // --- Replay Export (message only — RPC defined in cloud_replay.proto) ---
 
 message ExportReplayRequest {
