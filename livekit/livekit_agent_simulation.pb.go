@@ -3697,7 +3697,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\xb9V\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\xc5V\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -3976,8 +3976,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x05actor\x18\x06 \x01(\tR\x05actor\x1aH\n" +
 	"\x0fSamplingOptions\x12\x18\n" +
 	"\asamples\x18\x01 \x01(\x05R\asamples\x12\x1b\n" +
-	"\tpass_rate\x18\x02 \x01(\x01R\bpassRate\x1a\x85\a\n" +
-	"\x06Create\x1a\xec\x05\n" +
+	"\tpass_rate\x18\x02 \x01(\x01R\bpassRate\x1a\x8b\a\n" +
+	"\x06Create\x1a\xf2\x05\n" +
 	"\aRequest\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1d\n" +
@@ -4006,7 +4006,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x0f_scenario_groupB\x0e\n" +
 	"\f_concurrencyB\x05\n" +
 	"\x03_ciB\v\n" +
-	"\t_samplingJ\x04\b\x03\x10\x04R\x11agent_description\x1a\x8b\x01\n" +
+	"\t_samplingJ\x04\b\x03\x10\x04J\x04\b\x13\x10\x14R\x11agent_description\x1a\x8b\x01\n" +
 	"\bResponse\x12*\n" +
 	"\x11simulation_run_id\x18\x01 \x01(\tR\x0fsimulationRunId\x12S\n" +
 	"\x16presigned_post_request\x18\x02 \x01(\v2\x1d.livekit.PresignedPostRequestR\x14presignedPostRequest\x1a\xa0\x01\n" +
@@ -4087,7 +4087,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x10STATUS_CANCELLED\x10\x06B\x0e\n" +
 	"\f_issue_countB\x05\n" +
 	"\x03_ciB\v\n" +
-	"\t_samplingJ\x04\b\b\x10\tR\asummary\"\xb5\x03\n" +
+	"\t_samplingJ\x04\b\b\x10\tJ\x04\b\x18\x10\x19R\asummary\"\xb5\x03\n" +
 	"\bScenario\x12\x14\n" +
 	"\x05label\x18\x01 \x01(\tR\x05label\x12\"\n" +
 	"\finstructions\x18\x02 \x01(\tR\finstructions\x12-\n" +
