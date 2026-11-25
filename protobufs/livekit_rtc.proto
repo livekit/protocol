@@ -186,6 +186,12 @@ message AddTrackRequest {
   repeated AudioTrackFeature audio_features = 17;
 
   repeated PacketTrailerFeature packet_trailer_features = 18;
+
+  // Priority of the track over the network, ordered the way firewall rules are: 0 is the
+  // most important and a larger value is less important. Unset leaves the choice to the
+  // server. The server may raise a value that is too important (it keeps the lowest values
+  // for its own traffic).
+  optional uint32 priority = 19;
 }
 
 message PublishDataTrackRequest {
@@ -206,6 +212,9 @@ message PublishDataTrackRequest {
   // ID of the schema used by frames on this track if the track is typed.
   // If set, the associated schema must be stored with `StoreDataBlobRequest`.
   optional DataTrackSchemaId schema = 5;
+
+  // Priority of the track over the network, as in `AddTrackRequest.priority`.
+  optional uint32 priority = 6;
 }
 
 message PublishDataTrackResponse {
