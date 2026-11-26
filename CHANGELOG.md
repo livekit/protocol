@@ -1,5 +1,17 @@
 # github.com/livekit/protocol
 
+## 1.55.0
+
+### Minor Changes
+
+- Add `candidate_protocol` to `ConnectionSettings` and `StartSession`, so a client can ask the SFU to prefer TCP or TLS candidates - [#2014](https://github.com/livekit/protocol/pull/2014) ([@boks1971](https://github.com/boks1971))
+
+- Add per-track subscription FEC protection through the optional UpdateTrackSettings.fec field, with disabled, adaptive, fixed, and minimum modes and low, medium, and high levels. - [#1987](https://github.com/livekit/protocol/pull/1987) ([@cloudwebrtc](https://github.com/cloudwebrtc))
+
+### Patch Changes
+
+- Add `ObservabilityGrant.ClientWrite` (`clientWrite`), a grant to publish client SDK telemetry only - [#1883](https://github.com/livekit/protocol/pull/1883) ([@pblazej](https://github.com/pblazej))
+
 ## 1.54.2
 
 ### Patch Changes
