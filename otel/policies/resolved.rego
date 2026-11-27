@@ -58,6 +58,20 @@ deny contains data.livekit.lib.finding("livekit_alias_collision", msg) if {
 	msg := sprintf("%s: legacy spelling maps to both %s and %s; a legacy key normalizes to one canonical key", [p.old, p.new, q.new])
 }
 
+# Each spelling in a key's `renamed_from` appears once: an alias that repeats `renamed_from.key`,
+# repeats another alias or is the key itself would be a duplicate key in the generated Go map and
+# TypeScript object literals (a compile error in both), and the set of pairs above hides it.
+deny contains data.livekit.lib.finding("livekit_alias_duplicate", msg) if {
+	some a in attributes
+	from := data.livekit.lib.lk(a.attr, "renamed_from")
+	from != null
+	aliases := object.get(from, "aliases", [])
+	spellings := array.concat([a.key, from.key], aliases)
+	some alias in aliases
+	count([s | some s in spellings; s == alias]) > 1
+	msg := sprintf("%s: renamed_from alias %s repeats the key, renamed_from.key or another alias", [a.key, alias])
+}
+
 # The attribute rules skip deprecated keys, but a spelling the flat-identity rule forbids (a dotted
 # one, or an Agents `_sid` binding) may not be defined, deprecated or not. Either representation;
 # the per-file pass and the --v2 rule above already check every key that is not deprecated.

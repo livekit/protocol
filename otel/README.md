@@ -264,6 +264,7 @@ add to it:
 | `livekit_flat_identity` | yes | no `lk.room.sid`, `lk.participant.sid`, `lk.track.sid`, `lk.job.id`, and no `_sid` spelling (`lk.room_sid`, `lk.participant_sid`, `lk.track_sid`), deprecated or not (deprecated keys: resolved, both modes); pre-#7973 Agents names are historical bindings only |
 | `livekit_shared_rename` | yes | no old spelling named in a `renamed_from` (the `key` or any `aliases` entry) is defined as a key, deprecated or not (resolved, both modes) |
 | `livekit_alias_collision` | yes | no legacy spelling maps to more than one canonical key, so the reader helpers are unambiguous (resolved, both modes) |
+| `livekit_alias_duplicate` | yes | a `renamed_from.aliases` entry does not repeat the key, `renamed_from.key` or another alias, which would be a duplicate key in the generated Go map and TypeScript object (resolved, both modes) |
 | `livekit_rename_value` | yes | every value a `renamed_from` maps to is a member of the shared key's enum |
 | `livekit_seconds`, `livekit_unit` | yes | seconds, unless `unit_exception` |
 | `livekit_metric_unit` | yes | metric units are not `ms` (resolved, so `definition/2` metrics and refinements count) |

@@ -60,12 +60,20 @@ export const KEY_ALIASES: Record<string, readonly string[]> = {
 {% endif %}{% endfor %}};
 
 /**
+ * Own-property lookup, so a key such as `constructor` or `toString` read from a capture never
+ * resolves to an Object.prototype member of the alias maps.
+ */
+function own<T>(map: Record<string, T>, key: string): T | undefined {
+  return Object.prototype.hasOwnProperty.call(map, key) ? map[key] : undefined;
+}
+
+/**
  * Returns the canonical key for a legacy spelling, or `key` unchanged when it is not a known legacy
  * spelling. During dual-emit a record may carry both; the canonical key is already canonical and
  * returns unchanged, so prefer it over the result of normalizing the legacy key.
  */
 export function normalizeKey(key: string): string {
-  return RENAMED_KEYS[key] ?? key;
+  return own(RENAMED_KEYS, key) ?? key;
 }
 
 /**
@@ -73,7 +81,7 @@ export function normalizeKey(key: string): string {
  * carry either. A key with no recorded legacy spelling yields just itself.
  */
 export function aliasesFor(canonical: string): string[] {
-  return [canonical, ...(KEY_ALIASES[canonical] ?? [])];
+  return [canonical, ...(own(KEY_ALIASES, canonical) ?? [])];
 }
 
 /**
@@ -81,5 +89,6 @@ export function aliasesFor(canonical: string): string[] {
  * legacy key as read from the capture, not the canonical key.
  */
 export function normalizeValue(key: string, value: string): string {
-  return RENAMED_VALUES[key]?.[value] ?? value;
+  const values = own(RENAMED_VALUES, key);
+  return (values && own(values, value)) ?? value;
 }
