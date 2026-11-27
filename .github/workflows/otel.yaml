@@ -37,6 +37,12 @@ jobs:
         with:
           version: "0.28.0"
 
+      # The Go codegen target is generated, gofmt'd and verified (go build/test) in this workflow.
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: "go.mod"
+
       - name: Check the registry
         run: otel/check.sh
 
@@ -61,6 +67,14 @@ jobs:
           rustc --edition 2021 --crate-type lib -D warnings -D missing_docs otel/gen/rust/semconv.rs --out-dir "$RUNNER_TEMP"
           npx --yes -p typescript@5.9.3 tsc --strict --noEmit --target es2020 otel/gen/ts/semconv.ts
           python3 -I -W error otel/gen/python/semconv.py
+
+      # The Go package is part of the protocol module, so downstream Go services import it from
+      # github.com/livekit/protocol/otel/gen/go. gotest encodes the alias-map invariants.
+      - name: Generated Go compiles and passes its tests
+        run: |
+          go build ./otel/gen/go/...
+          go vet ./otel/gen/go/... ./otel/gotest/...
+          go test ./otel/gotest/...
 
       - name: Codegen escapes literals (round-trip through rustc, tsc and python3)
         run: otel/tests/codegen.sh

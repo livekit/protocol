@@ -30,14 +30,28 @@ policy, storage and the app API are not conventions and live with each SDK.
 | `model/agents/groups.yaml` | GenAI metrics imported from the GenAI registry, and the values Agents sends for upstream keys that the upstream definitions do not list |
 | `policies/` | LiveKit rules (`lib.rego`), applied per file (`livekit.rego`, default mode) and to the resolved registry (`resolved.rego`, default and `--v2`); any finding fails `check.sh` and `generate.sh` |
 | `advice/` | Non-failing advice, printed by `check.sh` |
-| `templates/registry/{rust,typescript,python,markdown}/` | Codegen templates |
-| `gen/` | Generated outputs, committed: `rust/semconv.rs`, `ts/semconv.ts`, `python/semconv.py`, `docs/semconv.md` |
+| `templates/registry/{go,rust,typescript,python,markdown}/` | Codegen templates |
+| `gen/` | Generated outputs, committed: `go/semconv.go`, `rust/semconv.rs`, `ts/semconv.ts`, `python/semconv.py`, `docs/semconv.md` |
+| `gotest/` | A Go test of the generated Go package's alias-map invariants; outside `gen/`, so regeneration never deletes it |
 | `live-check/` | Live-check config, advice rules and the OTLP/JSON converter |
 | `tests/` | Policy negatives, live-check samples, codegen escaping |
 
 The generated docs, [`gen/docs/semconv.md`](gen/docs/semconv.md), are the human-readable spec:
 naming rules, the Resource, the attributes on every record, each event and span with its
 requirement table, enum values and bindings.
+
+The Go output, [`gen/go/semconv.go`](gen/go/semconv.go), is part of the protocol Go module, so Go
+services import it directly: `semconv "github.com/livekit/protocol/otel/gen/go"`. It gives one
+constant per attribute key (`AttrLkRoomId`), enum value (`LkTrackSourceSourceCamera`), event
+(`EventLkRoomDisconnected`), span (`SpanLkConnect`), checkpoint and metric
+(`MetricLkAgentsConnectionAcquireTime` and its `…Unit`), plus two alias maps built from the shared
+keys' `renamed_from` annotations:
+`RenamedKeys` (legacy key → canonical key) and `RenamedValues` (legacy key → legacy value →
+canonical value, for the two enums whose values also changed). A consumer such as the collector
+uses them to normalize an older capture to the canonical names. The legacy spellings are never
+registered, so they appear only in these maps. `generate.sh` gofmts the file; `go tool mage otel`,
+`.github/workflows/otel.yaml` and the Test workflow (`go test ./...`) build the package and run
+`otel/gotest` to check the alias-map invariants.
 
 ## Ownership
 
@@ -169,7 +183,7 @@ for each LiveKit file in the not-yet-stable `definition/2` format (`client/group
 ```sh
 otel/check.sh                          # registry + LiveKit policies, default and --v2, then advice
 otel/tests/negatives.sh                # each negative fixture fails with its named finding, both modes
-go tool mage otel && git status otel/gen  # regenerate (runs otel/generate.sh); no diff expected
+go tool mage otel && git status otel/gen  # regenerate (runs generate.sh, then go build + test); no diff expected
 otel/tests/live-check.sh               # smoke and sparse samples clean, legacy keys flagged, wrapper exit status
 otel/tests/generate.sh                 # generate.sh replaces gen/ whole, and keeps it when a target fails
 otel/tests/codegen.sh                  # a value with quotes, backslashes, newlines round-trips through rustc, tsc and python3
@@ -177,9 +191,10 @@ otel/tests/codegen.sh                  # a value with quotes, backslashes, newli
 rustc --edition 2021 --crate-type lib -D warnings -D missing_docs otel/gen/rust/semconv.rs --out-dir /tmp
 npx -p typescript@5.9.3 tsc --strict --noEmit --target es2020 otel/gen/ts/semconv.ts
 python3 -I -W error otel/gen/python/semconv.py
+go build ./otel/gen/go/... && go test ./otel/gotest/...  # the generated Go package and its alias-map invariants
 ```
 
-The generated Rust and Python also carry an `upstream` section: every OTel key a LiveKit signal
+The generated Rust, Python and Go also carry an `upstream` section: every OTel key a LiveKit signal
 references (`error.type`, `gen_ai.request.model`, `rpc.method`, …), defined by a dependency and
 never here, so a producer names them from one place. TypeScript does not yet. Three mechanisms
 add to it:

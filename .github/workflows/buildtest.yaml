@@ -116,3 +116,5 @@ jobs:
         run: |
           node --input-type=module -e "await import('./dist/index.mjs')"
           node -e "require('./dist/index.cjs')"
+          node --input-type=module -e "await import('./dist/semconv.mjs')"
+          node -e "require('./dist/semconv.cjs')"

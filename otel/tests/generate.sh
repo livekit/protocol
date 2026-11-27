@@ -9,7 +9,9 @@ cat > "$tmp/weaver" <<'STUB'
 # weaver registry generate ... <target> <out-dir>
 target=${@: -2:1} out=${@: -1}
 [[ $target == "${FAIL_TARGET:-}" ]] && exit 3
-mkdir -p "$out" && echo "new $target" > "$out/semconv.$target"
+mkdir -p "$out"
+# generate.sh runs gofmt on the go target, so the stub must emit valid Go there.
+[[ $target == go ]] && echo "package semconv" > "$out/semconv.$target" || echo "new $target" > "$out/semconv.$target"
 STUB
 chmod +x "$tmp/weaver"
 mkdir -p "$tmp/gen/rust" "$tmp/gen/obsolete-dir"
@@ -25,7 +27,7 @@ diff -r "$tmp/before" "$tmp/gen" || { echo "FAIL  a failing target changed gen/"
 
 WEAVER=$tmp/weaver "$tmp/generate.sh"
 got=$(cd "$tmp/gen" && find . -mindepth 1 | sort | tr '\n' ' ')
-want="./docs ./docs/semconv.markdown ./python ./python/semconv.python ./rust ./rust/semconv.rust ./ts ./ts/semconv.typescript "
+want="./docs ./docs/semconv.markdown ./go ./go/semconv.go ./python ./python/semconv.python ./rust ./rust/semconv.rust ./ts ./ts/semconv.typescript "
 [[ $got == "$want" ]] || { echo "FAIL  gen/ after a successful run: $got" >&2; exit 1; }
 [[ $(cat "$tmp/gen/rust/semconv.rust") == "new rust" ]] || { echo "FAIL  gen/ kept an old output" >&2; exit 1; }
 echo "PASS  generate: a failing target leaves gen/ unchanged, a successful run removes obsolete outputs"

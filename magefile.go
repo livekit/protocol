@@ -263,7 +263,23 @@ func Proto() error {
 func Otel() error {
 	cmd := exec.Command("otel/generate.sh")
 	connectStd(cmd)
-	return cmd.Run()
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+
+	// Verify the generated Go package compiles and its alias invariants hold, so a model or
+	// template change that breaks the Go binding fails here next to generation, not downstream.
+	for _, args := range [][]string{
+		{"build", "./otel/gen/go/..."},
+		{"test", "./otel/gotest/..."},
+	} {
+		cmd := exec.Command("go", args...)
+		connectStd(cmd)
+		if err := cmd.Run(); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // run tests
