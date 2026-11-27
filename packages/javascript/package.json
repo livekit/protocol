@@ -32,6 +32,11 @@
   },
   "main": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
+  "typesVersions": {
+    "*": {
+      "semconv": ["./dist/semconv.d.ts"]
+    }
+  },
   "scripts": {
     "generate:proto": "mkdir -p src/gen && protoc --es_out src/gen --es_opt target=dts+js -I=../../protobufs ../../protobufs/livekit_*.proto ../../protobufs/agent/livekit_*.proto",
     "generate:semconv": "mkdir -p src/gen && cp ../../otel/gen/ts/semconv.ts src/gen/semconv.ts",
