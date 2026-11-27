@@ -838,7 +838,7 @@ Kind `client`. One LLM inference request, the OTel GenAI inference span.
 
 | Checkpoint | Requirement | Meaning |
 | --- | --- | --- |
-| `gen_ai.client.inference.operation.details` | Best effort | OTel GenAI inference details event (the GenAI registry defines it; events cannot be referenced |
+| `gen_ai.client.inference.operation.details` | Best effort | OTel GenAI inference details event (the GenAI registry defines it; events cannot be referenced, so it is named here). |
 
 No limits declared.
 
@@ -1774,8 +1774,11 @@ historical names only: live-check does not exempt them from unregistered-attribu
 ## Old spellings
 
 Keys and values that producers sent before this registry, and the key and value to send instead.
-Each row comes from `renamed_from` on the shared key. Live-check reports an old spelling as
-`livekit_shared_rename` and names the replacement.
+Each row comes from `renamed_from` on the shared key: the OTLP dotted rename (`key`) and any
+`aliases` (the pre-#7973 Agents span names and the Go logger / collector spellings). The generated
+reader helpers (`NormalizeKey`/`normalizeKey`, `AliasesFor`/`aliasesFor`) fold every spelling in
+this table onto the canonical key; live-check reports only the dotted spelling as
+`livekit_shared_rename`, since the alias spellings are not OTLP keys.
 
 | Old key | Old value | Key to send | Value to send |
 | --- | --- | --- | --- |
@@ -1798,11 +1801,24 @@ Each row comes from `renamed_from` on the shared key. Live-check reports an old 
 | `lk.disconnect.reason` | `user_rejected` | `lk.disconnect_reason` | `USER_REJECTED` |
 | `lk.disconnect.reason` | `user_unavailable` | `lk.disconnect_reason` | `USER_UNAVAILABLE` |
 | `lk.participant.sid` | any | `lk.participant_id` | unchanged |
+| `lk.participant_sid` | any | `lk.participant_id` | unchanged |
+| `participantID` | any | `lk.participant_id` | unchanged |
+| `participant_id` | any | `lk.participant_id` | unchanged |
 | `lk.participant.identity` | any | `lk.pii.participant_identity` | unchanged |
+| `participantIdentity` | any | `lk.pii.participant_identity` | unchanged |
+| `participant_identity` | any | `lk.pii.participant_identity` | unchanged |
 | `lk.participant.remote_identity` | any | `lk.pii.remote_participant_identity` | unchanged |
 | `lk.room.name` | any | `lk.pii.room_name` | unchanged |
+| `roomName` | any | `lk.pii.room_name` | unchanged |
+| `room_name` | any | `lk.pii.room_name` | unchanged |
 | `lk.room.sid` | any | `lk.room_id` | unchanged |
+| `lk.room_sid` | any | `lk.room_id` | unchanged |
+| `roomID` | any | `lk.room_id` | unchanged |
+| `room_id` | any | `lk.room_id` | unchanged |
 | `lk.track.sid` | any | `lk.track_id` | unchanged |
+| `lk.track_sid` | any | `lk.track_id` | unchanged |
+| `trackID` | any | `lk.track_id` | unchanged |
+| `track_id` | any | `lk.track_id` | unchanged |
 | `lk.track.source` | `camera` | `lk.track_source` | `SOURCE_CAMERA` |
 | `lk.track.source` | `microphone` | `lk.track_source` | `SOURCE_MICROPHONE` |
 | `lk.track.source` | `screen_share` | `lk.track_source` | `SOURCE_SCREENSHARE` |

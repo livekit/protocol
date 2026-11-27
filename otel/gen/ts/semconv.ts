@@ -1174,7 +1174,7 @@ export const CHECKPOINT_EXCEPTION = "exception" as const;
 export const CHECKPOINT_FIRST_FRAME = "first_frame" as const;
 /** Checkpoint (span event): The first inbound stats reading with bytes; the span ends ok here. */
 export const CHECKPOINT_FIRST_MEDIA = "first_media" as const;
-/** Checkpoint (span event): OTel GenAI inference details event (the GenAI registry defines it; events cannot be referenced */
+/** Checkpoint (span event): OTel GenAI inference details event (the GenAI registry defines it; events cannot be referenced, so it is named here). */
 export const CHECKPOINT_GEN_AI_CLIENT_INFERENCE_OPERATION_DETAILS = "gen_ai.client.inference.operation.details" as const;
 /** Checkpoint (span event): One generation started (the generation attributes). */
 export const CHECKPOINT_GENERATION = "generation" as const;
@@ -1299,3 +1299,107 @@ export const METRIC_LK_AGENTS_USAGE_TTS_AUDIO_DURATION = "lk.agents.usage.tts_au
 
 /** Characters synthesized. Instrument: counter, unit: ``. */
 export const METRIC_LK_AGENTS_USAGE_TTS_CHARACTERS = "lk.agents.usage.tts_characters" as const;
+
+/**
+ * Maps a legacy attribute key to the canonical key that replaces it, from the `renamed_from`
+ * annotations on the shared keys: the OTLP dotted rename and every `aliases` entry. The same source
+ * of truth as the Go semconv's RenamedKeys. Use {@link normalizeKey} to fold a legacy key read from
+ * an older capture onto the key this registry defines.
+ */
+export const RENAMED_KEYS: Record<string, string> = {
+  "lk.disconnect.reason": "lk.disconnect_reason",
+  "lk.participant.sid": "lk.participant_id",
+  "lk.participant_sid": "lk.participant_id",
+  "participantID": "lk.participant_id",
+  "participant_id": "lk.participant_id",
+  "lk.participant.identity": "lk.pii.participant_identity",
+  "participantIdentity": "lk.pii.participant_identity",
+  "participant_identity": "lk.pii.participant_identity",
+  "lk.participant.remote_identity": "lk.pii.remote_participant_identity",
+  "lk.room.name": "lk.pii.room_name",
+  "roomName": "lk.pii.room_name",
+  "room_name": "lk.pii.room_name",
+  "lk.room.sid": "lk.room_id",
+  "lk.room_sid": "lk.room_id",
+  "roomID": "lk.room_id",
+  "room_id": "lk.room_id",
+  "lk.track.sid": "lk.track_id",
+  "lk.track_sid": "lk.track_id",
+  "trackID": "lk.track_id",
+  "track_id": "lk.track_id",
+  "lk.track.source": "lk.track_source",
+};
+
+/**
+ * Maps a legacy attribute key to its legacy-value -> canonical-value mapping, for the shared keys
+ * whose enum values were also renamed. A renamed key whose values did not change is absent here.
+ */
+export const RENAMED_VALUES: Record<string, Record<string, string>> = {
+  "lk.disconnect.reason": {
+    "agent_error": "AGENT_ERROR",
+    "client_initiated": "CLIENT_INITIATED",
+    "connection_timeout": "CONNECTION_TIMEOUT",
+    "duplicate_identity": "DUPLICATE_IDENTITY",
+    "join_failure": "JOIN_FAILURE",
+    "media_failure": "MEDIA_FAILURE",
+    "migration": "MIGRATION",
+    "participant_removed": "PARTICIPANT_REMOVED",
+    "reconnect_failed": "RECONNECT_FAILED",
+    "room_closed": "ROOM_CLOSED",
+    "room_deleted": "ROOM_DELETED",
+    "server_shutdown": "SERVER_SHUTDOWN",
+    "signal_close": "SIGNAL_CLOSE",
+    "sip_trunk_failure": "SIP_TRUNK_FAILURE",
+    "state_mismatch": "STATE_MISMATCH",
+    "unknown": "UNKNOWN_REASON",
+    "user_rejected": "USER_REJECTED",
+    "user_unavailable": "USER_UNAVAILABLE",
+  },
+  "lk.track.source": {
+    "camera": "SOURCE_CAMERA",
+    "microphone": "SOURCE_MICROPHONE",
+    "screen_share": "SOURCE_SCREENSHARE",
+    "screen_share_audio": "SOURCE_SCREENSHARE_AUDIO",
+    "unknown": "SOURCE_UNKNOWN",
+  },
+};
+
+/**
+ * Maps a canonical key to its legacy spellings, the OTLP dotted rename first and then the
+ * `aliases`. {@link aliasesFor} reads it to expand a canonical key for querying historical data.
+ */
+export const KEY_ALIASES: Record<string, readonly string[]> = {
+  "lk.disconnect_reason": ["lk.disconnect.reason"],
+  "lk.participant_id": ["lk.participant.sid", "lk.participant_sid", "participantID", "participant_id"],
+  "lk.pii.participant_identity": ["lk.participant.identity", "participantIdentity", "participant_identity"],
+  "lk.pii.remote_participant_identity": ["lk.participant.remote_identity"],
+  "lk.pii.room_name": ["lk.room.name", "roomName", "room_name"],
+  "lk.room_id": ["lk.room.sid", "lk.room_sid", "roomID", "room_id"],
+  "lk.track_id": ["lk.track.sid", "lk.track_sid", "trackID", "track_id"],
+  "lk.track_source": ["lk.track.source"],
+};
+
+/**
+ * Returns the canonical key for a legacy spelling, or `key` unchanged when it is not a known legacy
+ * spelling. During dual-emit a record may carry both; the canonical key is already canonical and
+ * returns unchanged, so prefer it over the result of normalizing the legacy key.
+ */
+export function normalizeKey(key: string): string {
+  return RENAMED_KEYS[key] ?? key;
+}
+
+/**
+ * Returns the canonical key followed by its legacy spellings, for querying historical data that may
+ * carry either. A key with no recorded legacy spelling yields just itself.
+ */
+export function aliasesFor(canonical: string): string[] {
+  return [canonical, ...(KEY_ALIASES[canonical] ?? [])];
+}
+
+/**
+ * Returns the canonical value for a legacy value under a legacy key, or `value` unchanged. Pass the
+ * legacy key as read from the capture, not the canonical key.
+ */
+export function normalizeValue(key: string, value: string): string {
+  return RENAMED_VALUES[key]?.[value] ?? value;
+}
