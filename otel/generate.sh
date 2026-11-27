@@ -20,7 +20,7 @@ done
 # a top-level constant, where Rust and Python keep them apart in modules and classes. Two that
 # generate the same identifier are a redeclaration; `go build` rejects it, but catch it here with
 # the offending name, so a model addition cannot slip a silent flat-namespace collision past review.
-dupes=$(grep -hoE '^const [A-Za-z0-9_]+' "$tmp/gen/go/semconv.go" | awk '{print $2}' | sort | uniq -d)
+dupes=$(grep -hoE '^const [A-Za-z0-9_]+' "$tmp/gen/go/semconv.go" | awk '{print $2}' | sort | uniq -d || true)
 if [[ -n $dupes ]]; then
   echo "generate.sh: generated Go has duplicate top-level constants (flat-namespace collision):" >&2
   echo "$dupes" >&2
