@@ -1175,7 +1175,11 @@ type SimulationRun_JobMetrics struct {
 	CallerListenLanguage string `protobuf:"bytes,23,opt,name=caller_listen_language,json=callerListenLanguage,proto3" json:"caller_listen_language,omitempty"`
 	// Audio only: what the caller's audio went through before the agent heard
 	// it. Absent for a clean call.
-	Impairments   *SimulationImpairments `protobuf:"bytes,24,opt,name=impairments,proto3" json:"impairments,omitempty"`
+	Impairments *SimulationImpairments `protobuf:"bytes,24,opt,name=impairments,proto3" json:"impairments,omitempty"`
+	// The persona_model that played the simulated caller: the run's
+	// persona_model, or empty when the default persona played it, as it does
+	// a scenario that model can't play.
+	PersonaModel  string `protobuf:"bytes,25,opt,name=persona_model,json=personaModel,proto3" json:"persona_model,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1348,6 +1352,13 @@ func (x *SimulationRun_JobMetrics) GetImpairments() *SimulationImpairments {
 		return x.Impairments
 	}
 	return nil
+}
+
+func (x *SimulationRun_JobMetrics) GetPersonaModel() string {
+	if x != nil {
+		return x.PersonaModel
+	}
+	return ""
 }
 
 // Aggregates over this run's jobs, so a run summary does not have to pull
@@ -3713,7 +3724,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\x83W\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\xa8W\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -3775,7 +3786,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\rFailureReason\x12\x1e\n" +
 	"\x1aFAILURE_REASON_UNSPECIFIED\x10\x00\x12%\n" +
 	"!FAILURE_REASON_AGENT_JOIN_TIMEOUT\x10\x01J\x04\b\t\x10\n" +
-	"\x1a\x82+\n" +
+	"\x1a\xa7+\n" +
 	"\n" +
 	"JobMetrics\x12,\n" +
 	"\x0ftask_completion\x18\x03 \x01(\x02H\x00R\x0etaskCompletion\x88\x01\x01\x12(\n" +
@@ -3800,7 +3811,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"end_reason\x18\x15 \x01(\x0e2+.livekit.SimulationRun.JobMetrics.EndReasonR\tendReason\x12'\n" +
 	"\x0fcaller_language\x18\x16 \x01(\tR\x0ecallerLanguage\x124\n" +
 	"\x16caller_listen_language\x18\x17 \x01(\tR\x14callerListenLanguage\x12@\n" +
-	"\vimpairments\x18\x18 \x01(\v2\x1e.livekit.SimulationImpairmentsR\vimpairments\x1a\x92\x06\n" +
+	"\vimpairments\x18\x18 \x01(\v2\x1e.livekit.SimulationImpairmentsR\vimpairments\x12#\n" +
+	"\rpersona_model\x18\x19 \x01(\tR\fpersonaModel\x1a\x92\x06\n" +
 	"\x03STT\x12\x15\n" +
 	"\x03wer\x18\x01 \x01(\x02H\x00R\x03wer\x88\x01\x01\x12\x19\n" +
 	"\x05words\x18\x02 \x01(\rH\x01R\x05words\x88\x01\x01\x12$\n" +
