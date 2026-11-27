@@ -204,7 +204,8 @@ message SimulationRun {
       optional uint32 overlap_speech_ms = 8;             // pooling stats for overlap_ratio
       optional uint32 total_speech_ms = 9;
       optional uint32 awkward_silence_count = 11;        // gaps past the natural-pause threshold
-      optional uint32 unanswered_turns = 12;             // the simulated party spoke, the agent never responded
+      reserved 12;  // was unanswered_turns
+      reserved "unanswered_turns";
       optional uint32 false_interruption_count = 13;     // needs the RemoteSession; agent paused for a non-interruption
       optional uint32 e2e_latency_ms = 15;               // needs the RemoteSession; the agent's own claim
       optional uint32 backchannel_count = 16;            // the caller's acknowledgements over the agent's speech
@@ -236,7 +237,8 @@ message SimulationRun {
 
       optional bool eot_misprediction = 15;
       optional bool awkward_silence = 16;
-      optional bool unanswered = 17;
+      reserved 17;  // was unanswered
+      reserved "unanswered";
 
       // Audio only; needs the text judge. One per saying of a key entity in
       // this turn, in order, as the other side heard it. Matched over the whole

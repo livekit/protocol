@@ -2280,7 +2280,6 @@ type SimulationRun_JobMetrics_Conversation struct {
 	OverlapSpeechMs        *uint32                `protobuf:"varint,8,opt,name=overlap_speech_ms,json=overlapSpeechMs,proto3,oneof" json:"overlap_speech_ms,omitempty"`                   // pooling stats for overlap_ratio
 	TotalSpeechMs          *uint32                `protobuf:"varint,9,opt,name=total_speech_ms,json=totalSpeechMs,proto3,oneof" json:"total_speech_ms,omitempty"`
 	AwkwardSilenceCount    *uint32                `protobuf:"varint,11,opt,name=awkward_silence_count,json=awkwardSilenceCount,proto3,oneof" json:"awkward_silence_count,omitempty"`          // gaps past the natural-pause threshold
-	UnansweredTurns        *uint32                `protobuf:"varint,12,opt,name=unanswered_turns,json=unansweredTurns,proto3,oneof" json:"unanswered_turns,omitempty"`                        // the simulated party spoke, the agent never responded
 	FalseInterruptionCount *uint32                `protobuf:"varint,13,opt,name=false_interruption_count,json=falseInterruptionCount,proto3,oneof" json:"false_interruption_count,omitempty"` // needs the RemoteSession; agent paused for a non-interruption
 	E2ELatencyMs           *uint32                `protobuf:"varint,15,opt,name=e2e_latency_ms,json=e2eLatencyMs,proto3,oneof" json:"e2e_latency_ms,omitempty"`                               // needs the RemoteSession; the agent's own claim
 	BackchannelCount       *uint32                `protobuf:"varint,16,opt,name=backchannel_count,json=backchannelCount,proto3,oneof" json:"backchannel_count,omitempty"`                     // the caller's acknowledgements over the agent's speech
@@ -2388,13 +2387,6 @@ func (x *SimulationRun_JobMetrics_Conversation) GetAwkwardSilenceCount() uint32 
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_Conversation) GetUnansweredTurns() uint32 {
-	if x != nil && x.UnansweredTurns != nil {
-		return *x.UnansweredTurns
-	}
-	return 0
-}
-
 func (x *SimulationRun_JobMetrics_Conversation) GetFalseInterruptionCount() uint32 {
 	if x != nil && x.FalseInterruptionCount != nil {
 		return *x.FalseInterruptionCount
@@ -2440,7 +2432,6 @@ type SimulationRun_JobMetrics_Turn struct {
 	Conciseness       *float32 `protobuf:"fixed32,14,opt,name=conciseness,proto3,oneof" json:"conciseness,omitempty"` // needs the text judge
 	EotMisprediction  *bool    `protobuf:"varint,15,opt,name=eot_misprediction,json=eotMisprediction,proto3,oneof" json:"eot_misprediction,omitempty"`
 	AwkwardSilence    *bool    `protobuf:"varint,16,opt,name=awkward_silence,json=awkwardSilence,proto3,oneof" json:"awkward_silence,omitempty"`
-	Unanswered        *bool    `protobuf:"varint,17,opt,name=unanswered,proto3,oneof" json:"unanswered,omitempty"`
 	// Audio only; needs the text judge. One per saying of a key entity in
 	// this turn, in order, as the other side heard it. Matched over the whole
 	// call's transcript, so a saying spanning turns sits on its first, and
@@ -2599,13 +2590,6 @@ func (x *SimulationRun_JobMetrics_Turn) GetEotMisprediction() bool {
 func (x *SimulationRun_JobMetrics_Turn) GetAwkwardSilence() bool {
 	if x != nil && x.AwkwardSilence != nil {
 		return *x.AwkwardSilence
-	}
-	return false
-}
-
-func (x *SimulationRun_JobMetrics_Turn) GetUnanswered() bool {
-	if x != nil && x.Unanswered != nil {
-		return *x.Unanswered
 	}
 	return false
 }
@@ -3713,7 +3697,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\x83W\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\xb4V\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -3775,7 +3759,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\rFailureReason\x12\x1e\n" +
 	"\x1aFAILURE_REASON_UNSPECIFIED\x10\x00\x12%\n" +
 	"!FAILURE_REASON_AGENT_JOIN_TIMEOUT\x10\x01J\x04\b\t\x10\n" +
-	"\x1a\x82+\n" +
+	"\x1a\xb3*\n" +
 	"\n" +
 	"JobMetrics\x12,\n" +
 	"\x0ftask_completion\x18\x03 \x01(\x02H\x00R\x0etaskCompletion\x88\x01\x01\x12(\n" +
@@ -3873,7 +3857,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x14_entities_recognizedB\x10\n" +
 	"\x0e_entity_recallB\x1c\n" +
 	"\x1a_entities_acquired_utteredB\x1f\n" +
-	"\x1d_entities_acquired_recognized\x1a\xbd\b\n" +
+	"\x1d_entities_acquired_recognized\x1a\x90\b\n" +
 	"\fConversation\x12/\n" +
 	"\x11turn_taking_score\x18\x01 \x01(\x02H\x00R\x0fturnTakingScore\x88\x01\x01\x12;\n" +
 	"\x18heard_e2e_latency_p50_ms\x18\x02 \x01(\x05H\x01R\x14heardE2eLatencyP50Ms\x88\x01\x01\x12;\n" +
@@ -3884,12 +3868,11 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\roverlap_ratio\x18\a \x01(\x02H\x06R\foverlapRatio\x88\x01\x01\x12/\n" +
 	"\x11overlap_speech_ms\x18\b \x01(\rH\aR\x0foverlapSpeechMs\x88\x01\x01\x12+\n" +
 	"\x0ftotal_speech_ms\x18\t \x01(\rH\bR\rtotalSpeechMs\x88\x01\x01\x127\n" +
-	"\x15awkward_silence_count\x18\v \x01(\rH\tR\x13awkwardSilenceCount\x88\x01\x01\x12.\n" +
-	"\x10unanswered_turns\x18\f \x01(\rH\n" +
-	"R\x0funansweredTurns\x88\x01\x01\x12=\n" +
-	"\x18false_interruption_count\x18\r \x01(\rH\vR\x16falseInterruptionCount\x88\x01\x01\x12)\n" +
-	"\x0ee2e_latency_ms\x18\x0f \x01(\rH\fR\fe2eLatencyMs\x88\x01\x01\x120\n" +
-	"\x11backchannel_count\x18\x10 \x01(\rH\rR\x10backchannelCount\x88\x01\x01B\x14\n" +
+	"\x15awkward_silence_count\x18\v \x01(\rH\tR\x13awkwardSilenceCount\x88\x01\x01\x12=\n" +
+	"\x18false_interruption_count\x18\r \x01(\rH\n" +
+	"R\x16falseInterruptionCount\x88\x01\x01\x12)\n" +
+	"\x0ee2e_latency_ms\x18\x0f \x01(\rH\vR\fe2eLatencyMs\x88\x01\x01\x120\n" +
+	"\x11backchannel_count\x18\x10 \x01(\rH\fR\x10backchannelCount\x88\x01\x01B\x14\n" +
 	"\x12_turn_taking_scoreB\x1b\n" +
 	"\x19_heard_e2e_latency_p50_msB\x1b\n" +
 	"\x19_heard_e2e_latency_p95_msB\x1b\n" +
@@ -3899,11 +3882,10 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x0e_overlap_ratioB\x14\n" +
 	"\x12_overlap_speech_msB\x12\n" +
 	"\x10_total_speech_msB\x18\n" +
-	"\x16_awkward_silence_countB\x13\n" +
-	"\x11_unanswered_turnsB\x1b\n" +
+	"\x16_awkward_silence_countB\x1b\n" +
 	"\x19_false_interruption_countB\x11\n" +
 	"\x0f_e2e_latency_msB\x14\n" +
-	"\x12_backchannel_count\x1a\xf6\b\n" +
+	"\x12_backchannel_countJ\x04\b\f\x10\rR\x10unanswered_turns\x1a\xd4\b\n" +
 	"\x04Turn\x12\x14\n" +
 	"\x05index\x18\x01 \x01(\rR\x05index\x12+\n" +
 	"\x04role\x18\x02 \x01(\x0e2\x17.livekit.agent.ChatRoleR\x04role\x12\x12\n" +
@@ -3924,10 +3906,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"R\x0fturnTakingScore\x88\x01\x01\x12%\n" +
 	"\vconciseness\x18\x0e \x01(\x02H\vR\vconciseness\x88\x01\x01\x120\n" +
 	"\x11eot_misprediction\x18\x0f \x01(\bH\fR\x10eotMisprediction\x88\x01\x01\x12,\n" +
-	"\x0fawkward_silence\x18\x10 \x01(\bH\rR\x0eawkwardSilence\x88\x01\x01\x12#\n" +
-	"\n" +
-	"unanswered\x18\x11 \x01(\bH\x0eR\n" +
-	"unanswered\x88\x01\x01\x12I\n" +
+	"\x0fawkward_silence\x18\x10 \x01(\bH\rR\x0eawkwardSilence\x88\x01\x01\x12I\n" +
 	"\bentities\x18\x13 \x03(\v2-.livekit.SimulationRun.JobMetrics.Turn.EntityR\bentities\x12\x17\n" +
 	"\aitem_id\x18\x14 \x01(\tR\x06itemId\x1aR\n" +
 	"\x06Entity\x12\x12\n" +
@@ -3950,8 +3929,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x12_turn_taking_scoreB\x0e\n" +
 	"\f_concisenessB\x14\n" +
 	"\x12_eot_mispredictionB\x12\n" +
-	"\x10_awkward_silenceB\r\n" +
-	"\v_unanswered\"\xd7\x01\n" +
+	"\x10_awkward_silenceJ\x04\b\x11\x10\x12R\n" +
+	"unanswered\"\xd7\x01\n" +
 	"\tEndReason\x12\x1a\n" +
 	"\x16END_REASON_UNSPECIFIED\x10\x00\x12!\n" +
 	"\x1dEND_REASON_SCENARIO_COMPLETED\x10\x01\x12\x1a\n" +
