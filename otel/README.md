@@ -44,14 +44,27 @@ The Go output, [`gen/go/semconv.go`](gen/go/semconv.go), is part of the protocol
 services import it directly: `semconv "github.com/livekit/protocol/otel/gen/go"`. It gives one
 constant per attribute key (`AttrLkRoomId`), enum value (`LkTrackSourceSourceCamera`), event
 (`EventLkRoomDisconnected`), span (`SpanLkConnect`), checkpoint and metric
-(`MetricLkAgentsConnectionAcquireTime` and its `…Unit`), plus two alias maps built from the shared
-keys' `renamed_from` annotations:
-`RenamedKeys` (legacy key → canonical key) and `RenamedValues` (legacy key → legacy value →
-canonical value, for the two enums whose values also changed). A consumer such as the collector
-uses them to normalize an older capture to the canonical names. The legacy spellings are never
-registered, so they appear only in these maps. `generate.sh` gofmts the file; `go tool mage otel`,
-`.github/workflows/otel.yaml` and the Test workflow (`go test ./...`) build the package and run
-`otel/gotest` to check the alias-map invariants.
+(`MetricLkAgentsConnectionAcquireTime` and its `…Unit`), plus the legacy-key alias maps and reader
+helpers built from the shared keys' `renamed_from` annotations:
+
+- `RenamedKeys` (legacy key → canonical key), covering the OTLP dotted rename and every
+  `renamed_from.aliases` entry (the pre-#7973 Agents span names and the Go logger / collector
+  spellings such as `roomID`, `room_id`).
+- `RenamedValues` (legacy key → legacy value → canonical value, for the two enums whose values also
+  changed).
+- `KeyAliases` (canonical key → its legacy spellings).
+- `NormalizeKey(key) string` folds a legacy spelling onto its canonical key (or returns it
+  unchanged), `NormalizeValue(key, value) string` does the same for a renamed enum value, and
+  `AliasesFor(canonical) []string` expands a canonical key to `[canonical, …legacy]` for querying
+  historical data. The TypeScript output (`gen/ts/semconv.ts`, exported as
+  `@livekit/protocol/semconv`) mirrors these as `RENAMED_KEYS`, `RENAMED_VALUES`, `KEY_ALIASES`,
+  `normalizeKey`, `normalizeValue` and `aliasesFor`, so `livekit/web` uses the same source of truth.
+
+A consumer such as the collector uses them to normalize an older capture to the canonical names.
+The legacy spellings are never registered, so they appear only in these maps. `generate.sh` gofmts
+the file (with the go.mod toolchain's `gofmt`) and rejects a flat-namespace constant collision;
+`go tool mage otel`, `.github/workflows/otel.yaml` and the Test workflow (`go test ./...`) build the
+package and run `otel/gotest` to check the alias-map invariants.
 
 ## Ownership
 
@@ -126,7 +139,7 @@ map, and its fields (such as `reason` in `outcome`) are payload, not attribute k
    | `unit_exception` | a reason | allows a `*_ms` key with `unit: ms` (the RTC stats keys: `lk.rtc.window_ms` as measured, the others converted from the W3C stats' seconds) |
    | `bindings` | map of producer/store → name | informational; live-check reads the Agents span name from `agents_otlp` |
    | `cardinality_exception` | `true`, on a metric | allows a high-cardinality ID as a metric dimension |
-   | `renamed_from` | `{key, values}`, on a shared key | the spelling it replaces, and for an enum a map of old value → member; the old key stays unregistered |
+   | `renamed_from` | `{key, aliases, values}`, on a shared key | the OTLP spelling it replaces (`key`), additional legacy spellings (`aliases`: the pre-#7973 Agents names and Go logger / collector spellings, any casing), and for an enum a map of old value → member; none of these are registered keys |
    | `pii_heuristic_exception` | a reason | documents a shipped key the PII heuristic would flag; it only takes effect for a key listed in `pii_heuristic_allowlist` in `policies/lib.rego` (today `lk.rpc.caller_identity`, `lk.rpc.destination_identity`), so a new key cannot opt out by annotating itself. The collector still does not redact them |
 
    Events and spans carry their own `annotations.livekit`, rendered in the docs; live-check
@@ -150,6 +163,29 @@ map, and its fields (such as `reason` in `outcome`) are payload, not attribute k
 4. Reference it from the events or spans that carry it, with a `requirement_level`.
 5. Run `otel/check.sh`, then `go tool mage otel` (it runs `otel/generate.sh`), and commit `gen/`
    with the change.
+
+## Migrating a key
+
+Renaming a telemetry key across the stack follows one lifecycle, with this registry as the single
+source of truth for the legacy spellings. An emitter cannot rename a key in place, because readers
+and historical data still carry the old one, so the spellings coexist for a while.
+
+1. **Declare.** Add the legacy spellings to the canonical key's `renamed_from` in `otel/model`:
+   `key` for the OTLP dotted rename (what live-check names) and `aliases` for the rest (Go logger /
+   collector spellings, pre-#7973 Agents names). Regenerate. The spellings never become registered
+   keys; they live only in the generated `RenamedKeys` / `KeyAliases` maps.
+2. **Dual-emit.** The emitting service sends the canonical `lk.*` key alongside the legacy key
+   during rollout. It never renames in place.
+3. **Ingest-normalize** (e.g. `cloud-observability`). On ingest, call `NormalizeKey` /
+   `normalizeKey` (and `NormalizeValue` / `normalizeValue` for renamed enum values) to fold legacy
+   keys onto canonical ones. When a record carries both during dual-emit, prefer the canonical key:
+   it is already canonical and `NormalizeKey` returns it unchanged.
+4. **Query-expand** (e.g. `cloud-api-server`, `livekit/web`). To read historical ClickHouse / log
+   data or mixed payloads, call `AliasesFor` / `aliasesFor` to expand a canonical key to
+   `[canonical, …legacy]` and match any spelling.
+5. **Retire.** Once no live data or query path carries a legacy spelling, drop it from
+   `renamed_from.aliases` (or the whole `renamed_from` when the OTLP rename is done too) and
+   regenerate. The spelling leaves the alias maps.
 
 ## Versioning
 
@@ -186,7 +222,7 @@ otel/tests/negatives.sh                # each negative fixture fails with its na
 go tool mage otel && git status otel/gen  # regenerate (runs generate.sh, then go build + test); no diff expected
 otel/tests/live-check.sh               # smoke and sparse samples clean, legacy keys flagged, wrapper exit status
 otel/tests/generate.sh                 # generate.sh replaces gen/ whole, and keeps it when a target fails
-otel/tests/codegen.sh                  # a value with quotes, backslashes, newlines round-trips through rustc, tsc and python3
+otel/tests/codegen.sh                  # a value with quotes, backslashes, newlines round-trips through the Go toolchain, rustc, tsc and python3
 
 rustc --edition 2021 --crate-type lib -D warnings -D missing_docs otel/gen/rust/semconv.rs --out-dir /tmp
 npx -p typescript@5.9.3 tsc --strict --noEmit --target es2020 otel/gen/ts/semconv.ts
@@ -226,7 +262,9 @@ add to it:
 | `livekit_pii_marker` | yes | `sensitivity: pii` iff a `pii` key segment, except `chat.item`, which the collector drops by name (`pii_by_name` in `lib.rego`) |
 | `livekit_pii_heuristic` | yes | identity, email, phone, room/participant name outside `lk.pii.*`, unless the key is on the policy's `pii_heuristic_allowlist` and carries a `pii_heuristic_exception` reason |
 | `livekit_flat_identity` | yes | no `lk.room.sid`, `lk.participant.sid`, `lk.track.sid`, `lk.job.id`, and no `_sid` spelling (`lk.room_sid`, `lk.participant_sid`, `lk.track_sid`), deprecated or not (deprecated keys: resolved, both modes); pre-#7973 Agents names are historical bindings only |
-| `livekit_shared_rename` | yes | no old spelling named in a `renamed_from` is defined, deprecated or not (resolved, both modes) |
+| `livekit_shared_rename` | yes | no old spelling named in a `renamed_from` (the `key` or any `aliases` entry) is defined as a key, deprecated or not (resolved, both modes) |
+| `livekit_alias_collision` | yes | no legacy spelling maps to more than one canonical key, so the reader helpers are unambiguous (resolved, both modes) |
+| `livekit_alias_duplicate` | yes | a `renamed_from.aliases` entry does not repeat the key, `renamed_from.key` or another alias, which would be a duplicate key in the generated Go map and TypeScript object (resolved, both modes) |
 | `livekit_rename_value` | yes | every value a `renamed_from` maps to is a member of the shared key's enum |
 | `livekit_seconds`, `livekit_unit` | yes | seconds, unless `unit_exception` |
 | `livekit_metric_unit` | yes | metric units are not `ms` (resolved, so `definition/2` metrics and refinements count) |

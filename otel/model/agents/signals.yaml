@@ -600,7 +600,7 @@ groups:
     annotations:
       livekit:
         checkpoints:
-          - {name: gen_ai.client.inference.operation.details, requirement: best_effort, brief: OTel GenAI inference details event (the GenAI registry defines it; events cannot be referenced, so it is named here).}
+          - {name: gen_ai.client.inference.operation.details, requirement: best_effort, brief: "OTel GenAI inference details event (the GenAI registry defines it; events cannot be referenced, so it is named here)."}
     attributes:
       - ref: lk.retry_count
         requirement_level: recommended

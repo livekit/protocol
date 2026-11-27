@@ -25,16 +25,51 @@ attributes contains {"key": a.key, "attr": a} if {
 	some a in object.get(input, ["registry", "attributes"], [])
 }
 
-renamed_to[old] := a.key if {
+# Every legacy spelling a shared key replaces, paired with its canonical key: the OTLP dotted
+# `renamed_from.key` and each `renamed_from.aliases` entry (the pre-#7973 Agents span names and the
+# Go logger / collector spellings). A set of pairs, not a map, so a spelling claimed by two keys is
+# a reportable collision rather than a Rego object-key conflict.
+renamed_pairs contains {"old": a.attr.annotations.livekit.renamed_from.key, "new": a.key} if {
 	some a in attributes
-	old := data.livekit.lib.lk(a.attr, "renamed_from").key
+	data.livekit.lib.lk(a.attr, "renamed_from") != null
 }
 
-# An old spelling stays unregistered, deprecated or not: the rename lives on the shared key.
+renamed_pairs contains {"old": old, "new": a.key} if {
+	some a in attributes
+	some old in object.get(a.attr, ["annotations", "livekit", "renamed_from", "aliases"], [])
+}
+
+# An old spelling stays unregistered, deprecated or not: the rename lives on the shared key. This
+# covers the dotted rename and every alias.
 deny contains data.livekit.lib.finding("livekit_shared_rename", msg) if {
 	some a in attributes
-	new := renamed_to[a.key]
-	msg := sprintf("%s: renamed to %s (renamed_from on %s); the old spelling may not be defined, deprecated or not", [a.key, new, new])
+	some p in renamed_pairs
+	a.key == p.old
+	msg := sprintf("%s: renamed to %s (renamed_from on %s); the old spelling may not be defined, deprecated or not", [a.key, p.new, p.new])
+}
+
+# A legacy spelling must normalize to exactly one canonical key, so the reader helpers are
+# unambiguous. Two shared keys claiming the same old spelling is a hard error.
+deny contains data.livekit.lib.finding("livekit_alias_collision", msg) if {
+	some p in renamed_pairs
+	some q in renamed_pairs
+	p.old == q.old
+	p.new < q.new
+	msg := sprintf("%s: legacy spelling maps to both %s and %s; a legacy key normalizes to one canonical key", [p.old, p.new, q.new])
+}
+
+# Each spelling in a key's `renamed_from` appears once: an alias that repeats `renamed_from.key`,
+# repeats another alias or is the key itself would be a duplicate key in the generated Go map and
+# TypeScript object literals (a compile error in both), and the set of pairs above hides it.
+deny contains data.livekit.lib.finding("livekit_alias_duplicate", msg) if {
+	some a in attributes
+	from := data.livekit.lib.lk(a.attr, "renamed_from")
+	from != null
+	aliases := object.get(from, "aliases", [])
+	spellings := array.concat([a.key, from.key], aliases)
+	some alias in aliases
+	count([s | some s in spellings; s == alias]) > 1
+	msg := sprintf("%s: renamed_from alias %s repeats the key, renamed_from.key or another alias", [a.key, alias])
 }
 
 # The attribute rules skip deprecated keys, but a spelling the flat-identity rule forbids (a dotted

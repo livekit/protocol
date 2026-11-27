@@ -1,0 +1,22 @@
+# expect: livekit_shared_rename
+groups:
+  - id: registry.lk.negative
+    type: attribute_group
+    brief: Negative fixture.
+    attributes:
+      - id: lk.negative_id
+        type: string
+        stability: development
+        brief: A shared key whose legacy alias is wrongly defined as a key below.
+        examples: ["x"]
+        annotations:
+          livekit:
+            owner: shared
+            sensitivity: none
+            renamed_from: {key: lk.negative.id, aliases: [negativeID]}
+      - id: negativeID
+        type: string
+        stability: development
+        brief: The legacy alias, defined as a key, which the rename forbids.
+        examples: ["x"]
+        annotations: {livekit: {owner: client, sensitivity: none}}

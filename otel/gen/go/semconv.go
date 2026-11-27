@@ -3,7 +3,8 @@
 // Package semconv is the LiveKit telemetry semantic conventions as Go constants: the attribute
 // keys, enum values, event names, span names, checkpoints and metric names LiveKit producers send
 // over OTLP, and the legacy-key and legacy-value aliases a consumer uses to normalize an older
-// capture to the canonical names (see RenamedKeys and RenamedValues).
+// capture to the canonical names (see RenamedKeys, RenamedValues, KeyAliases and the NormalizeKey,
+// AliasesFor and NormalizeValue helpers).
 package semconv
 
 // AttrAgentName is the "agent_name" attribute: The agent's name.
@@ -1656,7 +1657,7 @@ const CheckpointFirstFrame = "first_frame"
 // CheckpointFirstMedia is the "first_media" checkpoint: The first inbound stats reading with bytes; the span ends ok here.
 const CheckpointFirstMedia = "first_media"
 
-// CheckpointGenAiClientInferenceOperationDetails is the "gen_ai.client.inference.operation.details" checkpoint: OTel GenAI inference details event (the GenAI registry defines it; events cannot be referenced
+// CheckpointGenAiClientInferenceOperationDetails is the "gen_ai.client.inference.operation.details" checkpoint: OTel GenAI inference details event (the GenAI registry defines it; events cannot be referenced, so it is named here).
 const CheckpointGenAiClientInferenceOperationDetails = "gen_ai.client.inference.operation.details"
 
 // CheckpointGeneration is the "generation" checkpoint: One generation started (the generation attributes).
@@ -1799,49 +1800,49 @@ const MetricLkAgentsTurnTtsTtfb = "lk.agents.turn.tts_ttfb"
 // MetricLkAgentsTurnTtsTtfbUnit is the unit of MetricLkAgentsTurnTtsTtfb, exactly as the producer creates the instrument (empty = none).
 const MetricLkAgentsTurnTtsTtfbUnit = "s"
 
-// MetricLkAgentsUsageInterruptionNumRequests is the "lk.agents.usage.interruption_num_requests" metric: Interruption-detector requests. Instrument: counter, unit: “.
+// MetricLkAgentsUsageInterruptionNumRequests is the "lk.agents.usage.interruption_num_requests" metric: Interruption-detector requests. Instrument: counter.
 const MetricLkAgentsUsageInterruptionNumRequests = "lk.agents.usage.interruption_num_requests"
 
 // MetricLkAgentsUsageInterruptionNumRequestsUnit is the unit of MetricLkAgentsUsageInterruptionNumRequests, exactly as the producer creates the instrument (empty = none).
 const MetricLkAgentsUsageInterruptionNumRequestsUnit = ""
 
-// MetricLkAgentsUsageLlmInputAudioTokens is the "lk.agents.usage.llm_input_audio_tokens" metric: Realtime-model audio input tokens. Instrument: counter, unit: “.
+// MetricLkAgentsUsageLlmInputAudioTokens is the "lk.agents.usage.llm_input_audio_tokens" metric: Realtime-model audio input tokens. Instrument: counter.
 const MetricLkAgentsUsageLlmInputAudioTokens = "lk.agents.usage.llm_input_audio_tokens"
 
 // MetricLkAgentsUsageLlmInputAudioTokensUnit is the unit of MetricLkAgentsUsageLlmInputAudioTokens, exactly as the producer creates the instrument (empty = none).
 const MetricLkAgentsUsageLlmInputAudioTokensUnit = ""
 
-// MetricLkAgentsUsageLlmInputCachedTokens is the "lk.agents.usage.llm_input_cached_tokens" metric: LLM cached input tokens. Instrument: counter, unit: “.
+// MetricLkAgentsUsageLlmInputCachedTokens is the "lk.agents.usage.llm_input_cached_tokens" metric: LLM cached input tokens. Instrument: counter.
 const MetricLkAgentsUsageLlmInputCachedTokens = "lk.agents.usage.llm_input_cached_tokens"
 
 // MetricLkAgentsUsageLlmInputCachedTokensUnit is the unit of MetricLkAgentsUsageLlmInputCachedTokens, exactly as the producer creates the instrument (empty = none).
 const MetricLkAgentsUsageLlmInputCachedTokensUnit = ""
 
-// MetricLkAgentsUsageLlmInputTextTokens is the "lk.agents.usage.llm_input_text_tokens" metric: Realtime-model text input tokens. Instrument: counter, unit: “.
+// MetricLkAgentsUsageLlmInputTextTokens is the "lk.agents.usage.llm_input_text_tokens" metric: Realtime-model text input tokens. Instrument: counter.
 const MetricLkAgentsUsageLlmInputTextTokens = "lk.agents.usage.llm_input_text_tokens"
 
 // MetricLkAgentsUsageLlmInputTextTokensUnit is the unit of MetricLkAgentsUsageLlmInputTextTokens, exactly as the producer creates the instrument (empty = none).
 const MetricLkAgentsUsageLlmInputTextTokensUnit = ""
 
-// MetricLkAgentsUsageLlmInputTokens is the "lk.agents.usage.llm_input_tokens" metric: LLM input tokens. Instrument: counter, unit: “.
+// MetricLkAgentsUsageLlmInputTokens is the "lk.agents.usage.llm_input_tokens" metric: LLM input tokens. Instrument: counter.
 const MetricLkAgentsUsageLlmInputTokens = "lk.agents.usage.llm_input_tokens"
 
 // MetricLkAgentsUsageLlmInputTokensUnit is the unit of MetricLkAgentsUsageLlmInputTokens, exactly as the producer creates the instrument (empty = none).
 const MetricLkAgentsUsageLlmInputTokensUnit = ""
 
-// MetricLkAgentsUsageLlmOutputAudioTokens is the "lk.agents.usage.llm_output_audio_tokens" metric: Realtime-model audio output tokens. Instrument: counter, unit: “.
+// MetricLkAgentsUsageLlmOutputAudioTokens is the "lk.agents.usage.llm_output_audio_tokens" metric: Realtime-model audio output tokens. Instrument: counter.
 const MetricLkAgentsUsageLlmOutputAudioTokens = "lk.agents.usage.llm_output_audio_tokens"
 
 // MetricLkAgentsUsageLlmOutputAudioTokensUnit is the unit of MetricLkAgentsUsageLlmOutputAudioTokens, exactly as the producer creates the instrument (empty = none).
 const MetricLkAgentsUsageLlmOutputAudioTokensUnit = ""
 
-// MetricLkAgentsUsageLlmOutputTextTokens is the "lk.agents.usage.llm_output_text_tokens" metric: Realtime-model text output tokens. Instrument: counter, unit: “.
+// MetricLkAgentsUsageLlmOutputTextTokens is the "lk.agents.usage.llm_output_text_tokens" metric: Realtime-model text output tokens. Instrument: counter.
 const MetricLkAgentsUsageLlmOutputTextTokens = "lk.agents.usage.llm_output_text_tokens"
 
 // MetricLkAgentsUsageLlmOutputTextTokensUnit is the unit of MetricLkAgentsUsageLlmOutputTextTokens, exactly as the producer creates the instrument (empty = none).
 const MetricLkAgentsUsageLlmOutputTextTokensUnit = ""
 
-// MetricLkAgentsUsageLlmOutputTokens is the "lk.agents.usage.llm_output_tokens" metric: LLM output tokens. Instrument: counter, unit: “.
+// MetricLkAgentsUsageLlmOutputTokens is the "lk.agents.usage.llm_output_tokens" metric: LLM output tokens. Instrument: counter.
 const MetricLkAgentsUsageLlmOutputTokens = "lk.agents.usage.llm_output_tokens"
 
 // MetricLkAgentsUsageLlmOutputTokensUnit is the unit of MetricLkAgentsUsageLlmOutputTokens, exactly as the producer creates the instrument (empty = none).
@@ -1865,25 +1866,82 @@ const MetricLkAgentsUsageTtsAudioDuration = "lk.agents.usage.tts_audio_duration"
 // MetricLkAgentsUsageTtsAudioDurationUnit is the unit of MetricLkAgentsUsageTtsAudioDuration, exactly as the producer creates the instrument (empty = none).
 const MetricLkAgentsUsageTtsAudioDurationUnit = "s"
 
-// MetricLkAgentsUsageTtsCharacters is the "lk.agents.usage.tts_characters" metric: Characters synthesized. Instrument: counter, unit: “.
+// MetricLkAgentsUsageTtsCharacters is the "lk.agents.usage.tts_characters" metric: Characters synthesized. Instrument: counter.
 const MetricLkAgentsUsageTtsCharacters = "lk.agents.usage.tts_characters"
 
 // MetricLkAgentsUsageTtsCharactersUnit is the unit of MetricLkAgentsUsageTtsCharacters, exactly as the producer creates the instrument (empty = none).
 const MetricLkAgentsUsageTtsCharactersUnit = ""
 
 // RenamedKeys maps a legacy attribute key to the canonical key that replaces it, from the
-// `renamed_from` annotations on the shared keys. A consumer (such as the collector) uses it to
-// normalize a legacy key read from an older capture to the key this registry defines. The legacy
-// keys are never registered, so they appear only here.
+// `renamed_from` annotations on the shared keys: the OTLP dotted rename and every `aliases` entry
+// (the pre-#7973 Agents span names and the Go logger / collector spellings). A consumer (such as
+// the collector) uses it, via NormalizeKey, to fold a legacy key read from an older capture onto
+// the key this registry defines. The legacy keys are never registered, so they appear only here.
 var RenamedKeys = map[string]string{
 	"lk.disconnect.reason":           "lk.disconnect_reason",
 	"lk.participant.sid":             "lk.participant_id",
+	"lk.participant_sid":             "lk.participant_id",
+	"participantID":                  "lk.participant_id",
+	"participant_id":                 "lk.participant_id",
 	"lk.participant.identity":        "lk.pii.participant_identity",
+	"participantIdentity":            "lk.pii.participant_identity",
+	"participant_identity":           "lk.pii.participant_identity",
 	"lk.participant.remote_identity": "lk.pii.remote_participant_identity",
 	"lk.room.name":                   "lk.pii.room_name",
+	"roomName":                       "lk.pii.room_name",
+	"room_name":                      "lk.pii.room_name",
 	"lk.room.sid":                    "lk.room_id",
+	"lk.room_sid":                    "lk.room_id",
+	"roomID":                         "lk.room_id",
+	"room_id":                        "lk.room_id",
 	"lk.track.sid":                   "lk.track_id",
+	"lk.track_sid":                   "lk.track_id",
+	"trackID":                        "lk.track_id",
+	"track_id":                       "lk.track_id",
 	"lk.track.source":                "lk.track_source",
+}
+
+// KeyAliases maps a canonical key to its legacy spellings, the OTLP dotted rename first and then
+// the `aliases`. AliasesFor reads it to expand a canonical key to every spelling older captures
+// used, for querying historical ClickHouse/log data or reading mixed payloads.
+var KeyAliases = map[string][]string{
+	"lk.disconnect_reason": {
+		"lk.disconnect.reason",
+	},
+	"lk.participant_id": {
+		"lk.participant.sid",
+		"lk.participant_sid",
+		"participantID",
+		"participant_id",
+	},
+	"lk.pii.participant_identity": {
+		"lk.participant.identity",
+		"participantIdentity",
+		"participant_identity",
+	},
+	"lk.pii.remote_participant_identity": {
+		"lk.participant.remote_identity",
+	},
+	"lk.pii.room_name": {
+		"lk.room.name",
+		"roomName",
+		"room_name",
+	},
+	"lk.room_id": {
+		"lk.room.sid",
+		"lk.room_sid",
+		"roomID",
+		"room_id",
+	},
+	"lk.track_id": {
+		"lk.track.sid",
+		"lk.track_sid",
+		"trackID",
+		"track_id",
+	},
+	"lk.track_source": {
+		"lk.track.source",
+	},
 }
 
 // RenamedValues maps a legacy attribute key to its legacy-value -> canonical-value mapping, for the
@@ -1917,4 +1975,36 @@ var RenamedValues = map[string]map[string]string{
 		"screen_share_audio": "SOURCE_SCREENSHARE_AUDIO",
 		"unknown":            "SOURCE_UNKNOWN",
 	},
+}
+
+// NormalizeKey returns the canonical key for a legacy spelling, or key unchanged when it is not a
+// known legacy spelling. A reader calls it on ingest to fold legacy keys onto canonical ones.
+// During dual-emit a record may carry both: the canonical key is already canonical and returns
+// unchanged, so prefer it over the result of normalizing the legacy key.
+func NormalizeKey(key string) string {
+	if canonical, ok := RenamedKeys[key]; ok {
+		return canonical
+	}
+	return key
+}
+
+// AliasesFor returns the canonical key followed by its legacy spellings, for querying historical
+// data that may carry either. A key with no recorded legacy spelling yields just itself.
+func AliasesFor(canonical string) []string {
+	aliases := KeyAliases[canonical]
+	out := make([]string, 0, 1+len(aliases))
+	out = append(out, canonical)
+	return append(out, aliases...)
+}
+
+// NormalizeValue returns the canonical value for a legacy value under a legacy key, or value
+// unchanged. Pass the legacy key as read from the capture, not the canonical key; only the shared
+// keys whose enum values were renamed have value mappings.
+func NormalizeValue(key, value string) string {
+	if values, ok := RenamedValues[key]; ok {
+		if canonical, ok := values[value]; ok {
+			return canonical
+		}
+	}
+	return value
 }

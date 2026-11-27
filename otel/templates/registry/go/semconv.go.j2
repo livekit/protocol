@@ -29,7 +29,8 @@ const {{ a.key | pascal_case }}{{ v.id | pascal_case }} = {{ lit(v.value) }}
 // Package semconv is the LiveKit telemetry semantic conventions as Go constants: the attribute
 // keys, enum values, event names, span names, checkpoints and metric names LiveKit producers send
 // over OTLP, and the legacy-key and legacy-value aliases a consumer uses to normalize an older
-// capture to the canonical names (see RenamedKeys and RenamedValues).
+// capture to the canonical names (see RenamedKeys, RenamedValues, KeyAliases and the NormalizeKey,
+// AliasesFor and NormalizeValue helpers).
 package semconv
 
 {% for a in ctx.attributes %}
@@ -40,7 +41,7 @@ package semconv
 {{ attr(a) }}{% endfor %}{% if ctx.upstream_metrics %}
 // Upstream metrics that LiveKit producers create, imported from the registry's dependencies.
 {% for m in ctx.upstream_metrics %}
-// Metric{{ m.name | pascal_case }} is the {{ lit(m.name) }} metric: {{ line(m.brief) }} Instrument: {{ m.instrument }}, unit: `{{ line(m.unit or "") }}`.
+// Metric{{ m.name | pascal_case }} is the {{ lit(m.name) }} metric: {{ line(m.brief) }} Instrument: {{ m.instrument }}{% if m.unit %}, unit: `{{ line(m.unit) }}`{% endif %}.
 const Metric{{ m.name | pascal_case }} = {{ lit(m.name) }}
 
 // Metric{{ m.name | pascal_case }}Unit is the unit of Metric{{ m.name | pascal_case }}, as the upstream definition gives it (empty = none).
@@ -64,18 +65,30 @@ const Checkpoint{{ c.name | pascal_case }} = {{ lit(c.name) }}
 {% endfor %}{% if ctx.metrics %}
 // Metric names.
 {% for m in ctx.metrics %}
-// Metric{{ m.name | pascal_case }} is the {{ lit(m.name) }} metric: {{ line(m.brief) }} Instrument: {{ m.instrument }}, unit: `{{ line(m.unit or "") }}`.
+// Metric{{ m.name | pascal_case }} is the {{ lit(m.name) }} metric: {{ line(m.brief) }} Instrument: {{ m.instrument }}{% if m.unit %}, unit: `{{ line(m.unit) }}`{% endif %}.
 const Metric{{ m.name | pascal_case }} = {{ lit(m.name) }}
 
 // Metric{{ m.name | pascal_case }}Unit is the unit of Metric{{ m.name | pascal_case }}, exactly as the producer creates the instrument (empty = none).
 const Metric{{ m.name | pascal_case }}Unit = {{ lit(m.unit or "") }}
 {% endfor %}{% endif %}
 // RenamedKeys maps a legacy attribute key to the canonical key that replaces it, from the
-// `renamed_from` annotations on the shared keys. A consumer (such as the collector) uses it to
-// normalize a legacy key read from an older capture to the key this registry defines. The legacy
-// keys are never registered, so they appear only here.
+// `renamed_from` annotations on the shared keys: the OTLP dotted rename and every `aliases` entry
+// (the pre-#7973 Agents span names and the Go logger / collector spellings). A consumer (such as
+// the collector) uses it, via NormalizeKey, to fold a legacy key read from an older capture onto
+// the key this registry defines. The legacy keys are never registered, so they appear only here.
 var RenamedKeys = map[string]string{
 {% for a in ctx.attributes %}{% set from = a.annotations.livekit.renamed_from %}{% if from %}	{{ lit(from.key) }}: {{ lit(a.key) }},
+{% for alias in from.aliases or [] %}	{{ lit(alias) }}: {{ lit(a.key) }},
+{% endfor %}{% endif %}{% endfor %}}
+
+// KeyAliases maps a canonical key to its legacy spellings, the OTLP dotted rename first and then
+// the `aliases`. AliasesFor reads it to expand a canonical key to every spelling older captures
+// used, for querying historical ClickHouse/log data or reading mixed payloads.
+var KeyAliases = map[string][]string{
+{% for a in ctx.attributes %}{% set from = a.annotations.livekit.renamed_from %}{% if from %}	{{ lit(a.key) }}: {
+		{{ lit(from.key) }},
+{% for alias in from.aliases or [] %}		{{ lit(alias) }},
+{% endfor %}	},
 {% endif %}{% endfor %}}
 
 // RenamedValues maps a legacy attribute key to its legacy-value -> canonical-value mapping, for the
@@ -86,3 +99,35 @@ var RenamedValues = map[string]map[string]string{
 {% for old, new in from["values"] | items %}		{{ lit(old) }}: {{ lit(new) }},
 {% endfor %}	},
 {% endif %}{% endfor %}}
+
+// NormalizeKey returns the canonical key for a legacy spelling, or key unchanged when it is not a
+// known legacy spelling. A reader calls it on ingest to fold legacy keys onto canonical ones.
+// During dual-emit a record may carry both: the canonical key is already canonical and returns
+// unchanged, so prefer it over the result of normalizing the legacy key.
+func NormalizeKey(key string) string {
+	if canonical, ok := RenamedKeys[key]; ok {
+		return canonical
+	}
+	return key
+}
+
+// AliasesFor returns the canonical key followed by its legacy spellings, for querying historical
+// data that may carry either. A key with no recorded legacy spelling yields just itself.
+func AliasesFor(canonical string) []string {
+	aliases := KeyAliases[canonical]
+	out := make([]string, 0, 1+len(aliases))
+	out = append(out, canonical)
+	return append(out, aliases...)
+}
+
+// NormalizeValue returns the canonical value for a legacy value under a legacy key, or value
+// unchanged. Pass the legacy key as read from the capture, not the canonical key; only the shared
+// keys whose enum values were renamed have value mappings.
+func NormalizeValue(key, value string) string {
+	if values, ok := RenamedValues[key]; ok {
+		if canonical, ok := values[value]; ok {
+			return canonical
+		}
+	}
+	return value
+}

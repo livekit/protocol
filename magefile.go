@@ -261,10 +261,29 @@ func Proto() error {
 
 // regenerate the telemetry conventions in otel/gen (needs weaver, see otel/README.md)
 func Otel() error {
+	// Snapshot otel/gen and restore it on any failure. generate.sh replaces otel/gen whole, and
+	// the Generate workflow commits whatever is left on disk, so a failed regeneration or a
+	// generated Go package that does not build or test must leave the previous otel/gen in place
+	// rather than a broken partial result.
+	backup, err := os.MkdirTemp("", "otel-gen-backup")
+	if err != nil {
+		return err
+	}
+	defer os.RemoveAll(backup)
+	if err := otelGenCopy("otel/gen", filepath.Join(backup, "gen")); err != nil {
+		return err
+	}
+	restore := func(cause error) error {
+		if err := otelGenCopy(filepath.Join(backup, "gen"), "otel/gen"); err != nil {
+			return fmt.Errorf("%w (and restoring otel/gen failed: %v)", cause, err)
+		}
+		return cause
+	}
+
 	cmd := exec.Command("otel/generate.sh")
 	connectStd(cmd)
 	if err := cmd.Run(); err != nil {
-		return err
+		return restore(err)
 	}
 
 	// Verify the generated Go package compiles and its alias invariants hold, so a model or
@@ -276,10 +295,21 @@ func Otel() error {
 		cmd := exec.Command("go", args...)
 		connectStd(cmd)
 		if err := cmd.Run(); err != nil {
-			return err
+			return restore(err)
 		}
 	}
 	return nil
+}
+
+// otelGenCopy replaces target with a fresh copy of source (a directory), used to snapshot and
+// restore otel/gen around regeneration.
+func otelGenCopy(source, target string) error {
+	if err := os.RemoveAll(target); err != nil {
+		return err
+	}
+	cmd := exec.Command("cp", "-R", source, target)
+	connectStd(cmd)
+	return cmd.Run()
 }
 
 // run tests

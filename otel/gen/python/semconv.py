@@ -1566,7 +1566,7 @@ CHECKPOINT_EXCEPTION = "exception"
 CHECKPOINT_FIRST_FRAME = "first_frame"
 #: The first inbound stats reading with bytes; the span ends ok here.
 CHECKPOINT_FIRST_MEDIA = "first_media"
-#: OTel GenAI inference details event (the GenAI registry defines it; events cannot be referenced
+#: OTel GenAI inference details event (the GenAI registry defines it; events cannot be referenced, so it is named here).
 CHECKPOINT_GEN_AI_CLIENT_INFERENCE_OPERATION_DETAILS = "gen_ai.client.inference.operation.details"
 #: One generation started (the generation attributes).
 CHECKPOINT_GENERATION = "generation"

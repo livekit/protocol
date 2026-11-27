@@ -30,3 +30,65 @@ export const CHECKPOINT_{{ c.name | screaming_snake_case }} = {{ c.name | tojson
 /** {{ line(m.brief) }} Instrument: {{ m.instrument }}, unit: `{{ line(m.unit) }}`. */
 export const METRIC_{{ m.name | screaming_snake_case }} = {{ m.name | tojson }} as const;
 {% endfor %}
+/**
+ * Maps a legacy attribute key to the canonical key that replaces it, from the `renamed_from`
+ * annotations on the shared keys: the OTLP dotted rename and every `aliases` entry. The same source
+ * of truth as the Go semconv's RenamedKeys. Use {@link normalizeKey} to fold a legacy key read from
+ * an older capture onto the key this registry defines.
+ */
+export const RENAMED_KEYS: Record<string, string> = {
+{% for a in ctx.attributes %}{% set from = a.annotations.livekit.renamed_from %}{% if from %}  {{ from.key | tojson }}: {{ a.key | tojson }},
+{% for alias in from.aliases or [] %}  {{ alias | tojson }}: {{ a.key | tojson }},
+{% endfor %}{% endif %}{% endfor %}};
+
+/**
+ * Maps a legacy attribute key to its legacy-value -> canonical-value mapping, for the shared keys
+ * whose enum values were also renamed. A renamed key whose values did not change is absent here.
+ */
+export const RENAMED_VALUES: Record<string, Record<string, string>> = {
+{% for a in ctx.attributes %}{% set from = a.annotations.livekit.renamed_from %}{% if from and from["values"] %}  {{ from.key | tojson }}: {
+{% for old, new in from["values"] | items %}    {{ old | tojson }}: {{ new | tojson }},
+{% endfor %}  },
+{% endif %}{% endfor %}};
+
+/**
+ * Maps a canonical key to its legacy spellings, the OTLP dotted rename first and then the
+ * `aliases`. {@link aliasesFor} reads it to expand a canonical key for querying historical data.
+ */
+export const KEY_ALIASES: Record<string, readonly string[]> = {
+{% for a in ctx.attributes %}{% set from = a.annotations.livekit.renamed_from %}{% if from %}  {{ a.key | tojson }}: [{{ from.key | tojson }}{% for alias in from.aliases or [] %}, {{ alias | tojson }}{% endfor %}],
+{% endif %}{% endfor %}};
+
+/**
+ * Own-property lookup, so a key such as `constructor` or `toString` read from a capture never
+ * resolves to an Object.prototype member of the alias maps.
+ */
+function own<T>(map: Record<string, T>, key: string): T | undefined {
+  return Object.prototype.hasOwnProperty.call(map, key) ? map[key] : undefined;
+}
+
+/**
+ * Returns the canonical key for a legacy spelling, or `key` unchanged when it is not a known legacy
+ * spelling. During dual-emit a record may carry both; the canonical key is already canonical and
+ * returns unchanged, so prefer it over the result of normalizing the legacy key.
+ */
+export function normalizeKey(key: string): string {
+  return own(RENAMED_KEYS, key) ?? key;
+}
+
+/**
+ * Returns the canonical key followed by its legacy spellings, for querying historical data that may
+ * carry either. A key with no recorded legacy spelling yields just itself.
+ */
+export function aliasesFor(canonical: string): string[] {
+  return [canonical, ...(own(KEY_ALIASES, canonical) ?? [])];
+}
+
+/**
+ * Returns the canonical value for a legacy value under a legacy key, or `value` unchanged. Pass the
+ * legacy key as read from the capture, not the canonical key.
+ */
+export function normalizeValue(key: string, value: string): string {
+  const values = own(RENAMED_VALUES, key);
+  return (values && own(values, value)) ?? value;
+}

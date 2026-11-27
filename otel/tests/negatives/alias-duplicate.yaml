@@ -1,0 +1,16 @@
+# expect: livekit_alias_duplicate
+groups:
+  - id: registry.lk.negative
+    type: attribute_group
+    brief: Negative fixture.
+    attributes:
+      - id: lk.negative_id
+        type: string
+        stability: development
+        brief: Lists its dotted rename again as an alias, a duplicate map key in the generated Go and TypeScript.
+        examples: ["x"]
+        annotations:
+          livekit:
+            owner: shared
+            sensitivity: none
+            renamed_from: {key: lk.negative.id, aliases: [lk.negative.id, negativeID]}

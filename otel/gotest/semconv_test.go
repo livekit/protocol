@@ -55,9 +55,11 @@ func TestConstants(t *testing.T) {
 	}
 }
 
-// TestRenamedKeys checks the legacy-key alias map against the eight documented client renames, and
-// its structural invariants: a legacy key is never empty, maps to a non-empty canonical key, and is
-// never equal to its own canonical key (a rename changes the spelling).
+// TestRenamedKeys checks the legacy-key alias map against the eight documented OTLP client renames
+// as a subset (the map now also carries the pre-#7973 Agents span names and the Go logger /
+// collector spellings as aliases), and its structural invariants: a legacy key is never empty, maps
+// to a non-empty canonical key, and is never equal to its own canonical key (a rename changes the
+// spelling).
 func TestRenamedKeys(t *testing.T) {
 	want := map[string]string{
 		"lk.room.sid":                    semconv.AttrLkRoomId,
@@ -68,9 +70,6 @@ func TestRenamedKeys(t *testing.T) {
 		"lk.participant.remote_identity": semconv.AttrLkPiiRemoteParticipantIdentity,
 		"lk.track.source":                semconv.AttrLkTrackSource,
 		"lk.disconnect.reason":           semconv.AttrLkDisconnectReason,
-	}
-	if len(semconv.RenamedKeys) != len(want) {
-		t.Fatalf("RenamedKeys has %d entries, want %d: %v", len(semconv.RenamedKeys), len(want), semconv.RenamedKeys)
 	}
 	for legacy, canonical := range want {
 		got, ok := semconv.RenamedKeys[legacy]
@@ -92,6 +91,86 @@ func TestRenamedKeys(t *testing.T) {
 	}
 }
 
+// TestKeyAliases checks the canonical-to-aliases map and its cross-map invariants: every canonical
+// key is a registered attribute, every alias maps back to that canonical in RenamedKeys, an alias
+// is never a canonical key itself, and the two maps agree (RenamedKeys has one entry per alias
+// across all KeyAliases lists).
+func TestKeyAliases(t *testing.T) {
+	registered := map[string]bool{
+		semconv.AttrLkRoomId:                       true,
+		semconv.AttrLkParticipantId:                true,
+		semconv.AttrLkTrackId:                      true,
+		semconv.AttrLkPiiRoomName:                  true,
+		semconv.AttrLkPiiParticipantIdentity:       true,
+		semconv.AttrLkPiiRemoteParticipantIdentity: true,
+		semconv.AttrLkTrackSource:                  true,
+		semconv.AttrLkDisconnectReason:             true,
+	}
+	aliasCount := 0
+	for canonical, aliases := range semconv.KeyAliases {
+		if !registered[canonical] {
+			t.Errorf("KeyAliases has canonical key %q that is not a registered attribute", canonical)
+		}
+		for _, alias := range aliases {
+			aliasCount++
+			if alias == canonical {
+				t.Errorf("KeyAliases[%q] lists the canonical key as its own alias", canonical)
+			}
+			if got := semconv.RenamedKeys[alias]; got != canonical {
+				t.Errorf("KeyAliases[%q] has alias %q, but RenamedKeys[%q] = %q", canonical, alias, alias, got)
+			}
+			if _, ok := semconv.KeyAliases[alias]; ok {
+				t.Errorf("alias %q is also a canonical key in KeyAliases", alias)
+			}
+		}
+	}
+	if aliasCount != len(semconv.RenamedKeys) {
+		t.Errorf("KeyAliases lists %d aliases, RenamedKeys has %d entries; they must match", aliasCount, len(semconv.RenamedKeys))
+	}
+}
+
+// TestNormalizeKey checks that a legacy spelling folds onto its canonical key, an unknown key is
+// returned unchanged, and a canonical key is already canonical.
+func TestNormalizeKey(t *testing.T) {
+	cases := map[string]string{
+		"roomID":             semconv.AttrLkRoomId,
+		"room_id":            semconv.AttrLkRoomId,
+		"lk.room.sid":        semconv.AttrLkRoomId,
+		"participantID":      semconv.AttrLkParticipantId,
+		semconv.AttrLkRoomId: semconv.AttrLkRoomId,
+		"app.custom.key":     "app.custom.key",
+	}
+	for key, want := range cases {
+		if got := semconv.NormalizeKey(key); got != want {
+			t.Errorf("NormalizeKey(%q) = %q, want %q", key, got, want)
+		}
+	}
+}
+
+// TestAliasesFor checks that the canonical key comes first, its aliases follow, and a key with no
+// recorded legacy spelling yields just itself.
+func TestAliasesFor(t *testing.T) {
+	got := semconv.AliasesFor(semconv.AttrLkRoomId)
+	if len(got) == 0 || got[0] != semconv.AttrLkRoomId {
+		t.Fatalf("AliasesFor(%q) = %v, want canonical first", semconv.AttrLkRoomId, got)
+	}
+	found := false
+	for _, a := range got[1:] {
+		if a == "roomID" {
+			found = true
+		}
+		if a == semconv.AttrLkRoomId {
+			t.Errorf("AliasesFor(%q) repeats the canonical key", semconv.AttrLkRoomId)
+		}
+	}
+	if !found {
+		t.Errorf("AliasesFor(%q) = %v, missing alias roomID", semconv.AttrLkRoomId, got)
+	}
+	if got := semconv.AliasesFor("app.custom.key"); len(got) != 1 || got[0] != "app.custom.key" {
+		t.Errorf("AliasesFor(%q) = %v, want just itself", "app.custom.key", got)
+	}
+}
+
 // TestRenamedValues checks the two enums whose values were also renamed, and that every key in
 // RenamedValues is also in RenamedKeys (a value remapping implies a key remapping).
 func TestRenamedValues(t *testing.T) {
@@ -108,5 +187,22 @@ func TestRenamedValues(t *testing.T) {
 		if _, ok := semconv.RenamedKeys[legacy]; !ok {
 			t.Errorf("RenamedValues key %q is not in RenamedKeys", legacy)
 		}
+	}
+}
+
+// TestNormalizeValue checks that a legacy value under a legacy key folds onto its canonical value,
+// and an unmapped key or value is returned unchanged.
+func TestNormalizeValue(t *testing.T) {
+	if got := semconv.NormalizeValue("lk.track.source", "camera"); got != semconv.LkTrackSourceSourceCamera {
+		t.Errorf("NormalizeValue(track.source, camera) = %q, want %q", got, semconv.LkTrackSourceSourceCamera)
+	}
+	if got := semconv.NormalizeValue("lk.disconnect.reason", "client_initiated"); got != semconv.LkDisconnectReasonClientInitiated {
+		t.Errorf("NormalizeValue(disconnect.reason, client_initiated) = %q, want %q", got, semconv.LkDisconnectReasonClientInitiated)
+	}
+	if got := semconv.NormalizeValue("lk.track.source", "SOURCE_CAMERA"); got != "SOURCE_CAMERA" {
+		t.Errorf("NormalizeValue of an already-canonical value = %q, want unchanged", got)
+	}
+	if got := semconv.NormalizeValue("lk.room.sid", "RM_abc"); got != "RM_abc" {
+		t.Errorf("NormalizeValue of a key with no value map = %q, want unchanged", got)
 	}
 }

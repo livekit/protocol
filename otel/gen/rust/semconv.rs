@@ -1466,7 +1466,7 @@ pub mod checkpoint {
     pub const FIRST_FRAME: &str = "first_frame";
     /// The first inbound stats reading with bytes; the span ends ok here.
     pub const FIRST_MEDIA: &str = "first_media";
-    /// OTel GenAI inference details event (the GenAI registry defines it; events cannot be referenced
+    /// OTel GenAI inference details event (the GenAI registry defines it; events cannot be referenced, so it is named here).
     pub const GEN_AI_CLIENT_INFERENCE_OPERATION_DETAILS: &str = "gen_ai.client.inference.operation.details";
     /// One generation started (the generation attributes).
     pub const GENERATION: &str = "generation";

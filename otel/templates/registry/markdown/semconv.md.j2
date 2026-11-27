@@ -205,11 +205,15 @@ historical names only: live-check does not exempt them from unregistered-attribu
 ## Old spellings
 
 Keys and values that producers sent before this registry, and the key and value to send instead.
-Each row comes from `renamed_from` on the shared key. Live-check reports an old spelling as
-`livekit_shared_rename` and names the replacement.
+Each row comes from `renamed_from` on the shared key: the OTLP dotted rename (`key`) and any
+`aliases` (the pre-#7973 Agents span names and the Go logger / collector spellings). The generated
+reader helpers (`NormalizeKey`/`normalizeKey`, `AliasesFor`/`aliasesFor`) fold every spelling in
+this table onto the canonical key; live-check reports only the dotted spelling as
+`livekit_shared_rename`, since the alias spellings are not OTLP keys.
 
 | Old key | Old value | Key to send | Value to send |
 | --- | --- | --- | --- |
 {% for a in ctx.attributes %}{% set from = a.annotations.livekit.renamed_from %}{% if from %}{% if from["values"] %}{% for old, new in from["values"] | items %}| `{{ from.key }}` | `{{ old }}` | `{{ a.key }}` | `{{ new }}` |
 {% endfor %}{% else %}| `{{ from.key }}` | any | `{{ a.key }}` | unchanged |
-{% endif %}{% endif %}{% endfor %}
+{% endif %}{% for alias in from.aliases or [] %}| `{{ alias }}` | any | `{{ a.key }}` | unchanged |
+{% endfor %}{% endif %}{% endfor %}

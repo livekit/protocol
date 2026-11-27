@@ -1,0 +1,26 @@
+# expect: livekit_alias_collision
+groups:
+  - id: registry.lk.negative
+    type: attribute_group
+    brief: Negative fixture.
+    attributes:
+      - id: lk.negative_one
+        type: string
+        stability: development
+        brief: Claims the legacy alias collide_me.
+        examples: ["x"]
+        annotations:
+          livekit:
+            owner: shared
+            sensitivity: none
+            renamed_from: {key: lk.negative.one, aliases: [collide_me]}
+      - id: lk.negative_two
+        type: string
+        stability: development
+        brief: Also claims the legacy alias collide_me, so one spelling has two canonical keys.
+        examples: ["x"]
+        annotations:
+          livekit:
+            owner: shared
+            sensitivity: none
+            renamed_from: {key: lk.negative.two, aliases: [collide_me]}

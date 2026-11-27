@@ -24,7 +24,11 @@ groups:
             owner: shared
             sensitivity: none
             authority: cloud
-            renamed_from: {key: lk.room.sid}
+            renamed_from:
+              key: lk.room.sid
+              # Legacy spellings beyond the OTLP rename above, normalized to lk.room_id by the
+              # reader helpers: the pre-#7973 Agents span name and the Go logger / collector names.
+              aliases: [lk.room_sid, roomID, room_id]
             # Physical name per producer/store. Weaver carries these; nothing validates them.
             bindings:
               agents_otlp: lk.room_id # canonical-only after livekit/agents#7973, all signals
@@ -41,7 +45,14 @@ groups:
           never a default metric dimension.
         examples: ["PA_9kLm2NpQ4rTs"]
         annotations:
-          livekit: {owner: shared, sensitivity: none, authority: cloud, renamed_from: {key: lk.participant.sid}, bindings: {event_logs: participantID}}
+          livekit:
+            owner: shared
+            sensitivity: none
+            authority: cloud
+            renamed_from:
+              key: lk.participant.sid
+              aliases: [lk.participant_sid, participantID, participant_id]
+            bindings: {event_logs: participantID}
       - id: lk.track_id
         type: string
         stability: development
@@ -55,7 +66,9 @@ groups:
             owner: shared
             sensitivity: none
             authority: cloud
-            renamed_from: {key: lk.track.sid}
+            renamed_from:
+              key: lk.track.sid
+              aliases: [lk.track_sid, trackID, track_id]
             bindings:
               agents_otlp: lk.track_id # canonical-only after livekit/agents#7973
               agents_otlp_before_7973: lk.track_sid # historical spans
@@ -95,7 +108,7 @@ groups:
           On every record and span of a session once the client has joined.
         examples: ["my-room"]
         annotations:
-          livekit: {owner: shared, sensitivity: pii, renamed_from: {key: lk.room.name}}
+          livekit: {owner: shared, sensitivity: pii, renamed_from: {key: lk.room.name, aliases: [roomName, room_name]}}
       - id: lk.pii.participant_identity
         type: string
         stability: development
@@ -104,7 +117,7 @@ groups:
           On every record and span of a session once the client has joined.
         examples: ["identity-0"]
         annotations:
-          livekit: {owner: shared, sensitivity: pii, renamed_from: {key: lk.participant.identity}}
+          livekit: {owner: shared, sensitivity: pii, renamed_from: {key: lk.participant.identity, aliases: [participantIdentity, participant_identity]}}
       - id: lk.pii.remote_participant_identity
         type: string
         stability: development
