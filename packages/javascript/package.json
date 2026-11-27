@@ -18,14 +18,25 @@
         "types": "./dist/index.d.cts",
         "default": "./dist/index.cjs"
       }
+    },
+    "./semconv": {
+      "import": {
+        "types": "./dist/semconv.d.mts",
+        "default": "./dist/semconv.mjs"
+      },
+      "require": {
+        "types": "./dist/semconv.d.cts",
+        "default": "./dist/semconv.cjs"
+      }
     }
   },
   "main": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
   "scripts": {
     "generate:proto": "mkdir -p src/gen && protoc --es_out src/gen --es_opt target=dts+js -I=../../protobufs ../../protobufs/livekit_*.proto ../../protobufs/agent/livekit_*.proto",
+    "generate:semconv": "mkdir -p src/gen && cp ../../otel/gen/ts/semconv.ts src/gen/semconv.ts",
     "generate:version": "genversion --esm --semi src/gen/version.js",
-    "build": "pnpm generate:version && pnpm generate:proto && unbuild"
+    "build": "pnpm generate:version && pnpm generate:proto && pnpm generate:semconv && unbuild"
   },
   "keywords": [],
   "author": "LiveKit",
