@@ -1,0 +1,18 @@
+#:schema https://raw.githubusercontent.com/livekit/verwalter/main/schemas/v1.json
+
+[versioning]
+fixed = [["github.com/livekit/protocol", "@livekit/protocol"]]
+
+# The Go module. The tag v<version> is the Go release, with no GitHub
+# release, as before. The root package.json keeps carrying the version.
+[packages."github.com/livekit/protocol"]
+path = "."
+versioning.files = ["go.mod", "package.json"]
+release.mode = "tag"
+publish.registry = "goproxy"
+
+[packages."@livekit/protocol"]
+path = "packages/javascript"
+versioning.files = ["package.json"]
+release.tag = "{package}@{version}"
+publish.registry = "npm"
