@@ -224,3 +224,9 @@ func TestProtoUnknownFieldPrefix(t *testing.T) {
 		require.False(t, strings.Contains(k, "_"), "key %q should be camelCase", k)
 	}
 }
+
+func TestProtoRedactsSipDTMF(t *testing.T) {
+	msg := &livekit.DataPacket{Value: &livekit.DataPacket_SipDtmf{SipDtmf: &livekit.SipDTMF{Code: 11, Digit: "#"}}}
+	fields := marshalFields(t, logger.Proto(msg))
+	require.Equal(t, map[string]any{"code": "<redacted>", "digit": "<redacted>"}, fields["sipDtmf"])
+}

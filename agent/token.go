@@ -29,6 +29,7 @@ func BuildAgentToken(
 		CanUpdateOwnMetadata: &permissions.CanUpdateMetadata,
 		CanSubscribeMetrics:  &permissions.CanSubscribeMetrics,
 	}
+	grant.SetCanReceiveSecure(permissions.CanReceiveSecure)
 
 	at := auth.NewAccessToken(apiKey, secret).
 		SetVideoGrant(grant).

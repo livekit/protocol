@@ -99,6 +99,12 @@ enum BackupCodecPolicy {
   REGRESSION = 2;
 }
 
+// LiveKit Cloud delivers data of a class only to participants whose can_receive_secure lists it.
+enum SecureClass {
+  SECURE_CLASS_NONE = 0;
+  SECURE_CLASS_CALL_INPUT = 1;
+}
+
 message PlayoutDelay {
   bool enabled = 1;
   uint32 min = 2;
@@ -128,8 +134,9 @@ message ParticipantPermission {
   bool can_subscribe_metrics = 12;
   // if a participant can manage an agent session via RemoteSession (control and access state)
   bool can_manage_agent_session = 13;
+  repeated SecureClass can_receive_secure = 14;
 
-  // NEXT_ID: 14
+  // NEXT_ID: 15
 }
 
 message ParticipantInfo {
@@ -470,8 +477,10 @@ message DataPacket {
   uint32 sequence = 16;
   // sid of the user that sent the message
   string participant_sid = 17;
+  // Set by LiveKit services only. LiveKit Cloud drops packets from other participants that set it.
+  repeated bytes metadata = 19;
 
-  // NEXT_ID: 19
+  // NEXT_ID: 20
 }
 
 message EncryptedPacket {
@@ -533,8 +542,8 @@ message UserPacket {
 }
 
 message SipDTMF {
-  uint32 code = 3;
-  string digit = 4;
+  uint32 code = 3 [(logger.sensitivity) = SENSITIVITY_SECRET];
+  string digit = 4 [(logger.sensitivity) = SENSITIVITY_SECRET];
 }
 
 message Transcription {
@@ -1005,4 +1014,30 @@ message WebhookConfig {
 message SubscribedAudioCodec {
   string codec = 1;
   bool enabled = 2;
+}
+
+message SecureInputInfo {
+  string secure_input_id = 1 [(logger.name) = "secureInputID"];
+}
+
+message StopSecureInputResponse {}
+
+message ListSecureInputsResponse {
+  repeated SecureInputInfo secure_inputs = 1;
+}
+
+// Why a secure input request failed with FailedPrecondition, attached to the error.
+message SecureInputError {
+  SecureInputErrorReason reason = 1;
+}
+
+enum SecureInputErrorReason {
+  SECURE_INPUT_ERROR_UNKNOWN = 0;
+  // Secure input is turned off. Start only.
+  SECURE_INPUT_ERROR_DISABLED = 1;
+  // The secure input ID was already stopped. Start only.
+  SECURE_INPUT_ERROR_INPUT_STOPPED = 2;
+  SECURE_INPUT_ERROR_CALL_NOT_ANSWERED = 3;
+  // The call did not negotiate RFC 4733 telephone events, so its digits exist only in the audio.
+  SECURE_INPUT_ERROR_NO_TELEPHONE_EVENTS = 4;
 }

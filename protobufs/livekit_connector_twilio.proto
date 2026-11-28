@@ -62,4 +62,6 @@ message ConnectTwilioCallRequest {
 message ConnectTwilioCallResponse {
   // The websocket URL which twilio media stream will connect to
   string connect_url = 1;
+  // The LiveKit call ID
+  string call_id = 2 [(logger.name) = "callID"];
 }

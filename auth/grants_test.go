@@ -16,6 +16,7 @@ package auth
 
 import (
 	"reflect"
+	"slices"
 	"strconv"
 	"testing"
 
@@ -653,4 +654,36 @@ func TestUpdateFromPermissionKeepsAgent(t *testing.T) {
 	require.True(t, v.Agent)
 	require.True(t, v.Hidden)
 	require.True(t, v.GetCanPublish())
+}
+
+func TestMatchesPermissionComparesCanReceiveSecure(t *testing.T) {
+	plain := &livekit.ParticipantPermission{CanSubscribe: true}
+	secure := &livekit.ParticipantPermission{CanSubscribe: true, CanReceiveSecure: []livekit.SecureClass{livekit.SecureClass_SECURE_CLASS_CALL_INPUT}}
+
+	v := &VideoGrant{}
+	v.UpdateFromPermission(plain)
+	require.False(t, v.MatchesPermission(secure))
+
+	v.UpdateFromPermission(secure)
+	require.False(t, v.MatchesPermission(plain))
+}
+
+func TestCanReceiveSecureClassMatchesGetter(t *testing.T) {
+	classes := []livekit.SecureClass{livekit.SecureClass_SECURE_CLASS_NONE, livekit.SecureClass_SECURE_CLASS_CALL_INPUT, 99, -1}
+	names := []string{"call_input", "CALL_INPUT", "call_ınput", "none", "99", "bogus"}
+	for mask := 0; mask < 1<<len(names); mask++ {
+		v := &VideoGrant{}
+		for i, n := range names {
+			if mask&(1<<i) != 0 {
+				v.CanReceiveSecure = append(v.CanReceiveSecure, n)
+			}
+		}
+		for _, c := range classes {
+			require.Equal(t, slices.Contains(v.GetCanReceiveSecure(), c), v.CanReceiveSecureClass(c), "%v %v", v.CanReceiveSecure, c)
+		}
+	}
+
+	v := &VideoGrant{CanReceiveSecure: []string{"bogus", "call_input"}}
+	require.True(t, v.CanReceiveSecureClass(livekit.SecureClass_SECURE_CLASS_CALL_INPUT))
+	require.Zero(t, testing.AllocsPerRun(100, func() { v.CanReceiveSecureClass(livekit.SecureClass_SECURE_CLASS_CALL_INPUT) }))
 }

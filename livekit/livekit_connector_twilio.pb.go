@@ -196,7 +196,9 @@ func (x *ConnectTwilioCallRequest) GetDestinationCountry() string {
 type ConnectTwilioCallResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The websocket URL which twilio media stream will connect to
-	ConnectUrl    string `protobuf:"bytes,1,opt,name=connect_url,json=connectUrl,proto3" json:"connect_url,omitempty"`
+	ConnectUrl string `protobuf:"bytes,1,opt,name=connect_url,json=connectUrl,proto3" json:"connect_url,omitempty"`
+	// The LiveKit call ID
+	CallId        string `protobuf:"bytes,2,opt,name=call_id,json=callId,proto3" json:"call_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -238,6 +240,13 @@ func (x *ConnectTwilioCallResponse) GetConnectUrl() string {
 	return ""
 }
 
+func (x *ConnectTwilioCallResponse) GetCallId() string {
+	if x != nil {
+		return x.CallId
+	}
+	return ""
+}
+
 var File_livekit_connector_twilio_proto protoreflect.FileDescriptor
 
 const file_livekit_connector_twilio_proto_rawDesc = "" +
@@ -257,10 +266,11 @@ const file_livekit_connector_twilio_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\\\n" +
 	"\x13TwilioCallDirection\x12!\n" +
 	"\x1dTWILIO_CALL_DIRECTION_INBOUND\x10\x00\x12\"\n" +
-	"\x1eTWILIO_CALL_DIRECTION_OUTBOUND\x10\x01\"<\n" +
+	"\x1eTWILIO_CALL_DIRECTION_OUTBOUND\x10\x01\"`\n" +
 	"\x19ConnectTwilioCallResponse\x12\x1f\n" +
 	"\vconnect_url\x18\x01 \x01(\tR\n" +
-	"connectUrlBFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
+	"connectUrl\x12\"\n" +
+	"\acall_id\x18\x02 \x01(\tB\t\xbaP\x06callIDR\x06callIdBFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
 
 var (
 	file_livekit_connector_twilio_proto_rawDescOnce sync.Once

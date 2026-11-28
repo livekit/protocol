@@ -76,6 +76,14 @@ service SIP {
 
   rpc CreateSIPParticipant(CreateSIPParticipantRequest) returns (SIPParticipantInfo);
   rpc TransferSIPParticipant(TransferSIPParticipantRequest) returns (TransferSIPParticipantResponse);
+
+  // LiveKit Cloud only. While a call has a secure input, the caller's voice is silenced and their
+  // keypad digits reach only participants that can receive SECURE_CLASS_CALL_INPUT.
+  rpc StartSIPSecureInput(StartSIPSecureInputRequest) returns (SecureInputInfo);
+  // LiveKit Cloud only.
+  rpc StopSIPSecureInput(StopSIPSecureInputRequest) returns (StopSecureInputResponse);
+  // LiveKit Cloud only.
+  rpc ListSIPSecureInputs(ListSIPSecureInputsRequest) returns (ListSecureInputsResponse);
 }
 
 enum SIPStatusCode {
@@ -917,6 +925,22 @@ message TransferSIPParticipantResponse {
   SIPStatus sip_status = 4;
 
   // NEXT ID: 5
+}
+
+message StartSIPSecureInputRequest {
+  // SIPParticipantInfo.sip_call_id or the sip.callID participant attribute.
+  string sip_call_id = 1 [(logger.name) = "sipCallID"];
+}
+
+message StopSIPSecureInputRequest {
+  // SIPParticipantInfo.sip_call_id or the sip.callID participant attribute.
+  string sip_call_id = 1 [(logger.name) = "sipCallID"];
+  string secure_input_id = 2 [(logger.name) = "secureInputID"];
+}
+
+message ListSIPSecureInputsRequest {
+  // SIPParticipantInfo.sip_call_id or the sip.callID participant attribute.
+  string sip_call_id = 1 [(logger.name) = "sipCallID"];
 }
 
 // Details of a failed SIP transfer, attached to the error.

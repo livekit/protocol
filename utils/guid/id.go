@@ -47,6 +47,7 @@ const (
 	SIPDispatchRulePrefix              = "SDR_"
 	SIPCallPrefix                      = "SCL_"
 	SIPTransferPrefix                  = "STR_"
+	TwilioCallPrefix                   = "CALL_TW"
 	RPCPrefix                          = "RPC_"
 	WHIPResourcePrefix                 = "WH_"
 	RTMPResourcePrefix                 = "RT_"
@@ -74,6 +75,7 @@ const (
 	ScenarioGroupPrefix                = "SCNG_"
 	AgentThreadPrefix                  = "AT_"
 	AgentStreamPrefix                  = "AST_" // ST_ is SIPTrunkPrefix
+	SecureInputPrefix                  = "SI_"
 )
 
 const (

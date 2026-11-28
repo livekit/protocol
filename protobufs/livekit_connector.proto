@@ -21,6 +21,8 @@ option ruby_package = "LiveKit::Proto";
 
 import "livekit_connector_whatsapp.proto";
 import "livekit_connector_twilio.proto";
+import "livekit_models.proto";
+import "logger/options.proto";
 
 service Connector {
   rpc DialWhatsAppCall(DialWhatsAppCallRequest) returns (DialWhatsAppCallResponse);
@@ -32,10 +34,45 @@ service Connector {
   rpc AcceptWhatsAppCall(AcceptWhatsAppCallRequest) returns (AcceptWhatsAppCallResponse);
 
   rpc ConnectTwilioCall(ConnectTwilioCallRequest) returns (ConnectTwilioCallResponse);
+
+  // LiveKit Cloud only, not supported yet. StartSIPSecureInput for WhatsApp and Twilio calls.
+  rpc StartConnectorSecureInput(StartConnectorSecureInputRequest) returns (SecureInputInfo);
+  // LiveKit Cloud only, not supported yet.
+  rpc StopConnectorSecureInput(StopConnectorSecureInputRequest) returns (StopSecureInputResponse);
+  // LiveKit Cloud only, not supported yet.
+  rpc ListConnectorSecureInputs(ListConnectorSecureInputsRequest) returns (ListSecureInputsResponse);
 }
 
 enum ConnectorType {
   Unspecified = 0;
   WhatsApp = 1;
   Twilio = 2;
+}
+
+message StartConnectorSecureInputRequest {
+  oneof call {
+    // DialWhatsAppCallResponse.whatsapp_call_id, or the ID passed to AcceptWhatsAppCall.
+    string whatsapp_call_id = 1 [(logger.name) = "whatsappCallID"];
+    // ConnectTwilioCallResponse.call_id, not Twilio's CallSid.
+    string twilio_call_id = 2 [(logger.name) = "twilioCallID"];
+  }
+}
+
+message StopConnectorSecureInputRequest {
+  oneof call {
+    // DialWhatsAppCallResponse.whatsapp_call_id, or the ID passed to AcceptWhatsAppCall.
+    string whatsapp_call_id = 1 [(logger.name) = "whatsappCallID"];
+    // ConnectTwilioCallResponse.call_id, not Twilio's CallSid.
+    string twilio_call_id = 2 [(logger.name) = "twilioCallID"];
+  }
+  string secure_input_id = 3 [(logger.name) = "secureInputID"];
+}
+
+message ListConnectorSecureInputsRequest {
+  oneof call {
+    // DialWhatsAppCallResponse.whatsapp_call_id, or the ID passed to AcceptWhatsAppCall.
+    string whatsapp_call_id = 1 [(logger.name) = "whatsappCallID"];
+    // ConnectTwilioCallResponse.call_id, not Twilio's CallSid.
+    string twilio_call_id = 2 [(logger.name) = "twilioCallID"];
+  }
 }

@@ -292,6 +292,9 @@ type VideoGrant struct {
 	// if a participant can manage an agent session via RemoteSession
 	CanManageAgentSession *bool `json:"canManageAgentSession,omitempty"`
 
+	// Secure classes whose marked data packets a participant may receive
+	CanReceiveSecure []string `json:"canReceiveSecure,omitempty"`
+
 	// destination room which this participant can forward to
 	DestinationRoom string `json:"destinationRoom,omitempty"`
 }
@@ -325,6 +328,13 @@ func (v *VideoGrant) SetCanSubscribeMetrics(val bool) {
 
 func (v *VideoGrant) SetCanManageAgentSession(val bool) {
 	v.CanManageAgentSession = &val
+}
+
+func (v *VideoGrant) SetCanReceiveSecure(classes []livekit.SecureClass) {
+	v.CanReceiveSecure = nil
+	for _, c := range normalizeSecureClasses(classes) {
+		v.CanReceiveSecure = append(v.CanReceiveSecure, secureClassToString(c))
+	}
 }
 
 func (v *VideoGrant) GetCanPublish() bool {
@@ -398,6 +408,26 @@ func (v *VideoGrant) GetCanManageAgentSession() bool {
 	return *v.CanManageAgentSession
 }
 
+func (v *VideoGrant) GetCanReceiveSecure() []livekit.SecureClass {
+	var classes []livekit.SecureClass
+	for _, s := range v.CanReceiveSecure {
+		classes = append(classes, secureClassToProto(s))
+	}
+	return normalizeSecureClasses(classes)
+}
+
+func (v *VideoGrant) CanReceiveSecureClass(c livekit.SecureClass) bool {
+	if c == livekit.SecureClass_SECURE_CLASS_NONE {
+		return false
+	}
+	for _, s := range v.CanReceiveSecure {
+		if secureClassToProto(s) == c {
+			return true
+		}
+	}
+	return false
+}
+
 func (v *VideoGrant) MatchesPermission(permission *livekit.ParticipantPermission) bool {
 	if permission == nil {
 		return false
@@ -431,6 +461,9 @@ func (v *VideoGrant) MatchesPermission(permission *livekit.ParticipantPermission
 	if v.GetCanManageAgentSession() != permission.CanManageAgentSession {
 		return false
 	}
+	if !slices.Equal(v.GetCanReceiveSecure(), normalizeSecureClasses(permission.CanReceiveSecure)) {
+		return false
+	}
 
 	return true
 }
@@ -450,6 +483,7 @@ func (v *VideoGrant) UpdateFromPermission(permission *livekit.ParticipantPermiss
 	// Agent is skipped, it comes only from a signed token
 	v.SetCanSubscribeMetrics(permission.CanSubscribeMetrics)
 	v.SetCanManageAgentSession(permission.CanManageAgentSession)
+	v.SetCanReceiveSecure(permission.CanReceiveSecure)
 }
 
 func (v *VideoGrant) ToPermission() *livekit.ParticipantPermission {
@@ -464,6 +498,7 @@ func (v *VideoGrant) ToPermission() *livekit.ParticipantPermission {
 		Agent:                 v.Agent,
 		CanSubscribeMetrics:   v.GetCanSubscribeMetrics(),
 		CanManageAgentSession: v.GetCanManageAgentSession(),
+		CanReceiveSecure:      v.GetCanReceiveSecure(),
 	}
 }
 
@@ -509,6 +544,8 @@ func (v *VideoGrant) Clone() *VideoGrant {
 		clone.CanManageAgentSession = &canManageAgentSession
 	}
 
+	clone.CanReceiveSecure = slices.Clone(v.CanReceiveSecure)
+
 	return &clone
 }
 
@@ -547,6 +584,7 @@ func (v *VideoGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 
 	logBoolPtr("CanSubscribeMetrics", v.CanSubscribeMetrics)
 	logBoolPtr("CanManageAgentSession", v.CanManageAgentSession)
+	e.AddArray("CanReceiveSecure", logger.StringSlice(v.CanReceiveSecure))
 	e.AddString("DestinationRoom", v.DestinationRoom)
 	return nil
 }
@@ -895,6 +933,32 @@ func sourceToProto(sourceStr string) livekit.TrackSource {
 		return livekit.TrackSource(val)
 	}
 	return livekit.TrackSource_UNKNOWN
+}
+
+const secureClassPrefix = "SECURE_CLASS_"
+
+func secureClassToString(c livekit.SecureClass) string {
+	return strings.ToLower(strings.TrimPrefix(c.String(), secureClassPrefix))
+}
+
+func secureClassToProto(s string) livekit.SecureClass {
+	for v, name := range livekit.SecureClass_name {
+		if strings.EqualFold(strings.TrimPrefix(name, secureClassPrefix), s) {
+			return livekit.SecureClass(v)
+		}
+	}
+	return livekit.SecureClass_SECURE_CLASS_NONE
+}
+
+func normalizeSecureClasses(classes []livekit.SecureClass) []livekit.SecureClass {
+	var out []livekit.SecureClass
+	for _, c := range classes {
+		if _, known := livekit.SecureClass_name[int32(c)]; known && c != livekit.SecureClass_SECURE_CLASS_NONE {
+			out = append(out, c)
+		}
+	}
+	slices.Sort(out)
+	return slices.Compact(out)
 }
 
 func kindFromProto(source livekit.ParticipantInfo_Kind) string {

@@ -21,6 +21,7 @@
 package livekit
 
 import (
+	_ "github.com/livekit/protocol/livekit/logger"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -84,22 +85,298 @@ func (ConnectorType) EnumDescriptor() ([]byte, []int) {
 	return file_livekit_connector_proto_rawDescGZIP(), []int{0}
 }
 
+type StartConnectorSecureInputRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Call:
+	//
+	//	*StartConnectorSecureInputRequest_WhatsappCallId
+	//	*StartConnectorSecureInputRequest_TwilioCallId
+	Call          isStartConnectorSecureInputRequest_Call `protobuf_oneof:"call"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StartConnectorSecureInputRequest) Reset() {
+	*x = StartConnectorSecureInputRequest{}
+	mi := &file_livekit_connector_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StartConnectorSecureInputRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StartConnectorSecureInputRequest) ProtoMessage() {}
+
+func (x *StartConnectorSecureInputRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_connector_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StartConnectorSecureInputRequest.ProtoReflect.Descriptor instead.
+func (*StartConnectorSecureInputRequest) Descriptor() ([]byte, []int) {
+	return file_livekit_connector_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *StartConnectorSecureInputRequest) GetCall() isStartConnectorSecureInputRequest_Call {
+	if x != nil {
+		return x.Call
+	}
+	return nil
+}
+
+func (x *StartConnectorSecureInputRequest) GetWhatsappCallId() string {
+	if x != nil {
+		if x, ok := x.Call.(*StartConnectorSecureInputRequest_WhatsappCallId); ok {
+			return x.WhatsappCallId
+		}
+	}
+	return ""
+}
+
+func (x *StartConnectorSecureInputRequest) GetTwilioCallId() string {
+	if x != nil {
+		if x, ok := x.Call.(*StartConnectorSecureInputRequest_TwilioCallId); ok {
+			return x.TwilioCallId
+		}
+	}
+	return ""
+}
+
+type isStartConnectorSecureInputRequest_Call interface {
+	isStartConnectorSecureInputRequest_Call()
+}
+
+type StartConnectorSecureInputRequest_WhatsappCallId struct {
+	// DialWhatsAppCallResponse.whatsapp_call_id, or the ID passed to AcceptWhatsAppCall.
+	WhatsappCallId string `protobuf:"bytes,1,opt,name=whatsapp_call_id,json=whatsappCallId,proto3,oneof"`
+}
+
+type StartConnectorSecureInputRequest_TwilioCallId struct {
+	// ConnectTwilioCallResponse.call_id, not Twilio's CallSid.
+	TwilioCallId string `protobuf:"bytes,2,opt,name=twilio_call_id,json=twilioCallId,proto3,oneof"`
+}
+
+func (*StartConnectorSecureInputRequest_WhatsappCallId) isStartConnectorSecureInputRequest_Call() {}
+
+func (*StartConnectorSecureInputRequest_TwilioCallId) isStartConnectorSecureInputRequest_Call() {}
+
+type StopConnectorSecureInputRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Call:
+	//
+	//	*StopConnectorSecureInputRequest_WhatsappCallId
+	//	*StopConnectorSecureInputRequest_TwilioCallId
+	Call          isStopConnectorSecureInputRequest_Call `protobuf_oneof:"call"`
+	SecureInputId string                                 `protobuf:"bytes,3,opt,name=secure_input_id,json=secureInputId,proto3" json:"secure_input_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StopConnectorSecureInputRequest) Reset() {
+	*x = StopConnectorSecureInputRequest{}
+	mi := &file_livekit_connector_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StopConnectorSecureInputRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StopConnectorSecureInputRequest) ProtoMessage() {}
+
+func (x *StopConnectorSecureInputRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_connector_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StopConnectorSecureInputRequest.ProtoReflect.Descriptor instead.
+func (*StopConnectorSecureInputRequest) Descriptor() ([]byte, []int) {
+	return file_livekit_connector_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *StopConnectorSecureInputRequest) GetCall() isStopConnectorSecureInputRequest_Call {
+	if x != nil {
+		return x.Call
+	}
+	return nil
+}
+
+func (x *StopConnectorSecureInputRequest) GetWhatsappCallId() string {
+	if x != nil {
+		if x, ok := x.Call.(*StopConnectorSecureInputRequest_WhatsappCallId); ok {
+			return x.WhatsappCallId
+		}
+	}
+	return ""
+}
+
+func (x *StopConnectorSecureInputRequest) GetTwilioCallId() string {
+	if x != nil {
+		if x, ok := x.Call.(*StopConnectorSecureInputRequest_TwilioCallId); ok {
+			return x.TwilioCallId
+		}
+	}
+	return ""
+}
+
+func (x *StopConnectorSecureInputRequest) GetSecureInputId() string {
+	if x != nil {
+		return x.SecureInputId
+	}
+	return ""
+}
+
+type isStopConnectorSecureInputRequest_Call interface {
+	isStopConnectorSecureInputRequest_Call()
+}
+
+type StopConnectorSecureInputRequest_WhatsappCallId struct {
+	// DialWhatsAppCallResponse.whatsapp_call_id, or the ID passed to AcceptWhatsAppCall.
+	WhatsappCallId string `protobuf:"bytes,1,opt,name=whatsapp_call_id,json=whatsappCallId,proto3,oneof"`
+}
+
+type StopConnectorSecureInputRequest_TwilioCallId struct {
+	// ConnectTwilioCallResponse.call_id, not Twilio's CallSid.
+	TwilioCallId string `protobuf:"bytes,2,opt,name=twilio_call_id,json=twilioCallId,proto3,oneof"`
+}
+
+func (*StopConnectorSecureInputRequest_WhatsappCallId) isStopConnectorSecureInputRequest_Call() {}
+
+func (*StopConnectorSecureInputRequest_TwilioCallId) isStopConnectorSecureInputRequest_Call() {}
+
+type ListConnectorSecureInputsRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Call:
+	//
+	//	*ListConnectorSecureInputsRequest_WhatsappCallId
+	//	*ListConnectorSecureInputsRequest_TwilioCallId
+	Call          isListConnectorSecureInputsRequest_Call `protobuf_oneof:"call"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListConnectorSecureInputsRequest) Reset() {
+	*x = ListConnectorSecureInputsRequest{}
+	mi := &file_livekit_connector_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListConnectorSecureInputsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListConnectorSecureInputsRequest) ProtoMessage() {}
+
+func (x *ListConnectorSecureInputsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_connector_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListConnectorSecureInputsRequest.ProtoReflect.Descriptor instead.
+func (*ListConnectorSecureInputsRequest) Descriptor() ([]byte, []int) {
+	return file_livekit_connector_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *ListConnectorSecureInputsRequest) GetCall() isListConnectorSecureInputsRequest_Call {
+	if x != nil {
+		return x.Call
+	}
+	return nil
+}
+
+func (x *ListConnectorSecureInputsRequest) GetWhatsappCallId() string {
+	if x != nil {
+		if x, ok := x.Call.(*ListConnectorSecureInputsRequest_WhatsappCallId); ok {
+			return x.WhatsappCallId
+		}
+	}
+	return ""
+}
+
+func (x *ListConnectorSecureInputsRequest) GetTwilioCallId() string {
+	if x != nil {
+		if x, ok := x.Call.(*ListConnectorSecureInputsRequest_TwilioCallId); ok {
+			return x.TwilioCallId
+		}
+	}
+	return ""
+}
+
+type isListConnectorSecureInputsRequest_Call interface {
+	isListConnectorSecureInputsRequest_Call()
+}
+
+type ListConnectorSecureInputsRequest_WhatsappCallId struct {
+	// DialWhatsAppCallResponse.whatsapp_call_id, or the ID passed to AcceptWhatsAppCall.
+	WhatsappCallId string `protobuf:"bytes,1,opt,name=whatsapp_call_id,json=whatsappCallId,proto3,oneof"`
+}
+
+type ListConnectorSecureInputsRequest_TwilioCallId struct {
+	// ConnectTwilioCallResponse.call_id, not Twilio's CallSid.
+	TwilioCallId string `protobuf:"bytes,2,opt,name=twilio_call_id,json=twilioCallId,proto3,oneof"`
+}
+
+func (*ListConnectorSecureInputsRequest_WhatsappCallId) isListConnectorSecureInputsRequest_Call() {}
+
+func (*ListConnectorSecureInputsRequest_TwilioCallId) isListConnectorSecureInputsRequest_Call() {}
+
 var File_livekit_connector_proto protoreflect.FileDescriptor
 
 const file_livekit_connector_proto_rawDesc = "" +
 	"\n" +
-	"\x17livekit_connector.proto\x12\alivekit\x1a livekit_connector_whatsapp.proto\x1a\x1elivekit_connector_twilio.proto*:\n" +
+	"\x17livekit_connector.proto\x12\alivekit\x1a livekit_connector_whatsapp.proto\x1a\x1elivekit_connector_twilio.proto\x1a\x14livekit_models.proto\x1a\x14logger/options.proto\"\xa2\x01\n" +
+	" StartConnectorSecureInputRequest\x12=\n" +
+	"\x10whatsapp_call_id\x18\x01 \x01(\tB\x11\xbaP\x0ewhatsappCallIDH\x00R\x0ewhatsappCallId\x127\n" +
+	"\x0etwilio_call_id\x18\x02 \x01(\tB\x0f\xbaP\ftwilioCallIDH\x00R\ftwilioCallIdB\x06\n" +
+	"\x04call\"\xdb\x01\n" +
+	"\x1fStopConnectorSecureInputRequest\x12=\n" +
+	"\x10whatsapp_call_id\x18\x01 \x01(\tB\x11\xbaP\x0ewhatsappCallIDH\x00R\x0ewhatsappCallId\x127\n" +
+	"\x0etwilio_call_id\x18\x02 \x01(\tB\x0f\xbaP\ftwilioCallIDH\x00R\ftwilioCallId\x128\n" +
+	"\x0fsecure_input_id\x18\x03 \x01(\tB\x10\xbaP\rsecureInputIDR\rsecureInputIdB\x06\n" +
+	"\x04call\"\xa2\x01\n" +
+	" ListConnectorSecureInputsRequest\x12=\n" +
+	"\x10whatsapp_call_id\x18\x01 \x01(\tB\x11\xbaP\x0ewhatsappCallIDH\x00R\x0ewhatsappCallId\x127\n" +
+	"\x0etwilio_call_id\x18\x02 \x01(\tB\x0f\xbaP\ftwilioCallIDH\x00R\ftwilioCallIdB\x06\n" +
+	"\x04call*:\n" +
 	"\rConnectorType\x12\x0f\n" +
 	"\vUnspecified\x10\x00\x12\f\n" +
 	"\bWhatsApp\x10\x01\x12\n" +
 	"\n" +
-	"\x06Twilio\x10\x022\xec\x03\n" +
+	"\x06Twilio\x10\x022\xa1\x06\n" +
 	"\tConnector\x12W\n" +
 	"\x10DialWhatsAppCall\x12 .livekit.DialWhatsAppCallRequest\x1a!.livekit.DialWhatsAppCallResponse\x12i\n" +
 	"\x16DisconnectWhatsAppCall\x12&.livekit.DisconnectWhatsAppCallRequest\x1a'.livekit.DisconnectWhatsAppCallResponse\x12`\n" +
 	"\x13ConnectWhatsAppCall\x12#.livekit.ConnectWhatsAppCallRequest\x1a$.livekit.ConnectWhatsAppCallResponse\x12]\n" +
 	"\x12AcceptWhatsAppCall\x12\".livekit.AcceptWhatsAppCallRequest\x1a#.livekit.AcceptWhatsAppCallResponse\x12Z\n" +
-	"\x11ConnectTwilioCall\x12!.livekit.ConnectTwilioCallRequest\x1a\".livekit.ConnectTwilioCallResponseBFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
+	"\x11ConnectTwilioCall\x12!.livekit.ConnectTwilioCallRequest\x1a\".livekit.ConnectTwilioCallResponse\x12`\n" +
+	"\x19StartConnectorSecureInput\x12).livekit.StartConnectorSecureInputRequest\x1a\x18.livekit.SecureInputInfo\x12f\n" +
+	"\x18StopConnectorSecureInput\x12(.livekit.StopConnectorSecureInputRequest\x1a .livekit.StopSecureInputResponse\x12i\n" +
+	"\x19ListConnectorSecureInputs\x12).livekit.ListConnectorSecureInputsRequest\x1a!.livekit.ListSecureInputsResponseBFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
 
 var (
 	file_livekit_connector_proto_rawDescOnce sync.Once
@@ -114,32 +391,45 @@ func file_livekit_connector_proto_rawDescGZIP() []byte {
 }
 
 var file_livekit_connector_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_livekit_connector_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_livekit_connector_proto_goTypes = []any{
-	(ConnectorType)(0),                     // 0: livekit.ConnectorType
-	(*DialWhatsAppCallRequest)(nil),        // 1: livekit.DialWhatsAppCallRequest
-	(*DisconnectWhatsAppCallRequest)(nil),  // 2: livekit.DisconnectWhatsAppCallRequest
-	(*ConnectWhatsAppCallRequest)(nil),     // 3: livekit.ConnectWhatsAppCallRequest
-	(*AcceptWhatsAppCallRequest)(nil),      // 4: livekit.AcceptWhatsAppCallRequest
-	(*ConnectTwilioCallRequest)(nil),       // 5: livekit.ConnectTwilioCallRequest
-	(*DialWhatsAppCallResponse)(nil),       // 6: livekit.DialWhatsAppCallResponse
-	(*DisconnectWhatsAppCallResponse)(nil), // 7: livekit.DisconnectWhatsAppCallResponse
-	(*ConnectWhatsAppCallResponse)(nil),    // 8: livekit.ConnectWhatsAppCallResponse
-	(*AcceptWhatsAppCallResponse)(nil),     // 9: livekit.AcceptWhatsAppCallResponse
-	(*ConnectTwilioCallResponse)(nil),      // 10: livekit.ConnectTwilioCallResponse
+	(ConnectorType)(0),                       // 0: livekit.ConnectorType
+	(*StartConnectorSecureInputRequest)(nil), // 1: livekit.StartConnectorSecureInputRequest
+	(*StopConnectorSecureInputRequest)(nil),  // 2: livekit.StopConnectorSecureInputRequest
+	(*ListConnectorSecureInputsRequest)(nil), // 3: livekit.ListConnectorSecureInputsRequest
+	(*DialWhatsAppCallRequest)(nil),          // 4: livekit.DialWhatsAppCallRequest
+	(*DisconnectWhatsAppCallRequest)(nil),    // 5: livekit.DisconnectWhatsAppCallRequest
+	(*ConnectWhatsAppCallRequest)(nil),       // 6: livekit.ConnectWhatsAppCallRequest
+	(*AcceptWhatsAppCallRequest)(nil),        // 7: livekit.AcceptWhatsAppCallRequest
+	(*ConnectTwilioCallRequest)(nil),         // 8: livekit.ConnectTwilioCallRequest
+	(*DialWhatsAppCallResponse)(nil),         // 9: livekit.DialWhatsAppCallResponse
+	(*DisconnectWhatsAppCallResponse)(nil),   // 10: livekit.DisconnectWhatsAppCallResponse
+	(*ConnectWhatsAppCallResponse)(nil),      // 11: livekit.ConnectWhatsAppCallResponse
+	(*AcceptWhatsAppCallResponse)(nil),       // 12: livekit.AcceptWhatsAppCallResponse
+	(*ConnectTwilioCallResponse)(nil),        // 13: livekit.ConnectTwilioCallResponse
+	(*SecureInputInfo)(nil),                  // 14: livekit.SecureInputInfo
+	(*StopSecureInputResponse)(nil),          // 15: livekit.StopSecureInputResponse
+	(*ListSecureInputsResponse)(nil),         // 16: livekit.ListSecureInputsResponse
 }
 var file_livekit_connector_proto_depIdxs = []int32{
-	1,  // 0: livekit.Connector.DialWhatsAppCall:input_type -> livekit.DialWhatsAppCallRequest
-	2,  // 1: livekit.Connector.DisconnectWhatsAppCall:input_type -> livekit.DisconnectWhatsAppCallRequest
-	3,  // 2: livekit.Connector.ConnectWhatsAppCall:input_type -> livekit.ConnectWhatsAppCallRequest
-	4,  // 3: livekit.Connector.AcceptWhatsAppCall:input_type -> livekit.AcceptWhatsAppCallRequest
-	5,  // 4: livekit.Connector.ConnectTwilioCall:input_type -> livekit.ConnectTwilioCallRequest
-	6,  // 5: livekit.Connector.DialWhatsAppCall:output_type -> livekit.DialWhatsAppCallResponse
-	7,  // 6: livekit.Connector.DisconnectWhatsAppCall:output_type -> livekit.DisconnectWhatsAppCallResponse
-	8,  // 7: livekit.Connector.ConnectWhatsAppCall:output_type -> livekit.ConnectWhatsAppCallResponse
-	9,  // 8: livekit.Connector.AcceptWhatsAppCall:output_type -> livekit.AcceptWhatsAppCallResponse
-	10, // 9: livekit.Connector.ConnectTwilioCall:output_type -> livekit.ConnectTwilioCallResponse
-	5,  // [5:10] is the sub-list for method output_type
-	0,  // [0:5] is the sub-list for method input_type
+	4,  // 0: livekit.Connector.DialWhatsAppCall:input_type -> livekit.DialWhatsAppCallRequest
+	5,  // 1: livekit.Connector.DisconnectWhatsAppCall:input_type -> livekit.DisconnectWhatsAppCallRequest
+	6,  // 2: livekit.Connector.ConnectWhatsAppCall:input_type -> livekit.ConnectWhatsAppCallRequest
+	7,  // 3: livekit.Connector.AcceptWhatsAppCall:input_type -> livekit.AcceptWhatsAppCallRequest
+	8,  // 4: livekit.Connector.ConnectTwilioCall:input_type -> livekit.ConnectTwilioCallRequest
+	1,  // 5: livekit.Connector.StartConnectorSecureInput:input_type -> livekit.StartConnectorSecureInputRequest
+	2,  // 6: livekit.Connector.StopConnectorSecureInput:input_type -> livekit.StopConnectorSecureInputRequest
+	3,  // 7: livekit.Connector.ListConnectorSecureInputs:input_type -> livekit.ListConnectorSecureInputsRequest
+	9,  // 8: livekit.Connector.DialWhatsAppCall:output_type -> livekit.DialWhatsAppCallResponse
+	10, // 9: livekit.Connector.DisconnectWhatsAppCall:output_type -> livekit.DisconnectWhatsAppCallResponse
+	11, // 10: livekit.Connector.ConnectWhatsAppCall:output_type -> livekit.ConnectWhatsAppCallResponse
+	12, // 11: livekit.Connector.AcceptWhatsAppCall:output_type -> livekit.AcceptWhatsAppCallResponse
+	13, // 12: livekit.Connector.ConnectTwilioCall:output_type -> livekit.ConnectTwilioCallResponse
+	14, // 13: livekit.Connector.StartConnectorSecureInput:output_type -> livekit.SecureInputInfo
+	15, // 14: livekit.Connector.StopConnectorSecureInput:output_type -> livekit.StopSecureInputResponse
+	16, // 15: livekit.Connector.ListConnectorSecureInputs:output_type -> livekit.ListSecureInputsResponse
+	8,  // [8:16] is the sub-list for method output_type
+	0,  // [0:8] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name
@@ -152,19 +442,33 @@ func file_livekit_connector_proto_init() {
 	}
 	file_livekit_connector_whatsapp_proto_init()
 	file_livekit_connector_twilio_proto_init()
+	file_livekit_models_proto_init()
+	file_livekit_connector_proto_msgTypes[0].OneofWrappers = []any{
+		(*StartConnectorSecureInputRequest_WhatsappCallId)(nil),
+		(*StartConnectorSecureInputRequest_TwilioCallId)(nil),
+	}
+	file_livekit_connector_proto_msgTypes[1].OneofWrappers = []any{
+		(*StopConnectorSecureInputRequest_WhatsappCallId)(nil),
+		(*StopConnectorSecureInputRequest_TwilioCallId)(nil),
+	}
+	file_livekit_connector_proto_msgTypes[2].OneofWrappers = []any{
+		(*ListConnectorSecureInputsRequest_WhatsappCallId)(nil),
+		(*ListConnectorSecureInputsRequest_TwilioCallId)(nil),
+	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_connector_proto_rawDesc), len(file_livekit_connector_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   0,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_livekit_connector_proto_goTypes,
 		DependencyIndexes: file_livekit_connector_proto_depIdxs,
 		EnumInfos:         file_livekit_connector_proto_enumTypes,
+		MessageInfos:      file_livekit_connector_proto_msgTypes,
 	}.Build()
 	File_livekit_connector_proto = out.File
 	file_livekit_connector_proto_goTypes = nil
