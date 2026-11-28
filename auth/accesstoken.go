@@ -137,6 +137,11 @@ func (t *AccessToken) SetAgentDatabaseGrant(grant *AgentDatabaseGrant) *AccessTo
 	return t
 }
 
+func (t *AccessToken) SetAgentDatabaseExportGrant(grant *AgentDatabaseExportGrant) *AccessToken {
+	t.grant.AgentDatabaseExport = grant
+	return t
+}
+
 func (t *AccessToken) SetMetadata(md string) *AccessToken {
 	t.grant.Metadata = md
 	return t
