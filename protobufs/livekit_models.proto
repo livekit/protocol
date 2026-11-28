@@ -136,7 +136,7 @@ message ParticipantInfo {
   enum State {
     // websocket' connected, but not offered yet
     JOINING = 0;
-    // server received client offer
+    // server sent the join response
     JOINED = 1;
     // ICE connectivity established
     ACTIVE = 2;
