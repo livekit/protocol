@@ -320,10 +320,12 @@ func (x *AgentDB_GetRequest) GetDatabaseId() string {
 	return ""
 }
 
+// The project's databases in an unspecified order, stable across pages. A
+// page may be short or empty while next_page_token is set.
 type AgentDB_ListRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	PageSize      int32                  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"` // server-clamped
-	PageToken     string                 `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	PageSize      int32                  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`   // unset is 50; larger is clamped to 100
+	PageToken     string                 `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"` // the previous response's next_page_token
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -373,9 +375,11 @@ func (x *AgentDB_ListRequest) GetPageToken() string {
 }
 
 type AgentDB_ListResponse struct {
-	state         protoimpl.MessageState   `protogen:"open.v1"`
-	Databases     []*AgentDB_AgentDatabase `protobuf:"bytes,1,rep,name=databases,proto3" json:"databases,omitempty"`
-	NextPageToken string                   `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"` // empty when exhausted
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// tip and expires_at are unset: GetRequest answers them.
+	Databases []*AgentDB_AgentDatabase `protobuf:"bytes,1,rep,name=databases,proto3" json:"databases,omitempty"`
+	// Pass it back as page_token to get the next page; empty means the end.
+	NextPageToken string `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

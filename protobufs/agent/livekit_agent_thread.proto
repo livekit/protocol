@@ -50,17 +50,23 @@ message AgentThread {
     string thread_id = 1 [(logger.name) = "threadID"];
   }
 
-  // The threads of one scope, newest first.
+  // Threads in an unspecified order, stable across pages. A page may be short
+  // or empty while next_page_token is set.
   message ListRequest {
+    // Empty lists every thread of the project under a project-wide grant, and
+    // the grant's own scope under a scoped one.
     string scope = 1 [(logger.sensitivity) = SENSITIVITY_PII];
-    // next_page_token of the previous ListResponse; empty for the first page.
+    // next_page_token of the previous ListResponse, to get the next page;
+    // empty for the first page. A token from another scope is refused.
     string page_token = 2;
+    // Unset is 50; larger is clamped to 100.
     int32 limit = 3;
   }
 
   message ListResponse {
+    // last_active and expires_at are unset: GetRequest answers them.
     repeated Thread threads = 1;
-    // Empty when exhausted.
+    // Pass it back as page_token to get the next page; empty means the end.
     string next_page_token = 2;
   }
 
